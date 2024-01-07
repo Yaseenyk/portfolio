@@ -1,0 +1,28 @@
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  
+}
+
+section {
+  height: 100vh;
+  color: white;
+  scroll-snap-align: center;
+}
+
+body{
+  font-family: "Open Sans", sans-serif;
+  background: #090e16;
+  color: white;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
