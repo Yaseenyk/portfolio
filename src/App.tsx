@@ -1,4 +1,5 @@
 import './App.scss'
+import Contacts from './components/Contacts/Contacts'
 import Domain from './components/Domain/Domain'
 import Hero from './components/Hero/Hero'
 import Navbar from './components/Navbar/Navbar'
@@ -11,7 +12,7 @@ function App() {
     <section id='Homepage'><Navbar/><Hero/></section>
       <section id='Services'><Domain/></section>
       <Portfolio/>
-      <section id='Contact'>Contact</section>
+      <section id='Contact'><Contacts/></section>
     </>
   )
 }
