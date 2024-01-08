@@ -12,7 +12,7 @@ function App() {
     <section id='Homepage'><Navbar/><Hero/></section>
       <section id='Services'><Domain/></section>
       <Portfolio/>
-      <section id='Contact'><Contacts/></section>
+      <section id='Contact' className='Contacts'><Contacts/></section>
     </>
   )
 }
