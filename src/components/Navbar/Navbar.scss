@@ -1,0 +1,41 @@
+@import '../../App.scss';
+
+.navbar {
+  // border: 1px solid red;
+  height: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+
+  .wrapper {
+    border-radius: 16px;
+    background: rgba(123, 74, 226, 0.05);
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 50px;
+    align-items: center;
+    height: 6vh;
+    width: 100%;
+    max-width: 1366px;
+    position: fixed;
+    @include mobile{
+      width: 90%;
+      padding: 0px 20px;
+    }
+  }
+  .Socials{
+    display: flex;
+    gap: 20px;
+    img{
+      @include mobile{
+        height: 3vh;
+      }
+    }
+    
+  }
+  img{
+    cursor: pointer;
+  }
+}

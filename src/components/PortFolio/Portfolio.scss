@@ -1,0 +1,81 @@
+// Your SCSS code
+
+.portfolio {
+  font-family: "Open Sans", sans-serif;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  .modifiedSection {
+    height: 100vh !important;
+    width: 90vw !important;
+    color: white !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    scroll-snap-align: center;
+    .wrapper {
+      border: 1px solid;
+      width: 50vw;
+      height: 50vh;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 20px;
+      .leftcontainer {
+        display: flex;
+        justify-content: center;
+        width: 50%;
+        height: 100%;
+        align-items: center;
+        border: 1px solid white;
+        border-radius: 16px;
+      }
+      .rightContainer {
+        height: 100%;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      }
+      .buttonWrapper {
+        // border: 1px solid;
+        width: 80%;
+        height: 15%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        button {
+          color: rgba(123, 74, 226, 1);
+          font-size: 1vw;
+          border-radius: 8px;
+          font-family: "Open Sans", sans-serif;
+          font-weight: 600;
+          background-color: rgba(123, 74, 226, 0.1);
+          line-height: normal;
+          width: 40%;
+          height: 70%;
+          border: none;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  .progress {
+    position: sticky;
+    top: 120px;
+    height: 100px;
+    text-align: center;
+    font-size: 30px;
+    width: 80vw;
+    .progressBar {
+      height: 6px;
+      background-color: white;
+      border-radius: 16px;
+    }
+  }
+}
