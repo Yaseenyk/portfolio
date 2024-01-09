@@ -1,5 +1,5 @@
 // Your SCSS code
-
+@import '../../App.scss';
 .portfolio {
   font-family: "Open Sans", sans-serif;
   position: relative;
@@ -7,6 +7,9 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  @include mobile{
+    // border: 1px solid;
+  }
   .modifiedSection {
     height: 100vh !important;
     width: 90vw !important;
@@ -15,14 +18,25 @@
     justify-content: center !important;
     align-items: center !important;
     scroll-snap-align: center;
+    @include mobile{
+      // border: 1px solid;
+    }
     .wrapper {
-      border: 1px solid;
+      // border: 1px solid;
       width: 50vw;
       height: 50vh;
       display: flex;
       justify-content: flex-start;
       align-items: center;
       gap: 20px;
+      @include mobile{
+        margin-top: 20px;
+        width: 90%;
+        flex-direction: column;
+        gap: 10px;
+        height: 50%;
+        border: 1px solid;
+      }
       .leftcontainer {
         display: flex;
         justify-content: center;
@@ -31,6 +45,10 @@
         align-items: center;
         border: 1px solid white;
         border-radius: 16px;
+        @include mobile{
+          // border: 1px solid;
+          width: 100%;
+        }
       }
       .rightContainer {
         height: 100%;
@@ -40,6 +58,10 @@
         justify-content: center;
         align-items: center;
         gap: 20px;
+        @include mobile{
+          width: 100%;
+          border: 1px solid;
+        }
       }
       .buttonWrapper {
         // border: 1px solid;
