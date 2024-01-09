@@ -18,7 +18,9 @@
     justify-content: center !important;
     align-items: center !important;
     scroll-snap-align: center;
+    z-index: -1;
     @include mobile{
+      z-index: -1;
       // border: 1px solid;
     }
     .wrapper {
@@ -30,12 +32,12 @@
       align-items: center;
       gap: 20px;
       @include mobile{
-        margin-top: 20px;
+        margin-top: 15vh;
         width: 90%;
         flex-direction: column;
         gap: 10px;
         height: 50%;
-        border: 1px solid;
+        // border: 1px solid;
       }
       .leftcontainer {
         display: flex;
@@ -60,7 +62,8 @@
         gap: 20px;
         @include mobile{
           width: 100%;
-          border: 1px solid;
+          // border: 1px solid;
+          text-align: left;
         }
       }
       .buttonWrapper {
@@ -71,6 +74,12 @@
         justify-content: center;
         align-items: center;
         gap: 20px;
+        @include mobile{
+          width: 100%;
+          height: 20%;
+          // border: 1px solid;
+          // text-align: left;
+        }
         button {
           color: rgba(123, 74, 226, 1);
           font-size: 1vw;
@@ -83,6 +92,12 @@
           height: 70%;
           border: none;
           cursor: pointer;
+          @include mobile{
+            width: 30%;
+            font-size: 1.5vh;
+            // border: 1px solid;
+            // text-align: left;
+          }
         }
       }
     }
@@ -94,10 +109,22 @@
     text-align: center;
     font-size: 30px;
     width: 80vw;
+    
+    h1{
+      @include mobile{
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 400;
+        font-size: 4vh;
+        margin-bottom: 10px;
+      }
+    }
     .progressBar {
       height: 6px;
       background-color: white;
       border-radius: 16px;
+      @include mobile{
+        height: 3px;
+      }
     }
   }
 }
