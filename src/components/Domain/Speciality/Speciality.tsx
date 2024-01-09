@@ -66,12 +66,15 @@ const Speciality = () => {
         {items.map((item) => (
           <motion.div key={item.id} className="boxes" whileHover={{scale:1.1}}>
             {item.img && <motion.img src={item.img} alt={item.name} />}
+            <div className="textWrapper">
             <motion.h3>{item.name}</motion.h3>
             <motion.p>{item.years}</motion.p>
+            </div>
           </motion.div>
         ))}
       </motion.div>
       <motion.div className="fullStack" variants={SilderVariant} initial="initial" animate="animate">
+        {/* <div className="textWrapper"></div> */}
         <div className="frontend">Frontend</div>
         <div className="backend">Backend</div>
         <div className="designer">UI &#x387; UX</div>
