@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import ReactImg from "../../../assets/React.svg";
+// import ReactImg from "../../../assets/React.svg";
 import Javascript from "../../../assets/Javascript.svg";
 import TypeScript from "../../../assets/TypeScript.svg";
 import GitHub from "../../../assets/Github (1).svg";
@@ -27,7 +27,7 @@ const WorkBench = () => {
       <motion.div className="Technologies" variants={imgVariants} initial="initial" animate="animate">Technologies Worked In</motion.div>
       <motion.div className="major" variants={imgVariants} initial="initial" animate="animate">Daily Life Work Libraries/Framework</motion.div>
       <motion.div className="imgWrapper" variants={imgVariants} initial="initial" animate="animate">
-      <motion.img src={ReactImg} whileHover={{scale:1.1}}/>
+      {/* <motion.img src={ReactImg} whileHover={{scale:1.1}}/> */}
       <motion.img src={Javascript} whileHover={{scale:1.1}}/>
       <motion.img src={TypeScript} whileHover={{scale:1.1}}/>
       <motion.img src={HTML} whileHover={{scale:1.1}}/>
@@ -37,7 +37,7 @@ const WorkBench = () => {
     </motion.div>
       <motion.div className="major" variants={imgVariants} initial="initial" animate="animate">Have Knowledge About Libraries/Framework</motion.div>
       <motion.div className="imgWrapper" variants={imgVariants} initial="initial" animate="animate">
-      <motion.img src={ReactImg} whileHover={{scale:1.1}}/>
+      {/* <motion.img src={ReactImg} whileHover={{scale:1.1}}/> */}
       <motion.img src={Javascript} whileHover={{scale:1.1}}/>
       <motion.img src={TypeScript} whileHover={{scale:1.1}}/>
       <motion.img src={HTML} whileHover={{scale:1.1}}/>
