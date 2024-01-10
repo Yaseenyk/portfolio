@@ -21,6 +21,7 @@
     max-width: 1366px;
     position: fixed;
     @include mobile{
+      justify-content: flex-end;
       width: 90%;
       padding: 0px 20px;
     }

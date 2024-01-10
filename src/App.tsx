@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, memo } from 'react';
+import { lazy, Suspense, memo } from 'react';
 import './App.scss';
 
 const LazyNavbar = lazy(() => import('./components/Navbar/Navbar'));
