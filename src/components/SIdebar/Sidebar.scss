@@ -1,4 +1,4 @@
-@import '../../App.scss';
+@import "../../App.scss";
 
 .sidebar {
   display: flex;
@@ -21,23 +21,23 @@
     justify-content: center;
     align-items: center;
     z-index: 10000;
-    @include mobile{
-    width: 90%;
-    left: 5vw;
+    @include mobile {
+      width: 90%;
+      left: 5vw;
     }
     .links {
-        position: absolute;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 30px;
-        font-size: 36px;
-        cursor: pointer;
-        font-weight: 400;
-      }
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      font-size: 36px;
+      cursor: pointer;
+      font-weight: 400;
+    }
   }
-  
+
   button {
     width: 40px;
     height: 40px;
@@ -51,19 +51,17 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    @include mobile{
+    @include mobile {
       width: 20px;
-    height: 20px;
-    top: 35px;
-    left: 34px;
+      height: 20px;
+      top: 35px;
+      left: 34px;
     }
-    svg{
-      @include mobile{
+    svg {
+      @include mobile {
         width: 10px;
-      height: 10px;
+        height: 10px;
       }
     }
-    
-}
-  
+  }
 }
