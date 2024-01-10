@@ -11,7 +11,7 @@ interface Item {
 const items: Item[] = [
   {
     id: 1,
-    name: "React",
+    name: "Yaseen's Portfolio",
     img: "dummy",
     desc: "Lorem",
   },
