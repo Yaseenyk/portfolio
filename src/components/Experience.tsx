@@ -48,11 +48,11 @@ const node: Variants = {
 
 export default function Experience() {
   return (
-    <div id="experience" className="scroll-mt-24">
+    <section id="experience" aria-label="Professional experience" className="scroll-mt-24">
       <div className="flex items-center gap-3">
-        <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
+        <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
           ~/experience
-        </span>
+        </h2>
         <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
       </div>
 
@@ -102,6 +102,6 @@ export default function Experience() {
           ))}
         </motion.div>
       </div>
-    </div>
+    </section>
   );
 }

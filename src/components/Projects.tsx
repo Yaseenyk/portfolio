@@ -183,11 +183,11 @@ function ProjectRow({ project }: { project: Project }) {
 
 export default function Projects() {
   return (
-    <div id="projects" className="scroll-mt-24">
+    <section id="projects" aria-label="Selected projects" className="scroll-mt-24">
       <div className="flex items-center gap-3">
-        <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
+        <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
           ~/projects
-        </span>
+        </h2>
         <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
       </div>
 
@@ -196,6 +196,6 @@ export default function Projects() {
           <ProjectRow key={project.name} project={project} />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

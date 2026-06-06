@@ -2,11 +2,21 @@ import type { Metadata } from "next";
 import { getAllPosts, formatDate } from "@/lib/blog";
 import BlogIndex, { type IndexPost } from "@/components/blog/BlogIndex";
 
+import { SITE_URL } from "@/lib/site";
+
 export const metadata: Metadata = {
-  title: "Blog — Yaseen Khatib",
+  title: "Field Notes",
   description:
     "Field notes on architecting MERN stacks, agentic AI workflows, and shipping production systems at AI-speed.",
-  alternates: { canonical: "/blog" },
+  alternates: { canonical: `${SITE_URL}/blog` },
+  openGraph: {
+    type: "website",
+    title: "Field Notes | Yaseen Khatib",
+    description:
+      "Field notes on architecting MERN stacks, agentic AI workflows, and shipping production systems at AI-speed.",
+    url: `${SITE_URL}/blog`,
+    siteName: "Yaseen Khatib",
+  },
 };
 
 export default function BlogIndexPage() {

@@ -45,10 +45,11 @@ export default function Hero() {
           variants={item}
           className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400"
         >
-          Bridging the gap between high-performance MERN architectures and
-          autonomous AI systems. Specializing in Agentic RAG pipelines, LLM
-          orchestrations, and reducing payload latency for intelligent, scalable
-          applications.
+          Yaseen Khatib is a Senior MERN Stack &amp; AI Systems Engineer who
+          bridges high-performance MERN architectures with autonomous AI systems.
+          He specializes in Agentic RAG pipelines, LLM orchestration, and
+          high-throughput backend scaling — architecting and shipping production
+          systems at AI-speed.
         </motion.p>
 
         <motion.div

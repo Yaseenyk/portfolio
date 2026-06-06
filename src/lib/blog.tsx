@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { SITE_URL } from "@/lib/site";
 import { architectingMernAtAiSpeed } from "@/content/posts/architecting-mern-at-ai-speed";
 import { tenXReality } from "@/content/posts/the-10x-reality";
 import { agenticRagPipelines } from "@/content/posts/agentic-rag-pipelines-nodejs";
@@ -21,9 +22,7 @@ import { tokenEconomics } from "@/content/posts/token-economics-cost-optimizing-
 import { functionCallingToolUse } from "@/content/posts/function-calling-tool-use-patterns";
 import { evaluatingLlmOutputs } from "@/content/posts/evaluating-llm-outputs";
 
-/** Public base URL — used for canonical links, OpenGraph, and JSON-LD. */
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.dev";
+export { SITE_URL };
 
 export interface Author {
   name: string;

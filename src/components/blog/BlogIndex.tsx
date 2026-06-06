@@ -146,7 +146,7 @@ export default function BlogIndex({ posts }: { posts: IndexPost[] }) {
       <div className="sticky top-24 z-30 mt-8 rounded-2xl border border-zinc-800/50 bg-zinc-950/60 p-4 backdrop-blur-md shadow-2xl shadow-cyan-900/20">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {/* Search */}
-          <div className="relative flex-1">
+          <div role="search" className="relative flex-1">
             <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
             <input
               type="text"
@@ -164,6 +164,7 @@ export default function BlogIndex({ posts }: { posts: IndexPost[] }) {
               <button
                 key={o}
                 type="button"
+                aria-pressed={sortOrder === o}
                 onClick={() => setSortOrder(o)}
                 className={`rounded-md px-3 py-1.5 capitalize transition-colors duration-200 ${
                   sortOrder === o
@@ -183,6 +184,7 @@ export default function BlogIndex({ posts }: { posts: IndexPost[] }) {
             <button
               key={cat}
               type="button"
+              aria-pressed={activeCategory === cat}
               onClick={() => setActiveCategory(cat)}
               className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors duration-200 ${
                 activeCategory === cat
