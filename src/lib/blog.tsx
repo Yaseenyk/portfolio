@@ -4,6 +4,12 @@ import { tenXReality } from "@/content/posts/the-10x-reality";
 import { agenticRagPipelines } from "@/content/posts/agentic-rag-pipelines-nodejs";
 import { payloadReductionReactFlow } from "@/content/posts/94-percent-payload-reduction-react-flow";
 import { promptingForArchitecture } from "@/content/posts/prompting-for-architecture-claude";
+import { cachingTheAi } from "@/content/posts/caching-the-ai-redis-mongodb";
+import { typeSafeLlms } from "@/content/posts/type-safe-llms-typescript-express";
+import { realTimeTelemetry } from "@/content/posts/real-time-telemetry-websockets-react";
+import { deathOfTheBackendRouter } from "@/content/posts/death-of-the-traditional-backend-router";
+import { fromWireframeToWeb } from "@/content/posts/from-wireframe-to-web-ai-speed";
+import { stateManagementAiEra } from "@/content/posts/state-management-ai-era-zustand-vs-redux";
 
 /** Public base URL — used for canonical links, OpenGraph, and JSON-LD. */
 export const SITE_URL =
@@ -43,6 +49,12 @@ const POSTS: BlogPost[] = [
   agenticRagPipelines,
   payloadReductionReactFlow,
   promptingForArchitecture,
+  cachingTheAi,
+  typeSafeLlms,
+  realTimeTelemetry,
+  deathOfTheBackendRouter,
+  fromWireframeToWeb,
+  stateManagementAiEra,
   architectingMernAtAiSpeed,
 ];
 
