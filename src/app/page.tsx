@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Hero from "@/components/Hero";
 import ArchitecturePipeline from "@/components/ArchitecturePipeline";
 import Dashboard from "@/components/Dashboard";
@@ -61,14 +62,22 @@ export default function Home() {
             © {new Date().getFullYear()} Yaseen Khatib — Architected with Next.js
             &amp; Framer Motion, delivered at AI-speed.
           </p>
-          <a
-            href="https://github.com/Yaseenyk/portfolio"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-colors duration-200 hover:text-cyan"
-          >
-            View source ↗
-          </a>
+          <div className="flex items-center gap-5">
+            <Link
+              href="/interview"
+              className="text-zinc-600 transition-colors duration-200 hover:text-cyan"
+            >
+              Interview Context
+            </Link>
+            <a
+              href="https://github.com/Yaseenyk/portfolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors duration-200 hover:text-cyan"
+            >
+              View source ↗
+            </a>
+          </div>
         </footer>
       </div>
     </>

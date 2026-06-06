@@ -6,7 +6,8 @@ interface Role {
   period: string;
   role: string;
   company: string;
-  note: string;
+  note?: string;
+  bullets?: string[];
   tags: string[];
 }
 
@@ -22,14 +23,20 @@ const ROLES: Role[] = [
     period: "Jan 2023 — May 2025",
     role: "Full Stack Web Developer",
     company: "MSA Software",
-    note: "Drove a 1.5× dashboard response improvement via useMemo optimization and led the codebase's TypeScript migration — building the performant, type-safe MERN foundations that now host AI-driven features.",
+    bullets: [
+      "Architected and scaled high-throughput Node.js APIs and React frontends, reducing legacy system latency by optimizing MongoDB aggregation pipelines.",
+      "Transitioned cross-functional teams to modern Next.js and TypeScript standards, eliminating type-related production bugs.",
+    ],
     tags: ["React", "TypeScript", "Node", "MongoDB"],
   },
   {
     period: "Sep 2021 — Jan 2023",
     role: "Software Developer (SDE 1)",
     company: "Manorama Infosolutions Pvt Ltd",
-    note: "Delivered a 2× data-transfer speed boost via ASP.NET REST APIs and led the frontend migration to ReactJS — establishing the scalable API and component architectures that underpin systems built to grow.",
+    bullets: [
+      "Engineered robust backend API services and frontend interfaces, establishing core data flow patterns that accelerated feature delivery.",
+      "Optimized system architecture for concurrent user sessions, improving overall platform stability.",
+    ],
     tags: ["ReactJS", "ASP.NET", "REST APIs"],
   },
 ];
@@ -85,9 +92,24 @@ export default function Experience() {
                 {role.role}
                 <span className="text-zinc-500"> · {role.company}</span>
               </h3>
-              <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-zinc-400">
-                {role.note}
-              </p>
+              {role.note && (
+                <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-zinc-400">
+                  {role.note}
+                </p>
+              )}
+              {role.bullets && (
+                <ul className="mt-3 max-w-2xl space-y-2.5">
+                  {role.bullets.map((point) => (
+                    <li
+                      key={point}
+                      className="flex gap-3 text-sm leading-relaxed text-zinc-400"
+                    >
+                      <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
               <div className="mt-4 flex flex-wrap gap-2">
                 {role.tags.map((tag) => (
                   <span
