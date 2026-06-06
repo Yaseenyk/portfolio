@@ -57,59 +57,63 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <motion.nav
-      initial={{ y: -24, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: EASE }}
-      className="fixed left-1/2 top-6 z-50 -translate-x-1/2"
-    >
-      <div className="flex items-center gap-2 rounded-full border border-zinc-800/50 bg-zinc-950/60 px-6 py-3 shadow-2xl shadow-cyan-900/20 backdrop-blur-md">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 pr-1">
-          <span className="text-sm font-bold tracking-tight text-zinc-50">
-            Yaseen Khatib
-          </span>
-          <PulseDot />
-        </Link>
+    <>
+      <motion.nav
+        initial={{ y: -24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="fixed left-1/2 top-6 z-50 -translate-x-1/2"
+      >
+        <div className="flex items-center gap-2 rounded-full border border-zinc-800/50 bg-zinc-950/60 px-6 py-3 shadow-2xl shadow-cyan-900/20 backdrop-blur-md">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 pr-1">
+            <span className="text-sm font-bold tracking-tight text-zinc-50">
+              Yaseen Khatib
+            </span>
+            <PulseDot />
+          </Link>
 
-        {/* Divider */}
-        <span className="hidden h-4 w-px bg-zinc-800 md:block" />
+          {/* Divider */}
+          <span className="hidden h-4 w-px bg-zinc-800 md:block" />
 
-        {/* Desktop links — sliding glass highlight via layoutId */}
-        <div
-          className="hidden items-center gap-1 md:flex"
-          onMouseLeave={() => setHovered(null)}
-        >
-          {LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onMouseEnter={() => setHovered(link.href)}
-              className="relative rounded-full px-4 py-1.5 text-sm"
-            >
-              {hovered === link.href && (
-                <motion.span
-                  layoutId="nav-pill"
-                  className="absolute inset-0 rounded-full bg-zinc-800/50"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                />
-              )}
-              <span
-                className={`relative transition-colors duration-200 ${
-                  hovered === link.href ? "text-zinc-50" : "text-zinc-400"
-                }`}
+          {/* Desktop links — sliding glass highlight via layoutId */}
+          <div
+            className="hidden items-center gap-1 md:flex"
+            onMouseLeave={() => setHovered(null)}
+          >
+            {LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onMouseEnter={() => setHovered(link.href)}
+                className="relative rounded-full px-4 py-1.5 text-sm"
               >
-                {link.label}
-              </span>
-            </Link>
-          ))}
+                {hovered === link.href && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-full bg-zinc-800/50"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <span
+                  className={`relative transition-colors duration-200 ${
+                    hovered === link.href ? "text-zinc-50" : "text-zinc-400"
+                  }`}
+                >
+                  {link.label}
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile toggle */}
+          <MenuToggle open={menuOpen} onClick={() => setMenuOpen((o) => !o)} />
         </div>
+      </motion.nav>
 
-        {/* Mobile toggle */}
-        <MenuToggle open={menuOpen} onClick={() => setMenuOpen((o) => !o)} />
-      </div>
-
-      {/* Mobile menu */}
+      {/* Mobile menu — rendered as a sibling of the nav (not a child) so its `fixed`
+          positioning resolves against the viewport. The nav's -translate-x-1/2
+          transform would otherwise become the containing block and clip/misalign it. */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -117,7 +121,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: EASE }}
-            className="absolute left-1/2 top-full mt-3 w-[min(80vw,18rem)] -translate-x-1/2 rounded-2xl border border-zinc-800/50 bg-zinc-950/80 p-2 shadow-2xl shadow-cyan-900/20 backdrop-blur-md md:hidden"
+            className="fixed right-6 top-24 z-[60] flex w-[min(80vw,18rem)] flex-col gap-y-4 rounded-2xl border border-zinc-800/50 bg-zinc-950/90 px-4 py-6 shadow-2xl shadow-cyan-900/20 backdrop-blur-md md:hidden"
           >
             {LINKS.map((link) => (
               <Link
@@ -132,6 +136,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </>
   );
 }
