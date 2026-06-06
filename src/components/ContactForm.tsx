@@ -19,6 +19,10 @@ const EMAILJS_SERVICE = "service_lanm9zj";
 const EMAILJS_TEMPLATE = "template_dyb1k4x";
 const EMAILJS_PUBLIC_KEY = "mB56akvK2qStLNadU";
 
+// Where enquiries are delivered + shown on the page.
+const CONTACT_EMAIL = "yaseenkhatib04@gmail.com";
+const CONTACT_PHONE = "8208335028";
+
 const STATUS_MESSAGE: Record<Exclude<Status, "idle" | "sending">, string> = {
   sent: "Message sent — thanks, I'll be in touch shortly.",
   error: "Something went wrong. Please try again.",
@@ -45,7 +49,7 @@ export default function ContactForm() {
       await emailjs.send(
         EMAILJS_SERVICE,
         EMAILJS_TEMPLATE,
-        { ...form },
+        { ...form, to_email: CONTACT_EMAIL, reply_to: form.email },
         EMAILJS_PUBLIC_KEY
       );
       setStatus("sent");
@@ -80,6 +84,23 @@ export default function ContactForm() {
           Have a product to build? <br className="hidden sm:block" />
           <span className="text-gradient animate-gradient">Let&apos;s ship it.</span>
         </h2>
+
+        <div className="mx-auto mt-6 flex max-w-xl flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="inline-flex items-center gap-2 text-zinc-300 transition-colors duration-200 hover:text-ice"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
+            {CONTACT_EMAIL}
+          </a>
+          <a
+            href={`tel:+91${CONTACT_PHONE}`}
+            className="inline-flex items-center gap-2 text-zinc-300 transition-colors duration-200 hover:text-ice"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
+            +91 {CONTACT_PHONE}
+          </a>
+        </div>
 
         <form onSubmit={handleSubmit} className="mx-auto mt-12 max-w-2xl text-left">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
