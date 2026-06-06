@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { ComponentType } from "react";
 import PulseDot from "./PulseDot";
 import { GithubIcon, ExternalLinkIcon } from "./Icons";
@@ -11,6 +12,7 @@ import RealtimeSync from "./projects/RealtimeSync";
 import DataSorting from "./projects/DataSorting";
 import TVScreen from "./projects/TVScreen";
 import Untangle from "./projects/Untangle";
+import ShadowDocs from "./projects/ShadowDocs";
 
 interface ProjectLink {
   href: string;
@@ -22,9 +24,12 @@ interface Project {
   name: string;
   category: string;
   description: string;
+  roi?: string;
   metrics: string[];
   tech: string[];
   Animation: ComponentType;
+  /** Optional expandable visual rendered below the card (e.g. ShadowDocs). */
+  Supplement?: ComponentType;
   links?: ProjectLink[];
 }
 
@@ -69,9 +74,11 @@ const PROJECTS: Project[] = [
     category: "Workflow Automation",
     description:
       "An interactive workflow-automation environment featuring responsive connectors, processing layers, and directional edge bindings. Developed a custom state Serialization Adapter architecture to optimize graph serialization over the wire.",
+    roi: "Achieved 94% reduction in workflow payload size by implementing a custom Serialization Adapter pattern, drastically lowering database I/O.",
     metrics: ["94% Payload Compression", "React Flow", "Zustand"],
     tech: ["React Flow", "Zustand", "TypeScript"],
     Animation: NodeGraph,
+    Supplement: ShadowDocs,
   },
   {
     name: "CMZ App — Enterprise Portal",
@@ -136,7 +143,8 @@ function MetricPills({ metrics }: { metrics: string[] }) {
 }
 
 function ProjectRow({ project }: { project: Project }) {
-  const { Animation } = project;
+  const { Animation, Supplement } = project;
+  const [showDocs, setShowDocs] = useState(false);
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
@@ -162,6 +170,13 @@ function ProjectRow({ project }: { project: Project }) {
           <p className="mt-4 text-sm leading-relaxed text-zinc-400">
             {project.description}
           </p>
+
+          {project.roi && (
+            <div className="mt-5 flex items-start gap-2.5 rounded-md border border-emerald-500/30 bg-emerald-900/20 px-3 py-2 font-mono text-sm text-emerald-400 shadow-[0_0_24px_-8px_rgba(16,185,129,0.55)]">
+              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_8px_1px_rgba(16,185,129,0.8)]" />
+              <span className="leading-relaxed">{project.roi}</span>
+            </div>
+          )}
 
           <div className="mt-6">
             <MetricPills metrics={project.metrics} />
@@ -205,6 +220,43 @@ function ProjectRow({ project }: { project: Project }) {
           <Animation />
         </div>
       </div>
+
+      {/* Supplementary architectural proof (e.g. ShadowDocs), toggled open */}
+      {Supplement && (
+        <div className="border-t border-zinc-800/50 px-8 pb-8 lg:px-12 lg:pb-12">
+          <button
+            type="button"
+            onClick={() => setShowDocs((v) => !v)}
+            aria-expanded={showDocs}
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/[0.06] px-4 py-2 font-mono text-xs text-cyan transition-colors hover:bg-cyan/10"
+          >
+            <span
+              className={`inline-block transition-transform duration-200 ${
+                showDocs ? "rotate-90" : ""
+              }`}
+            >
+              ▸
+            </span>
+            {showDocs ? "Hide shadow documentation" : "View shadow documentation"}
+          </button>
+
+          <AnimatePresence initial={false}>
+            {showDocs && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
+                className="overflow-hidden"
+              >
+                <div className="pt-6">
+                  <Supplement />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </motion.article>
   );
 }
