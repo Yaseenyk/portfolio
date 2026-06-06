@@ -12,6 +12,12 @@ import DataSorting from "./projects/DataSorting";
 import TVScreen from "./projects/TVScreen";
 import Untangle from "./projects/Untangle";
 
+interface ProjectLink {
+  href: string;
+  label: string;
+  icon: "github" | "external";
+}
+
 interface Project {
   name: string;
   category: string;
@@ -19,6 +25,7 @@ interface Project {
   metrics: string[];
   tech: string[];
   Animation: ComponentType;
+  links?: ProjectLink[];
 }
 
 const PROJECTS: Project[] = [
@@ -30,6 +37,23 @@ const PROJECTS: Project[] = [
     metrics: ["AI-Architected", "Rust / Next.js", "Live Telemetry"],
     tech: ["Rust", "WebSockets", "Claude AI"],
     Animation: SystemTelemetry,
+    links: [
+      {
+        href: "https://yaseenyk.github.io/streamer-os-website/",
+        label: "Live demo",
+        icon: "external",
+      },
+      {
+        href: "https://github.com/Yaseenyk/streamerOS",
+        label: "Source code",
+        icon: "github",
+      },
+      {
+        href: "https://github.com/Yaseenyk/streamer-os-website",
+        label: "Website repo",
+        icon: "github",
+      },
+    ],
   },
   {
     name: "Police RAG Agent — POSCO Cases",
@@ -154,22 +178,26 @@ function ProjectRow({ project }: { project: Project }) {
             ))}
           </div>
 
-          <div className="mt-7 flex items-center gap-3">
-            <a
-              href="#"
-              aria-label={`${project.name} source code`}
-              className="text-zinc-500 transition-colors duration-200 hover:text-ice"
-            >
-              <GithubIcon className="h-[18px] w-[18px]" />
-            </a>
-            <a
-              href="#"
-              aria-label={`${project.name} live demo`}
-              className="text-zinc-500 transition-colors duration-200 hover:text-ice"
-            >
-              <ExternalLinkIcon className="h-[18px] w-[18px]" />
-            </a>
-          </div>
+          {project.links && project.links.length > 0 && (
+            <div className="mt-7 flex items-center gap-3">
+              {project.links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${project.name} — ${link.label}`}
+                  className="text-zinc-500 transition-colors duration-200 hover:text-ice"
+                >
+                  {link.icon === "github" ? (
+                    <GithubIcon className="h-[18px] w-[18px]" />
+                  ) : (
+                    <ExternalLinkIcon className="h-[18px] w-[18px]" />
+                  )}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right — animation */}

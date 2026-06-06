@@ -56,11 +56,19 @@ export default function Home() {
           <ContactForm />
         </main>
 
-        <footer className="border-t border-zinc-800/70 py-10 text-sm text-zinc-500">
+        <footer className="flex flex-col gap-3 border-t border-zinc-800/70 py-10 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} Yaseen Khatib — Architected with Next.js
             &amp; Framer Motion, delivered at AI-speed.
           </p>
+          <a
+            href="https://github.com/Yaseenyk/portfolio"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors duration-200 hover:text-cyan"
+          >
+            View source ↗
+          </a>
         </footer>
       </div>
     </>
