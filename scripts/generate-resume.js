@@ -16,6 +16,11 @@ const path = require('path');
         badge: 'Flagship Deployment',
         desc: 'A Rust-powered desktop cockpit for streaming professionals, engineered via modular Claude orchestrations. Handles live system telemetry feeds, multi-platform chat velocity streams, and real-time automated OBS scene synchronization.',
         tags: ['AI-Architected', 'Rust / Next.js', 'Live Telemetry', 'WebSockets', 'Claude AI'],
+        links: [
+          { label: 'Live Demo', url: 'https://yaseenyk.github.io/streamer-os-website/' },
+          { label: 'Code', url: 'https://github.com/Yaseenyk/streamerOS' },
+          { label: 'Website', url: 'https://github.com/Yaseenyk/streamer-os-website' },
+        ],
       },
       {
         name: 'Police Agentic RAG System (POSCO Matrix)',
@@ -59,6 +64,7 @@ const path = require('path');
             </div>
             <p class="text-zinc-600 text-[12px] mt-0.5">${p.desc}</p>
             <div class="flex flex-wrap gap-1 mt-1.5">${p.tags.map(tagSpan).join('')}</div>
+            ${p.links ? `<div class="flex flex-wrap gap-x-3 mt-1.5 text-[10px]">${p.links.map((l) => `<a href="${l.url}" class="text-cyan-700 font-medium">${l.label} ↗</a>`).join('')}</div>` : ''}
           </div>`).join('');
 
     const htmlContent = `
@@ -88,10 +94,12 @@ const path = require('path');
       </p>
     </div>
     <div class="text-right text-zinc-600 text-[12px] space-y-1 bg-zinc-50 p-3 rounded-lg border border-zinc-100 min-w-[220px]">
-      <div>yaseenkhatib04@gmail.com</div>
-      <div>+91 8208335028</div>
-      <div class="text-cyan-700 font-medium">linkedin.com/in/yaseen-yk</div>
-      <div>github.com/Yaseenyk</div>
+      <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-zinc-600">yaseenkhatib04@gmail.com</a></div>
+      <div><a href="tel:+918208335028" class="text-zinc-600">+91 8208335028</a></div>
+      <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-cyan-700 font-medium">linkedin.com/in/yaseen-yk</a></div>
+      <div><a href="https://github.com/Yaseenyk" class="text-zinc-600">github.com/Yaseenyk</a></div>
+      <div><a href="https://yaseenyk.github.io/portfolio/" class="text-cyan-700 font-medium">yaseenyk.github.io/portfolio</a></div>
+      <div><a href="https://github.com/Yaseenyk/portfolio" class="text-zinc-600">github.com/Yaseenyk/portfolio</a></div>
       <div class="text-[11px] text-zinc-400 mt-1 font-medium tracking-wider uppercase">Hyderabad, INDIA</div>
     </div>
   </div>
