@@ -21,6 +21,17 @@ import { embeddingsSemanticSearch } from "@/content/posts/embeddings-semantic-se
 import { tokenEconomics } from "@/content/posts/token-economics-cost-optimizing-llm-apps";
 import { functionCallingToolUse } from "@/content/posts/function-calling-tool-use-patterns";
 import { evaluatingLlmOutputs } from "@/content/posts/evaluating-llm-outputs";
+// Advanced MERN + AI architecture series.
+import { agenticVsCopilots } from "@/content/posts/agentic-workflows-vs-copilots";
+import { customSerializationAdapters } from "@/content/posts/custom-serialization-adapters";
+import { vectorEmbeddingsInProduction } from "@/content/posts/vector-embeddings-in-production";
+import { advancedRedisCaching } from "@/content/posts/advanced-redis-caching-strategies";
+import { websocketTelemetryAtScale } from "@/content/posts/websocket-telemetry-at-scale";
+import { optimizingMongoAggregation } from "@/content/posts/optimizing-mongodb-aggregation";
+import { rbacPatterns } from "@/content/posts/role-based-access-control-patterns";
+import { reduxToolkitArchitectures } from "@/content/posts/redux-toolkit-architectures";
+import { typescriptMigrationPlaybook } from "@/content/posts/typescript-migration-playbook";
+import { reactUseMemoBenchmarks } from "@/content/posts/react-usememo-benchmarks";
 
 export { SITE_URL };
 
@@ -54,6 +65,17 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
+  // Advanced MERN + AI architecture series (newest).
+  agenticVsCopilots,
+  customSerializationAdapters,
+  vectorEmbeddingsInProduction,
+  advancedRedisCaching,
+  websocketTelemetryAtScale,
+  optimizingMongoAggregation,
+  rbacPatterns,
+  reduxToolkitArchitectures,
+  typescriptMigrationPlaybook,
+  reactUseMemoBenchmarks,
   tenXReality,
   agenticRagPipelines,
   payloadReductionReactFlow,

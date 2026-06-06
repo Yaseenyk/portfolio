@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import ArchitecturePipeline from "@/components/ArchitecturePipeline";
 import Dashboard from "@/components/Dashboard";
 import ContactForm from "@/components/ContactForm";
+import RecentPosts from "@/components/RecentPosts";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import { SITE_URL, PERSON } from "@/lib/site";
@@ -51,6 +52,7 @@ export default function Home() {
           <Hero />
           <ArchitecturePipeline />
           <Dashboard />
+          <RecentPosts />
           <ContactForm />
         </main>
 

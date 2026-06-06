@@ -1,132 +1,141 @@
-# Architecture & Conventions
+# Architecture
 
-Yaseen Khatib's personal portfolio — a **minimal but content-rich, animated single-page application** positioning him as a **Senior MERN Stack + AI Developer**. The aesthetic mimics the "streamerOS" landing-page style: an ink background with a faint CSS grid, neon cyan/purple gradients, inline animated SVGs, and a mocked-up desktop "dashboard" window housing the main content. Built with **Next.js (App Router)**, **React 18**, **TypeScript**, **Tailwind CSS**, and **Framer Motion**.
-
-See `migration-status.md` for the full history of design directions.
+The current-state architecture of the portfolio. For history/changelog see
+[migration-status.md](./migration-status.md).
 
 ## Tech stack
 
-| Concern      | Choice                                   |
-| ------------ | ---------------------------------------- |
-| Framework    | Next.js 14 (App Router, `src/app`)       |
-| Language     | TypeScript (strict)                      |
-| Styling      | Tailwind CSS                             |
-| Animation    | Framer Motion                            |
-| Icons        | Inline SVG (no icon library)             |
-| Contact form | EmailJS (`@emailjs/browser`)             |
-| Font         | Inter via `next/font/google`             |
+| Concern | Choice |
+| --- | --- |
+| Framework | Next.js 14, App Router, `output: 'export'` (static) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS, `@tailwindcss/typography` |
+| Animation | Framer Motion |
+| Icons | Inline SVG (no icon library) |
+| Fonts | Inter + Fira Code via `next/font/google` (CSS vars) |
+| Contact form | EmailJS (`@emailjs/browser`) |
+| Resume | Puppeteer (dev-only tooling) |
 
-## Theme — streamerOS Signal Kit
-
-Custom colors in `tailwind.config.ts` (`theme.extend.colors`):
-
-| Token    | Hex       | Role                                          |
-| -------- | --------- | --------------------------------------------- |
-| `ink`    | `#05070A` | Base background                               |
-| `cyan`   | `#22D3EE` | Gradient accent (bottom) · primary button     |
-| `purple` | `#A855F7` | Gradient accent (top)                         |
-| `ice`    | `#67E8F9` | Glowing borders / active states / pulse       |
-
-> ⚠️ These override Tailwind's default `cyan`/`purple` scales — use the flat tokens only.
-
-- **Grid background:** a fixed, `-z-10` overlay in `page.tsx` draws a faint 40px CSS grid (`linear-gradient` hairlines) over the ink base.
-- **Radial glows:** `globals.css` layers two faint cyan/purple radial glows on the body.
-- **Gradient text:** the `.text-gradient` utility (`globals.css`) + `animate-gradient`.
-- **Custom animations** (`tailwind.config.ts`): `animate-gradient` (flowing gradient text) and `animate-pulseGlow`. SVG "live" motion is done in Framer Motion (see `PulseDot`, `Signal`).
-
-## Project structure
+## Directory structure
 
 ```
 src/
   app/
-    layout.tsx        Root layout: Inter font var, SEO metadata
-    globals.css       Tailwind + ink theme, radial-glow bg, .text-gradient utility
-    page.tsx          Grid bg + sticky header + Hero + Dashboard + Contact + footer
-  app/blog/
-    layout.tsx        Grid bg + slim header/footer + reading container (max-w-3xl)
-    page.tsx          Blog index — lists posts from the registry
-    [slug]/page.tsx   Dynamic post template: generateStaticParams + generateMetadata
-                      (SEO) + JSON-LD TechArticle & BreadcrumbList (AEO) + themed layout
-  content/posts/      Blog posts as typed BlogPost objects (metadata + takeaways + JSX Body)
-  lib/blog.tsx        BlogPost type, post registry, helpers, SITE_URL, formatDate
+    layout.tsx          Root: <html>/<body>, fonts, metadata, sitewide Person JSON-LD
+    globals.css         Tailwind + ink theme, radial glow, .text-gradient, code tokens
+    page.tsx            Home: Navbar + Hero + ArchitecturePipeline + Dashboard + Contact
+    sitemap.ts          Generated /sitemap.xml
+    robots.ts           Generated /robots.txt
+    blog/
+      layout.tsx        Grid bg + Navbar + footer for all /blog pages
+      page.tsx          /blog server wrapper → <BlogIndex> (keeps metadata)
+      [slug]/page.tsx   Post template: generateStaticParams + generateMetadata + JSON-LD
+    uses/page.tsx       /uses system-specs dashboard
   components/
-    GridBackground.tsx  Shared fixed CSS grid bg (home + blog)
-    blog/Terminal.tsx   macOS-style terminal code block (token classes in globals.css)
-    Icons.tsx         Inline SVGs: WindowControls, Github, ExternalLink, Arrow, Download
-    PulseDot.tsx      Animated glowing "live" status dot (ping ring) — client
-    Signal.tsx        Animated broadcasting-signal SVG (pulsing arcs) — client
-    GradientText.tsx  Animated cyan→purple gradient text
-    Hero.tsx          2-col layout: copy (staggered reveal) + NeuralCore animation (client)
-    NeuralCore.tsx    Abstract "AI core" — pulsing nodes, data pulses, rotating rings (client)
-    ArchitecturePipeline.tsx  Interactive "mini-game": manifesto + animated Database→Backend→
-                      Frontend flow with a hold-to-engage AI speed toggle (client)
-    Dashboard.tsx     Glassmorphism desktop-window wrapper housing Projects & Experience
-    Projects.tsx      Stacked full-width 2-col cards (text left / animation right); 7 projects,
-                      each wired to a dedicated animation; metric pills; ice hover glow (client)
-    projects/         One Framer Motion animation per project:
-      SystemTelemetry   streamerOS — pulsing telemetry bars
-      NodeGraph         IntegrateX — node graph with flowing data packets
-      DocumentScan      Police RAG — scrolling text + scanning laser + verdict badge
-      RealtimeSync      CMZ App — server broadcasting packets to user nodes
-      DataSorting       Hospital-API — requests routed through a gateway into DBs
-      TVScreen          Cross-Platform TV — skeleton wipes into a resolved dashboard
-      Untangle          SANKALP — tangled nodes untangling into a clean grid
-    Experience.tsx    Vertical animated timeline tree, scroll fade-ins (client)
-    ContactForm.tsx   Neon form with submission state machine (client)
-    Reveal.tsx        Shared scroll fade-in wrapper (client) — available helper
-    SectionLabel.tsx  Shared numbered eyebrow — available helper
-    TextLink.tsx      Shared text link — available helper
+    Navbar.tsx          Floating glass island, layoutId hover, mobile menu
+    Hero.tsx            2-col hero (copy + NeuralCore)
+    NeuralCore.tsx      Animated AI-core SVG (nodes, data pulses, rings)
+    ArchitecturePipeline.tsx  Interactive Database→Backend→Frontend mini-game
+    Dashboard.tsx       Glass "cockpit" window wrapping Projects + Experience
+    Projects.tsx        7 full-width project cards (data-driven)
+    Experience.tsx      Animated vertical timeline
+    ContactForm.tsx     Neon EmailJS form with state machine
+    projects/           One Framer Motion animation per project (7)
+    blog/
+      BlogIndex.tsx     Client Command Center (search/filter/sort grid)
+      Terminal.tsx      macOS-style terminal code block
+    Icons.tsx, PulseDot.tsx, Signal.tsx, GradientText.tsx, Reveal.tsx,
+    SectionLabel.tsx, TextLink.tsx, GridBackground.tsx   shared primitives
+    FeaturedProject.tsx, StackEcosystem.tsx              unused (legacy, safe to prune)
+  content/posts/        21 typed BlogPost objects (one file each)
+  lib/
+    site.ts             SITE_URL, SOCIALS, PERSON, personJsonLd (single source)
+    blog.tsx            BlogPost type, post registry, helpers, formatDate
 public/
-  Resume.pdf          Linked from the Hero "Download CV" button
+  Resume.pdf            Generated CV (served by the Download CV button)
 ```
 
-## Page anatomy
+## Routes
 
-1. **Navbar** (`Navbar.tsx`) — a floating glassmorphic "island" (`fixed top-6 left-1/2 -translate-x-1/2`, `rounded-full backdrop-blur-md bg-zinc-950/60 shadow-cyan-900/20`). Logo + live `PulseDot`; desktop links use a Framer Motion `layoutId="nav-pill"` sliding glass highlight on hover; collapses to an animated hamburger + dropdown under `md`. Shared by the home page and the blog layout (links are absolute: `/#projects`, `/#experience`, `/blog`, `/#contact`).
-2. **Hero** — 2-column (`md:grid-cols-2`, `items-center`, `min-h-[80vh]`): left is the copy (pill badge + animated `PulseDot` + "Senior MERN + AI Developer"; gradient headline; AI-focused subheadline — Agentic RAG, LLM orchestration; CTAs "View Architecture →" solid cyan and "Download CV" outline). Right is `NeuralCore` — a live, breathing AI-brain animation (cyan/purple). Stacks copy-first on mobile. The whole content column lives in one wide wrapper (`mx-auto w-full max-w-7xl px-6 md:px-12 lg:px-24`) shared by Navbar, Hero, Dashboard, and Contact.
-2b. **Architecture Pipeline** (`#architecture`) — full-width immersive interactive section between Hero and Dashboard. Top: centered "The Architecture is Everything." manifesto. Middle: a prominent **reactor button** ("Hold to Engage AI") + speed readout. Below: a full-width diagonal diagram (`aspect-[25/14]`) with a radial glow, an accelerating CSS grid, three **mini-dashboard nodes** (Database = flowing rows; Backend = scrolling mini-terminal; Frontend = wireframe with pulsing blocks; glass `backdrop-blur-xl bg-zinc-900/40`) placed top-left / center-right / bottom-left, connected by sweeping **`motion.path`** curves with flowing dashes + a data-particle swarm sampled along the curves. **Hold-to-engage** (`useState(engaged)`) flips Manual (1x: few slow particles, dim lines, slow grid) → AI-Assisted (10x: ~12 particles/path, lines ignite + glow underlay, grid accelerates, nodes shake). Pointer + focus handlers (`onPointerEnter/Down/Leave/Cancel`, `onFocus/Blur`, `touch-none`) cover mouse/touch/keyboard. Collapses to a vertical node stack under `md`.
-3. **Dashboard** — a premium glassmorphism window (`bg-ink/80 backdrop-blur-md border-zinc-800 rounded-2xl shadow-2xl shadow-cyan-500/10`) with a macOS-style top bar (`WindowControls` + "portfolio -- interactive-mode" + live `Signal`) and generous internal padding. Body holds:
-   - **Projects** (`#projects`) — a vertical stack (`space-y-12`) of full-width glassmorphic cards (`bg-ink/50 backdrop-blur-md`, ice hover glow). Each card is a 2-column grid (`lg:grid-cols-2 gap-8 items-center p-8 lg:p-12`): **text left** (category, title, description, glowing ice metric pills, tech badges, GitHub/external links) and a **dedicated Framer Motion animation right** (see `components/projects/`). Seven projects: streamerOS, IntegrateX, Police RAG, CMZ App, Hospital-API, Cross-Platform TV, SANKALP. Each animation is drawn with SVG/`motion` divs (no images) inside a `aspect-[4/3]` glass panel.
-   - **Experience** (`#experience`) — animated vertical timeline (`space-y-16`): Sparity → MSA Software → Manorama.
-4. **Contact** (`#contact`) — neon EmailJS form.
-5. **Footer.**
+| Route | Type | Notes |
+| --- | --- | --- |
+| `/` | Static | Home SPA. `SoftwareApplication` JSON-LD (streamerOS, IntegrateX). |
+| `/blog` | Static | Client Command Center. |
+| `/blog/[slug]` | SSG | One per post via `generateStaticParams`. `TechArticle` + `BreadcrumbList`. |
+| `/uses` | Static | `TechArticle` JSON-LD with `mentions`. |
+| `/sitemap.xml`, `/robots.txt` | Static | Generated from `lib`. |
+
+All routes are prerendered to `out/` (with `trailingSlash: true`, each is
+`route/index.html`).
+
+## Theme — "streamerOS Signal Kit"
+
+Custom colors in `tailwind.config.ts` (`theme.extend.colors`):
+
+| Token | Hex | Role |
+| --- | --- | --- |
+| `ink` | `#05070A` | Background |
+| `cyan` | `#22D3EE` (+ 400/500/900) | Gradient accent (bottom), primary button |
+| `purple` | `#A855F7` (+ 400/500) | Gradient accent (top) |
+| `ice` | `#67E8F9` (+ 400/500) | Highlights, glows, "live" state |
+
+> `cyan`/`purple`/`ice` are objects with `DEFAULT` + numbered shades so both
+> `bg-cyan` and `shadow-cyan-900/20`-style utilities resolve.
+
+- **Grid background:** `GridBackground.tsx` — a fixed 40px CSS grid, used on
+  home, blog, and `/uses`.
+- **Radial glow + base theme:** `globals.css` (ink bg, two faint cyan/purple
+  radial glows, `::selection`).
+- **Gradient text:** `.text-gradient` utility + `animate-gradient` keyframe.
+- **Code tokens:** `.tok-*` classes in `globals.css` for terminal syntax color.
+- **Fonts:** `font-sans` → Inter (`--font-inter`), `font-mono` → Fira Code
+  (`--font-mono`).
+
+## Home page anatomy (`page.tsx`)
+
+1. **Navbar** (`Navbar.tsx`) — floating glass island (`fixed top-6 left-1/2`),
+   logo + `PulseDot`, Framer `layoutId="nav-pill"` sliding hover highlight,
+   animated hamburger + dropdown under `md`. Links: Projects, Experience, Blog,
+   Stack (`/uses`), Contact. Shared by home, blog, and `/uses`.
+2. **Hero** — 2-column, badge, gradient `whitespace-nowrap` "AI-Speed", factual
+   Subject-Verb-Object opening paragraph (AEO), CTAs (View Architecture solid
+   cyan / Download CV → `/Resume.pdf`), and `NeuralCore` AI-brain on the right.
+3. **ArchitecturePipeline** — full-width interactive "mini-game": Database →
+   Backend → Frontend glass nodes, `motion.path` curves, particle swarm, a
+   hold-to-engage reactor that flips Manual (1x) → AI-Assisted (10x).
+4. **Dashboard** — glassmorphism "cockpit" window housing:
+   - **Projects** (`#projects`) — 7 full-width 2-col cards (text + bespoke
+     animation): streamerOS, Police RAG, IntegrateX, CMZ, Hospital-API,
+     Cross-Platform TV, SANKALP.
+   - **Experience** (`#experience`) — animated timeline (Sparity, MSA, Manorama).
+5. **ContactForm** (`#contact`) — neon EmailJS form, `idle→sending→sent|error`
+   state machine, displays email + phone.
 
 ## Conventions
 
 ### Client vs. server components
-`layout.tsx`, `page.tsx`, `Dashboard.tsx`, `Icons.tsx`, `GradientText.tsx`, `SectionLabel.tsx`, `TextLink.tsx` are server components. Everything that animates or holds state is `"use client"` (`Hero`, `Projects`, `Experience`, `ContactForm`, `PulseDot`, `Signal`). `Dashboard` is a server component that composes client children.
+Server (no `"use client"`): all `app/` route files, `Dashboard`, `Icons`,
+`GradientText`, `SectionLabel`, `TextLink`, `GridBackground`, `Terminal`, the
+post content files, `lib/*`. Everything that animates or holds state is a client
+component (`Navbar`, `Hero`, `NeuralCore`, `ArchitecturePipeline`, `Projects`,
+`Experience`, `ContactForm`, `BlogIndex`, `PulseDot`, `Signal`, `Reveal`, the
+`projects/*` animations).
+
+> Route pages stay server components so they can export `metadata` / JSON-LD;
+> interactive UI is isolated in client leaves they render (e.g. `/blog` → server
+> page maps posts to a plain shape and renders the client `BlogIndex`).
 
 ### Framer Motion patterns
-- **Load reveal:** `Hero` — `container`/`item` variants with `staggerChildren`, `initial="hidden" animate="show"`.
-- **Scroll reveal / stagger:** `Projects` grid and `Experience` list use a container with `whileInView="show"` + `staggerChildren`, `viewport={{ once: true }}`.
-- **Looping SVG life:** `PulseDot` (expanding ping ring) and `Signal` (staggered arc opacity) loop with `repeat: Infinity`.
-- **Hover:** `whileHover={{ y: -4 }}` on cards plus `group-hover:border-ice/40` + ice glow shadow; buttons use `whileHover/whileTap` scale.
+- **Load reveal:** `container`/`item` variants with `staggerChildren`.
+- **Scroll reveal:** `whileInView` + `viewport={{ once: true }}` (or the shared
+  `<Reveal>`); never re-animate on scroll-back.
+- **Hover:** `whileHover`/`whileTap`, `layoutId` for the navbar pill, CSS
+  transitions for color/border/glow.
+- **Looping SVG life:** `PulseDot`, `Signal`, `NeuralCore`, project animations
+  use `repeat: Infinity` with transform/opacity only (no layout shift).
 - Shared easing: `[0.21, 0.47, 0.32, 0.98]`.
 
-### Content & data
-Projects and Experience are data-driven from arrays at the top of their files (`PROJECTS`, `ROLES`). Projects carry an optional `metrics: {value,label}[]` (rendered as ice metric cells; 4+ metrics → featured multi-column grid) and a `span` for bento sizing. To add an item, append to the array.
-
-### Contact form state
-`idle → sending → sent | error`; button label tracks status, status line on terminal states, form clears on success, editing after a terminal state resets to `idle`. EmailJS credentials are module constants.
-
-## Blog (SEO/AEO)
-
-`/blog` (index) and `/blog/[slug]` (dynamic posts) live under `src/app/blog/` and share a layout (grid bg + reading container). Posts are **typed `BlogPost` objects** in `src/content/posts/`, registered in `src/lib/blog.tsx`.
-
-- **Authoring:** each post exports a `BlogPost` — metadata (title, description, keywords, dates, author, tags), an AEO `takeaways[]` array, and a `Body` React component written with standard HTML tags (styled by `prose`) plus `<Terminal>` for code. Add it to the `POSTS` registry in `lib/blog.tsx`.
-- **SEO:** `generateStaticParams` pre-renders every post; `generateMetadata` returns dynamic title/description/keywords/canonical/OpenGraph/Twitter. `metadataBase` is set in the root layout (`NEXT_PUBLIC_SITE_URL`, default `https://yaseenkhatib.dev`).
-- **AEO:** a JSON-LD `<script>` emits a `TechArticle` (with `abstract` = takeaways) **and** a `BreadcrumbList`; the visible **Executive Summary** box puts direct answers at the very top.
-- **Theme:** gradient `<h1>`, `prose prose-invert` customized via modifiers (cyan h2s, ice links, cyan-bordered blockquotes), terminal code blocks, and a glowing footer CTA → `/#contact`.
-- **Note:** running Next 14, so `params` is synchronous. On Next 15, change the `params` type to `Promise<{slug}>` and `await` it in `generateMetadata`/the page.
-
-## Running locally
-
-```bash
-npm install
-npm run dev      # http://localhost:3000
-npm run build    # production build
-npm run start    # serve the production build
-npm run lint     # next lint
-```
-
-> Note: changes to `tailwind.config.ts` (e.g. new theme colors) require a **dev-server restart** — the JIT engine doesn't always hot-reload config changes, which can surface as a spurious "class does not exist" error until restart.
+### Styling
+Tailwind utilities, heavy use of arbitrary values for viewport/exact sizing.
+Brand colors via the theme tokens. Tailwind Typography (`prose prose-invert`)
+customized via modifiers in the blog post template.
