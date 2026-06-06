@@ -142,7 +142,7 @@ export default function BlogPostPage({ params }: PageProps) {
       <aside className="mt-10 rounded-2xl border border-cyan/30 bg-zinc-900/40 p-6 backdrop-blur-md sm:p-8">
         <div className="mb-4 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-cyan">
           <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
-          Executive Summary
+          [ EXECUTIVE TEARDOWN // TL;DR ]
         </div>
         <ul className="space-y-3">
           {post.takeaways.map((point) => (

@@ -12,7 +12,7 @@ export default function Home() {
       <GridBackground />
       <Navbar />
 
-      <div className="mx-auto w-full max-w-7xl px-6 md:px-12 lg:px-24">
+      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-24">
         <main className="pt-20">
           <Hero />
           <ArchitecturePipeline />

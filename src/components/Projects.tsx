@@ -26,35 +26,39 @@ const PROJECTS: Project[] = [
     name: "streamerOS",
     category: "Flagship · Desktop Cockpit",
     description:
-      "A Rust-powered desktop cockpit for Twitch & YouTube streamers — automating OBS scenes, monitoring chat velocity, and tracking system resources. Architected and brought to production via advanced Claude AI orchestrations.",
+      "A Rust-powered desktop cockpit for streaming professionals, engineered via modular Claude orchestrations. Handles live system telemetry feeds, multi-platform chat velocity streams, and real-time automated OBS scene synchronization.",
     metrics: ["AI-Architected", "Rust / Next.js", "Live Telemetry"],
-    tech: ["Rust", "Next.js", "Claude AI", "OBS", "WebSockets"],
+    tech: ["Rust", "WebSockets", "Claude AI"],
     Animation: SystemTelemetry,
-  },
-  {
-    name: "IntegrateX",
-    category: "Workflow Automation",
-    description:
-      "A highly complex workflow-automation UI (similar to n8n) featuring dynamic connectors, nodes, and edges. Engineered a custom Serialization Adapter pattern to radically compress workflow graphs on the wire.",
-    metrics: ["94% Smaller Payload", "React Flow", "Zustand"],
-    tech: ["React Flow", "Zustand", "TypeScript", "SVG"],
-    Animation: NodeGraph,
   },
   {
     name: "Police RAG Agent — POSCO Cases",
     category: "Agentic AI · RAG",
     description:
-      "An Agentic RAG pipeline engineered for law enforcement. The LLM autonomously extracts and analyzes dense case details from existing databases to deliver precise, actionable legal statements (Guilty / Not Guilty).",
+      "An autonomous agentic retrieval-augmented generation engine deployed for law enforcement workflows. Scans massive multi-format legal structures to confidently trace, evaluate, and output systematic verdict matrices directly to investigators.",
     metrics: ["Agentic AI", "Vector Retrieval", "LLM Orchestration"],
     tech: ["LLM", "Vector DB", "Prompt Orchestration", "Python"],
     Animation: DocumentScan,
   },
   {
-    name: "CMZ App — Enterprise Admin Portal",
+    name: "IntegrateX",
+    category: "Workflow Automation",
+    description:
+      "An interactive workflow-automation environment featuring responsive connectors, processing layers, and directional edge bindings. Developed a custom state Serialization Adapter architecture to optimize graph serialization over the wire.",
+    metrics: ["94% Payload Compression", "React Flow", "Zustand"],
+    tech: ["React Flow", "Zustand", "TypeScript"],
+    Animation: NodeGraph,
+  },
+  {
+    name: "CMZ App — Enterprise Portal",
     category: "Enterprise · Admin Portal",
     description:
-      "A large-scale React/TS/Node application serving 4,000+ active users. Implemented Redis caching, RBAC via JWT, and cross-platform real-time sync using WebSockets.",
-    metrics: ["25% Lower Latency", "99.9% Uptime", "35% Fewer Errors"],
+      "A scaled administrative core engine supporting thousands of active endpoints. Hardened through structured cache rings and strict role-based authorization layers for low-latency, high-availability operation.",
+    metrics: [
+      "25% Latency Reduction",
+      "99.9% Uptime",
+      "35% Error Elimination",
+    ],
     tech: ["React", "TypeScript", "Node", "Redis", "JWT", "WebSockets"],
     Animation: RealtimeSync,
   },
@@ -62,17 +66,21 @@ const PROJECTS: Project[] = [
     name: "Hospital-API",
     category: "Backend · REST API",
     description:
-      "A high-performance Node.js/Express RESTful API managing COVID-19 patient-doctor workflows. Hardened with custom rate-limiting, validation middleware, and heavily optimized MongoDB indexing.",
-    metrics: ["40% Less Admin Work", "30% Higher Query Efficiency"],
+      "A high-throughput clinical workflow orchestration platform. Optimizes lookup routines through heavily cached queries and defensive server request-validation pipes for reliable patient-doctor data flow.",
+    metrics: [
+      "40% Workload Reduction",
+      "30% Query Optimization",
+      "25% Server Response Accel",
+    ],
     tech: ["Node.js", "Express", "MongoDB"],
     Animation: DataSorting,
   },
   {
-    name: "Cross-Platform TV Application Suite",
+    name: "Cross-Platform TV Suite",
     category: "Embedded · Smart TV",
     description:
-      "Architected embedded applications for Samsung, LG, and Vizio Smart TVs using React and vanilla JavaScript. Delivered flawless rendering across 10+ screen resolutions and low-end hardware.",
-    metrics: ["30% Retention Boost", "15% Faster Load Times"],
+      "Embedded native smart-television systems engineered using modular vanilla abstractions for pristine execution over limited, multi-resolution, low-spec client platforms.",
+    metrics: ["30% Retention Boost", "15% Performance Tuning"],
     tech: ["React", "Vanilla JS", "Samsung", "LG", "Vizio"],
     Animation: TVScreen,
   },
@@ -80,8 +88,8 @@ const PROJECTS: Project[] = [
     name: "SANKALP",
     category: "Architecture · Refactoring",
     description:
-      "Led the complex system architecture and deep code refactoring of a legacy platform, ensuring enterprise-grade scalability, type-safety, and maintainability.",
-    metrics: ["System Architecture", "Deep Refactoring"],
+      "Structural system architectural optimization and deep defensive codebase translation for an enterprise core application. Implemented system type-safety definitions and refactored core data channels.",
+    metrics: ["System Architecture", "Deep Code Refactoring"],
     tech: ["System Design", "TypeScript", "Refactoring"],
     Animation: Untangle,
   },
@@ -111,9 +119,9 @@ function ProjectRow({ project }: { project: Project }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6 }}
-      className="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-ink/50 backdrop-blur-md transition-all duration-300 hover:border-ice/30 hover:shadow-[0_0_44px_-12px_rgba(103,232,249,0.4)]"
+      className="group relative overflow-hidden rounded-2xl border border-zinc-800/50 bg-ink/40 backdrop-blur-xl transition-all duration-300 hover:border-ice/30 hover:shadow-[0_0_44px_-12px_rgba(103,232,249,0.4)]"
     >
-      <div className="grid grid-cols-1 items-center gap-8 p-8 lg:grid-cols-2 lg:p-12">
+      <div className="grid grid-cols-1 items-center gap-12 p-8 lg:grid-cols-2 lg:p-12">
         {/* Left — content */}
         <div>
           <div className="flex items-center justify-between">

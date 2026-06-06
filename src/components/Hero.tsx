@@ -66,7 +66,7 @@ export default function Hero() {
           </motion.a>
           <motion.a
             href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/Resume.pdf`}
-            download
+            download="Yaseen-Khatib-Resume.pdf"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-200 transition-colors duration-300 hover:border-ice/60 hover:text-ice"
