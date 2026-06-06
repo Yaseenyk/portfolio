@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-zinc-100 antialiased;
+    background-color: #05070a;
+    background-image:
+      radial-gradient(
+        55rem 40rem at 50% -12%,
+        rgba(34, 211, 238, 0.08),
+        transparent 60%
+      ),
+      radial-gradient(
+        48rem 38rem at 100% 8%,
+        rgba(168, 85, 247, 0.07),
+        transparent 60%
+      );
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-cyan text-ink;
+  }
+}
+
+@layer utilities {
+  /* Animated Cyan→Purple gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-cyan via-purple to-cyan bg-clip-text text-transparent;
+    background-size: 200% auto;
+  }
+}
+
+@layer components {
+  /* Terminal code-block syntax-highlight tokens */
+  .tok-key {
+    color: #22d3ee;
+  }
+  .tok-fn {
+    color: #a855f7;
+  }
+  .tok-str {
+    color: #86efac;
+  }
+  .tok-num {
+    color: #67e8f9;
+  }
+  .tok-com {
+    color: #52525b;
+    font-style: italic;
+  }
+  .tok-punc {
+    color: #71717a;
+  }
+}
