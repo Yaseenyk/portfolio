@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
 import ArchitecturePipeline from "@/components/ArchitecturePipeline";
+import Products from "@/components/Products";
 import Dashboard from "@/components/Dashboard";
 import ContactForm from "@/components/ContactForm";
 import RecentPosts from "@/components/RecentPosts";
@@ -52,6 +53,7 @@ export default function Home() {
         <main className="pt-20">
           <Hero />
           <ArchitecturePipeline />
+          <Products />
           <Dashboard />
           <RecentPosts />
           <ContactForm />

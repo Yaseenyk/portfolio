@@ -13,6 +13,8 @@ import DataSorting from "./projects/DataSorting";
 import TVScreen from "./projects/TVScreen";
 import Untangle from "./projects/Untangle";
 import ShadowDocs from "./projects/ShadowDocs";
+import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
+import AiBloggerArt from "./products/art/AiBloggerArt";
 
 interface ProjectLink {
   href: string;
@@ -49,13 +51,40 @@ const PROJECTS: Project[] = [
         icon: "external",
       },
       {
-        href: "https://github.com/Yaseenyk/streamerOS",
+        href: "https://github.com/Yaseenyk/streamer-os-website",
+        label: "Website repo",
+        icon: "github",
+      },
+    ],
+  },
+  {
+    name: "Automated LinkedIn Pipeline",
+    category: "Automation · Agent",
+    description:
+      "A self-hosted autonomous agent that lives entirely in a GitHub repository. On a cron schedule, a GitHub Actions runner drafts a technical post with the Gemini API, publishes it, and commits its state back to the repo — no server, no subscription.",
+    metrics: ["Autonomous", "Zero-Cost", "Cron-Scheduled"],
+    tech: ["Python", "GitHub Actions", "Gemini API"],
+    Animation: LinkedInPipelineArt,
+    links: [
+      {
+        href: "https://github.com/Yaseenyk/linkedin-bot",
         label: "Source code",
         icon: "github",
       },
+    ],
+  },
+  {
+    name: "Zero-Cost AI Blog Writer",
+    category: "Pipeline · Content",
+    description:
+      "A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles straight to this site. Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships the static export — at a steady-state cost of exactly $0.",
+    metrics: ["$0 Infra", "Self-Writing", "Static Export"],
+    tech: ["Next.js", "MDX", "google-genai", "GitHub Actions"],
+    Animation: AiBloggerArt,
+    links: [
       {
-        href: "https://github.com/Yaseenyk/streamer-os-website",
-        label: "Website repo",
+        href: "https://github.com/Yaseenyk/portfolio",
+        label: "Source code",
         icon: "github",
       },
     ],

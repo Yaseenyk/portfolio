@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { getAllPosts } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
+import { PRODUCTS } from "@/lib/products";
 
 export const dynamic = "force-static";
 
@@ -45,6 +46,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${SITE_URL}/products`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...PRODUCTS.map((p) => ({
+      url: `${SITE_URL}/products/${p.slug}`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     {
       url: `${SITE_URL}/interview`,
       lastModified: lastBlogUpdate,
