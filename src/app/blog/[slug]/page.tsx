@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -6,20 +7,59 @@ import {
   getAllSlugs,
   getPostBySlug,
   formatDate,
+  type Author,
 } from "@/lib/blog";
+import { getMdxSlugs, getMdxPostBySlug } from "@/lib/mdx";
 
 interface PageProps {
   params: { slug: string };
 }
 
-// Pre-render every post at build time.
+// A view-model shared by both content sources (TSX registry + MDX files).
+interface ResolvedPost {
+  slug: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  publishedAt: string;
+  updatedAt?: string;
+  readingMinutes: number;
+  author: Author;
+  tags: string[];
+  takeaways: string[];
+  ogImage?: string;
+  body: ReactNode;
+}
+
+// Resolve a slug from the TSX registry first, then fall back to MDX files.
+async function resolvePost(slug: string): Promise<ResolvedPost | null> {
+  const tsx = getPostBySlug(slug);
+  if (tsx) {
+    const { Body, ...rest } = tsx;
+    return { ...rest, body: <Body /> };
+  }
+
+  const mdx = await getMdxPostBySlug(slug);
+  if (mdx) {
+    return {
+      ...mdx.meta,
+      body: <div dangerouslySetInnerHTML={{ __html: mdx.html }} />,
+    };
+  }
+
+  return null;
+}
+
+// Pre-render every post (TSX + MDX) at build time.
 export function generateStaticParams() {
-  return getAllSlugs().map((slug) => ({ slug }));
+  return [...getAllSlugs(), ...getMdxSlugs()].map((slug) => ({ slug }));
 }
 
 // --- SEO: dynamic <head> metadata -----------------------------------------
-export function generateMetadata({ params }: PageProps): Metadata {
-  const post = getPostBySlug(params.slug);
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const post = await resolvePost(params.slug);
   if (!post) return {};
 
   const url = `${SITE_URL}/blog/${post.slug}`;
@@ -52,11 +92,10 @@ export function generateMetadata({ params }: PageProps): Metadata {
   };
 }
 
-export default function BlogPostPage({ params }: PageProps) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: PageProps) {
+  const post = await resolvePost(params.slug);
   if (!post) notFound();
 
-  const { Body } = post;
   const url = `${SITE_URL}/blog/${post.slug}`;
 
   // --- AEO/SEO: JSON-LD (TechArticle + BreadcrumbList) ---------------------
@@ -139,20 +178,22 @@ export default function BlogPostPage({ params }: PageProps) {
       </header>
 
       {/* AEO: Executive Summary */}
-      <aside className="mt-10 rounded-2xl border border-cyan/30 bg-zinc-900/40 p-6 backdrop-blur-md sm:p-8">
-        <div className="mb-4 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-cyan">
-          <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
-          [ EXECUTIVE TEARDOWN // TL;DR ]
-        </div>
-        <ul className="space-y-3">
-          {post.takeaways.map((point) => (
-            <li key={point} className="flex gap-3 text-zinc-300">
-              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ice" />
-              <span className="leading-relaxed">{point}</span>
-            </li>
-          ))}
-        </ul>
-      </aside>
+      {post.takeaways.length > 0 && (
+        <aside className="mt-10 rounded-2xl border border-cyan/30 bg-zinc-900/40 p-6 backdrop-blur-md sm:p-8">
+          <div className="mb-4 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-cyan">
+            <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
+            [ EXECUTIVE TEARDOWN // TL;DR ]
+          </div>
+          <ul className="space-y-3">
+            {post.takeaways.map((point) => (
+              <li key={point} className="flex gap-3 text-zinc-300">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ice" />
+                <span className="leading-relaxed">{point}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
 
       {/* Body */}
       <div
@@ -165,9 +206,10 @@ export default function BlogPostPage({ params }: PageProps) {
           prose-blockquote:border-l-4 prose-blockquote:border-cyan prose-blockquote:bg-white/[0.02]
           prose-blockquote:py-1 prose-blockquote:not-italic prose-blockquote:text-zinc-300
           prose-code:text-ice prose-code:before:content-none prose-code:after:content-none
+          prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-zinc-950/70
           prose-li:text-zinc-300 prose-hr:border-zinc-800"
       >
-        <Body />
+        {post.body}
       </div>
 
       {/* Footer CTA */}

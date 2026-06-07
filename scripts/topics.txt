@@ -1,0 +1,50 @@
+Profiling a Tauri v2 Rust backend with tokio-console to hold a 1.8% CPU ceiling under four concurrent media streams
+Arena allocation patterns in Rust to keep streamerOS under 152 MB RAM across a 12-hour broadcast
+Zero-copy Twitch chat parsing in Rust with bytes::Bytes and nom at 5,000 messages per second without heap churn
+Bounded vs unbounded channels: backpressure design in a Tauri Rust core to survive chat floods without memory blowups
+Swapping serde_json for simd-json in the streamerOS IPC layer: benchmarking the deserialize hot path
+Halving Tauri v2 IPC cost: event batching and rmp-serde MessagePack over the Rust-to-WebView bridge
+A reproducible RAM-regression workflow for a Rust media app using dhat and heaptrack
+Lock-free SPSC ring buffers with crossbeam: feeding 60fps audio meters from Rust without contention
+Pinning a 1.8% idle CPU budget: event-driven versus polling architecture in a long-running Tauri tray app
+Structured concurrency in Rust: capping parallel media-decode workers with tokio JoinSet and semaphores
+Shrinking the streamerOS Rust binary: opt-level=z, fat LTO, and panic=abort and what each actually buys you
+SIMD sentiment scoring in Rust: vectorizing per-message chat analysis to keep it off the UI thread
+Flamegraphs across the Tauri IPC boundary: tracing real frame cost from a Rust event to a React paint
+Memory-mapped scene-asset caching with memmap2 for instant loads without doubling resident memory
+Diagnosing and killing async deadlocks in a production Tauri app with tokio task dumps and tracing spans
+Designing a zero-account architecture: device-bound identity and capability tokens with no auth server
+Encrypting local storage at rest in a zero-cloud Tauri app with age and the OS keychain
+Server-less local-first sync: replicating settings across devices over LAN with automerge CRDTs and mDNS
+Ingesting Twitch IRC entirely on-device: a resilient WebSocket reconnect and exponential-backoff state machine in Rust
+Merging Twitch and YouTube Live chat into one local event stream with ordered, de-duplicated delivery
+Proving zero network leakage: a deny-by-default egress test harness for a desktop app in CI
+Embedding SQLite in Tauri with sqlx: schema migrations and WAL tuning for a single-user local datastore
+Content-addressed local media storage: deduplication and integrity verification with BLAKE3
+An offline-first command queue: durable, replayable user actions that survive crashes with no backend
+On-device telemetry that never phones home: local metrics with user-exportable, signed reports
+Locking down Tauri v2 capabilities: scoping the filesystem and shell allowlists for a zero-trust core
+Peer-to-peer chat-overlay sync between two PCs over QUIC with no relay server
+Tamper-evident local logs: append-only BLAKE3 hash chains for a zero-cloud broadcast audit trail
+Cloud-free hot config reload: file-watching plus atomic rename to swap node-graph definitions live
+Data sovereignty by design: exporting and importing entire app state as one portable encrypted bundle
+Architecting a visual node-graph engine: typed ports, topological scheduling, and cycle detection in TypeScript
+Real-time chat-velocity nodes: sliding-window rate computation that fires live automation triggers
+Streaming sentiment analysis as a graph node: batching messages to a local ONNX model without UI jank
+Designing OBS WebSocket v5 IPC from a Tauri core: request batching, event subscriptions, and reconnection
+Deterministic node-graph execution: memoization and dirty-flag propagation for a 60fps automation canvas
+Backpressure inside a node graph: bounded queues between fast chat producers and slow OBS-action consumers
+A sandboxed plugin runtime for hot-reloading user-authored nodes with capability-gated side effects
+Mapping chat events to OBS scene switches: a debounced, priority-resolved action dispatcher
+Versioned, migration-safe serialization of user node graphs to JSON without breaking old workflows
+Time-travel debugging for node graphs: per-edge value inspection and full replay of an automation run
+Shipping a fully static Next.js 15 App Router marketing site with output export and zero runtime JS leaks
+Driving 60fps Framer Motion layout animations without layout thrash using transform-only choreography
+Theming a complex dashboard with Tailwind CSS v4: CSS-first @theme tokens and the new Oxide engine
+Code-splitting a heavy dashboard: next/dynamic, route segments, and Server Component boundaries
+Animating a node-graph canvas at 60fps in React: requestAnimationFrame versus Framer Motion useAnimationFrame
+Eliminating CLS on a glassmorphism hero: next/font loading, aspect-ratio reservations, and paint timing
+Responsive streamer dashboards with Tailwind v4 container queries and no JavaScript breakpoints
+Virtualizing a live chat feed in React: windowing 10,000 messages with TanStack Virtual at steady framerate
+Static-export gotchas: dynamic routes, generateStaticParams, and image handling under a GitHub Pages basePath
+Measuring and fixing INP on an interactive dashboard by scheduling work with scheduler.postTask

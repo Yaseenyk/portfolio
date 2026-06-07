@@ -1,11 +1,16 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { getAllPosts } from "@/lib/blog";
+import { getAllMdxMeta } from "@/lib/mdx";
 
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getAllPosts();
+  const tsxSlugs = new Set(getAllPosts().map((p) => p.slug));
+  const posts = [
+    ...getAllPosts(),
+    ...getAllMdxMeta().filter((m) => !tsxSlugs.has(m.slug)),
+  ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   const lastBlogUpdate = posts[0]?.publishedAt ?? "2026-06-06";
 
   const postEntries: MetadataRoute.Sitemap = posts.map((p) => ({

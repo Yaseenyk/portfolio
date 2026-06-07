@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Local secrets (e.g. GEMINI_API_KEY for scripts/ai_writer.py)
+.env
+.env.*
+!.env.example
+
+# Python (scripts/ai_writer.py tooling)
+__pycache__/
+*.pyc
+
 # Next.js
 /.next/
 /out/
