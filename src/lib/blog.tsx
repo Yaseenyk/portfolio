@@ -43,7 +43,7 @@ import { routerAgentPattern } from "@/content/posts/router-agent-multi-agent-orc
 import { ragChunkingArchitecture } from "@/content/posts/rag-chunking-strategy-architecture";
 import { streamingAiEdge } from "@/content/posts/streaming-ai-edge-hono-ai-sdk-nextjs";
 import { statelessAgentsEdge } from "@/content/posts/stateless-agents-edge-cloudflare-durable-objects";
-// The AI Systems Architect Roadmap — 10-part masterclass series (see lib/roadmap.ts).
+// The AI Systems Architect Roadmap — 15-part masterclass series (see lib/roadmap.ts).
 import { aiNativeDevStack } from "@/content/posts/ai-native-dev-stack-rethinking-mern";
 import { beyondThePrompt } from "@/content/posts/beyond-the-prompt-llm-mechanics";
 import { vectorFoundations } from "@/content/posts/vector-foundations-semantic-search";
@@ -53,6 +53,11 @@ import { latencyFirstAi } from "@/content/posts/latency-first-ai-serverless-hono
 import { modelContextProtocol } from "@/content/posts/model-context-protocol-mcp";
 import { payloadCompression } from "@/content/posts/payload-compression-serialization-patterns";
 import { guardrailEngineering } from "@/content/posts/guardrail-engineering-hallucination-prevention";
+import { hybridRag } from "@/content/posts/hybrid-rag-bm25-vector-reranking";
+import { llmObservability } from "@/content/posts/llm-observability-opentelemetry-tracing";
+import { finopsForAi } from "@/content/posts/finops-for-ai-cost-governance";
+import { evaluationDrivenDevelopment } from "@/content/posts/evaluation-driven-development-golden-dataset";
+import { memoryAndStatefulAi } from "@/content/posts/memory-and-stateful-ai-architecture";
 import { aiNativePortfolio } from "@/content/posts/ai-native-portfolio-landing-lead-roles";
 
 export { SITE_URL };
@@ -87,7 +92,7 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
-  // The AI Systems Architect Roadmap — 10-part masterclass series.
+  // The AI Systems Architect Roadmap — 15-part masterclass series.
   aiNativeDevStack,
   beyondThePrompt,
   vectorFoundations,
@@ -97,6 +102,11 @@ const POSTS: BlogPost[] = [
   modelContextProtocol,
   payloadCompression,
   guardrailEngineering,
+  hybridRag,
+  llmObservability,
+  finopsForAi,
+  evaluationDrivenDevelopment,
+  memoryAndStatefulAi,
   aiNativePortfolio,
   // streamerOS AI Support Agent — serverless RAG + agentic architecture (newest).
   zeroHallucinationRag,

@@ -7,7 +7,7 @@ interface RoadmapStepperProps {
 }
 
 /**
- * A compact horizontal stepper showing the lesson's position in the 10-part
+ * A compact horizontal stepper showing the lesson's position in the 15-part
  * series. Completed steps read filled, the current step glows, upcoming steps
  * stay dim. Each segment links to its lesson (published ones only).
  */

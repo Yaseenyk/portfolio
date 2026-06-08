@@ -1,5 +1,5 @@
 /**
- * The "AI Systems Architect" Masterclass Roadmap — a curated 10-lesson series.
+ * The "AI Systems Architect" Masterclass Roadmap — a curated 15-lesson series.
  *
  * This is the single source of truth for the series. The hub (`/roadmap`) and the
  * per-lesson chrome (progress bar + stepper + Next-Lesson nav, injected by
@@ -27,9 +27,9 @@ export interface RoadmapLesson {
 export const ROADMAP_META = {
   title: "The AI Systems Architect Roadmap",
   tagline:
-    "A 10-part masterclass on building production-grade AI systems — from rethinking the MERN stack to shipping grounded, latency-first agents.",
+    "A 15-part masterclass on building production-grade AI systems — from rethinking the MERN stack to hybrid retrieval, observability, FinOps, and stateful agents.",
   /** Estimated total read time, kept in sync with the lessons below. */
-  totalMinutes: 64,
+  totalMinutes: 98,
 };
 
 /**
@@ -121,6 +121,51 @@ export const ROADMAP: RoadmapLesson[] = [
   },
   {
     step: 10,
+    slug: "hybrid-rag-bm25-vector-reranking",
+    title: "Hybrid RAG",
+    blurb:
+      "Dense vectors miss exact codes; keywords miss paraphrase. Fuse BM25 and vectors, then rerank.",
+    module: "Production",
+    status: "published",
+  },
+  {
+    step: 11,
+    slug: "llm-observability-opentelemetry-tracing",
+    title: "LLM Observability",
+    blurb:
+      "A multi-step agent that only logs is a black box. One OpenTelemetry span per step makes it readable.",
+    module: "Production",
+    status: "published",
+  },
+  {
+    step: 12,
+    slug: "finops-for-ai-cost-governance",
+    title: "FinOps for AI",
+    blurb:
+      "Cost per request is a property you design — cache so you never pay twice, route so you never overpay.",
+    module: "Production",
+    status: "published",
+  },
+  {
+    step: 13,
+    slug: "evaluation-driven-development-golden-dataset",
+    title: "Evaluation-Driven Dev",
+    blurb:
+      "A prompt is code with no tests until a golden dataset gates the merge on a regression threshold.",
+    module: "Production",
+    status: "published",
+  },
+  {
+    step: 14,
+    slug: "memory-and-stateful-ai-architecture",
+    title: "Memory & Stateful AI",
+    blurb:
+      "The context window is RAM, not disk. Tier memory into a working buffer, episodic summaries, and durable facts.",
+    module: "Production",
+    status: "published",
+  },
+  {
+    step: 15,
     slug: "ai-native-portfolio-landing-lead-roles",
     title: "The AI-Native Portfolio",
     blurb:
