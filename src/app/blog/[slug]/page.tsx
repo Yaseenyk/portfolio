@@ -10,6 +10,10 @@ import {
   type Author,
 } from "@/lib/blog";
 import { getMdxSlugs, getMdxPostBySlug } from "@/lib/mdx";
+import { getLessonBySlug } from "@/lib/roadmap";
+import ReadingProgress from "@/components/blog/ReadingProgress";
+import RoadmapStepper from "@/components/blog/RoadmapStepper";
+import LessonNav from "@/components/blog/LessonNav";
 
 interface PageProps {
   params: { slug: string };
@@ -97,6 +101,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const url = `${SITE_URL}/blog/${post.slug}`;
+  const lesson = getLessonBySlug(post.slug);
 
   // --- AEO/SEO: JSON-LD (TechArticle + BreadcrumbList) ---------------------
   const jsonLd = [
@@ -118,6 +123,17 @@ export default async function BlogPostPage({ params }: PageProps) {
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
       keywords: post.keywords.join(", "),
       articleSection: post.tags[0],
+      // Roadmap lessons declare membership in the masterclass series.
+      ...(lesson
+        ? {
+            isPartOf: {
+              "@type": "Course",
+              name: "The AI Systems Architect Roadmap",
+              url: `${SITE_URL}/roadmap`,
+            },
+            position: lesson.lesson.step,
+          }
+        : {}),
       ...(post.ogImage ? { image: [`${SITE_URL}${post.ogImage}`] } : {}),
     },
     {
@@ -143,6 +159,9 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/* Reading-progress bar — roadmap lessons only */}
+      {lesson && <ReadingProgress />}
+
       {/* Breadcrumbs */}
       <nav
         aria-label="Breadcrumb"
@@ -161,6 +180,21 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       {/* Header */}
       <header>
+        {lesson && (
+          <div className="mb-5">
+            <Link
+              href="/roadmap"
+              className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-cyan transition-colors hover:text-ice"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
+              Masterclass Roadmap · Lesson {lesson.lesson.step} of {lesson.total}
+            </Link>
+            <div className="mt-3">
+              <RoadmapStepper current={lesson.lesson.step} />
+            </div>
+          </div>
+        )}
+
         <h1 className="text-gradient animate-gradient text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
           {post.title}
         </h1>
@@ -211,6 +245,9 @@ export default async function BlogPostPage({ params }: PageProps) {
       >
         {post.body}
       </div>
+
+      {/* Next-Lesson navigation — roadmap lessons only */}
+      {lesson && <LessonNav prev={lesson.prev} next={lesson.next} />}
 
       {/* Footer CTA */}
       <div className="mt-16 overflow-hidden rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-purple/10 p-8 text-center backdrop-blur-md sm:p-10">

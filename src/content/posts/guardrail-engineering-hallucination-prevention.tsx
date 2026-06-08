@@ -1,0 +1,153 @@
+import type { BlogPost } from "@/lib/blog";
+import Terminal from "@/components/blog/Terminal";
+import Diagram from "@/components/blog/Diagram";
+
+function GuardrailDiagram() {
+  return (
+    <Diagram
+      label="A defense-in-depth pipeline: an input guard, then a grounded model, then an output verifier and citation check, ending at a fail-closed gate that either passes the answer or routes it to an escalation path."
+      caption="Guardrails are deterministic checks wrapping a probabilistic core. Each layer catches what the others miss, and the final gate fails closed — it would rather escalate than ship an unverified answer."
+    >
+      <svg viewBox="0 0 760 260" role="img" aria-label="Defense-in-depth guardrails">
+        <defs>
+          <marker id="g-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#52525b" />
+          </marker>
+        </defs>
+
+        {[
+          ["input guard", 24, "#67E8F9", "pre"],
+          ["grounded model", 200, "#A855F7", "in-context"],
+          ["output verifier", 400, "#22D3EE", "post"],
+          ["fail-closed gate", 588, "#67E8F9", "decide"],
+        ].map(([label, x, color, tag], i, arr) => (
+          <g key={label as string}>
+            <rect x={x as number} y="86" width="148" height="56" rx="10" fill="#0b1018" stroke={color as string} />
+            <text x={(x as number) + 74} y="112" fill={color as string} fontFamily="monospace" fontSize="11" textAnchor="middle">
+              {label}
+            </text>
+            <text x={(x as number) + 74} y="130" fill="#71717a" fontFamily="monospace" fontSize="9" textAnchor="middle">
+              {tag}
+            </text>
+            {i < arr.length - 1 && (
+              <line x1={(x as number) + 148} y1="114" x2={(arr[i + 1][1] as number) - 4} y2="114" stroke="#52525b" strokeWidth="1.5" markerEnd="url(#g-arrow)" />
+            )}
+          </g>
+        ))}
+
+        {/* pass / escalate */}
+        <rect x="588" y="180" width="148" height="40" rx="10" fill="rgba(244,63,94,0.07)" stroke="#f43f5e" />
+        <text x="662" y="205" fill="#fb7185" fontFamily="monospace" fontSize="10" textAnchor="middle">
+          reject → escalate
+        </text>
+        <line x1="662" y1="142" x2="662" y2="178" stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="4 4" markerEnd="url(#g-arrow)" />
+
+        <rect x="588" y="28" width="148" height="36" rx="10" fill="rgba(34,211,238,0.06)" stroke="#22D3EE" />
+        <text x="662" y="51" fill="#22D3EE" fontFamily="monospace" fontSize="10" textAnchor="middle">
+          pass → ship
+        </text>
+        <line x1="662" y1="84" x2="662" y2="66" stroke="#52525b" strokeWidth="1.5" markerEnd="url(#g-arrow)" />
+      </svg>
+    </Diagram>
+  );
+}
+
+function Body() {
+  return (
+    <>
+      <p>
+        You can&apos;t fine-tune away hallucination, but you can engineer around it.
+        The production answer to &quot;what if the model is wrong?&quot; isn&apos;t a
+        better prompt — it&apos;s a set of deterministic checks wrapped around the
+        probabilistic core. Guardrails treat the model as an untrusted component:
+        validate what goes in, ground what it sees, verify what comes out, and fail
+        closed when something doesn&apos;t check.
+      </p>
+
+      <h2>Treat the model as untrusted</h2>
+      <p>
+        The mindset shift is to stop hoping the model behaves and start assuming it
+        might not. You wouldn&apos;t trust raw user input; don&apos;t trust raw model
+        output either. That means input validation at the front (reject prompt
+        injection, malformed or out-of-scope requests) and output verification at
+        the back (does the answer actually follow from the cited context?). The
+        model is a powerful, unreliable subsystem — architect for the unreliable
+        half.
+      </p>
+
+      <GuardrailDiagram />
+
+      <h2>Grounding plus &quot;refuse if unsupported&quot; beats hoping</h2>
+      <p>
+        The single highest-leverage guardrail is the grounding contract from RAG:
+        give the model only the retrieved context and instruct it to answer solely
+        from that — and to refuse when the context doesn&apos;t support an answer. A
+        post-generation verifier then checks that every claim traces to a cited
+        source. An answer that can&apos;t be grounded doesn&apos;t get
+        &quot;improved&quot;; it gets rejected. Refusal is a feature, not a failure.
+      </p>
+
+      <Terminal title="guardrails.ts">
+        <span className="tok-com">{`// defense in depth — each layer catches a different failure`}</span>
+        {"\n"}
+        {`const safe = inputGuard(req);            // pre: scope + injection check\n`}
+        {`if (!safe.ok) return reject(safe.reason);\n\n`}
+        {`const draft = await model.generate(ground(ctx, safe.q));  // in-context\n`}
+        {`const check = await verify(draft, ctx);  // post: claims ⊆ sources?\n\n`}
+        {`return check.grounded             // fail closed\n`}
+        {`  ? { answer: draft, sources: check.cited }\n`}
+        {`  : escalateToHuman(safe.q);      // would rather escalate than guess`}
+      </Terminal>
+
+      <h2>Layer the guardrails so each catches what the others miss</h2>
+      <p>
+        No single check is sufficient. Input validation catches the bad request the
+        model would have mishandled; grounding constrains what it can say; output
+        verification catches the confident fabrication that slipped through anyway;
+        the fail-closed gate ensures that &quot;unsure&quot; resolves to escalation,
+        not a shipped guess. Defense in depth means a failure has to defeat every
+        layer, and you&apos;ve designed each layer to fail in a different direction.
+      </p>
+
+      <blockquote>
+        You don&apos;t prevent hallucination by trusting the model harder. You
+        prevent it by wrapping it in deterministic checks that fail closed — so the
+        worst case is a refusal, never a confident lie.
+      </blockquote>
+
+      <p>
+        Guardrails are the production payoff of{" "}
+        <a href="/blog/rag-grounding-the-agent">grounding</a> and the discipline that
+        makes <a href="/blog/agentic-control-loops">autonomous loops</a> safe to
+        deploy. The series closes with the{" "}
+        <a href="/blog/ai-native-portfolio-landing-lead-roles">AI-native portfolio</a>{" "}
+        — see the full <a href="/roadmap">roadmap</a>.
+      </p>
+    </>
+  );
+}
+
+export const guardrailEngineering: BlogPost = {
+  slug: "guardrail-engineering-hallucination-prevention",
+  title: "Guardrail Engineering: Preventing Hallucination in Production",
+  description:
+    "You can't fine-tune away hallucination, but you can engineer around it. Guardrails are deterministic checks wrapped around a probabilistic core — input validation, grounding contracts, and output verification that fail closed.",
+  keywords: [
+    "AI guardrails",
+    "hallucination prevention",
+    "LLM output verification",
+    "prompt injection defense",
+    "grounding contract",
+    "production LLM safety",
+  ],
+  publishedAt: "2026-06-01",
+  readingMinutes: 7,
+  author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
+  tags: ["AI", "Architecture", "RAG"],
+  takeaways: [
+    "Treat the model as an untrusted subsystem: validate inputs and verify outputs, don't hope it behaves.",
+    "Grounding plus 'refuse if unsupported' is the highest-leverage guardrail — an ungroundable answer is rejected, not improved.",
+    "Layer guardrails (pre, in-context, post) and fail closed, so the worst case is a refusal or escalation, never a confident lie.",
+  ],
+  Body,
+};
