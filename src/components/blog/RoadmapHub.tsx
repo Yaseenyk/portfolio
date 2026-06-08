@@ -53,7 +53,7 @@ function LessonRow({ lesson, last }: { lesson: RoadmapLesson; last: boolean }) {
   const card = (
     <div
       className={[
-        "flex-1 rounded-2xl border p-5 backdrop-blur-md transition-all duration-300 sm:p-6",
+        "flex-1 rounded-2xl border p-4 backdrop-blur-md transition-all duration-300 sm:p-6",
         live
           ? "border-zinc-800 bg-zinc-900/40 group-hover:border-cyan/40 group-hover:bg-zinc-900/60"
           : "border-zinc-800/60 bg-zinc-900/20 opacity-70",
@@ -88,7 +88,7 @@ function LessonRow({ lesson, last }: { lesson: RoadmapLesson; last: boolean }) {
   );
 
   return (
-    <motion.li variants={rowVariants} className="group relative flex gap-5">
+    <motion.li variants={rowVariants} className="group relative flex gap-3.5 sm:gap-5">
       {/* Rail: step node + connecting line */}
       <div className="relative flex flex-col items-center">
         <span

@@ -233,8 +233,9 @@ export default async function BlogPostPage({ params }: PageProps) {
       <div
         className="prose prose-invert mt-12 max-w-none
           prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight
-          prose-h2:mt-16 prose-h2:text-cyan prose-h3:mt-10 prose-h3:text-zinc-50
-          prose-p:text-zinc-300 prose-p:leading-relaxed
+          prose-h2:mt-12 prose-h2:text-cyan sm:prose-h2:mt-16 prose-h3:mt-10 prose-h3:text-zinc-50
+          prose-p:text-zinc-300 prose-p:leading-[1.8] sm:prose-p:leading-relaxed
+          prose-li:leading-[1.7] sm:prose-li:leading-relaxed
           prose-a:text-ice prose-a:no-underline prose-a:underline-offset-4 hover:prose-a:underline
           prose-strong:text-zinc-100
           prose-blockquote:border-l-4 prose-blockquote:border-cyan prose-blockquote:bg-white/[0.02]
