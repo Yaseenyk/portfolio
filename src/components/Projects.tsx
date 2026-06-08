@@ -13,6 +13,7 @@ import DataSorting from "./projects/DataSorting";
 import TVScreen from "./projects/TVScreen";
 import Untangle from "./projects/Untangle";
 import ShadowDocs from "./projects/ShadowDocs";
+import SupportAgentDocs from "./projects/SupportAgentDocs";
 import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
 import AiBloggerArt from "./products/art/AiBloggerArt";
 
@@ -53,6 +54,28 @@ const PROJECTS: Project[] = [
       {
         href: "https://github.com/Yaseenyk/streamer-os-website",
         label: "Website repo",
+        icon: "github",
+      },
+    ],
+  },
+  {
+    name: "streamerOS AI Support Agent",
+    category: "RAG · Tier-1 Support",
+    description:
+      "A Tier-1 support assistant for streamerOS built on a grounded RAG architecture. A Hono router on Cloudflare Workers embeds the product knowledge base into Upstash Vector, retrieves the relevant passages per question, and streams a gemini-flash answer constrained strictly to that context — refusing anything out of scope.",
+    metrics: ["Zero-Hallucination", "Edge-Streamed", "Serverless"],
+    tech: ["Hono", "Cloudflare Workers", "Upstash Vector", "gemini-flash", "@ai-sdk"],
+    Animation: DocumentScan,
+    Supplement: SupportAgentDocs,
+    links: [
+      {
+        href: "https://yaseenyk.github.io/streamer-os-website/",
+        label: "Live demo",
+        icon: "external",
+      },
+      {
+        href: "https://github.com/Yaseenyk/streamer-os-website/tree/main/api",
+        label: "Agent API source",
         icon: "github",
       },
     ],

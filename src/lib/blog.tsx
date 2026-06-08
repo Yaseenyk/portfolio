@@ -32,6 +32,17 @@ import { rbacPatterns } from "@/content/posts/role-based-access-control-patterns
 import { reduxToolkitArchitectures } from "@/content/posts/redux-toolkit-architectures";
 import { typescriptMigrationPlaybook } from "@/content/posts/typescript-migration-playbook";
 import { reactUseMemoBenchmarks } from "@/content/posts/react-usememo-benchmarks";
+// streamerOS AI Support Agent — serverless RAG + agentic architecture series.
+import { zeroHallucinationRag } from "@/content/posts/zero-hallucination-rag-grounding-contract";
+import { edgeNativeRag } from "@/content/posts/edge-native-rag-cloudflare-workers-hono";
+import { singleModelRag } from "@/content/posts/single-model-rag-embeddings-generation";
+import { reactFlowAgentCanvas } from "@/content/posts/react-flow-agent-orchestration-canvas";
+import { compilingReactFlowAgent } from "@/content/posts/compiling-react-flow-graph-agent-pipeline";
+import { semanticCachingEdge } from "@/content/posts/semantic-caching-edge-rag";
+import { routerAgentPattern } from "@/content/posts/router-agent-multi-agent-orchestration";
+import { ragChunkingArchitecture } from "@/content/posts/rag-chunking-strategy-architecture";
+import { streamingAiEdge } from "@/content/posts/streaming-ai-edge-hono-ai-sdk-nextjs";
+import { statelessAgentsEdge } from "@/content/posts/stateless-agents-edge-cloudflare-durable-objects";
 
 export { SITE_URL };
 
@@ -65,7 +76,18 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
-  // Advanced MERN + AI architecture series (newest).
+  // streamerOS AI Support Agent — serverless RAG + agentic architecture (newest).
+  zeroHallucinationRag,
+  edgeNativeRag,
+  singleModelRag,
+  reactFlowAgentCanvas,
+  compilingReactFlowAgent,
+  semanticCachingEdge,
+  routerAgentPattern,
+  ragChunkingArchitecture,
+  streamingAiEdge,
+  statelessAgentsEdge,
+  // Advanced MERN + AI architecture series.
   agenticVsCopilots,
   customSerializationAdapters,
   vectorEmbeddingsInProduction,
