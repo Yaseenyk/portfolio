@@ -4,6 +4,7 @@ import ArchitecturePipeline from "@/components/ArchitecturePipeline";
 import Products from "@/components/Products";
 import Dashboard from "@/components/Dashboard";
 import ContactForm from "@/components/ContactForm";
+import RoadmapSection from "@/components/RoadmapSection";
 import RecentPosts from "@/components/RecentPosts";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
@@ -55,6 +56,7 @@ export default function Home() {
           <ArchitecturePipeline />
           <Products />
           <Dashboard />
+          <RoadmapSection />
           <RecentPosts />
           <ContactForm />
         </main>
