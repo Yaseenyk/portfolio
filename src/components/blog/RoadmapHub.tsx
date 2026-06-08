@@ -12,6 +12,17 @@ import {
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
+// Parent-orchestrated reveal so every lesson animates in reliably, regardless
+// of its own position in a tall mobile column.
+const listVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+const rowVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+};
+
 const MODULE_COLOR: Record<RoadmapLesson["module"], string> = {
   Foundations: "text-ice border-ice/30",
   Systems: "text-cyan border-cyan/30",
@@ -77,13 +88,7 @@ function LessonRow({ lesson, last }: { lesson: RoadmapLesson; last: boolean }) {
   );
 
   return (
-    <motion.li
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: EASE }}
-      className="group relative flex gap-5"
-    >
+    <motion.li variants={rowVariants} className="group relative flex gap-5">
       {/* Rail: step node + connecting line */}
       <div className="relative flex flex-col items-center">
         <span
@@ -146,7 +151,12 @@ export default function RoadmapHub() {
       </header>
 
       {/* Playlist */}
-      <ol className="mt-12 flex flex-col gap-6">
+      <motion.ol
+        variants={listVariants}
+        initial="hidden"
+        animate="show"
+        className="mt-12 flex flex-col gap-6"
+      >
         {ROADMAP.map((lesson, i) => (
           <LessonRow
             key={lesson.step}
@@ -154,7 +164,7 @@ export default function RoadmapHub() {
             last={i === ROADMAP.length - 1}
           />
         ))}
-      </ol>
+      </motion.ol>
 
       {/* Footer CTA */}
       <div className="mt-16 overflow-hidden rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-purple/10 p-8 text-center backdrop-blur-md sm:p-10">

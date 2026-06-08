@@ -12,6 +12,18 @@ import {
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
+// Parent-orchestrated reveal: the <ol> triggers once when it enters view and
+// staggers every child, so no row is gated on its own intersection (which left
+// the last rows invisible on tall mobile columns).
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE } },
+};
+
 const MODULE_COLOR: Record<RoadmapLesson["module"], string> = {
   Foundations: "text-ice",
   Systems: "text-cyan",
@@ -19,7 +31,7 @@ const MODULE_COLOR: Record<RoadmapLesson["module"], string> = {
   Career: "text-zinc-400",
 };
 
-function LessonRow({ lesson, i }: { lesson: RoadmapLesson; i: number }) {
+function LessonRow({ lesson }: { lesson: RoadmapLesson }) {
   const live = lesson.status === "published";
 
   const inner = (
@@ -61,13 +73,7 @@ function LessonRow({ lesson, i }: { lesson: RoadmapLesson; i: number }) {
   );
 
   return (
-    <motion.li
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.45, ease: EASE, delay: (i % 2) * 0.06 }}
-      className="group"
-    >
+    <motion.li variants={item} className="group">
       {live ? (
         <Link href={`/blog/${lesson.slug}`} className="block h-full">
           {inner}
@@ -118,11 +124,16 @@ export default function RoadmapSection() {
         </span>
       </div>
 
-      <ol className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2">
-        {ROADMAP.map((lesson, i) => (
-          <LessonRow key={lesson.step} lesson={lesson} i={i} />
+      <motion.ol
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2"
+      >
+        {ROADMAP.map((lesson) => (
+          <LessonRow key={lesson.step} lesson={lesson} />
         ))}
-      </ol>
+      </motion.ol>
 
       <Link
         href="/roadmap"

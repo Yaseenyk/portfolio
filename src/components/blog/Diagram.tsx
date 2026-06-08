@@ -20,9 +20,14 @@ export default function Diagram({ label, caption, children }: DiagramProps) {
     <figure
       role="group"
       aria-label={label}
-      className="not-prose my-10 overflow-hidden rounded-xl border border-zinc-800 bg-[#0b1018] p-6 [&_svg]:h-auto [&_svg]:w-full"
+      className="not-prose my-10 rounded-xl border border-zinc-800 bg-[#0b1018] p-4 sm:p-6"
     >
-      {children}
+      {/* On phones the wide SVG would shrink its labels to ~5px, so keep a
+          readable min-width and let the diagram scroll horizontally; on ≥sm it
+          fits the column at full width with no scroll. */}
+      <div className="-mx-1 overflow-x-auto px-1 [&_svg]:h-auto [&_svg]:w-full [&_svg]:min-w-[34rem] sm:[&_svg]:min-w-0">
+        {children}
+      </div>
       {caption && (
         <figcaption className="mt-4 text-center font-mono text-[11px] leading-relaxed text-zinc-500">
           {caption}
