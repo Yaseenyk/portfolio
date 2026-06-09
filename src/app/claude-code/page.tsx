@@ -1,52 +1,49 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/site";
-import {
-  ROADMAP,
-  ROADMAP_META,
-  type RoadmapLesson,
-} from "@/lib/roadmap";
+import { CC_ROADMAP, CC_META, type CcLesson } from "@/lib/claude-code-roadmap";
 import RoadmapHub from "@/components/blog/RoadmapHub";
 
-const url = `${SITE_URL}/roadmap`;
+const url = `${SITE_URL}/claude-code`;
 
 export const metadata: Metadata = {
-  title: ROADMAP_META.title,
-  description: ROADMAP_META.tagline,
+  title: CC_META.title,
+  description: CC_META.tagline,
   keywords: [
-    "AI systems architecture",
-    "production AI roadmap",
-    "RAG architecture",
-    "agentic AI",
-    "LLM engineering",
-    "AI architect masterclass",
+    "Claude Code",
+    "token optimization",
+    "LLM cost optimization",
+    "Claude Code efficiency",
+    "context window management",
+    "prompt caching",
+    "AI coding workflow",
   ],
   alternates: { canonical: url },
   openGraph: {
     type: "website",
-    title: `${ROADMAP_META.title} | Yaseen Khatib`,
-    description: ROADMAP_META.tagline,
+    title: `${CC_META.title} | Yaseen Khatib`,
+    description: CC_META.tagline,
     url,
     siteName: "Yaseen Khatib",
   },
   twitter: {
     card: "summary_large_image",
-    title: ROADMAP_META.title,
-    description: ROADMAP_META.tagline,
+    title: CC_META.title,
+    description: CC_META.tagline,
   },
 };
 
-export default function RoadmapPage() {
+export default function ClaudeCodeRoadmapPage() {
   // AEO/SEO: a Course with each published lesson as a syllabus item.
-  const liveLessons = ROADMAP.filter(
-    (l: RoadmapLesson) => l.status === "published",
+  const liveLessons = CC_ROADMAP.filter(
+    (l: CcLesson) => l.status === "published",
   );
 
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "Course",
-      name: ROADMAP_META.title,
-      description: ROADMAP_META.tagline,
+      name: CC_META.title,
+      description: CC_META.tagline,
       url,
       provider: {
         "@type": "Person",
@@ -56,7 +53,7 @@ export default function RoadmapPage() {
       hasCourseInstance: {
         "@type": "CourseInstance",
         courseMode: "online",
-        courseWorkload: `PT${ROADMAP_META.totalMinutes}M`,
+        courseWorkload: `PT${CC_META.totalMinutes}M`,
       },
       syllabusSections: liveLessons.map((l) => ({
         "@type": "Syllabus",
@@ -70,7 +67,7 @@ export default function RoadmapPage() {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name: "Roadmap", item: url },
+        { "@type": "ListItem", position: 2, name: "Claude Code Roadmap", item: url },
       ],
     },
   ];
@@ -81,7 +78,15 @@ export default function RoadmapPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <RoadmapHub meta={ROADMAP_META} lessons={ROADMAP} />
+      <RoadmapHub
+        meta={CC_META}
+        lessons={CC_ROADMAP}
+        eyebrow="Claude Code · Efficiency Roadmap"
+        cta={{
+          heading: "Burning tokens faster than budget?",
+          body: "This is the workflow I use to keep Claude Code lean. Let's tune yours.",
+        }}
+      />
     </>
   );
 }

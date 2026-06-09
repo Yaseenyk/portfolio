@@ -2,15 +2,27 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  ROADMAP,
-  ROADMAP_META,
-  TOTAL_LESSONS,
-  publishedCount,
-  type RoadmapLesson,
-} from "@/lib/roadmap";
+import type { RoadmapLesson, SeriesMeta } from "@/lib/series";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
+
+interface HubCta {
+  heading: string;
+  body: string;
+}
+
+interface RoadmapHubProps {
+  meta: SeriesMeta;
+  lessons: RoadmapLesson[];
+  /** Small uppercase label above the title. */
+  eyebrow?: string;
+  cta?: HubCta;
+}
+
+const DEFAULT_CTA: HubCta = {
+  heading: "Building a production AI system?",
+  body: "This roadmap is the architecture I ship by. Let's apply it to yours.",
+};
 
 // Parent-orchestrated reveal so every lesson animates in reliably, regardless
 // of its own position in a tall mobile column.
@@ -23,12 +35,16 @@ const rowVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
 };
 
-const MODULE_COLOR: Record<RoadmapLesson["module"], string> = {
+const MODULE_COLOR: Record<string, string> = {
   Foundations: "text-ice border-ice/30",
   Systems: "text-cyan border-cyan/30",
   Production: "text-purple-400 border-purple/30",
   Career: "text-zinc-300 border-zinc-700",
+  Precision: "text-cyan border-cyan/30",
+  Workflow: "text-purple-400 border-purple/30",
+  Scale: "text-ice border-ice/30",
 };
+const MODULE_COLOR_FALLBACK = "text-zinc-300 border-zinc-700";
 
 function StatusPill({ status }: { status: RoadmapLesson["status"] }) {
   if (status === "published") {
@@ -61,7 +77,7 @@ function LessonRow({ lesson, last }: { lesson: RoadmapLesson; last: boolean }) {
     >
       <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] ${MODULE_COLOR[lesson.module]}`}
+          className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.15em] ${MODULE_COLOR[lesson.module] ?? MODULE_COLOR_FALLBACK}`}
         >
           {lesson.module}
         </span>
@@ -117,35 +133,41 @@ function LessonRow({ lesson, last }: { lesson: RoadmapLesson; last: boolean }) {
   );
 }
 
-export default function RoadmapHub() {
-  const published = publishedCount();
+export default function RoadmapHub({
+  meta,
+  lessons,
+  eyebrow = "Masterclass Roadmap",
+  cta = DEFAULT_CTA,
+}: RoadmapHubProps) {
+  const total = lessons.length;
+  const published = lessons.filter((l) => l.status === "published").length;
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       {/* Header */}
       <header>
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-          [ Masterclass Roadmap ]
+          [ {eyebrow} ]
         </p>
         <h1 className="text-gradient animate-gradient mt-4 text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
-          {ROADMAP_META.title}
+          {meta.title}
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-zinc-400">
-          {ROADMAP_META.tagline}
+          {meta.tagline}
         </p>
 
         {/* Stats + progress bar */}
         <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-zinc-500">
-          <span className="text-zinc-300">{TOTAL_LESSONS} lessons</span>
+          <span className="text-zinc-300">{total} lessons</span>
           <span className="text-zinc-700">•</span>
           <span>{published} published</span>
           <span className="text-zinc-700">•</span>
-          <span>~{ROADMAP_META.totalMinutes} min total</span>
+          <span>~{meta.totalMinutes} min total</span>
         </div>
         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
           <div
             className="h-full rounded-full bg-gradient-to-r from-purple via-cyan to-ice shadow-[0_0_10px_0_rgba(34,211,238,0.6)]"
-            style={{ width: `${(published / TOTAL_LESSONS) * 100}%` }}
+            style={{ width: `${(published / total) * 100}%` }}
           />
         </div>
       </header>
@@ -157,11 +179,11 @@ export default function RoadmapHub() {
         animate="show"
         className="mt-12 flex flex-col gap-6"
       >
-        {ROADMAP.map((lesson, i) => (
+        {lessons.map((lesson, i) => (
           <LessonRow
             key={lesson.step}
             lesson={lesson}
-            last={i === ROADMAP.length - 1}
+            last={i === lessons.length - 1}
           />
         ))}
       </motion.ol>
@@ -169,11 +191,9 @@ export default function RoadmapHub() {
       {/* Footer CTA */}
       <div className="mt-16 overflow-hidden rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-purple/10 p-8 text-center backdrop-blur-md sm:p-10">
         <h2 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
-          Building a production AI system?
+          {cta.heading}
         </h2>
-        <p className="mt-3 text-zinc-400">
-          This roadmap is the architecture I ship by. Let&apos;s apply it to yours.
-        </p>
+        <p className="mt-3 text-zinc-400">{cta.body}</p>
         <Link
           href="/#contact"
           className="mt-6 inline-flex items-center gap-2 rounded-lg bg-cyan px-6 py-3 text-sm font-semibold text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_-2px_rgba(34,211,238,0.7)]"

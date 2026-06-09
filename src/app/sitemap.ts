@@ -41,6 +41,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/claude-code`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/uses`,
       lastModified: lastBlogUpdate,
       changeFrequency: "monthly",

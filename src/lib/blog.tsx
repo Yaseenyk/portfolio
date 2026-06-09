@@ -59,6 +59,8 @@ import { finopsForAi } from "@/content/posts/finops-for-ai-cost-governance";
 import { evaluationDrivenDevelopment } from "@/content/posts/evaluation-driven-development-golden-dataset";
 import { memoryAndStatefulAi } from "@/content/posts/memory-and-stateful-ai-architecture";
 import { aiNativePortfolio } from "@/content/posts/ai-native-portfolio-landing-lead-roles";
+// Mastering Claude Code: The 90% Efficiency Roadmap (see lib/claude-code-roadmap.ts).
+import { claudeCodeContextHygiene } from "@/content/posts/claude-code-context-hygiene-clear-compact";
 
 export { SITE_URL };
 
@@ -92,6 +94,8 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
+  // Mastering Claude Code: The 90% Efficiency Roadmap (newest).
+  claudeCodeContextHygiene,
   // The AI Systems Architect Roadmap — 15-part masterclass series.
   aiNativeDevStack,
   beyondThePrompt,

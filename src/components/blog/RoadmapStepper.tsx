@@ -1,23 +1,25 @@
 import Link from "next/link";
-import { ROADMAP } from "@/lib/roadmap";
+import type { RoadmapLesson } from "@/lib/series";
 
 interface RoadmapStepperProps {
+  /** Lessons of the series this post belongs to. */
+  lessons: RoadmapLesson[];
   /** 1-based step of the lesson currently being viewed. */
   current: number;
 }
 
 /**
- * A compact horizontal stepper showing the lesson's position in the 15-part
- * series. Completed steps read filled, the current step glows, upcoming steps
- * stay dim. Each segment links to its lesson (published ones only).
+ * A compact horizontal stepper showing the lesson's position in its series.
+ * Completed steps read filled, the current step glows, upcoming steps stay dim.
+ * Each segment links to its lesson (published ones only).
  */
-export default function RoadmapStepper({ current }: RoadmapStepperProps) {
+export default function RoadmapStepper({ lessons, current }: RoadmapStepperProps) {
   return (
     <nav
-      aria-label={`Roadmap progress: lesson ${current} of ${ROADMAP.length}`}
+      aria-label={`Roadmap progress: lesson ${current} of ${lessons.length}`}
       className="flex items-center gap-1.5"
     >
-      {ROADMAP.map((l) => {
+      {lessons.map((l) => {
         const isCurrent = l.step === current;
         const isDone = l.step < current;
         const live = l.status === "published";

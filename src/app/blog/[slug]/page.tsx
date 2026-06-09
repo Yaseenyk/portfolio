@@ -10,7 +10,7 @@ import {
   type Author,
 } from "@/lib/blog";
 import { getMdxSlugs, getMdxPostBySlug } from "@/lib/mdx";
-import { getLessonBySlug } from "@/lib/roadmap";
+import { resolveLesson } from "@/lib/series";
 import ReadingProgress from "@/components/blog/ReadingProgress";
 import RoadmapStepper from "@/components/blog/RoadmapStepper";
 import LessonNav from "@/components/blog/LessonNav";
@@ -101,7 +101,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const url = `${SITE_URL}/blog/${post.slug}`;
-  const lesson = getLessonBySlug(post.slug);
+  const lesson = resolveLesson(post.slug);
 
   // --- AEO/SEO: JSON-LD (TechArticle + BreadcrumbList) ---------------------
   const jsonLd = [
@@ -128,8 +128,8 @@ export default async function BlogPostPage({ params }: PageProps) {
         ? {
             isPartOf: {
               "@type": "Course",
-              name: "The AI Systems Architect Roadmap",
-              url: `${SITE_URL}/roadmap`,
+              name: lesson.series.courseName,
+              url: `${SITE_URL}${lesson.series.hubPath}`,
             },
             position: lesson.lesson.step,
           }
@@ -183,14 +183,17 @@ export default async function BlogPostPage({ params }: PageProps) {
         {lesson && (
           <div className="mb-5">
             <Link
-              href="/roadmap"
+              href={lesson.series.hubPath}
               className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-cyan transition-colors hover:text-ice"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
               Masterclass Roadmap · Lesson {lesson.lesson.step} of {lesson.total}
             </Link>
             <div className="mt-3">
-              <RoadmapStepper current={lesson.lesson.step} />
+              <RoadmapStepper
+                lessons={lesson.series.lessons}
+                current={lesson.lesson.step}
+              />
             </div>
           </div>
         )}
@@ -248,7 +251,13 @@ export default async function BlogPostPage({ params }: PageProps) {
       </div>
 
       {/* Next-Lesson navigation — roadmap lessons only */}
-      {lesson && <LessonNav prev={lesson.prev} next={lesson.next} />}
+      {lesson && (
+        <LessonNav
+          prev={lesson.prev}
+          next={lesson.next}
+          hubPath={lesson.series.hubPath}
+        />
+      )}
 
       {/* Footer CTA */}
       <div className="mt-16 overflow-hidden rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-purple/10 p-8 text-center backdrop-blur-md sm:p-10">

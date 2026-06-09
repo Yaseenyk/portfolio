@@ -1,17 +1,19 @@
 import Link from "next/link";
-import type { RoadmapLesson } from "@/lib/roadmap";
+import type { RoadmapLesson } from "@/lib/series";
 
 interface LessonNavProps {
   prev: RoadmapLesson | null;
   next: RoadmapLesson | null;
+  /** Hub route for this lesson's series, e.g. "/roadmap" or "/claude-code". */
+  hubPath: string;
 }
 
 /**
- * Bottom-of-lesson navigation for the roadmap series: a quiet "Previous" link
- * and a prominent "Next Lesson" card. Rendered above the generic hire-me CTA on
- * any post that belongs to the roadmap.
+ * Bottom-of-lesson navigation for a series: a quiet "Previous" link and a
+ * prominent "Next Lesson" card. Rendered above the generic hire-me CTA on any
+ * post that belongs to a series.
  */
-export default function LessonNav({ prev, next }: LessonNavProps) {
+export default function LessonNav({ prev, next, hubPath }: LessonNavProps) {
   if (!prev && !next) return null;
 
   return (
@@ -33,7 +35,7 @@ export default function LessonNav({ prev, next }: LessonNavProps) {
         </Link>
       ) : (
         <Link
-          href="/roadmap"
+          href={hubPath}
           className="group flex flex-col rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-md transition-colors hover:border-zinc-700"
         >
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500">
