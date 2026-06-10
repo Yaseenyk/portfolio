@@ -61,6 +61,22 @@ import { memoryAndStatefulAi } from "@/content/posts/memory-and-stateful-ai-arch
 import { aiNativePortfolio } from "@/content/posts/ai-native-portfolio-landing-lead-roles";
 // Mastering Claude Code: The 90% Efficiency Roadmap (see lib/claude-code-roadmap.ts).
 import { claudeCodeContextHygiene } from "@/content/posts/claude-code-context-hygiene-clear-compact";
+// The Complete Anthropic & Claude Developer Roadmap (see lib/anthropic-roadmap.ts).
+import { masteringClaudeArchitecture } from "@/content/posts/mastering-claude-architecture-context-windows-output-limits";
+import { xmlStructuralPrompting } from "@/content/posts/xml-tag-structural-prompting-deterministic-shell";
+import { jsonStructuredOutputs } from "@/content/posts/json-structured-outputs-type-safe-zod";
+import { toolUseFunctionCalling } from "@/content/posts/tool-use-function-calling-mechanics";
+import { modelContextProtocolFoundations } from "@/content/posts/model-context-protocol-mcp-server-foundations";
+import { adaptiveExtendedThinking } from "@/content/posts/adaptive-extended-thinking-latency-vs-compute";
+import { localFirstClaudeCode } from "@/content/posts/local-first-claude-code-claude-md-secure-cli";
+import { buildingCustomSkills } from "@/content/posts/building-custom-claude-skills-task-scripts";
+import { promptCachingDeepDive } from "@/content/posts/prompt-caching-deep-dive-latency-cost";
+import { constitutionalAiSafety } from "@/content/posts/constitutional-ai-safety-system-prompts-guardrails";
+import { multiAgentWorktrees } from "@/content/posts/multi-agent-worktrees-parallel-subagents";
+import { statefulAgentRuntime } from "@/content/posts/stateful-agent-runtime-persistence-durable-objects-redis";
+import { enterpriseMcpAggregation } from "@/content/posts/enterprise-mcp-aggregation-postgres-figma-playwright";
+import { evalDrivenPromptEngineering } from "@/content/posts/evaluation-driven-prompt-engineering-golden-datasets";
+import { autonomousAgentRoutines } from "@/content/posts/long-running-automated-agent-routines-cron-workflows";
 
 export { SITE_URL };
 
@@ -94,7 +110,23 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
-  // Mastering Claude Code: The 90% Efficiency Roadmap (newest).
+  // The Complete Anthropic & Claude Developer Roadmap — 15-part masterclass (newest).
+  masteringClaudeArchitecture,
+  xmlStructuralPrompting,
+  jsonStructuredOutputs,
+  toolUseFunctionCalling,
+  modelContextProtocolFoundations,
+  adaptiveExtendedThinking,
+  localFirstClaudeCode,
+  buildingCustomSkills,
+  promptCachingDeepDive,
+  constitutionalAiSafety,
+  multiAgentWorktrees,
+  statefulAgentRuntime,
+  enterpriseMcpAggregation,
+  evalDrivenPromptEngineering,
+  autonomousAgentRoutines,
+  // Mastering Claude Code: The 90% Efficiency Roadmap.
   claudeCodeContextHygiene,
   // The AI Systems Architect Roadmap — 15-part masterclass series.
   aiNativeDevStack,

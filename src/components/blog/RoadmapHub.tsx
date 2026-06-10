@@ -43,6 +43,8 @@ const MODULE_COLOR: Record<string, string> = {
   Precision: "text-cyan border-cyan/30",
   Workflow: "text-purple-400 border-purple/30",
   Scale: "text-ice border-ice/30",
+  "Developer Core": "text-cyan border-cyan/30",
+  "Enterprise Production": "text-purple-400 border-purple/30",
 };
 const MODULE_COLOR_FALLBACK = "text-zinc-300 border-zinc-700";
 

@@ -12,6 +12,7 @@
 
 import { ROADMAP, ROADMAP_META } from "./roadmap";
 import { CC_ROADMAP, CC_META } from "./claude-code-roadmap";
+import { AN_ROADMAP, AN_META } from "./anthropic-roadmap";
 
 export type LessonStatus = "published" | "coming-soon";
 
@@ -51,6 +52,12 @@ export const SERIES: Series[] = [
     courseName: CC_META.title,
     meta: CC_META,
     lessons: CC_ROADMAP,
+  },
+  {
+    hubPath: "/anthropic-roadmap",
+    courseName: AN_META.title,
+    meta: AN_META,
+    lessons: AN_ROADMAP,
   },
 ];
 
