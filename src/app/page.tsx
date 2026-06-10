@@ -62,10 +62,22 @@ export default function Home() {
         </main>
 
         <footer className="flex flex-col gap-3 border-t border-zinc-800/70 py-10 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © {new Date().getFullYear()} Yaseen Khatib — Architected with Next.js
-            &amp; Framer Motion, delivered at AI-speed.
-          </p>
+          <div>
+            <p>
+              © {new Date().getFullYear()} Yaseen Khatib — Architected with
+              Next.js &amp; Framer Motion, delivered at AI-speed.
+            </p>
+            <p className="mt-2 font-mono text-[11px] text-zinc-600">
+              ▸ AI Agents: Fetch{" "}
+              <a
+                href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ai-briefing.json`}
+                className="text-zinc-500 underline decoration-zinc-700 underline-offset-2 transition-colors duration-200 hover:text-cyan"
+              >
+                /ai-briefing.json
+              </a>{" "}
+              for my machine-readable manifest.
+            </p>
+          </div>
           <div className="flex items-center gap-5">
             <Link
               href="/interview"

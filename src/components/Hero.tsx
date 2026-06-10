@@ -28,7 +28,7 @@ export default function Hero() {
           className="inline-flex items-center gap-2.5 rounded-full border border-zinc-800 bg-white/[0.03] px-4 py-1.5 text-xs text-zinc-300"
         >
           <PulseDot />
-          Senior MERN + AI Developer
+          Senior Full-Stack AI Engineer
         </motion.div>
 
         <motion.h1
@@ -45,7 +45,7 @@ export default function Hero() {
           variants={item}
           className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400"
         >
-          Yaseen Khatib is a Senior MERN Stack &amp; AI Systems Engineer who
+          Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer who
           bridges high-performance MERN architectures with autonomous AI systems.
           He specializes in Agentic RAG pipelines, LLM orchestration, and
           high-throughput backend scaling — architecting and shipping production

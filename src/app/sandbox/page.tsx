@@ -3,6 +3,8 @@ import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import GradientText from "@/components/GradientText";
 import WorkflowCanvas from "./WorkflowCanvas";
+import FinOpsSimulator from "@/components/widgets/FinOpsSimulator";
+import ChaosToggle from "@/components/widgets/ChaosToggle";
 import { SITE_URL } from "@/lib/site";
 
 const DESCRIPTION =
@@ -67,6 +69,31 @@ export default function SandboxPage() {
             React Flow + Zustand · drag nodes to reposition · drag between
             handles to connect
           </p>
+
+          <section className="mt-24" aria-labelledby="lab-heading">
+            <div className="flex items-center gap-3">
+              <h2
+                id="lab-heading"
+                className="font-mono text-xs uppercase tracking-[0.25em] text-cyan"
+              >
+                ~/lab
+              </h2>
+              <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
+            </div>
+
+            <h3 className="mt-6 max-w-3xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+              Infrastructure &amp; <GradientText>Resiliency Lab</GradientText>
+            </h3>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+              Interactive demonstrations of production-grade LLM cost governance
+              and client-side network degradation recovery.
+            </p>
+
+            <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+              <FinOpsSimulator />
+              <ChaosToggle />
+            </div>
+          </section>
         </main>
 
         <footer className="mt-20 border-t border-zinc-800/70 py-10 text-sm text-zinc-500">

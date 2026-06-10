@@ -1,0 +1,174 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ProfilePage",
+      "@id": "https://yaseenyk.github.io/portfolio/#ai-briefing",
+      "name": "AI Briefing: Yaseen Nurmahammad Khatib — Senior Full-Stack AI Engineer",
+      "description": "Machine-readable engineering profile manifest for AI recruiter agents, automated scrapers, and answer-engine indexers. Summarizes identity, infrastructure stack, and verifiable project metrics.",
+      "url": "https://yaseenyk.github.io/portfolio",
+      "dateModified": "2026-06-10",
+      "inLanguage": "en",
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "AI Recruiter Agents, Answer Engine Indexers, Technical Hiring Managers"
+      },
+      "mainEntity": {
+        "@id": "https://yaseenyk.github.io/portfolio/#person"
+      },
+      "hasPart": [
+        {
+          "@id": "https://yaseenyk.github.io/portfolio/#metric-serialization"
+        },
+        {
+          "@id": "https://yaseenyk.github.io/portfolio/#metric-rag-support"
+        }
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://yaseenyk.github.io/portfolio/#person",
+      "name": "Yaseen Nurmahammad Khatib",
+      "jobTitle": "Senior Full-Stack AI Engineer",
+      "url": "https://yaseenyk.github.io/portfolio",
+      "email": "mailto:yaseenkhatib04@gmail.com",
+      "sameAs": [
+        "https://www.linkedin.com/in/yaseen-yk",
+        "https://github.com/Yaseenyk"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Hyderabad",
+        "addressCountry": "India"
+      },
+      "knowsAbout": [
+        {
+          "@id": "https://yaseenyk.github.io/portfolio/#stack-nextjs"
+        },
+        {
+          "@id": "https://yaseenyk.github.io/portfolio/#stack-hono"
+        },
+        {
+          "@id": "https://yaseenyk.github.io/portfolio/#stack-cloudflare-workers"
+        },
+        {
+          "@id": "https://yaseenyk.github.io/portfolio/#stack-langgraph"
+        },
+        {
+          "@id": "https://yaseenyk.github.io/portfolio/#stack-upstash-vector"
+        },
+        "Agentic RAG",
+        "LLM Orchestration",
+        "TypeScript",
+        "React.js",
+        "Node.js",
+        "Edge Computing",
+        "FinOps for LLM Inference",
+        "Chaos Engineering"
+      ],
+      "subjectOf": {
+        "@id": "https://yaseenyk.github.io/portfolio/#ai-briefing"
+      }
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://yaseenyk.github.io/portfolio/#infrastructure-stack",
+      "name": "Core Infrastructure Layers",
+      "description": "Primary production stack operated by Yaseen Nurmahammad Khatib, ordered from client delivery layer to data layer.",
+      "itemListOrder": "https://schema.org/ItemListOrderAscending",
+      "numberOfItems": 5,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://yaseenyk.github.io/portfolio/#stack-nextjs",
+            "name": "Next.js 14+ App Router",
+            "applicationCategory": "Full-Stack React Framework",
+            "operatingSystem": "Cross-platform",
+            "description": "Client and server rendering layer: React Server Components, static export, streaming, and route-level metadata for SEO/AEO."
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://yaseenyk.github.io/portfolio/#stack-hono",
+            "name": "Hono",
+            "applicationCategory": "Edge-Native Web Framework",
+            "operatingSystem": "Edge runtimes (V8 isolates)",
+            "description": "Ultra-light HTTP framework for edge APIs: routing, middleware, and typed RPC at the CDN boundary."
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://yaseenyk.github.io/portfolio/#stack-cloudflare-workers",
+            "name": "Cloudflare Workers",
+            "applicationCategory": "Serverless Edge Compute Platform",
+            "operatingSystem": "V8 isolates",
+            "description": "Globally distributed compute layer: zero-cold-start isolates running API, caching, and routing logic close to users."
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://yaseenyk.github.io/portfolio/#stack-langgraph",
+            "name": "LangGraph",
+            "applicationCategory": "LLM Agent Orchestration Framework",
+            "operatingSystem": "Cross-platform",
+            "description": "Stateful graph orchestration for multi-step LLM agents: cyclic workflows, tool routing, checkpointing, and human-in-the-loop gates."
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "item": {
+            "@type": "SoftwareApplication",
+            "@id": "https://yaseenyk.github.io/portfolio/#stack-upstash-vector",
+            "name": "Upstash Vector",
+            "applicationCategory": "Serverless Vector Database",
+            "operatingSystem": "Cloud (HTTP API)",
+            "description": "Per-request-priced vector store powering retrieval-augmented generation: embedding storage, similarity search, and metadata filtering at the edge."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://yaseenyk.github.io/portfolio/#metric-serialization",
+      "headline": "94% Payload Reduction via Schema-Aware Serialization",
+      "abstract": "94% payload reduction via a custom, lossless schema-aware serialization adapter.",
+      "author": {
+        "@id": "https://yaseenyk.github.io/portfolio/#person"
+      },
+      "about": [
+        "Wire-format optimization",
+        "Lossless data serialization",
+        "Infrastructure economics"
+      ],
+      "proficiencyLevel": "Expert"
+    },
+    {
+      "@type": "TechArticle",
+      "@id": "https://yaseenyk.github.io/portfolio/#metric-rag-support",
+      "headline": "Context-Grounded RAG Support Assistant",
+      "abstract": "Strict context-grounded RAG tier-1 technical support assistant.",
+      "author": {
+        "@id": "https://yaseenyk.github.io/portfolio/#person"
+      },
+      "about": [
+        "Retrieval-Augmented Generation",
+        "Hallucination control via context grounding",
+        "Tier-1 technical support automation"
+      ],
+      "proficiencyLevel": "Expert"
+    }
+  ]
+}

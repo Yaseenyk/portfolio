@@ -8,8 +8,8 @@ export const SOCIALS = {
 };
 
 export const PERSON = {
-  name: "Yaseen Khatib",
-  jobTitle: "Senior MERN Stack & AI Systems Engineer",
+  name: "Yaseen Nurmahammad Khatib",
+  jobTitle: "Senior Full-Stack AI Engineer",
   email: "yaseenkhatib04@gmail.com",
   locality: "Hyderabad",
   country: "India",
