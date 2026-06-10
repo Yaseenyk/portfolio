@@ -1,0 +1,22 @@
+<!-- @dsCard group="Spacing" viewport="700x190" name="Background system" subtitle="Ink + ambient radials + fixed 40px grid" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { padding: 20px; }
+  .sw-row { display: flex; gap: 10px; }
+  .sw { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .sw .chip { height: 64px; border-radius: 10px; border: 1px solid rgba(39,39,42,.6); }
+  .sw .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--zinc-500); }
+  .sw .lbl b { display: block; color: var(--zinc-300); font-weight: 500; }
+</style>
+</head>
+<body>
+<div style="position:relative;height:150px;border-radius:12px;overflow:hidden;border:1px solid var(--zinc-800);background-color:var(--ink);background-image:var(--gradient-ambient);background-position:50% 0;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(to right, var(--grid-line) 1px, transparent 1px),linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);background-size:40px 40px;"></div>
+  <div style="position:absolute;left:16px;bottom:12px;font-family:var(--font-mono);font-size:10px;color:var(--zinc-500);">#05070A + .sk-grid-bg + --gradient-ambient · max-width 1400px column</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Logo Redesign v2 — From Scratch</title>
+<link rel="stylesheet" href="styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="scraps/design-canvas.jsx"></script>
+<script type="text/babel" src="scraps/logo-marks-v2.jsx"></script>
+<script type="text/babel">
+const { DesignCanvas, DCSection, DCArtboard } = window;
+const { MarkHex, MarkCircuit, MarkVelocity, MarkOrbit, FaviconStrip2, Lockup2 } = window;
+
+const frame = {
+  display: "grid",
+  placeItems: "center",
+  height: 220,
+  background: "#05070A",
+  backgroundImage: "radial-gradient(20rem 14rem at 50% -10%, rgba(34,211,238,0.10), transparent 60%)",
+};
+
+function Board({ Mark }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div style={frame}>
+        <div style={{ filter: "drop-shadow(0 0 26px rgba(34,211,238,0.35))" }}>
+          <Mark size={160} />
+        </div>
+      </div>
+      <FaviconStrip2 Mark={Mark} />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="marks2" title="From-scratch brand marks" subtitle="Built on the brand's signal motifs — neural core, circuit nodes, AI-speed, orbit · favicon sizes 48 / 32 / 16">
+        <DCArtboard id="hex" label="1 · Neural Hex — Y spokes from a glowing core" width={330} height={345}><Board Mark={MarkHex} /></DCArtboard>
+        <DCArtboard id="cir" label="2 · Circuit Y — trace with node terminals" width={330} height={345}><Board Mark={MarkCircuit} /></DCArtboard>
+        <DCArtboard id="vel" label="3 · Velocity — YK sliced at AI-speed" width={330} height={345}><Board Mark={MarkVelocity} /></DCArtboard>
+        <DCArtboard id="orb" label="4 · Orbit — Y core in a dashed orbital" width={330} height={345}><Board Mark={MarkOrbit} /></DCArtboard>
+      </DCSection>
+      <DCSection id="lockups2" title="Lockups" subtitle="Mark + name + role line">
+        <DCArtboard id="lhex" label="1 · Neural Hex" width={440} height={110}><Lockup2 Mark={MarkHex} /></DCArtboard>
+        <DCArtboard id="lcir" label="2 · Circuit Y" width={440} height={110}><Lockup2 Mark={MarkCircuit} /></DCArtboard>
+        <DCArtboard id="lvel" label="3 · Velocity" width={440} height={110}><Lockup2 Mark={MarkVelocity} /></DCArtboard>
+        <DCArtboard id="lorb" label="4 · Orbit" width={440} height={110}><Lockup2 Mark={MarkOrbit} /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>

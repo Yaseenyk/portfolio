@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Logo Redesign — YK Monogram</title>
+<link rel="stylesheet" href="styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="scraps/design-canvas.jsx"></script>
+<script type="text/babel" src="scraps/logo-marks.jsx"></script>
+<script type="text/babel">
+const { DesignCanvas, DCSection, DCArtboard } = window;
+const { MarkA, MarkB, MarkC, MarkD, FaviconStrip, Lockup } = window;
+
+const logoCanvasFrame = {
+  display: "grid",
+  placeItems: "center",
+  height: 210,
+  background: "#05070A",
+  backgroundImage:
+    "radial-gradient(20rem 14rem at 50% -10%, rgba(34,211,238,0.10), transparent 60%)",
+};
+
+function MarkBoard({ Mark }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div style={logoCanvasFrame}>
+        <Mark size={150} />
+      </div>
+      <FaviconStrip Mark={Mark} />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="marks" title="YK Monogram — refined directions" subtitle="All cyan→ice gradient family · each shown with favicon sizes 48 / 32 / 16">
+        <DCArtboard id="a" label="A · Refined Classic" width={320} height={330}><MarkBoard Mark={MarkA} /></DCArtboard>
+        <DCArtboard id="b" label="B · Ligature" width={320} height={330}><MarkBoard Mark={MarkB} /></DCArtboard>
+        <DCArtboard id="c" label="C · Ink Inverse" width={320} height={330}><MarkBoard Mark={MarkC} /></DCArtboard>
+        <DCArtboard id="d" label="D · Terminal" width={320} height={330}><MarkBoard Mark={MarkD} /></DCArtboard>
+      </DCSection>
+      <DCSection id="lockups" title="Lockups" subtitle="Mark + Inter 700 wordmark on ink">
+        <DCArtboard id="la" label="A lockup" width={460} height={120}><Lockup Mark={MarkA} /></DCArtboard>
+        <DCArtboard id="lb" label="B lockup" width={460} height={120}><Lockup Mark={MarkB} /></DCArtboard>
+        <DCArtboard id="lc" label="C lockup" width={460} height={120}><Lockup Mark={MarkC} /></DCArtboard>
+        <DCArtboard id="ld" label="D lockup" width={460} height={120}><Lockup Mark={MarkD} /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</head>
+<body>
+<div id="root"></div>
+</body>
+</html>

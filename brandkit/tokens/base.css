@@ -1,0 +1,45 @@
+/* ── Signal Kit · Base styles & brand utilities ─────────────── */
+::selection {
+  background-color: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-page);
+  background-image: var(--gradient-ambient);
+  background-attachment: fixed;
+  color: var(--zinc-100);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Animated cyan→purple gradient text */
+.sk-text-gradient {
+  background-image: var(--gradient-signal);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sk-gradient var(--duration-gradient) linear infinite;
+}
+
+/* Faint fixed grid laid over the ink background */
+.sk-grid-bg {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+}
+
+/* Terminal syntax-highlight tokens */
+.tok-key { color: var(--tok-key); }
+.tok-fn { color: var(--tok-fn); }
+.tok-str { color: var(--tok-str); }
+.tok-num { color: var(--tok-num); }
+.tok-com { color: var(--tok-com); font-style: italic; }
+.tok-punc { color: var(--tok-punc); }

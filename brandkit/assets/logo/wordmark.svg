@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="96" viewBox="0 0 560 96">
+  
+  <text x="24" y="50" dominant-baseline="middle" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="48" letter-spacing="-1.2" fill="#FAFAFA">Yaseen Khatib</text>
+  <circle cx="392" cy="48" r="9" fill="#67E8F9"></circle>
+  <circle cx="392" cy="48" r="16" fill="none" stroke="#67E8F9" stroke-opacity="0.35" stroke-width="2"></circle>
+</svg>

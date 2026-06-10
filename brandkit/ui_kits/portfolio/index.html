@@ -1,0 +1,40 @@
+<!-- @dsCard group="Portfolio Site" viewport="1400x860" name="Homepage" subtitle="Hero, mission-control projects window, field notes, footer" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Yaseen Khatib | AI + MERN Architect</title>
+<link rel="icon" href="../../assets/favicon.ico" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<style>
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  (function () {
+    var NS = "YaseenKhatibSignalKit_bbdb40";
+    var tries = 0;
+    function mount() {
+      ReactDOM.createRoot(document.getElementById("root")).render(
+        React.createElement(window[NS].PortfolioHome)
+      );
+    }
+    function attempt() {
+      if (window[NS] && window[NS].PortfolioHome) { mount(); return; }
+      if (tries++ > 20) return;
+      var s = document.createElement("script");
+      s.src = "../../_ds_bundle.js?retry=" + tries;
+      s.onload = function () { if (window[NS]) mount(); else setTimeout(attempt, 1500); };
+      s.onerror = function () { setTimeout(attempt, 1500); };
+      document.head.appendChild(s);
+    }
+    window.addEventListener("DOMContentLoaded", attempt);
+  })();
+</script>
+</body>
+</html>

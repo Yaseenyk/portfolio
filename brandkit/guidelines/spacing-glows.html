@@ -1,0 +1,26 @@
+<!-- @dsCard group="Spacing" viewport="700x190" name="Shadows & glows" subtitle="Signal glows instead of dark shadows" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { padding: 20px; }
+  .sw-row { display: flex; gap: 10px; }
+  .sw { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .sw .chip { height: 64px; border-radius: 10px; border: 1px solid rgba(39,39,42,.6); }
+  .sw .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--zinc-500); }
+  .sw .lbl b { display: block; color: var(--zinc-300); font-weight: 500; }
+  .g { display:flex; gap:18px; padding: 12px 6px; }
+  .g > div { flex:1; height:84px; border-radius:12px; border:1px solid var(--zinc-800); background:var(--surface-card); display:flex; align-items:flex-end; padding:10px 12px; font-family:var(--font-mono); font-size:10px; color:var(--zinc-500); }
+</style>
+</head>
+<body>
+<div class="g">
+<div style="box-shadow:var(--glow-cta);background:var(--cyan);color:var(--ink);">--glow-cta</div>
+<div style="box-shadow:var(--glow-card-hover);border-color:var(--border-hover);">--glow-card-hover</div>
+<div style="box-shadow:var(--glow-emerald);border-color:rgba(16,185,129,.3);color:var(--emerald-400);">--glow-emerald</div>
+<div style="box-shadow:var(--shadow-window);">--shadow-window</div>
+</div>
+</body>
+</html>

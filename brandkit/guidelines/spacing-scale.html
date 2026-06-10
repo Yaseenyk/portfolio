@@ -1,0 +1,28 @@
+<!-- @dsCard group="Spacing" viewport="700x230" name="Spacing scale" subtitle="4px-based; sections breathe at 96px" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { padding: 20px; }
+  .sw-row { display: flex; gap: 10px; }
+  .sw { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .sw .chip { height: 64px; border-radius: 10px; border: 1px solid rgba(39,39,42,.6); }
+  .sw .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--zinc-500); }
+  .sw .lbl b { display: block; color: var(--zinc-300); font-weight: 500; }
+  .sp { display:flex; align-items:center; gap:14px; margin-bottom:9px; }
+  .sp code { font-family:var(--font-mono); font-size:10px; color:var(--zinc-500); width:110px; flex:none; }
+  .sp i { display:block; height:10px; background:rgba(34,211,238,0.35); border:1px solid rgba(34,211,238,0.6); border-radius:2px; }
+</style>
+</head>
+<body>
+<div class="sp"><code>--space-1 · 4px</code><i style="width:4px;"></i></div>
+<div class="sp"><code>--space-2 · 8px</code><i style="width:8px;"></i></div>
+<div class="sp"><code>--space-4 · 16px</code><i style="width:16px;"></i></div>
+<div class="sp"><code>--space-6 · 24px</code><i style="width:24px;"></i></div>
+<div class="sp"><code>--space-8 · 32px</code><i style="width:32px;"></i></div>
+<div class="sp"><code>--space-12 · 48px</code><i style="width:48px;"></i></div>
+<div class="sp"><code>--space-16 · 64px</code><i style="width:64px;"></i></div>
+<div class="sp"><code>--space-24 · 96px</code><i style="width:96px;"></i></div></body>
+</html>

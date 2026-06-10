@@ -1,0 +1,44 @@
+/* ── Signal Kit · Shadows, glows, gradients, motion ─────────── */
+:root {
+  /* Glows (the signature "signal" shadows) */
+  --glow-cta: 0 0 24px -4px rgba(34, 211, 238, 0.6);
+  --glow-cta-hover: 0 0 30px -2px rgba(34, 211, 238, 0.7);
+  --glow-card-hover: 0 0 44px -12px rgba(103, 232, 249, 0.4);
+  --glow-dot: 0 0 8px 1px rgba(103, 232, 249, 0.8);
+  --glow-dot-small: 0 0 6px 1px rgba(103, 232, 249, 0.7);
+  --glow-emerald: 0 0 24px -8px rgba(16, 185, 129, 0.55);
+  --shadow-window: 0 25px 50px -12px rgba(34, 211, 238, 0.1); /* shadow-2xl shadow-cyan-500/10 */
+  --shadow-nav: 0 25px 50px -12px rgba(22, 78, 99, 0.2);      /* shadow-cyan-900/20 */
+
+  /* Gradients */
+  --gradient-signal: linear-gradient(to right, var(--cyan), var(--purple), var(--cyan));
+  --gradient-ambient:
+    radial-gradient(55rem 40rem at 50% -12%, rgba(34, 211, 238, 0.08), transparent 60%),
+    radial-gradient(48rem 38rem at 100% 8%, rgba(168, 85, 247, 0.07), transparent 60%); /* @kind color */
+  --gradient-rule: linear-gradient(to right, rgba(34, 211, 238, 0.6), transparent); /* @kind color */
+  --gradient-rule-neutral: linear-gradient(to right, #27272a, transparent); /* @kind color */
+
+  /* Background grid */
+  --grid-line: rgba(79, 79, 79, 0.18); /* #4f4f4f2e */
+
+  /* Motion */
+  --ease-signal: cubic-bezier(0.21, 0.47, 0.32, 0.98); /* @kind other */
+  --duration-fast: 200ms; /* @kind other */
+  --duration-base: 300ms; /* @kind other */
+  --duration-reveal: 600ms; /* @kind other */
+  --duration-gradient: 4s; /* @kind other */
+  --duration-pulse: 2.4s; /* @kind other */
+}
+
+/* Shared keyframes */
+@keyframes sk-gradient {
+  to { background-position: 200% center; }
+}
+@keyframes sk-pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px 0 rgba(103, 232, 249, 0.7); }
+  50% { opacity: 0.6; box-shadow: 0 0 4px 0 rgba(103, 232, 249, 0.3); }
+}
+@keyframes sk-ping {
+  from { transform: scale(1); opacity: 0.6; }
+  to { transform: scale(2.2); opacity: 0; }
+}

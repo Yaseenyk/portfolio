@@ -1,0 +1,55 @@
+/* ── Signal Kit · Color tokens ─────────────────────────────────
+   Source: portfolio/tailwind.config.ts + globals.css (streamerOS Signal Kit) */
+:root {
+  /* Base brand */
+  --ink: #05070a;            /* page background */
+  --cyan: #22d3ee;           /* primary signal */
+  --cyan-900: #164e63;
+  --purple: #a855f7;         /* secondary signal (gradient partner) */
+  --ice: #67e8f9;            /* accent / "live" glow */
+
+  /* Neutrals (zinc) */
+  --zinc-50: #fafafa;
+  --zinc-100: #f4f4f5;
+  --zinc-200: #e4e4e7;
+  --zinc-300: #d4d4d8;
+  --zinc-400: #a1a1aa;
+  --zinc-500: #71717a;
+  --zinc-600: #52525b;
+  --zinc-700: #3f3f46;
+  --zinc-800: #27272a;
+  --zinc-950: #09090b;
+
+  /* Status */
+  --emerald: #10b981;        /* ROI / success notes */
+  --emerald-400: #34d399;
+  --red-traffic: #ff5f57;    /* macOS window controls */
+  --yellow-traffic: #febc2e;
+  --green-traffic: #28c840;
+
+  /* Terminal syntax tokens */
+  --tok-key: #22d3ee;
+  --tok-fn: #a855f7;
+  --tok-str: #86efac;
+  --tok-num: #67e8f9;
+  --tok-com: #52525b;
+  --tok-punc: #71717a;
+
+  /* Semantic aliases */
+  --bg-page: var(--ink);
+  --surface-card: rgba(9, 9, 11, 0.6);        /* zinc-950/60 glass card */
+  --surface-window: rgba(5, 7, 10, 0.8);      /* ink/80 dashboard window */
+  --surface-raise: rgba(255, 255, 255, 0.02); /* window bars, subtle lift */
+  --surface-terminal: #0b1018;                /* code block body */
+  --border-default: rgba(39, 39, 42, 0.5);    /* zinc-800/50 */
+  --border-strong: #27272a;                   /* zinc-800 */
+  --border-hover: rgba(103, 232, 249, 0.3);   /* ice/30 */
+  --text-heading: var(--zinc-50);
+  --text-body: var(--zinc-400);
+  --text-emphasis: var(--zinc-100);
+  --text-muted: var(--zinc-500);
+  --text-faint: var(--zinc-600);
+  --text-accent: var(--cyan);
+  --selection-bg: var(--cyan);
+  --selection-fg: var(--ink);
+}

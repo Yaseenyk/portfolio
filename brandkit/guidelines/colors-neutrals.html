@@ -1,0 +1,27 @@
+<!-- @dsCard group="Colors" viewport="700x130" name="Neutrals (zinc)" subtitle="Text and border scale on ink" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { padding: 20px; }
+  .sw-row { display: flex; gap: 10px; }
+  .sw { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .sw .chip { height: 64px; border-radius: 10px; border: 1px solid rgba(39,39,42,.6); }
+  .sw .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--zinc-500); }
+  .sw .lbl b { display: block; color: var(--zinc-300); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="sw-row">
+<div class="sw"><div class="chip" style="background:var(--zinc-50);"></div><div class="lbl"><b>zinc-50 · headings</b>#FAFAFA</div></div>
+<div class="sw"><div class="chip" style="background:var(--zinc-200);"></div><div class="lbl"><b>zinc-200 · emphasis</b>#E4E4E7</div></div>
+<div class="sw"><div class="chip" style="background:var(--zinc-400);"></div><div class="lbl"><b>zinc-400 · body</b>#A1A1AA</div></div>
+<div class="sw"><div class="chip" style="background:var(--zinc-500);"></div><div class="lbl"><b>zinc-500 · muted</b>#71717A</div></div>
+<div class="sw"><div class="chip" style="background:var(--zinc-700);"></div><div class="lbl"><b>zinc-700 · borders</b>#3F3F46</div></div>
+<div class="sw"><div class="chip" style="background:var(--zinc-800);"></div><div class="lbl"><b>zinc-800 · card borders</b>#27272A</div></div>
+<div class="sw"><div class="chip" style="background:var(--zinc-950);"></div><div class="lbl"><b>zinc-950 · card fill</b>#09090B</div></div>
+</div>
+</body>
+</html>

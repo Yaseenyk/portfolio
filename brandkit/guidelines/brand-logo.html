@@ -1,0 +1,31 @@
+<!-- @dsCard group="Brand" viewport="700x210" name="Logo" subtitle="Circuit Y · Live Port — assets/logo/" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { padding: 20px; }
+  .lg { display: flex; align-items: center; gap: 24px; }
+  .cell { display: flex; flex-direction: column; gap: 8px; }
+  .cell .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--zinc-500); }
+  .frame { display: grid; place-items: center; height: 120px; border-radius: 12px; border: 1px solid var(--zinc-800); background: rgba(255,255,255,0.02); padding: 0 20px; }
+</style>
+</head>
+<body>
+<div class="lg">
+  <div class="cell">
+    <div class="frame"><img src="../assets/logo/circuit-y-256.png" alt="Circuit Y mark" style="width:88px;height:88px;" /></div>
+    <span class="lbl">circuit-y · svg / 1024 / 512 / 256</span>
+  </div>
+  <div class="cell">
+    <div class="frame"><img src="../assets/logo/circuit-y-glyph-512.png" alt="Bare glyph" style="width:88px;height:88px;" /></div>
+    <span class="lbl">circuit-y-glyph · bare, transparent</span>
+  </div>
+  <div class="cell" style="flex:1;">
+    <div class="frame"><img src="../assets/logo/lockup-dark-bg.png" alt="Lockup" style="height:72px;" /></div>
+    <span class="lbl">lockup-dark-bg.png · favicon.ico 16/32/48</span>
+  </div>
+</div>
+</body>
+</html>
