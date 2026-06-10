@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Fira_Code } from "next/font/google";
 import { SITE_URL, personJsonLd } from "@/lib/site";
+import CommandPalette from "@/components/CommandPalette";
 import "./globals.css";
 
 const inter = Inter({
@@ -17,7 +18,7 @@ const firaCode = Fira_Code({
 
 const TITLE_DEFAULT = "Yaseen Khatib | AI + MERN Architect";
 const DESCRIPTION =
-  "Yaseen Khatib is a Senior MERN Stack & AI Systems Engineer specializing in Agentic RAG pipelines, LLM orchestration, and high-throughput backend scaling — architecting and shipping production systems at AI-speed.";
+  "Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer specializing in Agentic RAG pipelines, LLM orchestration, and high-throughput backend scaling — architecting and shipping production systems at AI-speed.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -41,7 +42,11 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Yaseen Khatib", url: SITE_URL }],
   creator: "Yaseen Khatib",
-  alternates: { canonical: SITE_URL },
+  alternates: {
+    canonical: SITE_URL,
+    // AEO: standalone machine-readable manifest for AI recruiter agents.
+    types: { "application/ld+json": `${SITE_URL}/ai-briefing.json` },
+  },
   openGraph: {
     type: "website",
     title: TITLE_DEFAULT,
@@ -49,12 +54,19 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "Yaseen Khatib",
     locale: "en_US",
+    images: [
+      {
+        url: `${SITE_URL}/og-lockup.png`,
+        alt: "Circuit Y mark — Yaseen Khatib, Senior Full-Stack AI Engineer",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE_DEFAULT,
     description: DESCRIPTION,
     creator: "@yaseenyk",
+    images: [`${SITE_URL}/og-lockup.png`],
   },
   robots: {
     index: true,
@@ -77,6 +89,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
         {children}
+        <CommandPalette />
       </body>
     </html>
   );
