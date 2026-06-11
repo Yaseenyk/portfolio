@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
+import TerminalAgent from "@/components/widgets/TerminalAgent";
 import ArchitecturePipeline from "@/components/ArchitecturePipeline";
 import Products from "@/components/Products";
 import Dashboard from "@/components/Dashboard";
@@ -53,6 +54,21 @@ export default function Home() {
       <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-24">
         <main className="pt-20">
           <Hero />
+
+          <section id="rag-concierge" className="py-16">
+            <h2 className="text-2xl font-semibold text-zinc-100">
+              RAG Terminal Concierge
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-400">
+              Query my experience through a context-grounded RAG pipeline — live
+              execution traces, structured outputs, and no answers outside the
+              indexed corpus.
+            </p>
+            <div className="mt-6 max-w-2xl">
+              <TerminalAgent />
+            </div>
+          </section>
+
           <ArchitecturePipeline />
           <Products />
           <Dashboard />
