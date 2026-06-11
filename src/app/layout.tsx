@@ -18,7 +18,7 @@ const firaCode = Fira_Code({
 
 const TITLE_DEFAULT = "Yaseen Khatib | AI + MERN Architect";
 const DESCRIPTION =
-  "Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer specializing in Agentic RAG pipelines, LLM orchestration, and high-throughput backend scaling — architecting and shipping production systems at AI-speed.";
+  "Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer building with Next.js, LangGraph, AI FinOps, and Scalable Architecture — specializing in Agentic RAG pipelines, LLM orchestration, and high-throughput backend scaling at AI-speed.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

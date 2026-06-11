@@ -56,7 +56,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/sandbox`,
       lastModified: lastBlogUpdate,
       changeFrequency: "monthly",
-      priority: 0.7,
+      priority: 0.9,
     },
     {
       url: `${SITE_URL}/products`,
