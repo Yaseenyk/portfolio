@@ -64,7 +64,7 @@ export default function Home() {
               execution traces, structured outputs, and no answers outside the
               indexed corpus.
             </p>
-            <div className="mt-6 max-w-2xl">
+            <div className="mt-6">
               <TerminalAgent />
             </div>
           </section>

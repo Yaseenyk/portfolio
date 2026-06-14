@@ -30,20 +30,20 @@ function cubicPoints(p0: Pt, p1: Pt, p2: Pt, p3: Pt, n = 24) {
 // SVG space is 1000×560 (== aspect-[25/14]); node anchors are the curve endpoints.
 const PATHS = [
   {
-    d: "M250 140 C520 120 560 300 740 290",
+    d: "M250 140 C480 120 520 300 620 290",
     ...cubicPoints(
       { x: 250, y: 140 },
-      { x: 520, y: 120 },
-      { x: 560, y: 300 },
-      { x: 740, y: 290 }
+      { x: 480, y: 120 },
+      { x: 520, y: 300 },
+      { x: 620, y: 290 }
     ),
   },
   {
-    d: "M740 290 C560 300 520 470 260 430",
+    d: "M620 290 C520 300 500 470 260 430",
     ...cubicPoints(
-      { x: 740, y: 290 },
-      { x: 560, y: 300 },
-      { x: 520, y: 470 },
+      { x: 620, y: 290 },
+      { x: 520, y: 300 },
+      { x: 500, y: 470 },
       { x: 260, y: 430 }
     ),
   },
@@ -52,7 +52,7 @@ const PATHS = [
 // Node centers as % of the diagram (anchor / 1000, anchor / 560).
 const POS = {
   database: { left: "25%", top: "25%" },
-  backend: { left: "74%", top: "51.8%" },
+  backend: { left: "62%", top: "51.8%" },
   frontend: { left: "26%", top: "76.8%" },
 };
 
@@ -194,16 +194,19 @@ export default function ArchitecturePipeline() {
   const particleStagger = engaged ? 0.05 : 1.6;
 
   return (
-    <section id="architecture" className="py-20">
+    <section id="architecture" className="py-20 lg:py-28">
+      <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        {/* LEFT — manifesto + reactor */}
+        <div>
       {/* Manifesto */}
-      <Reveal className="mx-auto max-w-3xl text-center">
+      <Reveal className="max-w-xl">
         <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
           ~/architecture
         </span>
         <h2 className="mt-5 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
           The Architecture is Everything.
         </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-300">
+        <p className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300">
           AI handles the syntax; the engineer dictates the flow. Master the
           pipeline:{" "}
           <span className="font-mono text-ice">
@@ -217,8 +220,8 @@ export default function ArchitecturePipeline() {
         </p>
       </Reveal>
 
-      {/* Reactor button + readout (centrally between text and diagram) */}
-      <div className="mt-10 flex flex-col items-center gap-3">
+      {/* Reactor button + readout */}
+      <div className="mt-10 flex flex-col items-start gap-3">
         <motion.button
           type="button"
           aria-pressed={engaged}
@@ -262,9 +265,12 @@ export default function ArchitecturePipeline() {
           )}
         </div>
       </div>
+        </div>
 
+        {/* RIGHT — pipeline diagram */}
+        <div>
       {/* Immersive diagram (md+) */}
-      <div className="mt-12 hidden md:block">
+      <div className="hidden md:block">
         <div className="relative aspect-[25/14] w-full overflow-hidden rounded-2xl border border-zinc-800">
           {/* Radial glow */}
           <div
@@ -382,7 +388,7 @@ export default function ArchitecturePipeline() {
           <NodeCard
             title="Database"
             engaged={engaged}
-            className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 lg:w-60"
+            className="absolute z-10 w-40 -translate-x-1/2 -translate-y-1/2 xl:w-52"
             style={POS.database}
           >
             <DatabaseViz engaged={engaged} />
@@ -390,7 +396,7 @@ export default function ArchitecturePipeline() {
           <NodeCard
             title="Backend API"
             engaged={engaged}
-            className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 lg:w-60"
+            className="absolute z-10 w-40 -translate-x-1/2 -translate-y-1/2 xl:w-52"
             style={POS.backend}
           >
             <BackendViz engaged={engaged} />
@@ -398,7 +404,7 @@ export default function ArchitecturePipeline() {
           <NodeCard
             title="Frontend UI"
             engaged={engaged}
-            className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 lg:w-60"
+            className="absolute z-10 w-40 -translate-x-1/2 -translate-y-1/2 xl:w-52"
             style={POS.frontend}
           >
             <FrontendViz engaged={engaged} />
@@ -407,7 +413,7 @@ export default function ArchitecturePipeline() {
       </div>
 
       {/* Cohesive vertical stack (mobile) */}
-      <div className="mt-12 flex flex-col items-center gap-3 md:hidden">
+      <div className="flex flex-col items-center gap-3 md:hidden">
         <NodeCard title="Database" engaged={engaged} className="w-full max-w-xs">
           <DatabaseViz engaged={engaged} />
         </NodeCard>
@@ -419,6 +425,8 @@ export default function ArchitecturePipeline() {
         <NodeCard title="Frontend UI" engaged={engaged} className="w-full max-w-xs">
           <FrontendViz engaged={engaged} />
         </NodeCard>
+      </div>
+        </div>
       </div>
     </section>
   );

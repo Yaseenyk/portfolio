@@ -2,12 +2,21 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Role = "user" | "assistant" | "system";
+type Role = "user" | "assistant" | "system" | "trace";
+
+type TraceKind = "search" | "context" | "guard";
+
+interface Trace {
+  kind: TraceKind;
+  label: string;
+  value: string;
+}
 
 interface TermMessage {
   id: number;
   role: Role;
   text: string;
+  trace?: Trace;
 }
 
 const PROMPT = "guest@yaseen-os:~$";
@@ -55,13 +64,70 @@ function getMockAnswer(query: string): string {
   return KNOWLEDGE.find((k) => k.match.test(query))?.answer ?? FALLBACK_ANSWER;
 }
 
-function traceLines(): string[] {
+function traces(): Trace[] {
   return [
-    `> [Vector Search: ${38 + Math.floor(Math.random() * 22)}ms]`,
-    "> [Context Retrieved: 3 chunks]",
-    "> [Guardrail Check: Passed]",
+    {
+      kind: "search",
+      label: "vector search",
+      value: `${38 + Math.floor(Math.random() * 22)}ms`,
+    },
+    { kind: "context", label: "context retrieved", value: "3 chunks" },
+    { kind: "guard", label: "guardrail check", value: "passed" },
   ];
 }
+
+const TRACE_STYLE: Record<
+  TraceKind,
+  { dot: string; value: string; icon: JSX.Element }
+> = {
+  search: {
+    dot: "bg-cyan",
+    value: "text-cyan",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-3 w-3" aria-hidden>
+        <path
+          d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"
+          fill="currentColor"
+        />
+      </svg>
+    ),
+  },
+  context: {
+    dot: "bg-purple",
+    value: "text-purple",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-3 w-3" aria-hidden>
+        <path
+          d="M12 3 3 7.5 12 12l9-4.5L12 3Z"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M3 12.5 12 17l9-4.5M3 16.5 12 21l9-4.5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  guard: {
+    dot: "bg-emerald-400",
+    value: "text-emerald-400",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-3 w-3" aria-hidden>
+        <path
+          d="m5 12 4.5 4.5L19 7"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+};
 
 const CHAR_INTERVAL_MS = 14;
 const TRACE_STEP_MS = 320;
@@ -84,6 +150,12 @@ export default function TerminalAgent() {
     idRef.current += 1;
     const id = idRef.current;
     setMessages((m) => [...m, { id, role, text }]);
+  }, []);
+
+  const pushTrace = useCallback((trace: Trace) => {
+    idRef.current += 1;
+    const id = idRef.current;
+    setMessages((m) => [...m, { id, role: "trace", text: "", trace }]);
   }, []);
 
   const schedule = useCallback((fn: () => void, delay: number) => {
@@ -159,15 +231,15 @@ export default function TerminalAgent() {
     setBusy(true);
     push("user", query);
 
-    const trace = traceLines();
-    trace.forEach((line, i) =>
-      schedule(() => push("system", line), TRACE_STEP_MS * (i + 1)),
+    const trace = traces();
+    trace.forEach((t, i) =>
+      schedule(() => pushTrace(t), TRACE_STEP_MS * (i + 1)),
     );
     schedule(
       () => streamAnswer(getMockAnswer(query)),
       TRACE_STEP_MS * (trace.length + 1),
     );
-  }, [input, busy, push, schedule, streamAnswer]);
+  }, [input, busy, push, pushTrace, schedule, streamAnswer]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const history = historyRef.current;
@@ -198,7 +270,7 @@ export default function TerminalAgent() {
 
   return (
     <div
-      className="overflow-hidden rounded-xl border border-zinc-800 bg-ink font-mono text-xs leading-relaxed"
+      className="overflow-hidden rounded-xl border border-zinc-800 bg-ink font-mono text-[13px] leading-relaxed"
       onClick={() => inputRef.current?.focus()}
     >
       {/* macOS window chrome */}
@@ -211,7 +283,14 @@ export default function TerminalAgent() {
         <span className="absolute left-1/2 -translate-x-1/2 text-[11px] text-zinc-500">
           rag-concierge — zsh
         </span>
-        <span className="ml-auto text-[10px] uppercase tracking-wider text-zinc-600">
+        <span className="ml-auto flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-zinc-500">
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              busy
+                ? "animate-pulse bg-cyan shadow-[0_0_6px_rgba(34,211,238,0.8)]"
+                : "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]"
+            }`}
+          />
           {busy ? "running" : "idle"}
         </span>
       </div>
@@ -221,7 +300,7 @@ export default function TerminalAgent() {
         role="log"
         aria-live="polite"
         aria-label="RAG agent terminal output"
-        className="h-72 overflow-y-auto px-4 py-3"
+        className="h-[26rem] overflow-y-auto px-5 py-4"
       >
         {messages.map((msg) => {
           if (msg.role === "user") {
@@ -241,14 +320,41 @@ export default function TerminalAgent() {
               </p>
             );
           }
+          if (msg.role === "trace" && msg.trace) {
+            const s = TRACE_STYLE[msg.trace.kind];
+            return (
+              <div
+                key={msg.id}
+                className="mt-1.5 flex w-fit items-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.03] px-2.5 py-1"
+              >
+                <span className={s.value}>{s.icon}</span>
+                <span className="text-[11px] text-zinc-500">
+                  {msg.trace.label}
+                </span>
+                <span className={`h-1 w-1 rounded-full ${s.dot}`} />
+                <span className={`text-[11px] font-medium ${s.value}`}>
+                  {msg.trace.value}
+                </span>
+              </div>
+            );
+          }
           const isStreamingThis = streaming && msg.id === lastMessage?.id;
           return (
-            <p key={msg.id} className="mt-1 whitespace-pre-wrap text-zinc-300">
-              {msg.text}
-              {isStreamingThis && (
-                <span className="ml-0.5 inline-block h-3.5 w-2 animate-pulse bg-cyan align-text-bottom" />
-              )}
-            </p>
+            <div
+              key={msg.id}
+              className="mt-2.5 rounded-lg border border-cyan/20 bg-cyan/[0.03] px-3 py-2"
+            >
+              <span className="mb-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-cyan/70">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
+                assistant
+              </span>
+              <p className="whitespace-pre-wrap text-zinc-300">
+                {msg.text}
+                {isStreamingThis && (
+                  <span className="ml-0.5 inline-block h-3.5 w-2 animate-pulse bg-cyan align-text-bottom" />
+                )}
+              </p>
+            </div>
           );
         })}
 
