@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
 """Autonomous AI blog writer.
 
-Reads the top topic from ``topics.txt``, asks Gemini to write a deeply technical,
-developer-focused article in strict Markdown, then writes it to
+Reads the top topic from ``topics.txt``, asks ChatGPT (OpenAI) to write a deeply
+technical, developer-focused article in strict Markdown, then writes it to
 ``src/content/blog/<slug>.mdx`` with frontmatter the Next.js site understands.
 On success the used topic is removed from ``topics.txt``.
 
 Env:
-  GEMINI_API_KEY  (required)  Google AI Studio API key.
-  GEMINI_MODEL    (optional)  Defaults to ``gemini-2.5-flash`` (free tier).
+  OPENAI_API_KEY     (required)  OpenAI API key.
+  OPENAI_MODEL       (optional)  Defaults to ``gpt-5``.
+  OPENAI_MAX_TOKENS  (optional)  Output token cap. Defaults to 16384.
 """
 
 from __future__ import annotations
 
 import datetime
+import json
 import os
 import pathlib
 import re
 import sys
 
 import yaml
-from google import genai
+from openai import OpenAI
 
 SCRIPTS_DIR = pathlib.Path(__file__).resolve().parent
 ROOT = SCRIPTS_DIR.parent
 TOPICS_FILE = SCRIPTS_DIR / "topics.txt"
 OUT_DIR = ROOT / "src" / "content" / "blog"
 
-# Local convenience: load GEMINI_API_KEY from a gitignored .env if present.
+# Local convenience: load OPENAI_API_KEY from a gitignored .env if present.
 # In CI the key comes from the environment (GitHub secret), so this is a no-op.
 try:
     from dotenv import load_dotenv
@@ -72,43 +74,43 @@ def build_prompt(topic: str) -> str:
 Write a highly technical, opinionated, practical article on this topic:
 "{topic}"
 
-Output requirements (follow EXACTLY):
-- Begin the response with a YAML frontmatter block delimited by triple dashes (---).
-- Frontmatter keys (and ONLY these): title, description, tags, keywords, takeaways.
-  - title: a specific, punchy title (string).
-  - description: one sentence, <=160 chars, no quotes inside.
-  - tags: a YAML list of 2-4 short topic tags (e.g. AI, Backend, RAG).
-  - keywords: a YAML list of 4-8 SEO keywords.
-  - takeaways: a YAML list of 3-4 direct, declarative bullet sentences (the TL;DR).
-- After the closing --- of the frontmatter, write the article body in GitHub-Flavored Markdown.
-- The body MUST be technical and concrete: use ## and ### headings, fenced code blocks
-  with language hints (```ts, ```python, ```bash), tables where useful, and at least
-  two substantial, correct code examples.
-- Do NOT include an H1 (#) heading in the body (the title is rendered from frontmatter).
-- Do NOT wrap the whole response in a markdown code fence.
-- Do NOT add any commentary before the frontmatter or after the article.
-- Target 900-1400 words.
+Field requirements (ALL fields are mandatory — never leave one empty):
+- title: a specific, punchy, keyword-rich title (<=70 chars).
+- description: one compelling meta-description sentence, 120-160 chars, plain text, no quotes.
+- tags: 2-4 short topic tags (e.g. AI, Backend, RAG).
+- keywords: 5-8 specific, long-tail SEO keywords/phrases a developer would actually search.
+- takeaways: 3-4 direct, declarative TL;DR sentences.
+- body_markdown: the full article in GitHub-Flavored Markdown. Requirements:
+  - Do NOT include an H1 (#) heading; the title is rendered separately. Use ## and ### headings.
+  - Be technical and concrete: fenced code blocks with language hints (```ts, ```python, ```bash),
+    tables where useful, and at least two substantial, correct code examples.
+  - Do NOT wrap the whole body in a markdown code fence. No commentary before or after the article.
+  - Target 900-1400 words.
 """
 
 
-def strip_outer_fence(text: str) -> str:
-    """Remove an accidental ```markdown ... ``` wrapper around the whole response."""
-    stripped = text.strip()
-    m = re.match(r"^```[a-zA-Z]*\n(.*)\n```$", stripped, re.DOTALL)
-    return m.group(1).strip() if m else stripped
-
-
-def parse_frontmatter(text: str) -> tuple[dict, str]:
-    """Split a frontmatter+body document. Returns (meta, body)."""
-    if text.startswith("---"):
-        parts = text.split("---", 2)
-        if len(parts) >= 3:
-            try:
-                meta = yaml.safe_load(parts[1]) or {}
-            except yaml.YAMLError:
-                meta = {}
-            return (meta if isinstance(meta, dict) else {}, parts[2].strip())
-    return {}, text.strip()
+# Structured-output contract: every SEO field is required, so the model cannot
+# silently omit description/keywords/takeaways the way free-form frontmatter allowed.
+POST_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string"},
+        "description": {"type": "string"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "keywords": {"type": "array", "items": {"type": "string"}},
+        "takeaways": {"type": "array", "items": {"type": "string"}},
+        "body_markdown": {"type": "string"},
+    },
+    "required": [
+        "title",
+        "description",
+        "tags",
+        "keywords",
+        "takeaways",
+        "body_markdown",
+    ],
+    "additionalProperties": False,
+}
 
 
 def reading_minutes(body: str) -> int:
@@ -124,20 +126,37 @@ def as_list(value) -> list[str]:
     return []
 
 
-def generate(topic: str) -> str:
-    api_key = os.environ.get("GEMINI_API_KEY")
+def generate(topic: str) -> dict:
+    api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        sys.exit("ERROR: GEMINI_API_KEY is not set.")
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+        sys.exit("ERROR: OPENAI_API_KEY is not set.")
+    model_name = os.environ.get("OPENAI_MODEL", "gpt-5")
+    max_tokens = int(os.environ.get("OPENAI_MAX_TOKENS", "16384"))
 
-    client = genai.Client(api_key=api_key)
-    resp = client.models.generate_content(
-        model=model_name, contents=build_prompt(topic)
+    client = OpenAI(api_key=api_key)
+    resp = client.responses.create(
+        model=model_name,
+        input=build_prompt(topic),
+        max_output_tokens=max_tokens,
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": "blog_post",
+                "strict": True,
+                "schema": POST_SCHEMA,
+            }
+        },
     )
-    text = (resp.text or "").strip()
+    if getattr(resp, "status", None) == "incomplete":
+        sys.exit("ERROR: response truncated — raise OPENAI_MAX_TOKENS.")
+
+    text = (resp.output_text or "").strip()
     if not text:
-        sys.exit("ERROR: Gemini returned an empty response.")
-    return text
+        sys.exit("ERROR: OpenAI returned an empty response.")
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as exc:
+        sys.exit(f"ERROR: could not parse structured output: {exc}")
 
 
 def main() -> None:
@@ -147,14 +166,14 @@ def main() -> None:
         return
 
     print(f"Topic: {topic}")
-    raw = strip_outer_fence(generate(topic))
-    meta, body = parse_frontmatter(raw)
+    data = generate(topic)
+    body = str(data.get("body_markdown") or "").strip()
 
-    title = str(meta.get("title") or topic).strip()
-    slug = slugify(str(meta.get("slug") or title))
+    title = str(data.get("title") or topic).strip()
+    slug = slugify(title)
     today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
 
-    if not body.strip():
+    if not body:
         sys.exit("ERROR: generated article body is empty.")
 
     # Build a clean, deterministic frontmatter block (we own slug/date/reading time).
@@ -162,11 +181,11 @@ def main() -> None:
         "title": title,
         "slug": slug,
         "date": today,
-        "description": str(meta.get("description") or "").strip(),
-        "tags": as_list(meta.get("tags")) or ["AI", "Engineering"],
-        "keywords": as_list(meta.get("keywords")) or as_list(meta.get("tags")),
+        "description": str(data.get("description") or "").strip(),
+        "tags": as_list(data.get("tags")) or ["AI", "Engineering"],
+        "keywords": as_list(data.get("keywords")) or as_list(data.get("tags")),
         "readingMinutes": reading_minutes(body),
-        "takeaways": as_list(meta.get("takeaways")),
+        "takeaways": as_list(data.get("takeaways")),
         "author": AUTHOR,
     }
 

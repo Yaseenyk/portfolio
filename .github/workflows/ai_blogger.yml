@@ -1,10 +1,10 @@
 name: AI Blogger
 
-# Autonomous blog pipeline: Gemini writes a post from scripts/topics.txt and
-# commits the resulting .mdx back to main. Runs Mondays & Wednesdays 10:00 UTC.
+# Autonomous blog pipeline: ChatGPT writes a post from scripts/topics.txt and
+# commits the resulting .mdx back to main. Runs daily at 10:00 UTC.
 on:
   schedule:
-    - cron: "0 10 * * 1,3"
+    - cron: "0 10 * * *"
   workflow_dispatch: {} # allow manual runs from the Actions tab
 
 # Needed so the workflow can push the generated post back to the repo.
@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate article
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python scripts/ai_writer.py
 
       - name: Commit & push new post
@@ -46,5 +46,5 @@ jobs:
             echo "No new content generated — nothing to commit."
             exit 0
           fi
-          git commit -m "content(blog): autonomous post via Gemini"
+          git commit -m "content(blog): autonomous post via ChatGPT"
           git push
