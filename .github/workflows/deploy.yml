@@ -3,6 +3,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  # Auto-publish after the autonomous blogger commits a post. Its push uses
+  # GITHUB_TOKEN, which does not trigger `on: push`, so chain off its run instead.
+  workflow_run:
+    workflows: ["AI Blogger"]
+    types: [completed]
   workflow_dispatch: # allow manual runs from the Actions tab
 
 # Required for the GitHub Pages deployment to authenticate via OIDC.
@@ -19,6 +24,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # On the workflow_run trigger only deploy if AI Blogger succeeded; push and
+    # manual runs are unaffected.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
