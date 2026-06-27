@@ -127,10 +127,12 @@ def as_list(value) -> list[str]:
 
 
 def generate(topic: str) -> dict:
-    api_key = os.environ.get("OPENAI_API_KEY")
+    # .strip() guards against a trailing newline/space in the key (a common
+    # paste artifact in CI secrets) that makes httpx reject the auth header.
+    api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
     if not api_key:
         sys.exit("ERROR: OPENAI_API_KEY is not set.")
-    model_name = os.environ.get("OPENAI_MODEL", "gpt-5")
+    model_name = os.environ.get("OPENAI_MODEL", "gpt-5").strip()
     max_tokens = int(os.environ.get("OPENAI_MAX_TOKENS", "16384"))
 
     client = OpenAI(api_key=api_key)
