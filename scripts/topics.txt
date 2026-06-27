@@ -48,3 +48,453 @@ Responsive streamer dashboards with Tailwind v4 container queries and no JavaScr
 Virtualizing a live chat feed in React: windowing 10,000 messages with TanStack Virtual at steady framerate
 Static-export gotchas: dynamic routes, generateStaticParams, and image handling under a GitHub Pages basePath
 Measuring and fixing INP on an interactive dashboard by scheduling work with scheduler.postTask
+Hybrid retrieval that actually helps: fusing BM25 and dense vectors with reciprocal rank fusion in a Node RAG pipeline
+Chunking long technical docs by semantic boundaries instead of fixed tokens for a measurable recall win
+Building a cross-encoder reranker stage in TypeScript to cut RAG hallucinations on ambiguous queries
+Late-chunking embeddings: embedding full documents then splitting to preserve context across chunk borders
+Query rewriting and decomposition: turning one vague user question into three grounded retrieval calls
+Citation-faithful RAG: forcing the model to quote retrieved spans and rejecting answers without sources
+Measuring RAG quality with a golden dataset: precision@k, faithfulness, and answer-relevance scoring
+Contextual compression: trimming retrieved chunks to only the sentences that answer the query
+Multi-vector retrieval with ColBERT-style token embeddings on a budget vector store
+Parent-document retrieval: searching small chunks but returning their full sections for grounding
+Self-querying RAG: letting the LLM emit metadata filters to narrow a vector search
+Structure-aware RAG chunking that survives Markdown tables, HTML, and fenced code blocks
+RAG over a constantly changing corpus: incremental re-embedding with content-hash change detection
+Detecting and refusing out-of-corpus questions: a grounding contract that prevents confident wrong answers
+Two-stage retrieval: cheap recall with embeddings, expensive precision with an LLM reranker
+Deduplicating near-identical chunks before reranking to stop the model echoing itself
+RAG evaluation in CI: catching retrieval regressions before they ship with a nightly eval job
+Embedding cache design: keying on normalized text to avoid re-paying for identical chunks
+Choosing chunk size empirically: a sweep harness that plots recall against tokens for your corpus
+Adding a freshness boost to vector search: time-decay scoring for a news-style knowledge base
+RAG with structured metadata: combining semantic search and SQL filters in one query path
+Grounding a support agent strictly in product docs: a zero-hallucination retrieval contract
+Streaming RAG answers token-by-token while citations resolve in parallel
+Fallback chains for empty retrieval: graceful degradation when the corpus has no answer
+Multi-tenant RAG: namespace isolation in a shared vector index without cross-tenant leakage
+Re-ranking with diversity: MMR to stop three near-duplicate chunks crowding out the answer
+Embedding model migration without downtime: dual-writing vectors during a re-index
+RAG over PDFs that fight back: layout-aware extraction before chunking multi-column and scanned docs
+Query-time HyDE: generating a hypothetical answer to improve dense retrieval recall
+Building a feedback loop: logging thumbs-down answers to grow a RAG eval set automatically
+Designing a router agent that classifies intent and dispatches to specialized sub-agents
+Stateful agent loops with LangGraph: persisting conversation state across tool calls in Durable Objects
+Supervisor-worker multi-agent patterns: when orchestration beats a single mega-prompt
+Bounding agent runaway: step limits, token budgets, and circuit breakers in a production agent loop
+Human-in-the-loop checkpoints: pausing an agent graph for approval before destructive actions
+Parallel tool execution in an agent: fanning out independent calls and merging results safely
+Retry and self-correction loops: feeding tool errors back to the model for a second attempt
+Deterministic orchestration versus model-driven control: choosing the boundary in agent design
+Memory architecture for agents: short-term scratchpad, long-term vector recall, and summarized history
+Designing idempotent tools so an agent retry never double-charges or double-sends
+Structured tool schemas: how strict JSON parameters cut agent tool-call failures
+A planner-executor agent: separating the reasoning step from deterministic action execution
+Streaming intermediate agent steps to the UI so users see thinking, not a spinner
+Cost-aware model routing: sending easy turns to a small model and hard turns to a frontier model
+Guarding agents against prompt injection from retrieved or tool-returned content
+Conversation summarization that preserves entities: compacting context without losing the thread
+Multi-agent debate for higher-confidence answers: when a second critic agent earns its tokens
+Tool-use observability: tracing every agent decision, tool call, and latency in one span tree
+Graceful agent timeouts: partial results and resumable runs instead of hard failures
+Designing an agent scratchpad in Redis for cross-request continuity at the edge
+Edge-native AI on Cloudflare Workers with Hono: sub-50ms first-token from a global PoP
+Streaming LLM responses from a Hono edge function to React with the Vercel AI SDK
+Stateful sessions at the edge with Durable Objects: one object per conversation, strongly consistent
+Semantic caching at the edge: serving repeat questions from a vector cache without a model call
+Rate limiting an AI endpoint at the edge with Durable Objects and a token-bucket algorithm
+Cold-start-free inference: why edge functions beat containers for bursty AI traffic
+Fan-out at the edge: querying three providers in parallel and returning the first good response
+Edge request coalescing: deduplicating identical in-flight LLM calls to cut spend
+Streaming Server-Sent Events through a Cloudflare Worker without buffering the whole response
+Handling backpressure when an edge stream outpaces a slow client connection
+Geo-routing AI requests to the nearest model region for latency and data-residency wins
+Building a typed RPC layer over Hono with end-to-end TypeScript inference
+Queuing long AI jobs with Cloudflare Queues and reporting progress over a Durable Object socket
+Persisting chat history to D1 from a Worker without blocking the response stream
+KV versus Durable Objects versus D1: choosing edge storage for an AI app by access pattern
+Secrets and key rotation in Workers: scoping provider API keys per environment safely
+Edge-side prompt assembly: templating system prompts close to the user to shave round-trips
+Resilient provider failover at the edge: detecting 429s and shifting traffic mid-stream
+A WebSocket fan-in at the edge: multiplexing many client sockets onto one upstream model stream
+Measuring true edge latency: p50/p95/p99 first-token timing from real PoPs, not localhost
+Choosing a vector store by workload: Upstash Vector, pgvector, Qdrant, and Pinecone compared
+pgvector at scale: HNSW versus IVFFlat index tuning for recall-versus-latency tradeoffs
+Cutting embedding bills with Matryoshka representations: truncating dimensions without killing recall
+Quantizing vectors to int8: shrinking a 1M-vector index 4x with negligible recall loss
+Metadata filtering in vector search: pre-filter versus post-filter and the recall cliff
+Keeping a vector index and source-of-truth database in sync with transactional outbox patterns
+Batch embedding pipelines: maximizing throughput against provider rate limits with concurrency control
+Designing partition keys for a multi-tenant pgvector table that stays fast at a thousand tenants
+Hybrid search in Postgres: combining tsvector full-text and pgvector similarity in one query
+Vector index warm-up: avoiding the first-query latency spike after a deploy
+Incremental index compaction: keeping HNSW healthy as you delete and re-insert vectors
+Choosing an embedding model: benchmarking domain recall before committing your whole corpus
+Streaming UI with React Server Components: rendering an AI answer as it arrives from the server
+Server Actions for AI mutations: type-safe form-to-model calls without a separate API route
+Partial prerendering in Next.js: a static shell with a streamed dynamic AI panel
+Suspense boundaries that don't jank: orchestrating loading states for a multi-source dashboard
+useOptimistic for chat: instant message echo while the model response streams in
+Caching strategy in the App Router: when to use revalidateTag versus on-demand revalidation
+Eliminating waterfalls: parallel data fetching in nested Server Components
+Edge runtime versus Node runtime in Next.js route handlers: picking per endpoint
+Type-safe environment variables in Next.js with a Zod-validated config module
+Streaming structured data to the client with the AI SDK and rendering it as it parses
+Building a command palette with cmdk: fuzzy search, keyboard nav, and route actions
+Optimistic navigation and prefetching: making App Router transitions feel instant
+Image optimization under static export: AVIF, responsive sizes, and a CDN without next/image server
+A type-safe MDX content pipeline: frontmatter schemas, remark plugins, and build-time compilation
+Discriminated unions for state machines: modeling UI states so impossible states can't compile
+Branded types in TypeScript: making UserId and OrderId un-swappable at the type level
+Zod at the boundary: parsing untrusted input once and trusting it everywhere after
+Inferring types from runtime schemas: deriving a single source of truth with z.infer
+const type parameters and satisfies: keeping literal types without losing inference
+Building a fully typed event emitter with mapped types and generics
+Template literal types for type-safe routing and API path builders
+Exhaustive switch handling with never: catching unhandled enum cases at compile time
+Performance of the TypeScript compiler: taming type-check time in a large monorepo
+Generic constraints that read well: designing library APIs that guide the caller
+Type-level validation of config objects: failing the build on a malformed feature flag
+Migrating a large JavaScript codebase to strict TypeScript without a big-bang rewrite
+Modeling API responses with discriminated result types instead of throwing
+Function overloads versus generics: when each produces a cleaner public API
+Node.js backpressure done right: piping streams without blowing up memory on large payloads
+Worker threads for CPU-bound work: offloading JSON-heavy transforms off the event loop
+Scaling a Node API with the cluster module and a shared-nothing request design
+Connection pooling that survives traffic spikes: tuning pg Pool for a serverless and a long-lived runtime
+Graceful shutdown in Node: draining in-flight requests before the container dies
+Diagnosing event-loop lag in production with perf_hooks and a histogram
+Streaming large file uploads through a Node service straight to object storage
+Idempotency keys for a payments-grade Node API: dedup without a distributed lock
+Caching computed responses in Node with stale-while-revalidate semantics
+Structured logging in Node with pino: correlation IDs across async boundaries
+Rate limiting a Node API with a sliding-window counter in Redis
+Memory-leak hunting in a long-running Node process with heap snapshots and clinic.js
+Batching database writes in Node: coalescing many small inserts into one round-trip
+A typed job queue on BullMQ: retries, backoff, and dead-letter handling
+Zero-downtime deploys for a Node service behind a rolling health check
+MongoDB aggregation pipelines that scale: $lookup, $facet, and index-aware stage ordering
+Modeling one-to-many in MongoDB: embedding versus referencing by access pattern
+Avoiding the unbounded-array antipattern in MongoDB document design
+Covered queries in MongoDB: serving reads entirely from an index
+Time-series collections in MongoDB for high-cardinality telemetry at low storage cost
+Change streams in MongoDB: building a real-time projection without polling
+Atomic counters and optimistic concurrency in MongoDB with findOneAndUpdate
+Sharding a MongoDB collection: choosing a shard key that avoids hot chunks
+Aggregation performance: when to push computation to $expr versus the application
+Schema validation in MongoDB with JSON Schema to enforce a contract at the database
+FinOps for LLM inference: building a per-request cost ledger that attributes spend to features
+Token budgeting in practice: capping context to hit a target cost-per-conversation
+Prompt compression that pays off: trimming system prompts without hurting answer quality
+Caching to cut LLM spend: how a 60% cache-hit rate halves a monthly bill
+Choosing model tiers by task: a routing policy that protects margin without hurting UX
+Measuring cost-per-resolved-ticket for an AI support agent, not cost-per-token
+Batch versus real-time inference: the price difference and when batching is acceptable
+Output-token control: why max_tokens and concise prompting are your biggest cost levers
+Detecting cost regressions in CI: failing a PR that raises average tokens-per-request
+A spend dashboard for AI features: latency, tokens, and dollars in one view
+Reserved versus on-demand inference capacity: modeling the break-even point
+Killing zombie spend: finding the one prompt that quietly tripled your token usage
+Observability for LLM apps with OpenTelemetry: spans for retrieval, generation, and tools
+Tracing a RAG request end-to-end: correlating embed, search, rerank, and generate latencies
+Capturing prompt and completion as span attributes without leaking PII
+Building an evals harness: regression-testing prompts against a labeled dataset on every deploy
+LLM-as-judge that you can trust: calibrating a grader against human labels
+Detecting silent quality drift: alerting when answer-faithfulness drops week-over-week
+Structured logging for AI: a schema that makes failures queryable, not just readable
+Latency budgets for a streaming AI UX: where the 200ms of first-token actually goes
+Sampling traces at scale: keeping the expensive ones without storing every request
+Replaying production prompts in a staging eval to reproduce a bad answer
+Token-level telemetry: measuring time-to-first-token versus tokens-per-second separately
+A golden-dataset workflow: curating, versioning, and growing eval cases over time
+Prompt engineering with XML tags: giving the model a deterministic structural shell
+Few-shot example selection: retrieving the most relevant demonstrations per query
+Structured outputs with JSON Schema: guaranteeing parseable responses every time
+System-prompt design: separating role, constraints, and output contract for reliability
+Chain-of-thought without leaking it: reasoning privately, returning only the answer
+Prompt versioning: treating prompts as code with diffs, reviews, and rollbacks
+Defending against prompt injection: input fencing and instruction-hierarchy patterns
+Temperature and top-p in practice: tuning sampling for deterministic versus creative tasks
+Building a prompt-template engine with typed variables and compile-time validation
+Self-consistency: sampling multiple reasonings and voting for higher accuracy
+Reducing refusals: rewriting prompts so a safe request stops getting blocked
+Negative prompting and constraints: telling the model what not to do, effectively
+Output formatting contracts: forcing tables, bullet lists, or strict schemas reliably
+Multi-turn prompt design: keeping a persona stable across a long conversation
+Token-efficient prompting: saying more with fewer instructions without losing precision
+Guardrail engineering: a layered defense against hallucination in a customer-facing agent
+Input validation for AI: blocking jailbreak patterns before they reach the model
+Output moderation: scanning generations for policy violations before they render
+Grounding contracts: refusing to answer when retrieval confidence is below threshold
+PII redaction in the prompt pipeline: scrubbing sensitive data before it hits a provider
+Constitutional constraints in system prompts: encoding non-negotiable behavior rules
+Detecting and handling toxic or unsafe user input gracefully
+Confidence scoring: when an AI should say I don't know instead of guessing
+Allow-listing tools per user role so an agent can't exceed its permissions
+Rate-limiting and abuse detection for a public AI endpoint
+A red-team harness: automatically probing your agent for injection and jailbreaks in CI
+Fallback to a human: designing the escalation path when guardrails trip
+Model Context Protocol foundations: building your first MCP server in TypeScript
+Exposing internal tools to an AI client over MCP without bespoke glue code
+MCP resource design: streaming large datasets to a model client efficiently
+Authentication and scoping for an MCP server exposed to multiple clients
+Aggregating multiple MCP servers behind one gateway for a single agent
+Testing an MCP server: contract tests for tools, resources, and prompts
+MCP versus custom function calling: when the protocol earns its complexity
+Building an MCP server that wraps a Postgres database with safe, scoped queries
+Caching MCP tool results to cut redundant downstream calls
+Versioning an MCP tool contract without breaking connected agents
+GitHub Actions for an autonomous content pipeline: generate, commit, and deploy on a schedule
+Why a GITHUB_TOKEN push won't trigger your deploy, and how workflow_run fixes it
+Matrix builds that stay fast: caching dependencies across jobs without cache thrash
+Static-export deploys to GitHub Pages: a reproducible Next.js build-and-publish workflow
+Secret management in CI: scoping API keys per environment and rotating them safely
+Concurrency groups in Actions: preventing two deploys from racing to production
+Caching the Python and Node toolchains in CI for sub-minute pipeline starts
+Path-filtered workflows: only running the jobs that the changed files actually need
+Reusable composite actions: factoring shared CI steps without copy-paste drift
+A nightly eval job: gating merges on AI-quality regression checks
+Auto-labeling and triaging issues with an LLM step inside a GitHub Action
+Building a deploy-preview workflow for every pull request
+Semantic caching with Redis: serving paraphrased repeat questions without a model call
+Cache invalidation that doesn't betray you: tag-based eviction for derived AI responses
+Two-tier caching: an in-memory LRU in front of Redis for hot prompts
+Stale-while-revalidate for AI answers: instant responses while a fresh one regenerates
+Redis Streams for an event-driven ingestion pipeline with consumer groups
+Distributed locks with Redis: the right way to coordinate a singleton background job
+Caching embeddings in Redis with TTLs tuned to corpus churn
+Rate limiting with Redis: comparing token-bucket, sliding-window, and GCRA
+Write-through versus write-behind caching for a read-heavy AI dashboard
+Preventing cache stampedes: request coalescing and early recomputation
+JWT sessions done safely: short-lived access tokens and rotating refresh tokens
+Role-based access control patterns: modeling permissions that scale past a boolean isAdmin
+Attribute-based access control for multi-tenant SaaS: policies as data, not code
+Securing an AI endpoint: per-user quotas, abuse detection, and key scoping
+OWASP for LLM apps: mapping the top risks to concrete mitigations
+Signed URLs for private media: time-boxed access without a permanent public link
+Defense-in-depth for a public API: rate limits, input validation, and output filtering
+Secrets hygiene: keeping API keys out of git, logs, and client bundles
+CSRF and CORS for a modern app: what actually matters with token auth
+Audit logging that holds up: append-only, tamper-evident records of sensitive actions
+Real-time updates without WebSockets: when Server-Sent Events are the simpler choice
+Designing a WebSocket reconnection protocol with resumable sessions
+Presence and typing indicators at scale: efficient fan-out without N-squared messages
+Backpressure on a WebSocket: dropping versus buffering when a client falls behind
+Multiplexing many logical channels over one WebSocket connection
+Heartbeats and dead-connection detection in a long-lived socket service
+Scaling WebSockets horizontally with a Redis pub/sub backplane
+Streaming telemetry to a React dashboard at 60fps without re-rendering the world
+Ordered, exactly-once delivery over an unreliable socket: sequence numbers and acks
+Authenticating a WebSocket: passing and refreshing tokens on a persistent connection
+Prompt caching with Claude: structuring a system prompt to maximize cache hits and cut cost
+Tool use with Claude: designing tool schemas that the model calls reliably
+Extended thinking: trading latency for accuracy on hard reasoning tasks, measured
+Streaming Claude responses to a React UI with proper event handling
+Batch processing with the Message Batches API for cheap, high-throughput jobs
+Choosing a Claude model tier by task: balancing cost, latency, and capability
+Counting tokens before you send: budgeting context windows accurately
+Migrating prompts between model versions without quality regressions
+Structuring multi-turn tool-use loops with Claude in a TypeScript backend
+Handling stop reasons and partial responses in a production Claude integration
+WebGPU inference in the browser: running a small embedding model client-side
+On-device ONNX models in a Tauri app: quantization for a tiny memory footprint
+Transformers.js in production: lazy-loading a model without freezing the UI
+Choosing between on-device and server inference by latency, privacy, and cost
+Warm-loading a WebGPU model: hiding compilation latency behind a splash state
+Streaming tokens from a browser-resident model to a React component
+Durable workflows: building a saga that survives crashes with replayable steps
+Cron-driven agent routines: long-running automated tasks with checkpointing
+Exactly-once job execution: deduplication keys and idempotent steps in a queue
+Fan-out/fan-in workflows: parallel sub-tasks that converge into one result
+Retrying with exponential backoff and jitter without thundering herds
+Building a scheduler that survives daylight-saving and timezone edge cases
+Compensating actions: rolling back a multi-step workflow when step four fails
+Progress reporting for long jobs: streaming status from a worker to the UI
+Designing an ETL pipeline that's resumable from the last successful checkpoint
+Schema-on-read versus schema-on-write for an analytics ingestion pipeline
+Deduplicating an event stream at ingestion with a bloom filter
+Backfilling historical data without overwhelming the live pipeline
+Payload compression on the wire: when Brotli beats gzip for API responses
+A lossless schema-aware serialization adapter: cutting JSON payloads 94% without data loss
+Columnar encoding for telemetry: shrinking repeated keys with a dictionary scheme
+MessagePack versus JSON versus Protobuf: picking a wire format by use case
+Streaming NDJSON for large result sets instead of one giant array
+Delta encoding for frequent small updates over a socket
+Optimizing Core Web Vitals on a content site: LCP, CLS, and INP in one pass
+Font loading without layout shift: size-adjust and fallback metrics
+Lazy-loading below-the-fold widgets with IntersectionObserver
+Reducing JavaScript bundle size: tree-shaking, code-splitting, and dependency audits
+Image performance: responsive sizes, modern formats, and priority hints
+Prefetching the next route on hover for instant perceived navigation
+Eliminating render-blocking resources on a statically exported site
+Measuring real-user performance with the web-vitals library and a beacon
+A unit-test strategy for AI pipelines: mocking the model, asserting on the contract
+Snapshot-testing prompts: detecting unintended template changes in review
+Property-based testing for a parser with fast-check
+Contract tests between a frontend and a typed API
+Testing streaming endpoints: asserting on chunk order and final assembly
+Deterministic tests for non-deterministic models: seeding, mocking, and tolerance bands
+End-to-end testing an AI chat flow with Playwright
+Load-testing an AI endpoint: finding the concurrency cliff before users do
+Mutation testing: measuring whether your tests actually catch bugs
+Postgres for AI apps: storing embeddings, metadata, and chat history in one database
+Connection pooling for serverless Postgres with PgBouncer in transaction mode
+Row-level security in Postgres for true multi-tenant isolation
+LISTEN/NOTIFY for real-time updates without a separate message broker
+JSONB indexing: GIN indexes for fast queries over semi-structured columns
+Partitioning a large append-only table by time for cheap retention pruning
+Transactional outbox in Postgres: reliable event publishing without dual writes
+Materialized views for an expensive dashboard query, refreshed incrementally
+Query-plan debugging: reading EXPLAIN ANALYZE to kill a slow sequential scan
+Upserts at scale: ON CONFLICT patterns that stay fast under contention
+Building a Tauri v2 plugin in Rust: exposing native capability to the WebView safely
+Auto-updating a Tauri desktop app with signed release artifacts
+Cross-platform builds for Tauri: code-signing and notarization in CI
+System-tray and background operation in Tauri without a visible window
+Deep-linking into a Tauri app from the browser with a custom protocol handler
+Native notifications and OS integration from a Tauri Rust core
+React Flow at scale: rendering a thousand-node graph without dropping frames
+Custom edges and handles in React Flow for a typed automation canvas
+Undo/redo for a node editor: a command-pattern history that's memory-bounded
+Auto-layout for a node graph with elkjs without fighting the user's manual positions
+Serializing and validating a React Flow graph with a Zod schema
+Copy-paste and grouping in a node editor: preserving edges and offsets correctly
+Compiling a visual node graph into an executable pipeline plan
+Validating a node graph before run: type-checking ports and detecting cycles
+Minimap and viewport performance in a large React Flow canvas
+Keyboard-first editing in a node editor: shortcuts, focus, and accessibility
+Designing an AI-native portfolio: a RAG concierge grounded only in your own corpus
+Architecting a tier-1 support assistant that escalates instead of hallucinating
+From MERN to AI-native: rethinking the stack when the model is a first-class dependency
+The architecture is everything: why an AI-equipped engineer ships a squad's volume
+Building an autonomous blog pipeline: topics in, SEO-ready posts out, on a schedule
+Designing for AEO: structuring content so AI answer engines cite you
+Programmatic SEO with Next.js: generating a sitemap and metadata for hundreds of pages
+JSON-LD and structured data for an AI-first portfolio that machines can parse
+A machine-readable profile endpoint: serving ai-briefing.json for agent consumption
+Latency-first AI product design: why time-to-first-token shapes the whole UX
+Cost-governed AI features: building margin protection into the product from day one
+Designing a streaming dashboard that stays honest: showing real traces, not fake spinners
+The serialization adapter that cut payloads 94%: a deep dive into the schema-aware design
+Edge-native by default: the case for putting the AI layer at the CDN
+Choosing build versus buy for your vector layer at three different scales
+Instrumenting an AI feature for product analytics: the events that actually matter
+A pragmatic guardrail stack for a solo-built production AI product
+Shipping at AI-speed without shipping bugs: the verification loop that makes it safe
+Designing topics-as-data: how an autonomous writer stays on-brand from a flat file
+Type-safe everything: carrying one schema from database to model to UI
+The 10x reality: where AI actually multiplies an engineer and where it doesn't
+Caching the AI: a Redis-and-Mongo two-tier design for a chat-heavy app
+Real-time telemetry over WebSockets to a React dashboard, end to end
+Death of the traditional backend router: edge functions as the new request layer
+From wireframe to web at AI-speed: a repeatable design-to-deploy loop
+State management in the AI era: Zustand versus Redux for streaming UIs
+Vector databases for MERN developers: a practical on-ramp from MongoDB
+Fine-tuning versus RAG: a decision framework with real cost and quality numbers
+Streaming LLM responses to React: handling chunks, errors, and cancellation
+Embeddings and semantic search in MongoDB Atlas Vector Search
+Token economics: a field guide to cost-optimizing real LLM applications
+Function calling and tool-use patterns that hold up in production
+Evaluating LLM outputs: the metrics that correlate with user satisfaction
+Agentic workflows versus copilots: choosing the right autonomy level per feature
+Custom serialization adapters: designing a lossless, schema-aware compression layer
+Vector embeddings in production: versioning, drift, and re-indexing strategies
+Advanced Redis caching strategies for read-heavy, write-occasional workloads
+WebSocket telemetry at scale: fan-out patterns that survive a traffic spike
+Optimizing MongoDB aggregation: index-aware pipeline design for sub-100ms queries
+TypeScript migration playbook: strict mode adoption without halting feature work
+Redux Toolkit architectures for large apps: slices, RTK Query, and normalized state
+Prompt-injection defense in depth: a layered model for untrusted input
+Designing an LLM cost ledger that attributes every cent to a feature and a user
+Building a deterministic eval suite that catches model-version regressions
+The grounding contract: a precise specification for zero-hallucination retrieval
+Streaming structured output: parsing partial JSON safely as it arrives
+A capability-token auth model for apps with no central auth server
+Observability-driven prompt engineering: optimizing prompts from production traces
+The single-model RAG stack: one embedding model, one generator, minimal moving parts
+Hybrid BM25-plus-vector retrieval with reranking: the pipeline that beats either alone
+Designing IPC for a desktop app: typed, batched, and backpressure-aware
+Local-first architecture: conflict-free sync without a server using CRDTs
+Building a 60fps automation canvas: scheduling, memoization, and dirty-flag propagation
+Edge session state with Durable Objects: one consistent object per conversation
+The latency anatomy of a streaming AI response, profiled millisecond by millisecond
+Designing a topics pipeline so an autonomous agent never repeats itself
+SEO for developer content: ranking technical posts with depth, schema, and internal links
+A reproducible memory-regression harness for a long-running native app
+Capacity planning for bursty AI traffic: why cold starts decide your architecture
+The verification loop: turning "make it work" into a goal you can test against
+gRPC versus REST versus tRPC: choosing an API contract for a TypeScript monorepo
+Streaming gRPC from a Node service: server-side streaming with backpressure
+GraphQL versus REST for an AI dashboard: when a typed graph earns its overhead
+Avoiding the N-plus-one in GraphQL with DataLoader batching and caching
+Persisted GraphQL queries: shrinking payloads and locking down the API surface
+Designing an accessible chat interface: ARIA live regions for streaming AI responses
+Keyboard navigation and focus management in a complex single-page dashboard
+Color-contrast and motion-safe animations: respecting prefers-reduced-motion in a flashy UI
+Internationalizing a Next.js App Router site with locale-aware routing and metadata
+Right-to-left layout support without forking your component library
+Dockerizing a Node AI service: multi-stage builds for a tiny production image
+Reproducible builds with a lockfile-first Dockerfile and layer caching
+Health checks and readiness probes for a streaming AI container
+Blue-green deploys for an AI API without dropping in-flight streams
+Feature flags for AI features: shipping a new model behind a gradual rollout
+A/B testing two prompts in production and measuring the quality delta
+Canary analysis: catching a bad model deploy from latency and error signals
+Structured incident response for an AI outage: provider failover runbooks
+Designing a status page that reflects real model and retrieval health
+Chaos testing an AI pipeline: injecting provider 429s and timeouts on purpose
+Cost attribution by tenant: metering AI usage for usage-based billing
+Building a usage-based billing meter that survives retries and double-counts
+Webhooks done right: signature verification, retries, and idempotent handlers
+Designing an event schema registry so producers and consumers never drift
+Outbox-to-Kafka: reliably publishing domain events without dual-write bugs
+Dead-letter queues with replay: recovering from a poison message safely
+Exactly-once stream processing: idempotent consumers over an at-least-once broker
+Backfilling embeddings for ten million rows without melting your rate limits
+Streaming a CSV export of a huge query without loading it all into memory
+Pagination that scales: cursor-based over offset for large, mutating datasets
+Soft deletes versus hard deletes: designing for recovery and compliance
+Audit trails with temporal tables: querying what the data looked like last Tuesday
+Multi-region data residency: keeping EU user data in the EU by design
+Encrypting field-level PII at the application layer with envelope encryption
+Key rotation without downtime: versioned data keys and lazy re-encryption
+Designing a secrets-rotation workflow that won't break a running deployment
+Threat-modeling an AI feature: where untrusted input meets privileged tools
+Sandboxing model-generated code execution in an ephemeral, network-less runtime
+Safely letting an agent run SQL: read-only roles, query allow-lists, and timeouts
+Building a deterministic mock LLM for fast, free integration tests
+Recording and replaying provider responses to test without spending tokens
+Snapshot diffing generated content to catch prompt-template regressions in review
+Measuring answer faithfulness automatically with an entailment check
+Calibrating an LLM judge against a human-labeled rubric for trustworthy evals
+Detecting hallucinated citations by verifying every quote against the source span
+Building a regression dashboard for prompt quality over successive deploys
+Fine-tuning a small model on your domain: when it beats prompting a big one
+Distilling a frontier model's outputs into a cheaper student for a narrow task
+LoRA adapters in production: swapping task-specific weights without redeploying
+Synthetic data generation for evals: creating hard cases your users will hit
+Active learning for evals: mining production failures into new test cases
+Designing embeddings for code search: chunking by symbol instead of by line
+Semantic code search over a monorepo: indexing functions, not files
+Retrieval over conversation history: making a chatbot remember last week's thread
+Summarization pipelines that preserve numbers, names, and negations
+Long-context versus RAG: when stuffing the window beats retrieval, with numbers
+Map-reduce summarization for documents that exceed any context window
+Extracting structured data from messy text with a typed schema and validation
+Classification at scale with an LLM: batching, caching, and a confidence threshold
+Entity resolution with embeddings: deduplicating records that humans typed differently
+Designing a data-viz layer for AI telemetry with lightweight SVG charts
+Rendering a real-time latency histogram in React without a charting library
+Animating number transitions in a dashboard with spring physics, not setInterval
+Building a flamegraph viewer in the browser for trace visualization
+A heatmap of token cost by feature: turning a spend ledger into a picture
+Designing empty, loading, and error states that make an AI app feel reliable
+Skeleton screens versus spinners: perceived-performance choices for streaming UIs
+Optimistic UI for agent actions: showing intent before the tool call resolves
+Designing a retry-and-recover UX when a model stream fails mid-answer
+Progressive disclosure for AI traces: hiding complexity until the user wants it
+Building a copy-to-clipboard with syntax-highlighted code blocks in MDX
+A keyboard-driven blog reader: navigation, search, and table-of-contents jumps
+Generating Open Graph images at build time for every post under static export
+RSS and JSON Feed for a developer blog: making your content syndicatable
+Internal linking automation: suggesting related posts from embedding similarity
