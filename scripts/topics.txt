@@ -1,4 +1,3 @@
-Arena allocation patterns in Rust to keep streamerOS under 152 MB RAM across a 12-hour broadcast
 Zero-copy Twitch chat parsing in Rust with bytes::Bytes and nom at 5,000 messages per second without heap churn
 Bounded vs unbounded channels: backpressure design in a Tauri Rust core to survive chat floods without memory blowups
 Swapping serde_json for simd-json in the streamerOS IPC layer: benchmarking the deserialize hot path

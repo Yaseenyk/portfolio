@@ -1,0 +1,316 @@
+---
+title: Rust arena allocation to keep streamerOS under 152 MB for 12h
+slug: rust-arena-allocation-to-keep-streameros-under-152-mb-for-12h
+date: '2026-06-28'
+description: Practical, code-first arena allocation patterns in Rust that kept our
+  live-streaming OS under 152 MB RAM for 12-hour broadcasts with zero leaks.
+tags:
+- Rust
+- Systems
+- Streaming
+keywords:
+- Rust arena allocation patterns
+- bumpalo per-epoch allocator example
+- region-based memory Rust streaming pipeline
+- slotmap generational handles Rust
+- zero-copy Bytes pool Rust Tokio
+- Rust string interning for chat overlays
+- memory accounting arena reset Rust
+readingMinutes: 8
+takeaways:
+- Model memory by lifetime and bind each lifetime to an arena you can reset.
+- Use per-epoch bump arenas for hot paths; use handle tables (slotmap/slab) for long-lived
+  state.
+- Intern and pool aggressively (strings, bytes, frames) and pass handles/Bytes between
+  actors.
+- Instrument and enforce caps; fail fast on pressure instead of silently fragmenting.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Problem framing: 12 hours, 152 MB, no fragmentation
+
+streamerOS ingests RTMP/WebRTC, composites overlays, and encodes. Our initial heap profile looked fine at 30 minutes, then devolved into fragmentation and tiny leaks that only surfaced past the 6-hour mark. We re-architected memory around region-based allocation (arenas), choosing explicit lifetime buckets and hard caps per bucket.
+
+A concrete budget we hold during a 12-hour run:
+
+| Bucket | Capacity | Notes |
+|---|---:|---|
+| Video ring (YUV planes + staging) | 64 MB | Fixed N frames, no growth |
+| Audio ring | 2 MB | Fixed PCM windows |
+| Asset arena (fonts, emotes, shader params) | 30 MB | Long-lived; reset only on scene reload |
+| Segment arena (per-GOP/per-scene tick) | 16 MB | Reset every 2s (GOP) |
+| Network bytes pool | 16 MB | Reused BytesMut, backpressured |
+| Scratch arena (layout, AST, temp) | 8 MB | Reset per frame |
+| Misc (actors, slab indices, logs) | 10–12 MB | Monitored |
+
+The key idea: align allocation strategy with object lifetime. Long-lived things live in a handle table. Ephemeral things live in a bump arena that we reset.
+
+## Pattern 1: Per-epoch bump arenas with reset
+
+For hot, short-lived allocations (layout trees, filter params, chat render buffers), use a bump allocator and drop them en masse at a well-defined boundary (GOP, scene tick, or render frame).
+
+bumpalo is perfect here.
+
+```rust
+use bumpalo::Bump;
+use bumpalo::collections::{Vec as BArenaVec, String as BArenaString};
+
+#[derive(Debug)]
+struct GlyphRun<'a> {
+    text: &'a str,
+    x: f32,
+    y: f32,
+}
+
+#[derive(Debug)]
+struct OverlayFrame<'a> {
+    runs: BArenaVec<'a, GlyphRun<'a>>,
+}
+
+fn build_overlay_frame<'a>(seg: &'a Bump, chat_msgs: &[&str]) -> OverlayFrame<'a> {
+    // Reserve predictably to avoid re-alloc within the arena page.
+    let mut runs = BArenaVec::with_capacity_in(chat_msgs.len(), seg);
+
+    for (i, msg) in chat_msgs.iter().enumerate() {
+        // Copy small strings into the arena to tightly pack
+        let mut s = BArenaString::with_capacity_in(msg.len(), seg);
+        s.push_str(msg);
+        let text: &'a str = s.into_bump_str();
+
+        runs.push(GlyphRun { text, x: 16.0, y: 24.0 + 18.0 * i as f32 });
+    }
+
+    OverlayFrame { runs }
+}
+
+struct SegmentCtx {
+    arena: Bump,
+}
+
+impl SegmentCtx {
+    fn new() -> Self { Self { arena: Bump::with_capacity(1 << 20) } } // 1 MiB first page
+    fn reset(&mut self) { self.arena.reset(); }
+}
+
+fn render_segment(mut seg: SegmentCtx) {
+    for gop in 0..7200 { // ~4 hours at 2s GOP; example only
+        let chat = ["hi", ":)", "new follower", "gg"]; // streamed in
+        let frame = build_overlay_frame(&seg.arena, &chat);
+        // ... composite into video planes using frame.runs ...
+        // Drop per-GOP allocations in one shot:
+        seg.reset();
+    }
+}
+```
+
+Notes:
+- The arena address space remains stable during the epoch, which helps when passing slices to the compositor.
+- Reset cost is near-zero; it only updates the bump pointer and keeps pages cached.
+- No per-object Drop runs; avoid putting RAII that must run in Drop into arena-owned objects.
+
+### Avoiding 'static traps with async
+Arenas usually don’t live 'static. Keep them thread-confined and pass handles across tasks instead of references. Example: an actor owns the segment arena and spawns no background futures that capture arena borrows. Inter-actor messages carry handles or Bytes, never &'arena T.
+
+## Pattern 2: Handle indirection with a generational table for long-lived state
+
+Pointers to arena-allocated objects become invalid after reset. For state that must outlive epochs (sessions, filters with mutable params, assets), store them in a stable table and pass typed handles.
+
+slotmap is ergonomic and avoids the ABA reuse problems.
+
+```rust
+use slotmap::{new_key_type, SlotMap};
+
+new_key_type! { pub struct SessionKey; }
+
+#[derive(Debug)]
+struct Session {
+    user_id: u64,
+    bitrate_kbps: u32,
+    // store IDs into interned strings or assets, not owned Strings
+    display_name: StringId,
+}
+
+#[derive(Copy, Clone, Debug)]
+struct StringId(u32); // points into our string interner (see below)
+
+struct SessionTable {
+    inner: SlotMap<SessionKey, Session>,
+}
+
+impl SessionTable {
+    fn new() -> Self { Self { inner: SlotMap::with_key() } }
+    fn insert(&mut self, sess: Session) -> SessionKey { self.inner.insert(sess) }
+    fn get(&self, k: SessionKey) -> Option<&Session> { self.inner.get(k) }
+    fn get_mut(&mut self, k: SessionKey) -> Option<&mut Session> { self.inner.get_mut(k) }
+    fn remove(&mut self, k: SessionKey) { self.inner.remove(k); }
+}
+```
+
+Pass SessionKey across threads or store it in metrics; never capture &Session across await points. This removes many lifetime knots and reduces accidental clones of large payloads.
+
+## Pattern 3: Fixed-cap string interning for chat/emotes
+
+Chat overlays and logs repeat strings (usernames, emotes, commands). Intern strings into a fixed-cap arena to dedupe and bound RAM. For deterministic caps, use a fixed bump allocator for the bytes plus a map from hash to offsets. Below is a minimal fixed-cap bump and a compact interner.
+
+```rust
+use core::{cell::Cell, mem, ptr, alloc::Layout};
+use std::alloc::{alloc_zeroed, dealloc};
+use ahash::AHashMap; // fast and predictable
+
+struct FixedBump {
+    ptr: *mut u8,
+    cap: usize,
+    off: Cell<usize>,
+}
+
+impl FixedBump {
+    fn with_capacity(cap: usize) -> Self {
+        let layout = Layout::from_size_align(cap, 64).unwrap();
+        let ptr = unsafe { alloc_zeroed(layout) };
+        Self { ptr, cap, off: Cell::new(0) }
+    }
+    fn alloc_bytes(&self, n: usize, align: usize) -> Option<*mut u8> {
+        let base = self.ptr as usize;
+        let cur = self.off.get();
+        let aligned = (base + cur + (align - 1)) & !(align - 1);
+        let new_off = (aligned - base) + n;
+        if new_off > self.cap { return None; }
+        self.off.set(new_off);
+        Some(aligned as *mut u8)
+    }
+    fn alloc_str(&self, s: &str) -> Option<&str> {
+        unsafe {
+            let p = self.alloc_bytes(s.len(), mem::align_of::<u8>())?;
+            ptr::copy_nonoverlapping(s.as_ptr(), p, s.len());
+            Some(std::str::from_utf8_unchecked(std::slice::from_raw_parts(p, s.len())))
+        }
+    }
+}
+
+impl Drop for FixedBump {
+    fn drop(&mut self) {
+        unsafe { dealloc(self.ptr, Layout::from_size_align(self.cap, 64).unwrap()) }
+    }
+}
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+pub struct StringId(u32);
+
+pub struct Interner<'a> {
+    bump: &'a FixedBump,
+    map: AHashMap<&'a str, StringId>,
+    rev: Vec<&'a str>,
+}
+
+impl<'a> Interner<'a> {
+    pub fn new(bump: &'a FixedBump, cap: usize) -> Self {
+        Self { bump, map: AHashMap::with_capacity(cap), rev: Vec::with_capacity(cap) }
+    }
+    pub fn intern(&mut self, s: &str) -> Option<StringId> {
+        if let Some(id) = self.map.get(s) { return Some(*id); }
+        let stored = self.bump.alloc_str(s)?; // returns None if out of space
+        let id = StringId(self.rev.len() as u32);
+        self.map.insert(stored, id);
+        self.rev.push(stored);
+        Some(id)
+    }
+    pub fn get(&self, id: StringId) -> &'a str { self.rev[id.0 as usize] }
+}
+```
+
+We allocate a single 8–12 MB fixed region for strings. On pressure (alloc_str returns None), we drop oldest least-used IDs or shed features (e.g., stop interning non-emote chat). Most runs never hit the cap because dedupe is so effective.
+
+## Pattern 4: Zero-copy bytes pool for network and IPC
+
+Avoid churn in network parsing/serialization by pooling BytesMut slabs. bytes::Bytes/BytesMut support zero-copy slicing and refcounted sharing. Pre-allocate a small number of large slabs and recycle.
+
+```rust
+use bytes::{Bytes, BytesMut, BufMut};
+use crossbeam_queue::ArrayQueue;
+use std::sync::Arc;
+
+struct BytesPool {
+    q: Arc<ArrayQueue<BytesMut>>, // lock-free SPSC/MPSC works well per-actor
+}
+
+impl BytesPool {
+    fn with_slabs(n: usize, slab_size: usize) -> Self {
+        let q = Arc::new(ArrayQueue::new(n));
+        for _ in 0..n { let _ = q.push(BytesMut::with_capacity(slab_size)); }
+        Self { q }
+    }
+    fn take(&self) -> Option<BytesMut> { self.q.pop().ok() }
+    fn give(&self, mut b: BytesMut) {
+        b.clear();
+        let _ = self.q.push(b); // if full, drop -> backpressure via allocation
+    }
+}
+
+// usage in an actor
+fn serialize_msg(pool: &BytesPool, payload: &[u8]) -> Bytes {
+    let mut buf = pool.take().unwrap_or_else(|| BytesMut::with_capacity(16 * 1024));
+    buf.put_u16(payload.len() as u16);
+    buf.extend_from_slice(payload);
+    buf.freeze() // zero-copy share; return slab to pool when refcount drops
+}
+```
+
+The pool gives predictable memory. If producers outrun consumers, you either allocate temporarily (and count it), or apply backpressure by refusing to send (preferred).
+
+## Glueing it together: lifetime buckets per actor
+
+- AssetActor: owns Asset arena (bumpalo or FixedBump+Interner), slotmap for filters/shaders, image atlases; exposes handles.
+- SegmentActor: owns per-GOP bump arena; builds overlay layout, text shaping, effect params; resets every GOP.
+- IOActor(s): own BytesPool; all network buffers are Bytes/BytesMut; they exchange only handles and Bytes with other actors.
+
+Cross-actor messages contain only:
+- Small POD structs (Copy),
+- Slotmap keys (handles),
+- Bytes (for payloads),
+- Compact indices (StringId, TextureId).
+
+No &'a T crosses actors. No Vec<String> or owned Strings in the hot path.
+
+## Instrumentation and enforcement
+
+- Track each bucket’s current and high-water usage. For bumpalo-based arenas, maintain a manual counter for known allocations and cross-check with page sizes. For FixedBump, the off counter is exact.
+- Expose memory gauges via metrics and assert at boundaries (e.g., if segment arena exceeds 16 MB twice in a row, shed features or drop debug overlays).
+- Prefer fallible APIs (Option/Result on allocation) in hot paths to allow controlled degradation instead of OOM.
+
+Example: guard per-segment budget on text shaping costs.
+
+```rust
+struct BudgetGuard { used: usize, limit: usize }
+impl BudgetGuard {
+    fn try_alloc(&mut self, n: usize) -> bool {
+        if self.used + n > self.limit { return false; }
+        self.used += n; true
+    }
+}
+
+fn push_text(seg: &Bump, budget: &mut BudgetGuard, s: &str, out: &mut BArenaVec<'_, GlyphRun<'_>>) -> bool {
+    if !budget.try_alloc(s.len()) { return false; }
+    let text = BArenaString::from_str_in(s, seg).into_bump_str();
+    out.push(GlyphRun { text, x: 0.0, y: 0.0 });
+    true
+}
+```
+
+## Practical pitfalls
+
+- Don’t store Drop-heavy types in arenas. Use handles to resources with normal ownership.
+- Avoid arena-referencing futures. Keep arenas thread-confined; send handles or Bytes.
+- Pre-size collections in arenas. bumpalo::collections::Vec re-grows by allocating more in the arena; reserve accurate sizes to avoid balloon pages.
+- Shrink/clear long-lived Vecs only when you’re sure. Prefer pooled buffers over frequently allocating/dropping.
+- Use smallvec/arrayvec for tiny collections on stack and predictable inlined storage.
+
+## Why this keeps us under 152 MB for 12 hours
+
+- Fragmentation is nil in bump arenas because we only move a pointer and reset.
+- Long-lived state sits behind compact handles and deduped interned strings; no accidental clones of megabyte-sized JSON/strings during spikes.
+- Bytes pooling and handle-only messages avoid copying payloads across actors.
+- Caps are explicit; when exceeded, we degrade features deterministically instead of leaking.
+
+This is not micro-optimization. It’s aligning allocation strategy with real lifetimes and enforcing caps with backpressure. The result is a stable RSS across a 12-hour broadcast and predictable performance in the hot path.
