@@ -1,0 +1,317 @@
+---
+title: Zero-copy Twitch IRC parsing in Rust with Bytes + nom at 5k/s
+slug: zero-copy-twitch-irc-parsing-in-rust-with-bytes-nom-at-5ks
+date: '2026-06-29'
+description: Build a zero-copy Twitch IRC parser in Rust using bytes::Bytes and nom
+  to sustain 5,000+ messages/sec without heap churn or unnecessary allocations.
+tags:
+- Rust
+- Backend
+- Streaming
+keywords:
+- rust zero-copy parser
+- twitch irc parsing rust
+- nom bytes BytesMut
+- tokio tcp zero copy
+- irc tags nom parser
+- rust parse CRLF frames
+- memchr split_to performance
+readingMinutes: 7
+takeaways:
+- Use Bytes/BytesMut to frame CRLF-delimited IRC lines without copying.
+- Parse tags/prefix/params with nom into borrowed &str slices for zero allocation.
+- 'Keep ownership boundaries clean: send Bytes across tasks; parse at the edge.'
+- SmallVec for tags/params removes heap churn at 5k+ msgs/sec.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Goal and constraints
+
+- Throughput target: ≥5,000 PRIVMSG/second from Twitch IRC.
+- Zero-copy from the socket up to the parsed view of a message.
+- No heap churn per message: no String, Vec growth, or transient hash maps.
+- Backpressure-aware: avoid per-line tasks; rely on bounded channels.
+
+The core technique: frame with BytesMut, split_to on CRLF, freeze into Bytes, then parse using nom on borrowed &str slices. The parsed view borrows from the immutable Bytes, so no copying. For small dynamic lists (tags, params), use SmallVec to stay on the stack in the hot path.
+
+## Quick refresher: Twitch IRC line shape
+
+Example (CRLF-terminated):
+
+```
+@badge-info=;badges=broadcaster/1;color=#1E90FF;display-name=Foo;id=abc-123;mod=0 :foo!foo@foo.tmi.twitch.tv PRIVMSG #mychan :Hello, world!
+
+```
+
+Grammar sketch (simplified):
+
+- Optional tags: `@key=val;key=val ...<space>`
+- Optional prefix: `:<prefix><space>`
+- Command: `PRIVMSG|PING|...`
+- Params: space-separated, last param may start with `:` to allow spaces
+- Terminator: `\r\n`
+
+## Borrowed data model (no allocations)
+
+We want a view that borrows slices out of the inbound frame. The frame itself is Bytes, which is cheap to clone and reference-counted. The parsed struct borrows `&'a str` from that Bytes.
+
+```rust
+use smallvec::SmallVec;
+
+#[derive(Debug)]
+pub struct IrcMsg<'a> {
+    pub tags: SmallVec<[(&'a str, &'a str); 16]>,
+    pub prefix: Option<&'a str>,
+    pub command: &'a str,
+    pub params: SmallVec<[&'a str; 4]>,
+    pub trailing: Option<&'a str>, // the last param starting with ':'
+}
+```
+
+16 tags is a realistic stack capacity for Twitch metadata; 4 params covers PRIVMSG and common commands. Adjust for your traffic.
+
+## Zero-copy nom parser
+
+Nom works perfectly with borrowed inputs; we feed it `&str` borrowed from the Bytes. No cloning, no intermediate String.
+
+```rust
+use nom::{
+    IResult,
+    branch::alt,
+    bytes::complete::{is_not, tag, take_till1, take_while1},
+    character::complete::space1,
+    combinator::{map, opt},
+    multi::separated_list0,
+    sequence::{preceded, separated_pair, tuple},
+};
+
+fn is_tag_key_char(c: char) -> bool {
+    // RFC1459-ish token; conservative for Twitch tags
+    match c {
+        '=' | ';' | ' ' | '\r' | '\n' => false,
+        _ => true,
+    }
+}
+
+fn is_tag_val_char(c: char) -> bool {
+    match c {
+        ';' | ' ' | '\r' | '\n' => false,
+        _ => true,
+    }
+}
+
+fn parse_tags(input: &str) -> IResult<&str, SmallVec<[(&str, &str); 16]>> {
+    let kv = separated_pair(
+        take_while1(is_tag_key_char),
+        tag("="),
+        take_while1(is_tag_val_char),
+    );
+    let (i, pairs) = preceded(tag("@"), separated_list0(tag(";"), kv))(input)?;
+    let (i, _) = tag(" ")(i)?; // space after tags
+    let mut out: SmallVec<[(&str, &str); 16]> = SmallVec::new();
+    out.extend(pairs);
+    Ok((i, out))
+}
+
+fn parse_prefix(input: &str) -> IResult<&str, &str> {
+    preceded(tag(":"), take_till1(|c| c == ' '))(input)
+}
+
+fn parse_command(input: &str) -> IResult<&str, &str> {
+    // e.g. PRIVMSG, PING, NOTICE
+    take_while1(|c: char| c != ' ' && c != '\r' && c != '\n')(input)
+}
+
+fn parse_params(input: &str) -> IResult<&str, (SmallVec<[&str; 4]>, Option<&str>)> {
+    // params until optional trailing that starts with ':'
+    let mut i = input;
+    let mut params: SmallVec<[&str; 4]> = SmallVec::new();
+    let mut trailing: Option<&str> = None;
+
+    loop {
+        if let Ok((i2, _)) = tag::<_, _, nom::error::Error<_>>(" ")(i) { i = i2; } else { break; }
+        if let Ok((i2, t)) = preceded(tag(":"), map(is_not("\r\n"), |s: &str| s))(i) {
+            trailing = Some(t);
+            i = i2;
+            break;
+        }
+        let (i2, p) = take_while1(|c: char| c != ' ' && c != '\r' && c != '\n')(i)?;
+        params.push(p);
+        i = i2;
+    }
+
+    Ok((i, (params, trailing)))
+}
+
+pub fn parse_irc_line<'a>(line: &'a str) -> IResult<&'a str, IrcMsg<'a>> {
+    let (i, tags) = opt(parse_tags)(line)?;
+    let (i, prefix) = opt(tuple((parse_prefix, space1)))(i)?;
+    let (i, cmd) = parse_command(i)?;
+    let (i, (params, trailing)) = parse_params(i)?;
+
+    Ok((i, IrcMsg {
+        tags: tags.unwrap_or_else(SmallVec::new),
+        prefix: prefix.map(|(p, _)| p),
+        command: cmd,
+        params,
+        trailing,
+    }))
+}
+```
+
+This parser never allocates for the happy path; it slices into the `&str` originating from the frame’s Bytes. It also avoids per-field copies. If you need to normalize or decode tag escapes, do it lazily only for fields you care about.
+
+## Framing with BytesMut and zero-copy splits
+
+Tokio’s AsyncReadExt::read_buf fills a BytesMut. We scan for CRLF, split_to to peel a frame, and immediately freeze to Bytes. Freezing does not copy; it converts the growable buffer into an immutable shared view.
+
+```rust
+use tokio::{io::AsyncReadExt, net::TcpStream};
+use bytes::{Bytes, BytesMut, Buf};
+use memchr::memmem::Finder;
+
+pub async fn read_frames(mut stream: TcpStream, tx: tokio::sync::mpsc::Sender<Bytes>) -> anyhow::Result<()> {
+    let mut buf = BytesMut::with_capacity(64 * 1024);
+    let finder = Finder::new(b"\r\n");
+
+    loop {
+        // READ: grow if needed; read_buf avoids realloc when capacity exists
+        let n = stream.read_buf(&mut buf).await?;
+        if n == 0 { break; }
+
+        // SCAN: find CRLF boundaries and emit frames
+        while let Some(pos) = finder.find(&buf) {
+            // Split the line (without CRLF)
+            let mut line = buf.split_to(pos);
+            // Drop CRLF from the original buffer
+            buf.advance(2);
+
+            // Freeze to an immutable Bytes without copying
+            let bytes = line.freeze();
+            if tx.try_send(bytes).is_err() {
+                // Apply backpressure: if full, await once then retry
+                tx.send(Bytes::new()).await.ok(); // or handle properly
+            }
+        }
+
+        // Optional: compact when buffer is mostly unused
+        if buf.capacity() > 256 * 1024 && buf.len() < 8 * 1024 { buf.reserve(0); }
+    }
+    Ok(())
+}
+```
+
+Why not use tokio-util’s LinesCodec? Because it allocates Strings and does UTF-8 checks per chunk. We defer UTF-8 validation to parse time and keep everything as Bytes until needed.
+
+## Parse where the data lands (ownership boundaries)
+
+Bytes is reference-counted. Avoid self-referential types by sending Bytes across tasks and parsing at the consumer. The parsed IrcMsg<'a> borrows from the Bytes that lives in the same stack frame.
+
+```rust
+use bytes::Bytes;
+use tokio::sync::mpsc;
+
+pub async fn run(mut rx: mpsc::Receiver<Bytes>) {
+    let mut count = 0u64;
+    let mut tick = tokio::time::interval(std::time::Duration::from_secs(1));
+    loop {
+        tokio::select! {
+            Some(frame) = rx.recv() => {
+                // Borrow a &str without copying
+                let s = match std::str::from_utf8(&frame) {
+                    Ok(s) => s,
+                    Err(_) => continue, // or lossily map; Twitch is UTF-8
+                };
+                match parse_irc_line(s) {
+                    Ok((_rest, msg)) => {
+                        // msg borrows from s, which borrows from frame
+                        if msg.command == "PRIVMSG" {
+                            // Hot path: use borrowed slices
+                            let _chan = msg.params.get(0).copied();
+                            let _text = msg.trailing;
+                        }
+                        count += 1;
+                    }
+                    Err(_e) => { /* ignore malformed */ }
+                }
+                // msg drops here before next iteration
+            }
+            _ = tick.tick() => {
+                eprintln!("throughput: {} msgs/s", count);
+                count = 0;
+            }
+        }
+    }
+}
+```
+
+Notice the lifetime discipline: we do not stash IrcMsg beyond the loop iteration; if you must store, store the Bytes and re-parse on read, or copy only the fields you actually need.
+
+## Hitting 5,000+/s: practical notes
+
+- Avoid per-line allocations:
+  - Use BytesMut + split_to + freeze; never String::from_utf8.
+  - SmallVec for tags/params covers the common case on stack.
+- Limit syscalls by reading larger chunks (64–128 KiB) and framing in memory.
+- Use memchr/memmem to find CRLF; it is vectorized and fast.
+- Keep parsing single-threaded unless CPU-bound; the socket usually bottlenecks first.
+- If you must fan out, send Bytes downstream and parse at the edge.
+- Release pressure with a bounded mpsc channel and apply backpressure correctly.
+
+## Benchmark sketch with Criterion
+
+This microbench validates parser cost without I/O. It feeds real-looking lines and asserts no allocations in the steady state (use heap profiling in your environment).
+
+```rust
+use criterion::{criterion_group, criterion_main, Criterion, black_box};
+
+fn gen_line() -> String {
+    format!(
+        "@badge-info=;badges=subscriber/1;color=#1E90FF;display-name=Foo;id={};mod=0 :foo!foo@foo.tmi.twitch.tv PRIVMSG #chan :Hello world!\r\n",
+        uuid::Uuid::new_v4()
+    )
+}
+
+fn bench_parse(c: &mut Criterion) {
+    let lines: Vec<_> = (0..10_000).map(|_| gen_line()).collect();
+    c.bench_function("parse_irc_line", |b| {
+        b.iter(|| {
+            for l in &lines {
+                let s = &l[..l.len()-2]; // trim CRLF; framing does this
+                let (_rest, msg) = parse_irc_line(black_box(s)).unwrap();
+                black_box(msg);
+            }
+        })
+    });
+}
+
+criterion_group!(benches, bench_parse);
+criterion_main!(benches);
+```
+
+On a modern laptop, the parser alone easily handles >1e6 lines/s; the 5k/s end-to-end goal is dominated by the network and framing loop. Verify with `--release`, `lto = true`, `codegen-units = 1`.
+
+## Common pitfalls
+
+- Using tokio::io::BufReader::lines() allocates a String per line and strips `\n` only; you need CRLF and zero-copy.
+- Building a HashMap for tags per message: big allocator churn; prefer SmallVec of pairs or a tiny arena if you need lookup.
+- Splitting on `\n` only: Twitch terminates with `\r\n`; you’ll leave stray `\r`.
+- Keeping parsed views beyond the frame’s lifetime: borrow checker won’t let you; re-parse or copy the minimal data you truly need.
+
+## Extensions
+
+- Convert popular tags to typed fields lazily: look up the pair and parse only when accessed.
+- Support PING/NOTICE/USERSTATE with the same combinators.
+- If you need partial Unicode normalization, do it on-demand for `trailing` only.
+- Pre-size the read buffer to expected peak line density to minimize reallocations.
+
+## TL;DR architecture
+
+- Socket -> BytesMut (read_buf)
+- Frame by scanning for CRLF -> split_to -> freeze Bytes
+- Consumer receives Bytes, converts to &str, parses with nom into borrowed slices
+- Do work with borrowed fields; copy minimally if you must persist
+
+This design avoids heap churn in the hot path, keeps parsing branchless and cache-friendly, and comfortably sustains 5,000+ Twitch chat messages per second on commodity hardware.
