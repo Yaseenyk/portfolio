@@ -1,0 +1,277 @@
+---
+title: 'Tauri Rust Backpressure: Bounded vs Unbounded Channels for Chat Floods'
+slug: tauri-rust-backpressure-bounded-vs-unbounded-channels-for-chat-floods
+date: '2026-06-30'
+description: Design a Tauri Rust core that survives chat floods without memory blowups
+  using bounded channels, drop-oldest semantics, and time-based batching.
+tags:
+- Rust
+- Tauri
+- Backend
+keywords:
+- tauri rust backpressure
+- tokio bounded channel chat
+- tokio broadcast drop oldest
+- tauri window.emit batching
+- prevent memory blowup unbounded channel
+readingMinutes: 7
+takeaways:
+- Never ship unbounded channels for UI event streams; they will OOM under chat floods.
+- Use bounded broadcast channels with drop-oldest semantics and batch to the WebView.
+- Coalesce at 8–16ms and cap batch size to bound CPU and message fan-out.
+- Measure lag and drops; expose counters and tune capacity and batching via config.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## The problem: desktop chat floods meet a tiny event loop
+
+Tauri gives you a Rust core and a WebView UI. It’s easy to emit a UI event per token from an LLM or per message from a chat gateway. It’s also easy to accidentally buffer millions of events and nuke memory because the WebView can’t keep up.
+
+The failure mode is classic: unbounded channels in the core + window.emit per message = unbounded memory growth when the UI stalls (GC, devtools open, heavy React reconciliation) or the network spikes.
+
+You need backpressure. In Rust that means bounded channels, clear overload semantics (block, drop, or coalesce), and batching.
+
+## Bounded vs unbounded channels in Rust (Tauri context)
+
+- tokio::sync::mpsc::unbounded_channel
+  - Pros: zero backpressure; send is infallible.
+  - Cons: unbounded memory; catastrophic under floods.
+- tokio::sync::mpsc::channel(cap)
+  - Pros: bounded memory; send().await backpressures producers when full.
+  - Cons: if used on hot paths in a Tauri command, you can stall request handlers unless you carefully spawn.
+- tokio::sync::broadcast::channel(cap)
+  - Pros: bounded ring buffer; when receivers lag, old messages are overwritten (drop-oldest) and receivers see RecvError::Lagged(n); send is non-async and never blocks. Perfect when you prefer shedding over blocking.
+  - Cons: no per-receiver ordering guarantees if you count lost messages as gaps; requires handling Lagged.
+
+For a chat viewer, you typically want “best effort latest view” rather than “block the world and buffer everything.” That maps well to broadcast channels plus coalescing.
+
+## Design goals
+
+- Bounded memory regardless of producer rate or WebView slowness.
+- Keep the UI responsive by reducing event fan-out and work per frame.
+- Provide metrics about how often we drop or lag.
+
+## Architecture
+
+- Producers (network/LLM stream) publish ChatEvent into a bounded broadcast channel.
+- A single emitter task subscribes, coalesces events into batches every 8–16ms (one frame), and emits to the WebView.
+- On receiver lag, we record the drop count and continue.
+
+## Implementation: broadcast with drop-oldest + frame-time batching
+
+Cargo.toml (relevant bits):
+
+```toml
+[dependencies]
+tauri = { version = "1", features = ["api-all"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+```
+
+Rust (core):
+
+```rust
+use serde::Serialize;
+use std::sync::{Arc, atomic::{AtomicU64, Ordering}};
+use tauri::{Manager, State, Window};
+use tokio::{sync::broadcast, time::{self, Duration}};
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ChatEvent {
+  pub room_id: String,
+  pub text: String,
+  pub ts_ms: u128,
+}
+
+#[derive(Clone)]
+pub struct ChatHub {
+  tx: broadcast::Sender<ChatEvent>,
+  dropped: Arc<AtomicU64>,
+}
+
+impl ChatHub {
+  pub fn new(capacity: usize) -> Self {
+    let (tx, _rx) = broadcast::channel(capacity);
+    Self { tx, dropped: Arc::new(AtomicU64::new(0)) }
+  }
+
+  pub fn publisher(&self) -> broadcast::Sender<ChatEvent> { self.tx.clone() }
+  pub fn dropped_total(&self) -> u64 { self.dropped.load(Ordering::Relaxed) }
+}
+
+async fn start_emitter(window: Window, hub: ChatHub) {
+  let mut rx = hub.tx.subscribe();
+  let mut ticker = time::interval(Duration::from_millis(16)); // ~60 FPS
+  let mut buf: Vec<ChatEvent> = Vec::with_capacity(256);
+  const MAX_BATCH: usize = 256;
+
+  loop {
+    tokio::select! {
+      _ = ticker.tick() => {
+        if !buf.is_empty() {
+          let payload = serde_json::json!({ "events": &buf });
+          // Emit is synchronous per call; errors usually mean the window is gone.
+          let _ = window.emit("chat:delta", payload);
+          buf.clear();
+        }
+      }
+      recv = rx.recv() => {
+        match recv {
+          Ok(ev) => {
+            buf.push(ev);
+            if buf.len() >= MAX_BATCH {
+              let payload = serde_json::json!({ "events": &buf });
+              let _ = window.emit("chat:delta", payload);
+              buf.clear();
+            }
+          }
+          Err(broadcast::error::RecvError::Lagged(n)) => {
+            hub.dropped.fetch_add(n as u64, Ordering::Relaxed);
+            // We lost n oldest items; continue with latest.
+          }
+          Err(broadcast::error::RecvError::Closed) => break,
+        }
+      }
+    }
+  }
+}
+
+#[tauri::command]
+async fn publish_token(hub: State<'_, ChatHub>, room_id: String, text: String) -> Result<(), String> {
+  let ev = ChatEvent { room_id, text, ts_ms: 
+    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis() };
+  // Non-blocking, bounded, drop-oldest semantics under pressure
+  let _ = hub.publisher().send(ev);
+  Ok(())
+}
+
+pub fn run() {
+  tauri::Builder::default()
+    .setup(|app| {
+      let hub = ChatHub::new(1024); // tuneable capacity (see below)
+      let window = app.get_window("main").expect("main window");
+      app.manage(hub.clone());
+      tauri::async_runtime::spawn(start_emitter(window, hub));
+      Ok(())
+    })
+    .invoke_handler(tauri::generate_handler![publish_token])
+    .run(tauri::generate_context!())
+    .expect("error while running tauri application");
+}
+```
+
+Frontend (TypeScript):
+
+```ts
+import { listen } from '@tauri-apps/api/event';
+
+type ChatEvent = { room_id: string; text: string; ts_ms: number };
+
+async function bootstrap() {
+  await listen<{ events: ChatEvent[] }>('chat:delta', ({ payload }) => {
+    // Apply batched deltas in a single render pass.
+    for (const ev of payload.events) {
+      appendToChat(ev.room_id, ev.text, ev.ts_ms);
+    }
+  });
+}
+```
+
+Why this works under floods:
+- Memory bounded: broadcaster ring buffer caps memory at O(capacity), plus the small batching buffer.
+- UI load bounded: coalescing amortizes per-message overhead to one emit per frame or per 256 events.
+- When overloaded: old deltas are dropped; users see the latest state, not a lagging backlog.
+
+## Anti-pattern: unbounded channels + per-message emits
+
+This is how you OOM a desktop app under flood:
+
+```rust
+use tokio::sync::mpsc;
+let (tx, mut rx) = mpsc::unbounded_channel::<ChatEvent>();
+// Producers: tx.send(ev).unwrap(); // infallible => unbounded growth
+// Emitter loop:
+while let Some(ev) = rx.recv().await {
+  window.emit("chat:delta", ev).unwrap(); // emit 100k/s? enjoy
+}
+```
+
+Never do this for UI event streams. The WebView will stall and this buffer grows without bound.
+
+## Alternative: bounded mpsc to block producers (strict delivery)
+
+If you prefer blocking producers over dropping events (e.g., you must deliver every message to persistence), use a bounded mpsc and move the blocking off the Tauri command thread:
+
+```rust
+use tokio::sync::mpsc;
+
+#[derive(Clone)]
+struct StrictBus { tx: mpsc::Sender<ChatEvent> }
+
+impl StrictBus {
+  fn new(cap: usize) -> (Self, mpsc::Receiver<ChatEvent>) {
+    let (tx, rx) = mpsc::channel(cap);
+    (Self { tx }, rx)
+  }
+
+  async fn publish(&self, ev: ChatEvent) {
+    // This awaits when full: true backpressure
+    let _ = self.tx.send(ev).await;
+  }
+}
+
+// In setup
+let (bus, mut rx) = StrictBus::new(1024);
+app.manage(bus.clone());
+// Spawn a background aggregator that drains rx and batches to the UI (as before).
+
+tauri::async_runtime::spawn(async move {
+  let mut buf = Vec::with_capacity(256);
+  let mut ticker = tokio::time::interval(Duration::from_millis(16));
+  loop {
+    tokio::select! {
+      _ = ticker.tick() => { if !buf.is_empty() { let _ = window.emit("chat:delta", serde_json::json!({"events": &buf })); buf.clear(); } }
+      Some(ev) = rx.recv() => { buf.push(ev); if buf.len() >= 256 { let _ = window.emit("chat:delta", serde_json::json!({"events": &buf })); buf.clear(); } }
+      else => break,
+    }
+  }
+});
+
+// In a Tauri command, never await on .publish directly if you're on the hot path.
+#[tauri::command]
+async fn deliver_all(bus: State<'_, StrictBus>, room_id: String, text: String) -> Result<(), String> {
+  let ev = ChatEvent { room_id, text, ts_ms: 0 };
+  // Offload the potential await to a background task
+  let b = bus.clone();
+  tauri::async_runtime::spawn(async move { b.publish(ev).await; });
+  Ok(())
+}
+```
+
+This design gives strict delivery (no drops) at the cost of slowing producers when the UI is slow. If your producers are network tasks, that may be acceptable; if they’re CPU-bound tokenizers, consider yielding to avoid starving the runtime.
+
+## Tuning knobs that actually matter
+
+- Channel capacity: start with 1–4k for broadcast (ring buffer). For strict mpsc, 256–1k is usually enough because batching drains fast.
+- Batch window: 8–16ms fits 60Hz rendering and keeps UI snappy. Increase to 33ms if your payloads are large.
+- Max batch size: 128–512. Too big increases JSON serialization and JS parsing time per emit.
+- Per-room fairness: use one channel per room and a fair round-robin in the emitter if you serve multiple chats.
+- Drop metrics: track dropped_total and expose it via a Tauri command or periodic event to inform tuning.
+
+## Failure modes and guardrails
+
+- Deadlocks: don’t call send().await on a bounded mpsc inside a synchronous path that blocks the same runtime workers. Always spawn.
+- Emitter reentrancy: don’t call window.emit in a tight loop without batching; JSON serialization costs are real.
+- Shutdown: dropping all senders closes channels; make emitter exit cleanly on Closed.
+- Observability: add tracing spans around batching and emission; emit a heartbeat metric including drops and current batch sizes.
+
+## TL;DR recipe
+
+- Prefer tokio::broadcast::channel for UI-bound streams: it gives bounded memory with drop-oldest semantics.
+- Always coalesce to frame time or a max batch size before emitting to the WebView.
+- If you must not lose data, use bounded mpsc and push back on producers—off the UI path.
+- Instrument and tune capacity and batch windows. You’ll ship a desktop chat that survives floods without memory blowups.
