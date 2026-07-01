@@ -1,4 +1,3 @@
-Swapping serde_json for simd-json in the streamerOS IPC layer: benchmarking the deserialize hot path
 Halving Tauri v2 IPC cost: event batching and rmp-serde MessagePack over the Rust-to-WebView bridge
 A reproducible RAM-regression workflow for a Rust media app using dhat and heaptrack
 Lock-free SPSC ring buffers with crossbeam: feeding 60fps audio meters from Rust without contention
