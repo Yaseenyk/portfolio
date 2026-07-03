@@ -1,0 +1,287 @@
+---
+title: A reproducible RAM-regression workflow in Rust with dhat + heaptrack
+slug: a-reproducible-ram-regression-workflow-in-rust-with-dhat-heaptrack
+date: '2026-07-03'
+description: A practical, deterministic workflow to catch and bisect memory regressions
+  in a Rust media pipeline using dhat for budgets and heaptrack for call stacks.
+tags:
+- Rust
+- Performance
+- Tooling
+keywords:
+- rust dhat heap profiler
+- heaptrack rust CI pipeline
+- memory regression workflow rust
+- rust media pipeline memory limits
+- dhat HeapStats example
+- heaptrack_print automation
+- git bisect memory regression
+- rust global allocator dhatalloc
+readingMinutes: 7
+takeaways:
+- Use dhat in tests to enforce peak-heap budgets and fail fast on regressions.
+- Use heaptrack in CI to capture call stacks and quantify where new allocations appear.
+- 'Make the workload deterministic: fixed assets, thread counts, allocator, and CPU
+  features.'
+- Automate baselines and bisect so any PR that moves memory by more than X% is blocked.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why RAM regressions are common in media pipelines
+
+Media apps amplify heap usage: large frame buffers, variable codec behavior, and deep pipelines (decode → transform → encode). Small code changes—buffer growth policies, an extra clone(), a channel backpressure change—can move peak RSS by hundreds of MB without an obvious culprit.
+
+This article shows a reproducible, CI-friendly workflow that does two complementary things:
+- Use dhat to put a hard budget on peak heap in tests and fail fast.
+- Use heaptrack in CI to produce allocation-centric call stacks and quantify where memory moved.
+
+You’ll leave with a drop-in harness you can paste into a Rust media crate, plus shell glue to automate baselines, diff, and git bisect.
+
+## Tooling split: dhat vs heaptrack
+
+- dhat (crate: `dhat`) replaces the global allocator at test time and tracks heap stats with near-zero noise. It’s perfect for budget tests and per-test reproducibility. It emits machine-readable JSON and exposes `HeapStats` for assertions.
+- heaptrack (CLI/GUI) interposes allocation calls and records full backtraces with sizes and lifetimes. It’s heavier but gives you the “who allocated this 300MB vec?” call tree. Ideal for CI artifacts and investigation.
+
+You want both: dhat to gate PRs; heaptrack to explain what happened.
+
+## Make the workload deterministic
+
+Before you chase numbers, constrain variability:
+- Pin a single Rust toolchain and crate lockfile.
+- Fix CPU features and disable auto-tuning: set `RUSTFLAGS="-C target-cpu=x86-64-v3"` (or your floor) instead of `native` in CI.
+- Use the system allocator for heaptrack runs. Only enable `DhatAlloc` under tests.
+- Single-thread or fixed-thread execution: `RUST_TEST_THREADS=1`, `RAYON_NUM_THREADS=1` (if applicable).
+- Stable media assets checked into the repo or fetched with pinned checksums.
+- Warm up caches the same way every time (e.g., decode one short segment first) or explicitly disable caches.
+
+## Wire in dhat for budgeted tests
+
+The pattern is: swap in `DhatAlloc` only for tests, drive a deterministic media workload, read `HeapStats`, and assert budgets.
+
+Cargo.toml (relevant bits):
+```toml
+[dev-dependencies]
+dhat = "0.3"
+anyhow = "1"
+# your media stack, examples:
+# ffmpeg-next = "6"
+# symphonia = { version = "0.5", features = ["aac", "mp3"] }
+```
+
+lib.rs (or the crate root):
+```rust
+#![cfg_attr(test, allow(dead_code))]
+
+#[cfg(all(test, feature = "dhat-heap"))]
+use dhat::{Dhat, DhatAlloc, HeapStats};
+
+#[cfg(all(test, feature = "dhat-heap"))]
+#[global_allocator]
+static ALLOC: DhatAlloc = DhatAlloc;
+
+#[cfg(not(all(test, feature = "dhat-heap")))]
+#[global_allocator]
+static ALLOC: std::alloc::System = std::alloc::System;
+
+// A sketch of a deterministic media work unit. Replace with your real pipeline.
+pub fn transcode_in_place(input_path: &str, target_bitrate: u32) -> anyhow::Result<Vec<u8>> {
+    // Do real work: open input, decode frames, resample, encode, and collect output bytes.
+    // Be careful with buffering: use bounded queues and avoid unbounded Vec::reserve growth.
+    // For illustration we simulate dynamic growth patterns often seen in media code.
+    let mut out = Vec::with_capacity(16 * 1024);
+    let chunks = std::fs::read(input_path)?; // deterministic blob
+
+    let step = (target_bitrate as usize).max(64);
+    for window in chunks.chunks(step) {
+        // Pretend: transform + encode window
+        let mut buf = window.to_vec();
+        // e.g., format conversion might temporarily double memory
+        buf.extend_from_slice(&[0u8; 128]);
+        out.extend_from_slice(&buf);
+    }
+
+    // Simulate container mux overhead
+    out.splice(0..0, [0x52, 0x55, 0x53, 0x54]); // 'RUST'
+    Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Budget tuned for a known input asset of ~5 MiB.
+    // Keep a baseline in the repo and update intentionally via a PR with justification.
+    const PEAK_HEAP_BUDGET_BYTES: usize = 64 * 1024 * 1024; // 64 MiB
+
+    #[test]
+    #[cfg(feature = "dhat-heap")]
+    fn memory_budget_transcode() {
+        // Start dhat and ensure single-thread determinism for the test.
+        let _dhat = Dhat::start_heap_profiling();
+        std::env::set_var("RAYON_NUM_THREADS", "1");
+
+        let out = transcode_in_place("tests/assets/sample.aac", 192_000).unwrap();
+        assert!(out.len() > 0);
+
+        let stats = HeapStats::get();
+        eprintln!(
+            "dhat: total_bytes={}, max_bytes={}, curr_bytes={}",
+            stats.total_bytes, stats.max_bytes, stats.curr_bytes
+        );
+
+        assert!(
+            stats.max_bytes <= PEAK_HEAP_BUDGET_BYTES,
+            "peak heap {} > budget {}",
+            stats.max_bytes,
+            PEAK_HEAP_BUDGET_BYTES
+        );
+    }
+}
+```
+
+How to run:
+```bash
+# Pin rustc and dependencies; CI should use the same toolchain.
+rustup override set 1.77.2
+
+# Only tests compiled with the feature use dhat.
+cargo test -F dhat-heap -- --nocapture --test-threads=1
+```
+
+Notes:
+- `DhatAlloc` must be the only `#[global_allocator]` in the build. The cfg-gated approach above ensures that.
+- dhat writes a `dhat-heap.json` by default; keep it as an artifact if you want historical traces.
+- Use separate budgets for different test shapes (audio-only vs 4K video), or assert delta from a baseline number stored in the repo.
+
+## Heaptrack in CI for call stacks and diffs
+
+heaptrack shines when the budget trips: you’ll want to see the allocation sites and lifetimes.
+
+Install and run (Ubuntu/Debian):
+```bash
+sudo apt-get update && sudo apt-get install -y heaptrack
+
+# Always profile a release build with debuginfo for useful stacks.
+RUSTFLAGS="-C debuginfo=1 -C target-cpu=x86-64-v3" cargo build --release
+
+mkdir -p artifacts
+# Record; `-o` sets the output prefix. The program and args follow `--`.
+heaptrack -o artifacts/trace -- \
+  ./target/release/your-bin \
+  --input tests/assets/sample.aac --bitrate 192000
+
+# Print a textual summary for CI logs and machine parsing.
+heaptrack_print artifacts/trace.zst | tee artifacts/trace.txt
+```
+
+A minimal CI gate that compares peak heap between main and PR:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+parse_peak_bytes() {
+  # Extract a number of bytes from heaptrack_print output lines like:
+  # "peak heap memory consumption: 64.23 MiB"
+  awk '/peak heap memory/{print $(NF-1), $NF}' | \
+  python3 - "$@" <<'PY'
+import sys
+val, unit = sys.stdin.read().strip().split()
+num = float(val)
+mult = {
+  'B': 1,
+  'KiB': 1024,
+  'MiB': 1024**2,
+  'GiB': 1024**3,
+}.get(unit, 1)
+print(int(num * mult))
+PY
+}
+
+profile_once() {
+  local out_prefix=$1
+  shift
+  heaptrack -o "${out_prefix}" -- "$@" >/dev/null 2>&1
+  heaptrack_print "${out_prefix}.zst" > "${out_prefix}.txt"
+  parse_peak_bytes < "${out_prefix}.txt"
+}
+
+# Build once for determinism
+RUSTFLAGS="-C debuginfo=1 -C target-cpu=x86-64-v3" cargo build --release
+
+# Baseline command is the same across runs; load it or regenerate from main.
+BASELINE_BYTES=$(profile_once artifacts/baseline ./target/release/your-bin --input tests/assets/sample.aac --bitrate 192000)
+PR_BYTES=$(profile_once artifacts/pr ./target/release/your-bin --input tests/assets/sample.aac --bitrate 192000)
+
+DELTA=$(( PR_BYTES - BASELINE_BYTES ))
+ABS_DELTA=${DELTA#-}
+
+BUDGET_PCT=${BUDGET_PCT:-5}
+THRESH=$(( BASELINE_BYTES * BUDGET_PCT / 100 ))
+
+printf "baseline=%d bytes, pr=%d bytes, delta=%+d bytes, threshold=%d bytes\n" \
+  "$BASELINE_BYTES" "$PR_BYTES" "$DELTA" "$THRESH"
+
+if (( ABS_DELTA > THRESH )); then
+  echo "ERROR: peak heap moved by > ${BUDGET_PCT}%"
+  exit 1
+fi
+```
+
+Wire this into CI after building the PR artifact. Store the baseline from `main` as an artifact or regenerate by checking out `origin/main` within the workflow.
+
+## Baselines, budgets, and bisect
+
+- Store a small JSON file alongside your test assets with measured `dhat.max_bytes` and `heaptrack.peak_heap_bytes` from `main`.
+- Fail PRs if either number moves by more than X% or Y bytes.
+- When a regression slips in, use `git bisect run` with the CI script locally:
+
+```bash
+git bisect start
+git bisect bad HEAD
+git bisect good origin/main
+
+git bisect run bash -lc 'cargo build --release >/dev/null && ci/mem_gate.sh'
+```
+
+This gives you the exact commit where peak heap crossed the line.
+
+## Allocators and reproducibility gotchas
+
+- System allocator for heaptrack: Prefer `std::alloc::System` in release builds you profile with heaptrack. If you normally use `mimalloc`/`jemalloc`, build a profiling variant with the system allocator to maximize interposition fidelity.
+- Only one global allocator: Guard `DhatAlloc` with a feature flag just for tests. Mixing allocators within a single binary leads to undefined behavior.
+- Debug info: Build release with `-C debuginfo=1` to keep frame pointers for heaptrack without ruining optimization.
+- Threads: Fix `RAYON_NUM_THREADS=1` or a constant; uncontrolled parallelism changes allocation interleavings and peaks.
+- Inputs: Keep assets small but realistic. A 5–20 MiB clip exercises buffering without spending minutes per run.
+
+## Interpreting results
+
+- dhat:
+  - `max_bytes` is your budget anchor. For media workloads, this approximates “frame queue high-water mark + working buffers.”
+  - `total_bytes` moving a lot without `max_bytes` moving usually means churn (e.g., zero-copy opportunities exist).
+- heaptrack:
+  - Look for hot allocation sites by cumulative size. Common suspects: `Vec::resize`, `image::ImageBuffer::from_raw`, `bytes::BytesMut::reserve`.
+  - Compare “allocated but not freed at exit” to find leaks; watch for `Arc` cycles or missed `drop` on pipeline teardown.
+  - Cross-check peaks with dhat numbers; if they disagree wildly, ensure you profiled the same binary path and allocator.
+
+## What a good PR looks like
+
+- Includes updated dhat baseline numbers or an explanation why the budget increased (e.g., enabling B-frames ups buffering by 2×). 
+- Attaches heaptrack summary text to the PR for reviewers. 
+- Keeps allocator and thread settings unchanged unless the PR’s goal is to change them. 
+- Documents trade-offs (e.g., added 8 MiB for a 12% throughput win) and updates budget constants.
+
+## Appendix: pinning versions for repeatability
+
+- rust-toolchain.toml:
+```toml
+[toolchain]
+channel = "1.77.2"
+components = ["rustc", "cargo"]
+```
+
+- CI packages: `heaptrack >= 1.4` recommended. dhat crate pinned via Cargo.lock.
+
+With this setup, memory regressions become just another test failure: actionable, explainable, and bisectable. The combination of dhat’s precise budgeting and heaptrack’s rich call stacks gives you both a guardrail and a microscope for your Rust media app.
