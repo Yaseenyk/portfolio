@@ -1,0 +1,304 @@
+---
+title: Crossbeam SPSC ring buffers for 60 FPS Rust audio meters
+slug: crossbeam-spsc-ring-buffers-for-60-fps-rust-audio-meters
+date: '2026-07-04'
+description: Build a zero-allocation, lock-free SPSC ring buffer with crossbeam to
+  stream audio metering data to a 60 FPS UI in Rust without contention.
+tags:
+- Rust
+- Audio
+- Concurrency
+- Performance
+keywords:
+- rust spsc ring buffer
+- crossbeam lock-free queue
+- real-time audio rust
+- rust audio meters ui
+- cache padded atomics rust
+- cpal audio metering rust
+- lock-free producer consumer rust
+readingMinutes: 7
+takeaways:
+- A small lock-free SPSC ring buffer is the right primitive for RT audio → UI data
+  flow.
+- Using crossbeam’s CachePadded and atomics eliminates false sharing and syscalls.
+- Bounded, drop-on-full semantics plus pop_latest() gives smooth 60 FPS meters.
+- Avoid channels for RT paths; stick to single-producer/single-consumer atomics.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why a lock-free SPSC ring buffer for audio meters
+
+Audio callbacks must never block, allocate, or take locks. Your UI, meanwhile, ticks at ~60 Hz and can burst or stall. A bounded, single-producer/single-consumer (SPSC) ring gives you:
+
+- Constant-time, wait-free push/pop with only a couple of atomic ops
+- Bounded memory; no allocation after init
+- No syscalls (no parking/unparking); stable latency
+- Natural backpressure policy (drop when full) that’s perfect for meters
+
+Crossbeam provides the right building blocks (CachePadded, Backoff, AtomicCell) and battle-tested atomics. We’ll build a compact SPSC ring tailored to RT audio → UI.
+
+## Design choices
+
+- SPSC only: one audio thread produces; one UI thread consumes
+- Bounded, power-of-two capacity with index masking (fast mod)
+- False-sharing resistance via CachePadded for head/tail
+- Safe, Copy-only payloads for meter frames (no drop complexity on RT path)
+- Drop-on-full write policy + pop_latest on UI to coalesce bursts
+
+If you need general T with Drop, you can extend this with MaybeUninit and careful drop logic off the RT path; for meters, a small Copy struct is ideal.
+
+## Implementation
+
+Cargo.toml (relevant parts):
+
+```toml
+[dependencies]
+crossbeam-utils = "0.8"
+```
+
+SPSC ring buffer (Copy payload):
+
+```rust
+use core::mem::MaybeUninit;
+use core::sync::atomic::{AtomicUsize, Ordering};
+use crossbeam_utils::CachePadded;
+
+pub struct SpscRing<T: Copy> {
+    buf: Box<[MaybeUninit<T>]>,
+    mask: usize,                   // capacity - 1 (power-of-two)
+    head: CachePadded<AtomicUsize>,// write index (producer-only increments)
+    tail: CachePadded<AtomicUsize>,// read index (consumer-only increments)
+}
+
+impl<T: Copy> SpscRing<T> {
+    pub fn with_capacity_pow2(capacity: usize) -> Self {
+        assert!(capacity >= 2 && capacity.is_power_of_two());
+        let buf = {
+            let mut v: Vec<MaybeUninit<T>> = Vec::with_capacity(capacity);
+            // SAFETY: we’ll manage initialization manually; this is a fixed-size ring
+            unsafe { v.set_len(capacity); }
+            v.into_boxed_slice()
+        };
+        Self {
+            mask: capacity - 1,
+            buf,
+            head: CachePadded::new(AtomicUsize::new(0)),
+            tail: CachePadded::new(AtomicUsize::new(0)),
+        }
+    }
+
+    #[inline]
+    pub fn capacity(&self) -> usize { self.mask + 1 }
+
+    #[inline]
+    pub fn len(&self) -> usize {
+        let head = self.head.load(Ordering::Acquire);
+        let tail = self.tail.load(Ordering::Acquire);
+        head - tail
+    }
+
+    // Producer: non-blocking; returns Err(value) if full
+    #[inline]
+    pub fn try_push(&self, value: T) -> Result<(), T> {
+        let head = self.head.load(Ordering::Relaxed);
+        let tail = self.tail.load(Ordering::Acquire);
+        if head - tail == self.capacity() {
+            return Err(value); // drop-on-full policy
+        }
+        let idx = head & self.mask;
+        // SAFETY: single-producer ensures exclusive write to this slot
+        unsafe { self.buf.get_unchecked(idx).as_ptr().write(value); }
+        // Publish the write
+        self.head.store(head.wrapping_add(1), Ordering::Release);
+        Ok(())
+    }
+
+    // Consumer: non-blocking; None if empty
+    #[inline]
+    pub fn try_pop(&self) -> Option<T> {
+        let tail = self.tail.load(Ordering::Relaxed);
+        let head = self.head.load(Ordering::Acquire);
+        if tail == head { return None; }
+        let idx = tail & self.mask;
+        // SAFETY: single-consumer ensures exclusive read from this slot
+        let v = unsafe { self.buf.get_unchecked(idx).as_ptr().read() };
+        // Publish the read
+        self.tail.store(tail.wrapping_add(1), Ordering::Release);
+        Some(v)
+    }
+
+    // Consumer convenience: drain queue and return the most recent frame
+    #[inline]
+    pub fn pop_latest(&self) -> Option<T> {
+        let mut last = self.try_pop()?;
+        while let Some(v) = self.try_pop() { last = v; }
+        Some(last)
+    }
+}
+
+unsafe impl<T: Copy + Send> Send for SpscRing<T> {}
+unsafe impl<T: Copy + Send> Sync for SpscRing<T> {}
+```
+
+Notes on memory ordering:
+- Producer writes the slot, then Release-stores head. Consumer Acquire-loads head before reading, ensuring the slot write is visible.
+- Consumer reads the slot, then Release-stores tail. Producer Acquire-loads tail before checking capacity, ensuring it sees consumption.
+- CachePadded places head and tail on different cache lines, preventing false sharing and reducing store/load ping-pong.
+
+### Meter frame type
+
+Meters are tiny Copy structs:
+
+```rust
+#[derive(Copy, Clone, Default)]
+pub struct MeterFrame {
+    pub peak_l: f32,
+    pub peak_r: f32,
+    pub rms_l: f32,
+    pub rms_r: f32,
+}
+```
+
+## Wiring it into an audio callback and a 60 FPS UI
+
+We’ll use cpal for the audio callback and a simple loop to emulate a 60 Hz UI. The key is: the producer must never block; the consumer coalesces with pop_latest().
+
+```rust
+use std::sync::Arc;
+use std::time::{Duration, Instant};
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+
+fn main() -> anyhow::Result<()> {
+    let ring = Arc::new(SpscRing::<MeterFrame>::with_capacity_pow2(64));
+
+    // Audio setup (input or output callback depending on your app)
+    let host = cpal::default_host();
+    let device = host.default_input_device().expect("no input device");
+    let config = device.default_input_config()?; // e.g., f32 mono/stereo
+
+    let ring_p = ring.clone();
+    let stream = match config.sample_format() {
+        cpal::SampleFormat::F32 => build_stream::<f32>(&device, &config.into(), ring_p)?,
+        cpal::SampleFormat::I16 => build_stream::<i16>(&device, &config.into(), ring_p)?,
+        cpal::SampleFormat::U16 => build_stream::<u16>(&device, &config.into(), ring_p)?,
+        _ => unimplemented!(),
+    };
+    stream.play()?;
+
+    // UI loop @ ~60 FPS: pull latest frame, draw meters
+    let mut last = MeterFrame::default();
+    let frame = Duration::from_millis(16);
+    let mut next = Instant::now();
+    loop {
+        if let Some(latest) = ring.pop_latest() { last = latest; }
+        draw_meters(last); // your UI framework of choice
+        next += frame;
+        let now = Instant::now();
+        if next > now { std::thread::sleep(next - now); } else { next = now; }
+    }
+}
+
+fn build_stream<T>(device: &cpal::Device, config: &cpal::StreamConfig, ring: Arc<SpscRing<MeterFrame>>)
+    -> Result<cpal::Stream, cpal::BuildStreamError>
+where
+    T: cpal::Sample + cpal::FromSample<f32>,
+{
+    let channels = config.channels as usize;
+    device.build_input_stream(
+        config,
+        move |data: &[T], _| {
+            // RT callback: compute per-block meters
+            let mut peak_l = 0.0f32; let mut peak_r = 0.0f32;
+            let mut sumsq_l = 0.0f32; let mut sumsq_r = 0.0f32; let mut n = 0u32;
+            if channels == 1 {
+                for &s in data { let x: f32 = s.to_sample();
+                    let a = x.abs(); if a > peak_l { peak_l = a; }
+                    sumsq_l += x * x; n += 1;
+                }
+                // mirror mono to R
+                peak_r = peak_l; sumsq_r = sumsq_l;
+            } else {
+                for frame in data.chunks_exact(channels) {
+                    let l: f32 = frame[0].to_sample();
+                    let r: f32 = frame[1].to_sample();
+                    let al = l.abs(); let ar = r.abs();
+                    if al > peak_l { peak_l = al; }
+                    if ar > peak_r { peak_r = ar; }
+                    sumsq_l += l * l; sumsq_r += r * r; n += 1;
+                }
+            }
+            if n > 0 {
+                let invn = 1.0 / (n as f32);
+                let frame = MeterFrame {
+                    peak_l,
+                    peak_r,
+                    rms_l: (sumsq_l * invn).sqrt(),
+                    rms_r: (sumsq_r * invn).sqrt(),
+                };
+                let _ = ring.try_push(frame); // drop on full: UI will coalesce
+            }
+        },
+        move |err| eprintln!("stream error: {err}"),
+        None,
+    )
+}
+
+fn draw_meters(m: MeterFrame) {
+    // Replace with egui, wgpu, iced, etc. Here we just log occasionally.
+    static mut CNT: u32 = 0;
+    unsafe {
+        CNT += 1;
+        if CNT % 60 == 0 { println!("peak L/R: {:.3} {:.3} | rms L/R: {:.3} {:.3}", m.peak_l, m.peak_r, m.rms_l, m.rms_r); }
+    }
+}
+```
+
+This pattern keeps the audio thread allocation- and lock-free. The UI gets the freshest meter each frame, even if the audio callback runs 200–1000 Hz.
+
+## Why not crossbeam channels or ArrayQueue?
+
+- crossbeam-channel (bounded) is excellent for general MPMC, but it may park/unpark under contention and does more bookkeeping than needed for SPSC. Any parking is death in a real-time callback.
+- crossbeam_queue::ArrayQueue is fast and lock-free for MPMC, but SPSC lets you shave overhead: you only need one writer and one reader index, with no ABA issues or tickets.
+- A bespoke SPSC ring gives predictable cache behavior and fewer atomics.
+
+If you must ship yesterday and can tolerate a few extra atomics, ArrayQueue<Frame> works; still prefer drop-on-full + pop_latest to keep meters smooth.
+
+## Pitfalls and tuning
+
+- Capacity sizing: 32–256 frames is plenty for meters. Too small risks frequent drops; too large increases latency when the UI hiccups.
+- Power-of-two capacity simplifies the fast path (mask instead of %). Don’t fight it.
+- Keep payload Copy and small (<= 32 bytes) to avoid cache misses and complicated drops.
+- No cross-thread tail updates: for SPSC, only the consumer increments tail. Overwriting full buffers from the producer by moving tail is possible but requires careful synchronization to avoid racing the consumer.
+- Overflow of head/tail counters is theoretical on 64-bit (2^64 wraps after centuries at kHz). If you care, wrap with wrapping_add and rely on signed distance in comparisons as shown.
+
+## Micro-benchmark sketch
+
+For a feel, a release build on a modern x86_64 should do a push+pop in ~5–20 ns per element for a small Copy payload. You can measure with criterion:
+
+```rust
+// Cargo.toml: criterion = "0.5"
+use criterion::{criterion_group, criterion_main, Criterion, black_box};
+
+fn bench_spsc(c: &mut Criterion) {
+    let ring = SpscRing::<u64>::with_capacity_pow2(1024);
+    c.bench_function("spsc push+pop", |b| {
+        b.iter(|| {
+            let v = black_box(42u64);
+            let _ = ring.try_push(v);
+            let _ = ring.try_pop();
+        })
+    });
+}
+criterion_group!(benches, bench_spsc);
+criterion_main!(benches);
+```
+
+## Takeaways
+
+- For RT audio → UI, a tiny SPSC ring is the right tool: bounded, wait-free, no syscalls.
+- crossbeam’s CachePadded and atomics make a robust implementation trivial.
+- Drop-on-full plus pop_latest prevents UI stalls from growing latency while keeping meters responsive.
+- Resist the convenience of general-purpose channels on the RT path; save them for orchestration off the hot loop.

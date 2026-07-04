@@ -1,4 +1,3 @@
-Lock-free SPSC ring buffers with crossbeam: feeding 60fps audio meters from Rust without contention
 Pinning a 1.8% idle CPU budget: event-driven versus polling architecture in a long-running Tauri tray app
 Structured concurrency in Rust: capping parallel media-decode workers with tokio JoinSet and semaphores
 Shrinking the streamerOS Rust binary: opt-level=z, fat LTO, and panic=abort and what each actually buys you
