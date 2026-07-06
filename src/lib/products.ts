@@ -2,7 +2,11 @@
 // the /products dashboard, and each /products/<slug> deep-dive all read from here.
 import { SITE_URL } from "@/lib/site";
 
-export type ProductSlug = "streameros" | "linkedin-pipeline" | "ai-blogger";
+export type ProductSlug =
+  | "sable"
+  | "streameros"
+  | "linkedin-pipeline"
+  | "ai-blogger";
 
 export interface ProductMeta {
   slug: ProductSlug;
@@ -22,6 +26,24 @@ export interface ProductMeta {
 }
 
 export const PRODUCTS: ProductMeta[] = [
+  {
+    slug: "sable",
+    name: "Sable",
+    category: "Mobile · AI Agent",
+    tagline: "Local-First AI Financial Agent",
+    summary:
+      "A privacy-first personal finance agent that keeps 100% of your financial data on-device in SQLite — no cloud backend. An OpenAI function-calling agent tracks debts and pushes proactive briefings, with every database mutation gated behind a Review & Confirm boundary.",
+    tech: [
+      "React Native (Expo)",
+      "TypeScript",
+      "SQLite",
+      "Zustand",
+      "OpenAI · Function Calling",
+      "Local RAG",
+    ],
+    // TODO: confirm the real repository (and a live/App Store link if any).
+    repoUrl: "https://github.com/Yaseenyk/sable",
+  },
   {
     slug: "streameros",
     name: "streamerOS",
