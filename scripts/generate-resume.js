@@ -42,6 +42,23 @@ const path = require('path');
         desc: 'A node-routing workflow-automation environment with responsive connectors, processing layers, and directional edge bindings. A custom state Serialization Adapter compresses graph definitions over the wire.',
         tags: ['94% Payload Compression', 'React Flow', 'Zustand', 'TypeScript'],
       },
+      {
+        name: 'Automated LinkedIn Pipeline',
+        desc: 'A Python autonomous agent on GitHub Actions that drafts and publishes technical LinkedIn content on a cron via the Gemini API — zero servers, zero manual posting.',
+        tags: ['Autonomous Agent', 'Python', 'GitHub Actions', 'Gemini API', 'Cron'],
+        links: [
+          { label: 'Code', url: 'https://github.com/Yaseenyk/linkedin-bot' },
+        ],
+      },
+      {
+        name: 'Zero-Cost AI Blog Writer',
+        desc: 'A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles to this site — Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships it at $0 runtime cost.',
+        tags: ['Autonomous Pipeline', 'Next.js', 'MDX', 'google-genai', 'GitHub Actions'],
+        links: [
+          { label: 'Case Study', url: 'https://yaseenkhatib.streamerosai.com/products/ai-blogger' },
+          { label: 'Code', url: 'https://github.com/Yaseenyk/portfolio' },
+        ],
+      },
     ];
 
     const tagSpan = (t) =>
