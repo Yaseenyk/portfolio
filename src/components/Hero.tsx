@@ -23,12 +23,14 @@ export default function Hero() {
     <section className="grid min-h-[80vh] grid-cols-1 items-center gap-12 py-20 md:grid-cols-2 md:gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
       {/* Left: copy */}
       <motion.div variants={container} initial="hidden" animate="show">
-        <motion.div
-          variants={item}
-          className="inline-flex items-center gap-2.5 rounded-full border border-zinc-800 bg-white/[0.03] px-4 py-1.5 text-xs text-zinc-300"
-        >
-          <PulseDot />
-          Senior Full-Stack AI Engineer
+        <motion.div variants={item} className="flex flex-wrap items-center gap-2.5">
+          <span className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-4 py-1.5 text-xs font-medium text-emerald-300">
+            <PulseDot color="bg-emerald-400" />
+            Open to Remote roles
+          </span>
+          <span className="inline-flex items-center rounded-full border border-zinc-800 bg-white/[0.03] px-4 py-1.5 text-xs text-zinc-300">
+            Senior Full-Stack AI Engineer
+          </span>
         </motion.div>
 
         <motion.h1
@@ -45,11 +47,15 @@ export default function Hero() {
           variants={item}
           className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400"
         >
-          Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer who
-          bridges high-performance MERN architectures with autonomous AI systems.
-          He specializes in Agentic RAG pipelines, LLM orchestration, and
-          high-throughput backend scaling — architecting and shipping production
-          systems at AI-speed.
+          Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer who builds
+          and ships autonomous AI products — from Agentic RAG pipelines and LLM
+          orchestration to the high-throughput MERN systems they run on. He turns
+          AI capabilities into production software, at AI-speed.
+        </motion.p>
+
+        <motion.p variants={item} className="mt-4 text-sm text-zinc-500">
+          Based in Hyderabad (IST) · Remote-first, effective across global time
+          zones.
         </motion.p>
 
         <motion.div
@@ -57,12 +63,12 @@ export default function Hero() {
           className="mt-12 flex flex-wrap items-center gap-4"
         >
           <motion.a
-            href="#dashboard"
+            href="#contact"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             className="group inline-flex items-center gap-2 rounded-lg bg-cyan px-6 py-3 text-sm font-semibold text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_-2px_rgba(34,211,238,0.7)]"
           >
-            View Architecture
+            Get in touch
             <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </motion.a>
           <motion.a
@@ -75,6 +81,12 @@ export default function Hero() {
             <DownloadIcon className="h-4 w-4" />
             Download CV
           </motion.a>
+          <a
+            href="#dashboard"
+            className="text-sm font-medium text-zinc-400 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-cyan"
+          >
+            View live architecture
+          </a>
         </motion.div>
       </motion.div>
 

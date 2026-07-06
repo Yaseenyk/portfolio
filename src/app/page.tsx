@@ -55,6 +55,8 @@ export default function Home() {
         <main className="pt-20">
           <Hero />
 
+          <Products />
+
           <section id="rag-concierge" className="py-16">
             <h2 className="text-2xl font-semibold text-zinc-100">
               RAG Terminal Concierge
@@ -70,7 +72,6 @@ export default function Home() {
           </section>
 
           <ArchitecturePipeline />
-          <Products />
           <Dashboard />
           <RoadmapSection />
           <RecentPosts />
