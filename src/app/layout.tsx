@@ -16,9 +16,9 @@ const firaCode = Fira_Code({
   variable: "--font-mono",
 });
 
-const TITLE_DEFAULT = "Yaseen Khatib | AI + MERN Architect";
+const TITLE_DEFAULT = "Yaseen Khatib | Full-Stack AI Engineer";
 const DESCRIPTION =
-  "Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer building with Next.js, LangGraph, AI FinOps, and Scalable Architecture — specializing in Agentic RAG pipelines, LLM orchestration, and high-throughput backend scaling at AI-speed.";
+  "Yaseen Khatib — Senior Full-Stack AI Engineer who builds and ships autonomous AI products: Agentic RAG, LLM orchestration, and scalable MERN systems. Open to remote roles.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -65,7 +65,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE_DEFAULT,
     description: DESCRIPTION,
-    creator: "@yaseenyk",
     images: [`${SITE_URL}/og-lockup.png`],
   },
   robots: {
@@ -73,6 +72,16 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+};
+
+// AEO: WebSite entity, authored by the Person — anchors the site in the entity graph.
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Yaseen Khatib",
+  url: SITE_URL,
+  description: DESCRIPTION,
+  author: { "@type": "Person", name: "Yaseen Nurmahammad Khatib", url: SITE_URL },
 };
 
 export default function RootLayout({
@@ -83,10 +92,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
       <body className="font-sans">
-        {/* AEO: sitewide Person entity */}
+        {/* AEO: sitewide Person + WebSite entities */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         {children}
         <CommandPalette />
