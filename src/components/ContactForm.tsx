@@ -20,7 +20,7 @@ const EMAILJS_TEMPLATE = "template_dyb1k4x";
 const EMAILJS_PUBLIC_KEY = "mB56akvK2qStLNadU";
 
 // Where enquiries are delivered + shown on the page.
-const CONTACT_EMAIL = "yaseenkhatib04@gmail.com";
+const CONTACT_EMAIL = "contact@streamerosai.com";
 const CONTACT_PHONE = "8208335028";
 
 const STATUS_MESSAGE: Record<Exclude<Status, "idle" | "sending">, string> = {

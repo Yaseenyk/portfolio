@@ -101,7 +101,7 @@ const path = require('path');
       </p>
     </div>
     <div class="text-right text-zinc-600 text-[12px] space-y-1 bg-zinc-50 p-3 rounded-lg border border-zinc-100 min-w-[220px]">
-      <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-zinc-600">yaseenkhatib04@gmail.com</a></div>
+      <div><a href="mailto:contact@streamerosai.com" class="text-zinc-600">contact@streamerosai.com</a></div>
       <div><a href="tel:+918208335028" class="text-zinc-600">+91 8208335028</a></div>
       <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-cyan-700 font-medium">linkedin.com/in/yaseen-yk</a></div>
       <div><a href="https://github.com/Yaseenyk" class="text-zinc-600">github.com/Yaseenyk</a></div>
@@ -115,7 +115,7 @@ const path = require('path');
   <div class="grid grid-cols-12 gap-6 mt-5">
 
     <!-- LEFT SIDE COLUMN: Core Experience Narrative -->
-    <div class="col-span-8 space-y-5">
+    <div class="col-span-7 space-y-5">
 
       <div>
         <h2 class="text-[14px] font-bold tracking-wider uppercase text-zinc-900 border-b border-zinc-200 pb-1 mb-3">
@@ -180,7 +180,7 @@ const path = require('path');
     </div>
 
     <!-- RIGHT SIDE COLUMN: Skills, Credentials, Education -->
-    <div class="col-span-4 space-y-5">
+    <div class="col-span-5 space-y-5">
 
       <!-- Core Technology Tags -->
       <div>
