@@ -18,6 +18,18 @@ const projectsJsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
+    name: "Sable",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "iOS, Android",
+    description:
+      "A local-first AI financial agent: all data lives on-device in SQLite with no cloud backend, an OpenAI function-calling agent manages debts behind a Review & Confirm boundary, and a daily local RAG job delivers a proactive Morning Briefing.",
+    keywords:
+      "React Native, Expo, TypeScript, SQLite, OpenAI, Function Calling, Local RAG, offline-first",
+    author,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
     name: "streamerOS",
     applicationCategory: "MultimediaApplication",
     operatingSystem: "Windows, macOS, Linux",
