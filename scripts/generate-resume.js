@@ -42,26 +42,6 @@ const path = require('path');
         desc: 'A node-routing workflow-automation environment with responsive connectors, processing layers, and directional edge bindings. A custom state Serialization Adapter compresses graph definitions over the wire.',
         tags: ['94% Payload Compression', 'React Flow', 'Zustand', 'TypeScript'],
       },
-      {
-        name: 'CMZ App (Enterprise Portal)',
-        desc: 'A scaled administrative core supporting thousands of active endpoints, hardened through structured Redis cache rings and strict role-based (JWT) authorization layers for low-latency, high-availability operation.',
-        tags: ['25% Latency Reduction', '99.9% Uptime', '35% Error Elimination', 'Redis', 'WebSockets'],
-      },
-      {
-        name: 'Hospital-API',
-        desc: 'A high-throughput clinical workflow orchestration platform. Optimizes lookup routines through heavily cached queries and defensive server request-validation pipelines.',
-        tags: ['40% Workload Reduction', '30% Query Optimization', '25% Response Accel', 'Node.js', 'MongoDB'],
-      },
-      {
-        name: 'Cross-Platform TV Suite',
-        desc: 'Embedded native smart-television systems engineered with modular vanilla abstractions for pristine execution across limited, multi-resolution, low-spec client platforms.',
-        tags: ['30% Retention Boost', '15% Performance Tuning', 'React', 'Vanilla JS'],
-      },
-      {
-        name: 'SANKALP',
-        desc: 'Structural system architectural optimization and deep defensive codebase translation for an enterprise core. Implemented system type-safety definitions and refactored core data channels.',
-        tags: ['System Architecture', 'Deep Code Refactoring', 'TypeScript'],
-      },
     ];
 
     const tagSpan = (t) =>
@@ -100,7 +80,7 @@ const path = require('path');
       <h1 class="text-3xl font-bold tracking-tight text-zinc-900">Yaseen Khatib</h1>
       <p class="text-md font-medium text-cyan-600 mt-0.5">Senior Full-Stack AI Engineer · Builds &amp; Ships AI Products</p>
       <p class="text-zinc-600 max-w-xl mt-3 text-[12px] leading-normal">
-        Senior Full-Stack AI Engineer with 4.5+ years building and shipping autonomous AI products — Agentic RAG, LLM orchestration, and OpenAI function-calling agents on scalable MERN foundations. Expert at slashing system latencies, payload sizes, and engineering bottlenecks at AI-speed. Open to remote roles.
+        Senior Full-Stack AI Engineer with 4.5+ years building and shipping autonomous AI products — Agentic RAG, LLM orchestration, and OpenAI function-calling agents on scalable MERN foundations. Open to remote roles.
       </p>
     </div>
     <div class="text-right text-zinc-600 text-[12px] space-y-1 bg-zinc-50 p-3 rounded-lg border border-zinc-100 min-w-[220px]">
@@ -197,7 +177,6 @@ const path = require('path');
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Agentic RAG</span>
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">OpenAI Function Calling</span>
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Local / On-Device RAG</span>
-              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">LLM Orchestration</span>
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Claude / GPT</span>
             </div>
           </div>
