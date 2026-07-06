@@ -36,7 +36,7 @@ other docs for content, SEO, and deployment. The whole app builds clean
   Pages on push; delete `nextjs.yml` (see [deployment.md](./deployment.md)).
 - **EmailJS recipient.** The form passes `to_email`/`reply_to`, but the actual
   "To" address is set in the EmailJS template dashboard — confirm it routes to
-  `yaseenkhatib04@gmail.com`. Credentials are constants in `ContactForm.tsx`.
+  `contact@streamerosai.com`. Credentials are constants in `ContactForm.tsx`.
 - **Twitter handle** in `layout.tsx` is a placeholder (`@yaseenyk`).
 - **No favicon / OG images.** Add a favicon and per-page OG images (`ogImage` on
   `BlogPost` is supported but unused).

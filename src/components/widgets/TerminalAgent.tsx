@@ -48,7 +48,7 @@ const KNOWLEDGE: { match: RegExp; answer: string }[] = [
   {
     match: /contact|email|hire|reach|linkedin|github/i,
     answer:
-      "Reach Yaseen at yaseenkhatib04@gmail.com, github.com/Yaseenyk, or linkedin.com/in/yaseen-yk. Machine-readable profile: /ai-briefing.json.",
+      "Reach Yaseen at contact@streamerosai.com, github.com/Yaseenyk, or linkedin.com/in/yaseen-yk. Machine-readable profile: /ai-briefing.json.",
   },
   {
     match: /resume|cv/i,

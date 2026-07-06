@@ -10,7 +10,7 @@ export const SOCIALS = {
 export const PERSON = {
   name: "Yaseen Nurmahammad Khatib",
   jobTitle: "Senior Full-Stack AI Engineer",
-  email: "yaseenkhatib04@gmail.com",
+  email: "contact@streamerosai.com",
   locality: "Hyderabad",
   country: "India",
   knowsAbout: [
