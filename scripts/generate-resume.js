@@ -99,6 +99,16 @@ const path = require('path');
       <p class="text-zinc-600 max-w-xl mt-3 text-[12px] leading-normal">
         Senior Full-Stack AI Engineer with 4.5+ years building and shipping autonomous AI products — Agentic RAG, LLM orchestration, and OpenAI function-calling agents on scalable MERN foundations. Open to remote roles.
       </p>
+      <div class="max-w-xl mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-zinc-500">
+        <span class="font-bold uppercase tracking-wider text-zinc-400">Core</span>
+        <span>Agentic RAG</span><span class="text-zinc-300">·</span>
+        <span>LLM Orchestration</span><span class="text-zinc-300">·</span>
+        <span>OpenAI Function Calling</span><span class="text-zinc-300">·</span>
+        <span>React / Next.js</span><span class="text-zinc-300">·</span>
+        <span>Node.js</span><span class="text-zinc-300">·</span>
+        <span>TypeScript</span><span class="text-zinc-300">·</span>
+        <span>React Native</span>
+      </div>
     </div>
     <div class="text-right text-zinc-600 text-[12px] space-y-1 bg-zinc-50 p-3 rounded-lg border border-zinc-100 min-w-[220px]">
       <div><a href="mailto:contact@streamerosai.com" class="text-zinc-600">contact@streamerosai.com</a></div>
@@ -106,7 +116,6 @@ const path = require('path');
       <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-cyan-700 font-medium">linkedin.com/in/yaseen-yk</a></div>
       <div><a href="https://github.com/Yaseenyk" class="text-zinc-600">github.com/Yaseenyk</a></div>
       <div><a href="https://yaseenkhatib.streamerosai.com/" class="text-cyan-700 font-medium">yaseenkhatib.streamerosai.com</a></div>
-      <div><a href="https://github.com/Yaseenyk/portfolio" class="text-zinc-600">github.com/Yaseenyk/portfolio</a></div>
       <div class="text-[11px] text-zinc-400 mt-1 font-medium tracking-wider uppercase">Hyderabad, INDIA · Open to Remote</div>
     </div>
   </div>
