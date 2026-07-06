@@ -115,7 +115,7 @@ const path = require('path');
   <div class="grid grid-cols-12 gap-6 mt-5">
 
     <!-- LEFT SIDE COLUMN: Core Experience Narrative -->
-    <div class="col-span-8 space-y-5">
+    <div class="col-span-7 space-y-5">
 
       <div>
         <h2 class="text-[14px] font-bold tracking-wider uppercase text-zinc-900 border-b border-zinc-200 pb-1 mb-3">
@@ -180,7 +180,7 @@ const path = require('path');
     </div>
 
     <!-- RIGHT SIDE COLUMN: Skills, Credentials, Education -->
-    <div class="col-span-4 space-y-5">
+    <div class="col-span-5 space-y-5">
 
       <!-- Core Technology Tags -->
       <div>
