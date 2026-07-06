@@ -15,7 +15,7 @@ interface FormState {
 
 const EMPTY_FORM: FormState = { name: "", email: "", message: "" };
 
-const EMAILJS_SERVICE = "service_lanm9zj";
+const EMAILJS_SERVICE = "service_560nh3i";
 const EMAILJS_TEMPLATE = "template_dyb1k4x";
 const EMAILJS_PUBLIC_KEY = "mB56akvK2qStLNadU";
 
