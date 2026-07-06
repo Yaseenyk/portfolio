@@ -6,13 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import PulseDot from "./PulseDot";
 
 const LINKS = [
-  { href: "/products", label: "Products" },
-  { href: "/#projects", label: "Projects" },
-  { href: "/#experience", label: "Experience" },
-  { href: "/roadmap", label: "Roadmap" },
+  { href: "/work", label: "Work" },
   { href: "/blog", label: "Blog" },
-  { href: "/uses", label: "Stack" },
   { href: "/sandbox", label: "Sandbox" },
+  { href: "/experience", label: "Experience" },
+  { href: "/roadmap", label: "Roadmap" },
+  { href: "/uses", label: "Stack" },
   { href: "/#contact", label: "Contact" },
 ];
 

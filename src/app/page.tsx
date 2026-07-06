@@ -1,14 +1,13 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
+import SectionCards from "@/components/SectionCards";
 import TerminalAgent from "@/components/widgets/TerminalAgent";
-import ArchitecturePipeline from "@/components/ArchitecturePipeline";
-import Products from "@/components/Products";
-import Dashboard from "@/components/Dashboard";
-import ContactForm from "@/components/ContactForm";
-import RoadmapSection from "@/components/RoadmapSection";
 import RecentPosts from "@/components/RecentPosts";
+import ContactForm from "@/components/ContactForm";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
+import SpotlightCard from "@/components/products/SpotlightCard";
+import { PRODUCTS } from "@/lib/products";
 import { SITE_URL, PERSON } from "@/lib/site";
 
 const author = { "@type": "Person", name: PERSON.name, url: SITE_URL };
@@ -51,6 +50,9 @@ const projectsJsonLd = [
   },
 ];
 
+// Curated featured preview — the top products; full list lives on /work.
+const FEATURED = PRODUCTS.slice(0, 3);
+
 export default function Home() {
   return (
     <>
@@ -67,7 +69,8 @@ export default function Home() {
         <main className="pt-20">
           <Hero />
 
-          <Products />
+          {/* Hub — routes into the focused pages instead of stacking it all here */}
+          <SectionCards />
 
           <section id="rag-concierge" className="py-16">
             <h2 className="text-2xl font-semibold text-zinc-100">
@@ -83,9 +86,33 @@ export default function Home() {
             </div>
           </section>
 
-          <ArchitecturePipeline />
-          <Dashboard />
-          <RoadmapSection />
+          {/* Featured products — a curated three; the rest live on /work */}
+          <section aria-label="Featured work" className="py-16">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
+                ~/featured
+              </h2>
+              <Link
+                href="/work"
+                className="font-mono text-xs text-zinc-500 transition-colors duration-200 hover:text-cyan"
+              >
+                All work →
+              </Link>
+            </div>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-zinc-400">
+              Shipped AI products, built lean. Open any card for the full
+              technical deep-dive.
+            </p>
+            <div
+              className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
+              style={{ perspective: 1000 }}
+            >
+              {FEATURED.map((product, i) => (
+                <SpotlightCard key={product.slug} product={product} index={i} />
+              ))}
+            </div>
+          </section>
+
           <RecentPosts />
           <ContactForm />
         </main>
