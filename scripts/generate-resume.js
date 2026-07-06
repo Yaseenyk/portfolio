@@ -12,12 +12,22 @@ const path = require('path');
     // All projects live on page 2.
     const PROJECTS = [
       {
+        name: 'Sable',
+        badge: 'Flagship Product',
+        desc: 'A local-first AI financial agent (React Native / Expo). Keeps 100% of financial data on-device in SQLite with no cloud backend; an OpenAI function-calling agent tracks peer-to-peer debts and pushes proactive briefings, with every database mutation gated behind a Review & Confirm boundary. Automated bank-SMS ingestion uses the Adapter Pattern and a p-queue to serialize SQLite writes.',
+        tags: ['Local-First / On-Device AI', 'React Native / Expo', 'SQLite', 'OpenAI Function Calling', 'Local RAG'],
+        links: [
+          { label: 'Case Study', url: 'https://yaseenkhatib.streamerosai.com/products/sable' },
+          { label: 'Code', url: 'https://github.com/Yaseenyk/sable' },
+        ],
+      },
+      {
         name: 'streamerOS',
         badge: 'Flagship Deployment',
         desc: 'A Rust-powered desktop cockpit for streaming professionals, engineered via modular Claude orchestrations. Handles live system telemetry feeds, multi-platform chat velocity streams, and real-time automated OBS scene synchronization.',
         tags: ['AI-Architected', 'Rust / Next.js', 'Live Telemetry', 'WebSockets', 'Claude AI'],
         links: [
-          { label: 'Live Demo', url: 'https://yaseenyk.github.io/streamer-os-website/' },
+          { label: 'Live Demo', url: 'https://streamerosai.com' },
           { label: 'Code', url: 'https://github.com/Yaseenyk/streamerOS' },
           { label: 'Website', url: 'https://github.com/Yaseenyk/streamer-os-website' },
         ],
@@ -33,24 +43,21 @@ const path = require('path');
         tags: ['94% Payload Compression', 'React Flow', 'Zustand', 'TypeScript'],
       },
       {
-        name: 'CMZ App (Enterprise Portal)',
-        desc: 'A scaled administrative core supporting thousands of active endpoints, hardened through structured Redis cache rings and strict role-based (JWT) authorization layers for low-latency, high-availability operation.',
-        tags: ['25% Latency Reduction', '99.9% Uptime', '35% Error Elimination', 'Redis', 'WebSockets'],
+        name: 'Automated LinkedIn Pipeline',
+        desc: 'A Python autonomous agent on GitHub Actions that drafts and publishes technical LinkedIn content on a cron via the Gemini API — zero servers, zero manual posting.',
+        tags: ['Autonomous Agent', 'Python', 'GitHub Actions', 'Gemini API', 'Cron'],
+        links: [
+          { label: 'Code', url: 'https://github.com/Yaseenyk/linkedin-bot' },
+        ],
       },
       {
-        name: 'Hospital-API',
-        desc: 'A high-throughput clinical workflow orchestration platform. Optimizes lookup routines through heavily cached queries and defensive server request-validation pipelines.',
-        tags: ['40% Workload Reduction', '30% Query Optimization', '25% Response Accel', 'Node.js', 'MongoDB'],
-      },
-      {
-        name: 'Cross-Platform TV Suite',
-        desc: 'Embedded native smart-television systems engineered with modular vanilla abstractions for pristine execution across limited, multi-resolution, low-spec client platforms.',
-        tags: ['30% Retention Boost', '15% Performance Tuning', 'React', 'Vanilla JS'],
-      },
-      {
-        name: 'SANKALP',
-        desc: 'Structural system architectural optimization and deep defensive codebase translation for an enterprise core. Implemented system type-safety definitions and refactored core data channels.',
-        tags: ['System Architecture', 'Deep Code Refactoring', 'TypeScript'],
+        name: 'Zero-Cost AI Blog Writer',
+        desc: 'A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles to this site — Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships it at $0 runtime cost.',
+        tags: ['Autonomous Pipeline', 'Next.js', 'MDX', 'google-genai', 'GitHub Actions'],
+        links: [
+          { label: 'Case Study', url: 'https://yaseenkhatib.streamerosai.com/products/ai-blogger' },
+          { label: 'Code', url: 'https://github.com/Yaseenyk/portfolio' },
+        ],
       },
     ];
 
@@ -88,9 +95,9 @@ const path = require('path');
   <div class="flex justify-between items-start border-b border-zinc-200 pb-5">
     <div>
       <h1 class="text-3xl font-bold tracking-tight text-zinc-900">Yaseen Khatib</h1>
-      <p class="text-md font-medium text-cyan-600 mt-0.5">Senior MERN Stack & AI Systems Engineer / Solutions Architect</p>
+      <p class="text-md font-medium text-cyan-600 mt-0.5">Senior Full-Stack AI Engineer · Builds &amp; Ships AI Products</p>
       <p class="text-zinc-600 max-w-xl mt-3 text-[12px] leading-normal">
-        Senior developer with 4.5+ years of experience leveraging advanced AI orchestration to drive end-to-end engineering pipelines. Expert at slashing system latencies, payload sizes, and engineering bottlenecks at AI-speed.
+        Senior Full-Stack AI Engineer with 4.5+ years building and shipping autonomous AI products — Agentic RAG, LLM orchestration, and OpenAI function-calling agents on scalable MERN foundations. Open to remote roles.
       </p>
     </div>
     <div class="text-right text-zinc-600 text-[12px] space-y-1 bg-zinc-50 p-3 rounded-lg border border-zinc-100 min-w-[220px]">
@@ -98,9 +105,9 @@ const path = require('path');
       <div><a href="tel:+918208335028" class="text-zinc-600">+91 8208335028</a></div>
       <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-cyan-700 font-medium">linkedin.com/in/yaseen-yk</a></div>
       <div><a href="https://github.com/Yaseenyk" class="text-zinc-600">github.com/Yaseenyk</a></div>
-      <div><a href="https://yaseenyk.github.io/portfolio/" class="text-cyan-700 font-medium">yaseenyk.github.io/portfolio</a></div>
+      <div><a href="https://yaseenkhatib.streamerosai.com/" class="text-cyan-700 font-medium">yaseenkhatib.streamerosai.com</a></div>
       <div><a href="https://github.com/Yaseenyk/portfolio" class="text-zinc-600">github.com/Yaseenyk/portfolio</a></div>
-      <div class="text-[11px] text-zinc-400 mt-1 font-medium tracking-wider uppercase">Hyderabad, INDIA</div>
+      <div class="text-[11px] text-zinc-400 mt-1 font-medium tracking-wider uppercase">Hyderabad, INDIA · Open to Remote</div>
     </div>
   </div>
 
@@ -182,11 +189,12 @@ const path = require('path');
         </h2>
         <div class="space-y-3">
           <div>
-            <h4 class="text-[11px] uppercase tracking-wider text-zinc-400 font-bold mb-1.5">AI & Orchestration</h4>
+            <h4 class="text-[11px] uppercase tracking-wider text-zinc-400 font-bold mb-1.5">AI Engineering</h4>
             <div class="flex flex-wrap gap-1">
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Agentic RAG</span>
-              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Claude Core</span>
-              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">LLM Prompts</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">OpenAI Function Calling</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Local / On-Device RAG</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Claude / GPT</span>
             </div>
           </div>
           <div>
@@ -195,6 +203,7 @@ const path = require('path');
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">React.js</span>
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">TypeScript</span>
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Next.js App Router</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">React Native / Expo</span>
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Redux Toolkit</span>
             </div>
           </div>
