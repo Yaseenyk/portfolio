@@ -52,10 +52,9 @@ jobs:
       - name: Build (static export)
         run: npm run build
         env:
-          # Project site → served under /portfolio. Used for basePath +
-          # asset prefixing and for canonical/OG/JSON-LD URLs.
-          NEXT_PUBLIC_BASE_PATH: /portfolio
-          NEXT_PUBLIC_SITE_URL: https://yaseenyk.github.io/portfolio
+          # Custom domain → served at root, so no basePath. Used for
+          # canonical/OG/JSON-LD/sitemap URLs.
+          NEXT_PUBLIC_SITE_URL: https://yaseenkhatib.streamerosai.com
 
       - name: Disable Jekyll
         run: touch ./out/.nojekyll

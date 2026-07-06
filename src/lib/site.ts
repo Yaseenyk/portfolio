@@ -1,6 +1,6 @@
 /** Production base URL — used for canonical links, OpenGraph, JSON-LD, sitemap. */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenyk.github.io/portfolio";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
 
 export const SOCIALS = {
   github: "https://github.com/Yaseenyk",
