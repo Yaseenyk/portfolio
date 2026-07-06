@@ -31,13 +31,17 @@ const STATUS_MESSAGE: Record<Exclude<Status, "idle" | "sending">, string> = {
 export default function ContactForm() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [status, setStatus] = useState<Status>("idle");
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    if (status === "error" || status === "sent") setStatus("idle");
+    if (status === "error" || status === "sent") {
+      setStatus("idle");
+      setErrorDetail(null);
+    }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -54,7 +58,15 @@ export default function ContactForm() {
       );
       setStatus("sent");
       setForm(EMPTY_FORM);
-    } catch {
+    } catch (err) {
+      // EmailJS rejects with { status, text }; surface both so config issues
+      // (bad key, origin not allowlisted, template recipient) are diagnosable.
+      const detail =
+        err && typeof err === "object" && "text" in err
+          ? `${(err as { status?: number }).status ?? ""} ${(err as { text?: string }).text ?? ""}`.trim()
+          : String(err);
+      console.error("EmailJS send failed:", err);
+      setErrorDetail(detail || null);
       setStatus("error");
     }
   };
@@ -162,6 +174,11 @@ export default function ContactForm() {
                 }`}
               >
                 {STATUS_MESSAGE[status]}
+                {status === "error" && errorDetail && (
+                  <span className="mt-1 block text-xs text-red-400/70">
+                    {errorDetail}
+                  </span>
+                )}
               </motion.p>
             )}
           </div>
