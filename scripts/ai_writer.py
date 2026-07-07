@@ -173,13 +173,19 @@ def generate(topic: str) -> dict:
 # Same style contract as scripts/generate-og-images.py so every cover on the
 # site reads as one brand.
 IMAGE_STYLE_RULES = (
-    "Style: bold, clickable tech-thumbnail cover (YouTube-thumbnail energy, "
-    "LinkedIn-professional polish). One dominant focal subject, dramatic "
-    "lighting, rich saturated colors, high contrast, instantly readable as a "
-    "small feed preview. The headline text must appear exactly once, spelled "
-    "exactly as quoted in the prompt, in massive bold clean sans-serif type "
-    "with strong contrast against the background. No other text, no "
-    "watermarks, no logos anywhere in the image."
+    "Style: minimal, flat, vector-style editorial illustration for a premium "
+    "developer portfolio. Background: near-black dark navy ink (#05070A), "
+    "uniform and matte. Restrained palette ONLY: deep navy blues, one cyan "
+    "accent (#22D3EE), one violet accent (#A855F7), and warm off-white "
+    "(#F4F1EA) for the headline. Clean geometric shapes, crisp edges, subtle "
+    "flat shading, generous negative space, one clear focal illustration. "
+    "STRICTLY FORBIDDEN: neon glow effects, light bursts, lens flares, "
+    "glowing auras or halos behind text, gradients that blow out to white, "
+    "photorealism, 3D renders, busy backgrounds, saturated orange/red/green. "
+    "The headline text must appear exactly once, spelled exactly as quoted, "
+    "in massive bold clean sans-serif type in flat off-white, set directly "
+    "on the dark background — never inside a glow, badge, panel, or box. "
+    "No other text, watermarks, or logos anywhere."
 )
 
 
@@ -205,8 +211,10 @@ def generate_cover(client: OpenAI, title: str, takeaways: list[str], slug: str) 
             "- Build the scene around ONE concrete visual metaphor specific to "
             "THIS article — never a generic laptop, circuit board, or glowing "
             "cube.\n"
-            "- High contrast, 2-3 vivid accent colors, one focal subject, "
-            "readable as a small thumbnail. No other text or lettering.\n"
+            "- Flat editorial-illustration scene on a near-black navy "
+            "background with cyan and violet accents only; one focal "
+            "subject, readable as a small thumbnail. No glow effects. "
+            "No other text or lettering.\n"
             "Return only the prompt text.\n\n"
             f"Article title: {title}\n\nKey takeaways:\n"
             + "\n".join(f"- {t}" for t in takeaways)
