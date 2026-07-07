@@ -213,7 +213,7 @@ const POSTS: BlogPost[] = [
   fromWireframeToWeb,
   stateManagementAiEra,
   architectingMernAtAiSpeed,
-  // Foundational series, backdated across the AI boom (2022–2024).
+  // Foundational series (fundamentals-first primers).
   functionCallingToolUse,
   evaluatingLlmOutputs,
   tokenEconomics,

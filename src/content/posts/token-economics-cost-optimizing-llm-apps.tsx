@@ -80,7 +80,7 @@ export const tokenEconomics: BlogPost = {
     "backend",
     "AI",
   ],
-  publishedAt: "2024-02-18",
+  publishedAt: "2026-06-06",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["LLM", "Cost", "Backend"],

@@ -80,7 +80,7 @@ export const buildingYourFirstRag: BlogPost = {
     "AI architecture",
     "grounding",
   ],
-  publishedAt: "2023-03-10",
+  publishedAt: "2026-06-06",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["RAG", "AI", "Node.js"],

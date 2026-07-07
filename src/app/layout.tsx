@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Fira_Code } from "next/font/google";
-import { SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
+import { SITE_URL, SITE_DESCRIPTION, VERIFICATION } from "@/lib/site";
 import { siteGraphJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CommandPalette from "@/components/CommandPalette";
@@ -74,6 +74,12 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  verification: {
+    ...(VERIFICATION.google ? { google: VERIFICATION.google } : {}),
+    ...(VERIFICATION.bing
+      ? { other: { "msvalidate.01": VERIFICATION.bing } }
+      : {}),
+  },
 };
 
 export default function RootLayout({
@@ -90,6 +96,14 @@ export default function RootLayout({
         <JsonLd data={siteGraphJsonLd} />
         {children}
         <CommandPalette />
+        {/* GoatCounter — privacy-friendly, cookieless page analytics.
+            Skips localhost automatically; register the site code at
+            https://yaseenkhatib.goatcounter.com to activate. */}
+        <script
+          data-goatcounter="https://yaseenkhatib.goatcounter.com/count"
+          async
+          src="https://gc.zgo.at/count.js"
+        />
       </body>
     </html>
   );

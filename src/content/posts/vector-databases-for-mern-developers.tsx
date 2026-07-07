@@ -82,7 +82,7 @@ export const vectorDatabasesForMern: BlogPost = {
     "MERN",
     "AI",
   ],
-  publishedAt: "2023-05-05",
+  publishedAt: "2026-06-06",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["Vector DB", "MongoDB", "AI"],

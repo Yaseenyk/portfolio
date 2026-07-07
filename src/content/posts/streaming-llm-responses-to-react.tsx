@@ -85,7 +85,7 @@ export const streamingLlmToReact: BlogPost = {
     "latency",
     "EventSource",
   ],
-  publishedAt: "2023-09-12",
+  publishedAt: "2026-06-06",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["React", "Streaming", "AI"],

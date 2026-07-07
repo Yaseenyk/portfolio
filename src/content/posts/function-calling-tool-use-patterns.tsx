@@ -90,7 +90,7 @@ export const functionCallingToolUse: BlogPost = {
     "validation",
     "AI architecture",
   ],
-  publishedAt: "2024-06-09",
+  publishedAt: "2026-06-06",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["Agentic AI", "Tool Use", "Node.js"],

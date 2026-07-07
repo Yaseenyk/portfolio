@@ -6,6 +6,17 @@ export const SITE_URL =
 export const SITE_DESCRIPTION =
   "Yaseen Khatib — Senior Full-Stack AI Engineer who builds and ships autonomous AI products: Agentic RAG, LLM orchestration, and scalable MERN systems. Open to remote roles.";
 
+/**
+ * Search-engine site-verification codes. Paste the content value from
+ * Google Search Console (HTML-tag method) and Bing Webmaster Tools here,
+ * then rebuild — empty strings are omitted from the page entirely.
+ * Bing matters for AEO: its index feeds ChatGPT search.
+ */
+export const VERIFICATION = {
+  google: "",
+  bing: "",
+};
+
 export const SOCIALS = {
   github: "https://github.com/Yaseenyk",
   linkedin: "https://www.linkedin.com/in/yaseen-yk",

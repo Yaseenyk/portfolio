@@ -80,7 +80,7 @@ export const promptEngineeringFundamentals: BlogPost = {
     "API contract",
     "AI",
   ],
-  publishedAt: "2023-01-15",
+  publishedAt: "2026-06-06",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["Prompt Engineering", "Backend", "AI"],

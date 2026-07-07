@@ -87,7 +87,7 @@ export const embeddingsSemanticSearch: BlogPost = {
     "AI",
     "search relevance",
   ],
-  publishedAt: "2023-11-28",
+  publishedAt: "2026-06-06",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["Embeddings", "MongoDB", "Search"],

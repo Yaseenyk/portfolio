@@ -70,7 +70,7 @@ export const fineTuningVsRag: BlogPost = {
     "AI architecture",
     "decision",
   ],
-  publishedAt: "2023-07-20",
+  publishedAt: "2026-06-06",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["RAG", "Fine-Tuning", "AI"],

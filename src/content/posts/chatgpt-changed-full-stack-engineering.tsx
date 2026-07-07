@@ -70,7 +70,7 @@ export const chatgptChangedEngineering: BlogPost = {
     "software architecture",
     "developer productivity",
   ],
-  publishedAt: "2022-12-01",
+  publishedAt: "2026-06-06",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["AI", "Industry", "MERN"],
