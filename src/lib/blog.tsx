@@ -77,8 +77,33 @@ import { statefulAgentRuntime } from "@/content/posts/stateful-agent-runtime-per
 import { enterpriseMcpAggregation } from "@/content/posts/enterprise-mcp-aggregation-postgres-figma-playwright";
 import { evalDrivenPromptEngineering } from "@/content/posts/evaluation-driven-prompt-engineering-golden-datasets";
 import { autonomousAgentRoutines } from "@/content/posts/long-running-automated-agent-routines-cron-workflows";
+// Founder's Log — the vision series: product stories + operating model (see components/FoundersLog.tsx).
+import { shippedFiveProductsSolo } from "@/content/posts/shipped-5-products-solo-12-months";
+import { visionOverSyntax } from "@/content/posts/vision-over-syntax-architecture-first";
+import { oneArchitectFullSquad } from "@/content/posts/one-architect-claude-mcp-full-squad";
+import { aiFinopsPlaybook } from "@/content/posts/ai-finops-playbook-stop-burning-money";
+import { linkedinPipelineStory } from "@/content/posts/linkedin-pipeline-job-search-runs-itself";
+import { zeroDollarContentEngine } from "@/content/posts/zero-dollar-content-engine";
+import { sableTrustBoundary } from "@/content/posts/sable-ai-agent-never-touches-money";
+import { streamerOsRustStory } from "@/content/posts/streameros-rust-over-electron";
+import { ninetyFourPercentDecision } from "@/content/posts/the-94-percent-decision-integratex";
+import { hireMyHead } from "@/content/posts/hire-my-head-not-my-hands";
 
 export { SITE_URL };
+
+/** The Founder's Log vision series, in narrative order — featured on the home page. */
+export const FOUNDERS_LOG_SLUGS = [
+  "shipped-5-products-solo-12-months",
+  "vision-over-syntax-architecture-first",
+  "one-architect-claude-mcp-full-squad",
+  "ai-finops-playbook-stop-burning-money",
+  "linkedin-pipeline-job-search-runs-itself",
+  "zero-dollar-content-engine",
+  "sable-ai-agent-never-touches-money",
+  "streameros-rust-over-electron",
+  "the-94-percent-decision-integratex",
+  "hire-my-head-not-my-hands",
+] as const;
 
 export interface Author {
   name: string;
@@ -110,6 +135,17 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
+  // Founder's Log — the vision series (newest).
+  shippedFiveProductsSolo,
+  visionOverSyntax,
+  oneArchitectFullSquad,
+  aiFinopsPlaybook,
+  linkedinPipelineStory,
+  zeroDollarContentEngine,
+  sableTrustBoundary,
+  streamerOsRustStory,
+  ninetyFourPercentDecision,
+  hireMyHead,
   // The Complete Anthropic & Claude Developer Roadmap — 15-part masterclass (newest).
   masteringClaudeArchitecture,
   xmlStructuralPrompting,

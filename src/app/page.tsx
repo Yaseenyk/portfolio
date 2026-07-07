@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
+import FoundersLog from "@/components/FoundersLog";
 import TerminalAgent from "@/components/widgets/TerminalAgent";
 import ArchitecturePipeline from "@/components/ArchitecturePipeline";
 import Products from "@/components/Products";
@@ -75,6 +76,9 @@ export default function Home() {
       <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-24">
         <main className="pt-20">
           <Hero />
+
+          {/* Recruiter-first: the vision series headlines read in the first scroll. */}
+          <FoundersLog />
 
           <Products />
 
