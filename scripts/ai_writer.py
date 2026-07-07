@@ -6,15 +6,23 @@ technical, developer-focused article in strict Markdown, then writes it to
 ``src/content/blog/<slug>.mdx`` with frontmatter the Next.js site understands.
 On success the used topic is removed from ``topics.txt``.
 
+After the article is written, a matching OG cover is generated to
+``public/og/<slug>.jpg`` (the blog template attaches it automatically).
+Cover generation is best-effort: any failure logs and the post still ships.
+
 Env:
   OPENAI_API_KEY     (required)  OpenAI API key.
   OPENAI_MODEL       (optional)  Defaults to ``gpt-5``.
   OPENAI_MAX_TOKENS  (optional)  Output token cap. Defaults to 16384.
+  OPENAI_IMAGE_MODEL (optional)  Cover model. Defaults to ``gpt-image-1``.
+  SKIP_COVER         (optional)  Set to "1" to skip cover generation.
 """
 
 from __future__ import annotations
 
+import base64
 import datetime
+import io
 import json
 import os
 import pathlib
@@ -28,6 +36,7 @@ SCRIPTS_DIR = pathlib.Path(__file__).resolve().parent
 ROOT = SCRIPTS_DIR.parent
 TOPICS_FILE = SCRIPTS_DIR / "topics.txt"
 OUT_DIR = ROOT / "src" / "content" / "blog"
+OG_DIR = ROOT / "public" / "og"
 
 # Local convenience: load OPENAI_API_KEY from a gitignored .env if present.
 # In CI the key comes from the environment (GitHub secret), so this is a no-op.
@@ -161,6 +170,78 @@ def generate(topic: str) -> dict:
         sys.exit(f"ERROR: could not parse structured output: {exc}")
 
 
+# Same style contract as scripts/generate-og-images.py so every cover on the
+# site reads as one brand.
+IMAGE_STYLE_RULES = (
+    "Style: bold, clickable tech-thumbnail cover (YouTube-thumbnail energy, "
+    "LinkedIn-professional polish). One dominant focal subject, dramatic "
+    "lighting, rich saturated colors, high contrast, instantly readable as a "
+    "small feed preview. The headline text must appear exactly once, spelled "
+    "exactly as quoted in the prompt, in massive bold clean sans-serif type "
+    "with strong contrast against the background. No other text, no "
+    "watermarks, no logos anywhere in the image."
+)
+
+
+def generate_cover(client: OpenAI, title: str, takeaways: list[str], slug: str) -> None:
+    """Best-effort OG cover → public/og/<slug>.jpg. Never blocks publishing."""
+    if os.environ.get("SKIP_COVER") == "1":
+        print("SKIP_COVER=1 — skipping cover generation.")
+        return
+    try:
+        from PIL import Image
+    except ImportError:
+        print("Pillow not installed — skipping cover generation.")
+        return
+    try:
+        brief_prompt = (
+            "You are an art director for a software engineering blog. Write ONE "
+            "vivid image-generation prompt (max 100 words) for a scroll-stopping "
+            "OpenGraph cover thumbnail.\n"
+            "- Distill the article into a punchy 3-6 word HEADLINE (plain ASCII). "
+            "Put it in double quotes and state it must be rendered exactly once, "
+            "spelled exactly as given, in huge bold sans-serif type dominating "
+            "the layout.\n"
+            "- Build the scene around ONE concrete visual metaphor specific to "
+            "THIS article — never a generic laptop, circuit board, or glowing "
+            "cube.\n"
+            "- High contrast, 2-3 vivid accent colors, one focal subject, "
+            "readable as a small thumbnail. No other text or lettering.\n"
+            "Return only the prompt text.\n\n"
+            f"Article title: {title}\n\nKey takeaways:\n"
+            + "\n".join(f"- {t}" for t in takeaways)
+        )
+        brief = (
+            client.responses.create(
+                model=os.environ.get("OPENAI_MODEL", "gpt-5").strip(),
+                input=brief_prompt,
+            ).output_text
+            or ""
+        ).strip()
+        print(f"Cover brief: {brief[:120]}...")
+
+        result = client.images.generate(
+            model=os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1").strip(),
+            prompt=f"{brief}\n\n{IMAGE_STYLE_RULES}",
+            size="1536x1024",
+            quality="medium",
+        )
+        png = base64.b64decode(result.data[0].b64_json)
+
+        # Re-encode to JPEG: drops every metadata chunk (incl. C2PA) and
+        # shrinks the ~2 MB PNG before it gets committed.
+        img = Image.open(io.BytesIO(png)).convert("RGB")
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+
+        OG_DIR.mkdir(parents=True, exist_ok=True)
+        target = OG_DIR / f"{slug}.jpg"
+        target.write_bytes(buf.getvalue())
+        print(f"Wrote {target.relative_to(ROOT)} ({target.stat().st_size // 1024} KB)")
+    except Exception as exc:
+        print(f"Cover generation failed ({exc}) — publishing without a cover.")
+
+
 def main() -> None:
     topic = read_top_topic()
     if not topic:
@@ -204,6 +285,10 @@ def main() -> None:
 
     remove_topic(topic)
     print("Removed topic from topics.txt")
+
+    # Cover last: the post is already on disk, so a cover failure costs nothing.
+    api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
+    generate_cover(OpenAI(api_key=api_key), title, frontmatter["takeaways"], slug)
 
 
 if __name__ == "__main__":
