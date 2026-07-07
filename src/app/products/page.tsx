@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/site";
 import { PRODUCTS, productUrl } from "@/lib/products";
+import { breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import SpotlightCard from "@/components/products/SpotlightCard";
 
 export const metadata: Metadata = {
@@ -33,9 +35,8 @@ const jsonLd = {
 export default function ProductsPage() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <JsonLd
+        data={[jsonLd, breadcrumbJsonLd([{ name: "Products", path: "/products" }])]}
       />
 
       <header>

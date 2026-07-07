@@ -2,6 +2,10 @@
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
 
+/** Sitewide default description — root metadata, OG, and the WebSite entity. */
+export const SITE_DESCRIPTION =
+  "Yaseen Khatib — Senior Full-Stack AI Engineer who builds and ships autonomous AI products: Agentic RAG, LLM orchestration, and scalable MERN systems. Open to remote roles.";
+
 export const SOCIALS = {
   github: "https://github.com/Yaseenyk",
   linkedin: "https://www.linkedin.com/in/yaseen-yk",
@@ -22,21 +26,4 @@ export const PERSON = {
     "LLM Orchestration",
     "MongoDB",
   ],
-};
-
-/** schema.org Person — injected sitewide in the root layout for AEO. */
-export const personJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: PERSON.name,
-  jobTitle: PERSON.jobTitle,
-  url: SITE_URL,
-  email: `mailto:${PERSON.email}`,
-  sameAs: [SOCIALS.linkedin, SOCIALS.github],
-  knowsAbout: PERSON.knowsAbout,
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: PERSON.locality,
-    addressCountry: PERSON.country,
-  },
 };

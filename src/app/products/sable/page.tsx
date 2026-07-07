@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { SITE_URL } from "@/lib/site";
 import { getProduct, productUrl } from "@/lib/products";
+import { personRef, breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import ProductHero from "@/components/products/ProductHero";
 import Section from "@/components/products/Section";
 import Prose from "@/components/products/Prose";
@@ -52,27 +53,19 @@ const jsonLd = [
     operatingSystem: "iOS, Android",
     description: product.summary,
     keywords: product.tech.join(", "),
-    author: { "@type": "Person", name: "Yaseen Khatib", url: SITE_URL },
+    author: personRef,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   },
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Products", item: `${SITE_URL}/products` },
-      { "@type": "ListItem", position: 3, name: product.name, item: productUrl(product.slug) },
-    ],
-  },
+  breadcrumbJsonLd([
+    { name: "Products", path: "/products" },
+    { name: product.name, path: `/products/${product.slug}` },
+  ]),
 ];
 
 export default function SablePage() {
   return (
     <article className="mx-auto max-w-5xl px-6 py-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <ProductHero product={product} art={<SableArt />} />
 

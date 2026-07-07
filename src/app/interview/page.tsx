@@ -3,10 +3,41 @@ import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import GradientText from "@/components/GradientText";
 import Terminal from "@/components/blog/Terminal";
-import { SITE_URL } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { SITE_URL, PERSON, SOCIALS } from "@/lib/site";
+import {
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  type FaqItem,
+} from "@/lib/seo";
 
 const DESCRIPTION =
   "An internal-style talent briefing for engineering leadership evaluating Yaseen Khatib for a Lead MERN / AI Systems Architect role — architectural strengths, suggested interview prompts, and verifiable proof points.";
+
+// One array drives BOTH the visible accordion and the FAQPage JSON-LD —
+// rich-results rules require the markup to match rendered content, and a
+// single source makes drift impossible.
+const FAQ_ITEMS: FaqItem[] = [
+  {
+    question: "What is Yaseen Khatib's core stack?",
+    answer:
+      "Next.js 14 (App Router), Node.js, and strict TypeScript on the MERN stack, with a production AI layer: Agentic RAG pipelines, LLM orchestration, vector retrieval, and schema-enforced structured outputs.",
+  },
+  {
+    question: "Is Yaseen available for hire?",
+    answer:
+      "Yes — open to Lead/Senior Full-Stack and AI Engineering roles. Remote-first from Hyderabad (IST), effective across global time zones.",
+  },
+  {
+    question: "What production AI systems has he shipped?",
+    answer:
+      "streamerOS (a Rust desktop cockpit with live telemetry and OBS automation), IntegrateX (React Flow workflow automation with a serialization adapter that cut payloads 94%), Sable (a local-first AI financial agent), and the context-grounded RAG concierge on this site.",
+  },
+  {
+    question: "How do I contact him?",
+    answer: `Email ${PERSON.email}, or connect via LinkedIn (${SOCIALS.linkedin}) and GitHub (${SOCIALS.github}). A machine-readable profile lives at /ai-briefing.json.`,
+  },
+];
 
 export const metadata: Metadata = {
   title: { absolute: "Interview Context | Yaseen Khatib" },
@@ -34,6 +65,13 @@ export const metadata: Metadata = {
 export default function InterviewPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          faqPageJsonLd(FAQ_ITEMS),
+          breadcrumbJsonLd([{ name: "Interview Context", path: "/interview" }]),
+        ]}
+      />
+
       <GridBackground />
       <Navbar />
 
@@ -138,6 +176,27 @@ export default function InterviewPage() {
             {"\n"}
             <span className="tok-key">fi</span>
           </Terminal>
+
+          <section className="mt-14">
+            <h2 className="text-xl font-semibold tracking-tight text-zinc-100">
+              Hiring FAQ
+            </h2>
+            <div className="mt-5 space-y-3">
+              {FAQ_ITEMS.map((f) => (
+                <details
+                  key={f.question}
+                  className="group rounded-xl border border-zinc-800 bg-white/[0.02] px-5 py-4"
+                >
+                  <summary className="cursor-pointer list-none font-medium text-zinc-200 transition-colors hover:text-cyan">
+                    {f.question}
+                  </summary>
+                  <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+                    {f.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </section>
 
           <footer className="mt-16 border-t border-zinc-800/70 py-10 text-sm text-zinc-500">
             © {new Date().getFullYear()} Yaseen Khatib — Architected with Next.js

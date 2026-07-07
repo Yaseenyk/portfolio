@@ -11,6 +11,8 @@ import {
 } from "@/lib/blog";
 import { getMdxSlugs, getMdxPostBySlug } from "@/lib/mdx";
 import { resolveLesson } from "@/lib/series";
+import { PERSON_ID, personRef, breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import ReadingProgress from "@/components/blog/ReadingProgress";
 import RoadmapStepper from "@/components/blog/RoadmapStepper";
 import LessonNav from "@/components/blog/LessonNav";
@@ -113,13 +115,9 @@ export default async function BlogPostPage({ params }: PageProps) {
       abstract: post.takeaways.join(" "),
       datePublished: post.publishedAt,
       dateModified: post.updatedAt ?? post.publishedAt,
-      author: {
-        "@type": "Person",
-        name: post.author.name,
-        jobTitle: post.author.role,
-        url: SITE_URL,
-      },
-      publisher: { "@type": "Person", name: post.author.name },
+      // Author/publisher resolve to the sitewide Person node in the layout graph.
+      author: { "@id": PERSON_ID, name: post.author.name },
+      publisher: personRef,
       mainEntityOfPage: { "@type": "WebPage", "@id": url },
       keywords: post.keywords.join(", "),
       articleSection: post.tags[0],
@@ -136,28 +134,15 @@ export default async function BlogPostPage({ params }: PageProps) {
         : {}),
       ...(post.ogImage ? { image: [`${SITE_URL}${post.ogImage}`] } : {}),
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Blog",
-          item: `${SITE_URL}/blog`,
-        },
-        { "@type": "ListItem", position: 3, name: post.title, item: url },
-      ],
-    },
+    breadcrumbJsonLd([
+      { name: "Blog", path: "/blog" },
+      { name: post.title, path: `/blog/${post.slug}` },
+    ]),
   ];
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-12">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       {/* Reading-progress bar — roadmap lessons only */}
       {lesson && <ReadingProgress />}

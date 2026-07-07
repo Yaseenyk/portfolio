@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/site";
 import { CC_ROADMAP, CC_META, type CcLesson } from "@/lib/claude-code-roadmap";
 import RoadmapHub from "@/components/blog/RoadmapHub";
+import { personRef, breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 
 const url = `${SITE_URL}/claude-code`;
 
@@ -45,11 +47,7 @@ export default function ClaudeCodeRoadmapPage() {
       name: CC_META.title,
       description: CC_META.tagline,
       url,
-      provider: {
-        "@type": "Person",
-        name: "Yaseen Khatib",
-        url: SITE_URL,
-      },
+      provider: personRef,
       hasCourseInstance: {
         "@type": "CourseInstance",
         courseMode: "online",
@@ -62,22 +60,12 @@ export default function ClaudeCodeRoadmapPage() {
         url: `${SITE_URL}/blog/${l.slug}`,
       })),
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name: "Claude Code Roadmap", item: url },
-      ],
-    },
+    breadcrumbJsonLd([{ name: "Claude Code Roadmap", path: "/claude-code" }]),
   ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <RoadmapHub
         meta={CC_META}
         lessons={CC_ROADMAP}

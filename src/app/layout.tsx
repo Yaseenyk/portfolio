@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Fira_Code } from "next/font/google";
-import { SITE_URL, personJsonLd } from "@/lib/site";
+import { SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
+import { siteGraphJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import CommandPalette from "@/components/CommandPalette";
 import "./globals.css";
 
@@ -17,8 +19,7 @@ const firaCode = Fira_Code({
 });
 
 const TITLE_DEFAULT = "Yaseen Khatib | Full-Stack AI Engineer";
-const DESCRIPTION =
-  "Yaseen Khatib — Senior Full-Stack AI Engineer who builds and ships autonomous AI products: Agentic RAG, LLM orchestration, and scalable MERN systems. Open to remote roles.";
+const DESCRIPTION = SITE_DESCRIPTION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -27,18 +28,19 @@ export const metadata: Metadata = {
     template: "%s | Yaseen Khatib",
   },
   description: DESCRIPTION,
+  // Keywords phrased as the queries people actually type, not abstract labels.
   keywords: [
     "Yaseen Khatib",
-    "MERN Stack Developer",
-    "AI Systems Engineer",
-    "Solutions Architect",
+    "hire full-stack AI engineer",
+    "senior MERN stack developer for hire",
+    "AI systems engineer remote",
+    "RAG pipeline consultant",
+    "LLM orchestration engineer",
+    "TypeScript consultant",
+    "Next.js developer",
     "Agentic RAG",
-    "LLM Orchestration",
-    "React",
     "Node.js",
     "MongoDB",
-    "TypeScript",
-    "Next.js",
   ],
   authors: [{ name: "Yaseen Khatib", url: SITE_URL }],
   creator: "Yaseen Khatib",
@@ -74,16 +76,6 @@ export const metadata: Metadata = {
   },
 };
 
-// AEO: WebSite entity, authored by the Person — anchors the site in the entity graph.
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "Yaseen Khatib",
-  url: SITE_URL,
-  description: DESCRIPTION,
-  author: { "@type": "Person", name: "Yaseen Nurmahammad Khatib", url: SITE_URL },
-};
-
 export default function RootLayout({
   children,
 }: {
@@ -92,15 +84,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
       <body className="font-sans">
-        {/* AEO: sitewide Person + WebSite entities */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
+        {/* AEO: sitewide entity graph — Person + WebSite with stable @ids
+            that every page-level schema block references instead of
+            redeclaring. */}
+        <JsonLd data={siteGraphJsonLd} />
         {children}
         <CommandPalette />
       </body>

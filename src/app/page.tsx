@@ -9,9 +9,21 @@ import RoadmapSection from "@/components/RoadmapSection";
 import RecentPosts from "@/components/RecentPosts";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
-import { SITE_URL, PERSON } from "@/lib/site";
+import JsonLd from "@/components/JsonLd";
+import { SITE_URL } from "@/lib/site";
+import { PERSON_ID, WEBSITE_ID, personRef } from "@/lib/seo";
 
-const author = { "@type": "Person", name: PERSON.name, url: SITE_URL };
+const author = personRef;
+
+// AEO: the homepage is the Person's profile — mainEntity points at the
+// sitewide Person node by @id instead of redeclaring it.
+const profilePageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  url: SITE_URL,
+  mainEntity: { "@id": PERSON_ID },
+  isPartOf: { "@id": WEBSITE_ID },
+};
 
 // AEO: SoftwareApplication entities for the flagship projects.
 const projectsJsonLd = [
@@ -54,10 +66,7 @@ const projectsJsonLd = [
 export default function Home() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectsJsonLd) }}
-      />
+      <JsonLd data={[profilePageJsonLd, ...projectsJsonLd]} />
 
       {/* Faint CSS grid background */}
       <GridBackground />

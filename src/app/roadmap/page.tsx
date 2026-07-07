@@ -6,6 +6,8 @@ import {
   type RoadmapLesson,
 } from "@/lib/roadmap";
 import RoadmapHub from "@/components/blog/RoadmapHub";
+import { personRef, breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 
 const url = `${SITE_URL}/roadmap`;
 
@@ -48,11 +50,7 @@ export default function RoadmapPage() {
       name: ROADMAP_META.title,
       description: ROADMAP_META.tagline,
       url,
-      provider: {
-        "@type": "Person",
-        name: "Yaseen Khatib",
-        url: SITE_URL,
-      },
+      provider: personRef,
       hasCourseInstance: {
         "@type": "CourseInstance",
         courseMode: "online",
@@ -65,22 +63,12 @@ export default function RoadmapPage() {
         url: `${SITE_URL}/blog/${l.slug}`,
       })),
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name: "Roadmap", item: url },
-      ],
-    },
+    breadcrumbJsonLd([{ name: "Roadmap", path: "/roadmap" }]),
   ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <RoadmapHub meta={ROADMAP_META} lessons={ROADMAP} />
     </>
   );

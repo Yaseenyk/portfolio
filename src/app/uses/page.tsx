@@ -3,6 +3,8 @@ import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import GradientText from "@/components/GradientText";
 import { SITE_URL, PERSON } from "@/lib/site";
+import { PERSON_ID, personRef, breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 
 const DESCRIPTION =
   "The exact hardware, software, and AI orchestration stack Yaseen Khatib uses to architect and ship full-stack MERN applications at 10x velocity — Next.js, TypeScript, Node.js, Express, MongoDB, Redis, Claude, and Cursor.";
@@ -148,8 +150,8 @@ const usesJsonLd = {
   description: DESCRIPTION,
   datePublished: "2026-06-06",
   dateModified: "2026-06-06",
-  author: { "@type": "Person", name: PERSON.name, url: SITE_URL },
-  publisher: { "@type": "Person", name: PERSON.name },
+  author: { "@id": PERSON_ID, name: PERSON.name },
+  publisher: personRef,
   mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/uses` },
   about: "Developer hardware, software, and AI orchestration tooling",
   mentions: CLUSTERS.flatMap((c) =>
@@ -164,9 +166,8 @@ const usesJsonLd = {
 export default function UsesPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(usesJsonLd) }}
+      <JsonLd
+        data={[usesJsonLd, breadcrumbJsonLd([{ name: "Uses", path: "/uses" }])]}
       />
 
       <GridBackground />

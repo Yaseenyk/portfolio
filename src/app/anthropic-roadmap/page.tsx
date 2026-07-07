@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/site";
 import { AN_ROADMAP, AN_META, type AnLesson } from "@/lib/anthropic-roadmap";
 import RoadmapHub from "@/components/blog/RoadmapHub";
+import { personRef, breadcrumbJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 
 const url = `${SITE_URL}/anthropic-roadmap`;
 
@@ -47,11 +49,7 @@ export default function AnthropicRoadmapPage() {
       name: AN_META.title,
       description: AN_META.tagline,
       url,
-      provider: {
-        "@type": "Person",
-        name: "Yaseen Khatib",
-        url: SITE_URL,
-      },
+      provider: personRef,
       hasCourseInstance: {
         "@type": "CourseInstance",
         courseMode: "online",
@@ -64,27 +62,14 @@ export default function AnthropicRoadmapPage() {
         url: `${SITE_URL}/blog/${l.slug}`,
       })),
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Anthropic & Claude Developer Roadmap",
-          item: url,
-        },
-      ],
-    },
+    breadcrumbJsonLd([
+      { name: "Anthropic & Claude Developer Roadmap", path: "/anthropic-roadmap" },
+    ]),
   ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <RoadmapHub
         meta={AN_META}
         lessons={AN_ROADMAP}
