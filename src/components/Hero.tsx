@@ -18,6 +18,13 @@ const item: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
+// The h1 is the page's LCP element: it must paint visible in the initial
+// HTML (no opacity fade), otherwise Chrome never records an LCP candidate.
+const headline: Variants = {
+  hidden: { y: 24 },
+  show: { y: 0, transition: { duration: 0.6, ease: EASE } },
+};
+
 export default function Hero() {
   return (
     <section className="grid min-h-[80vh] grid-cols-1 items-center gap-12 py-20 md:grid-cols-2 md:gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
@@ -34,7 +41,7 @@ export default function Hero() {
         </motion.div>
 
         <motion.h1
-          variants={item}
+          variants={headline}
           className="mt-8 text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
         >
           Architecting Scalable Systems.

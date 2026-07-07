@@ -145,6 +145,7 @@ export default function TerminalAgent() {
   const historyIdxRef = useRef(-1);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const interactedRef = useRef(false);
 
   const push = useCallback((role: Role, text: string) => {
     idRef.current += 1;
@@ -192,9 +193,12 @@ export default function TerminalAgent() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
-  // Return focus to the prompt when a run finishes.
+  // Return focus to the prompt when a run finishes — but never before the
+  // user has touched the terminal: autofocusing an off-screen input scrolls
+  // the page down to it on load (and kills the LCP measurement).
   useEffect(() => {
-    if (!busy) inputRef.current?.focus();
+    if (!busy && interactedRef.current)
+      inputRef.current?.focus({ preventScroll: true });
   }, [busy]);
 
   const streamAnswer = useCallback((full: string) => {
@@ -271,7 +275,10 @@ export default function TerminalAgent() {
   return (
     <div
       className="overflow-hidden rounded-xl border border-zinc-800 bg-ink font-mono text-[13px] leading-relaxed"
-      onClick={() => inputRef.current?.focus()}
+      onClick={() => {
+        interactedRef.current = true;
+        inputRef.current?.focus();
+      }}
     >
       {/* macOS window chrome */}
       <div className="relative flex items-center border-b border-zinc-800 bg-white/[0.02] px-4 py-2.5">
@@ -370,6 +377,7 @@ export default function TerminalAgent() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
+              onFocus={() => (interactedRef.current = true)}
               aria-label="Ask the RAG agent about Yaseen's experience"
               className="w-full bg-transparent text-zinc-100 caret-cyan outline-none placeholder:text-zinc-700"
               placeholder="ask about stack, projects, experience…"
