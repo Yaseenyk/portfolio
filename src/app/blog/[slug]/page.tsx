@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -210,6 +211,20 @@ export default async function BlogPostPage({ params }: PageProps) {
           </span>
         </div>
       </header>
+
+      {/* Cover image — same asset served as the og:image share card */}
+      {ogImage && (
+        <figure className="mt-10 overflow-hidden rounded-2xl border border-zinc-800/70">
+          <Image
+            src={ogImage}
+            alt={`Cover illustration: ${post.title}`}
+            width={1536}
+            height={1024}
+            priority
+            className="h-auto w-full"
+          />
+        </figure>
+      )}
 
       {/* AEO: Executive Summary */}
       {post.takeaways.length > 0 && (
