@@ -97,10 +97,10 @@ export default function RootLayout({
         {children}
         <CommandPalette />
         {/* GoatCounter — privacy-friendly, cookieless page analytics.
-            Skips localhost automatically; register the site code at
-            https://yaseenkhatib.goatcounter.com to activate. */}
+            Skips localhost automatically; dashboard at
+            https://yaseen.goatcounter.com */}
         <script
-          data-goatcounter="https://yaseenkhatib.goatcounter.com/count"
+          data-goatcounter="https://yaseen.goatcounter.com/count"
           async
           src="https://gc.zgo.at/count.js"
         />
