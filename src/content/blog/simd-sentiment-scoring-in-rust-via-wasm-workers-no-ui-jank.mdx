@@ -1,0 +1,292 @@
+---
+title: SIMD sentiment scoring in Rust via WASM workers (no UI jank)
+slug: simd-sentiment-scoring-in-rust-via-wasm-workers-no-ui-jank
+date: '2026-07-08'
+description: Build a SIMD-accelerated sentiment scorer in Rust, ship it as WebAssembly,
+  and keep chat analysis off the UI thread without hurting battery or FPS.
+tags:
+- Rust
+- WebAssembly
+- AI
+keywords:
+- rust wasm simd sentiment analysis
+- wasm32 simd128 f32x4 rust example
+- avx2 rust intrinsics horizontal add
+- web worker wasm-bindgen simd
+- nextjs electron off main thread wasm
+- vectorized sum f32 rust example
+- micro-batching sentiment scoring wasm
+readingMinutes: 8
+takeaways:
+- Lexicon-based sentiment can be vectorized as a plain f32 sum and mapped to SIMD
+  easily.
+- Compile Rust to wasm32 with simd128 and call it from a Web Worker to keep the UI
+  smooth.
+- Micro-batch messages and use flat buffers to amortize JS↔WASM copies.
+- Provide AVX2 on desktop/server and a scalar fallback for portability.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why SIMD for chat sentiment?
+
+Per-message chat sentiment doesn’t need a transformer. A lexicon-weighted sum over tokens (plus a couple of heuristics) catches most UX needs: highlight toxic messages, flag high-arousal threads, bias notification sounds. The tight loop is embarrassingly parallel: sum N small floats. That’s exactly what SIMD is good at. Ship it as WebAssembly, run it in a Web Worker, and you avoid trashing the UI thread with per-keystroke analysis.
+
+Below, I’ll show:
+- A Rust SIMD kernel for summing f32 weights (wasm32 simd128 and x86_64 AVX2).
+- A batch API to amortize FFI overhead.
+- A Web Worker wiring that keeps React/Next/Electron responsive.
+
+## The scoring model (simple, cheap, good-enough)
+
+- Tokenize message to words/emojis (JS or Rust). Map each token to a float weight (SentiWordNet/AFINN/custom). Optionally handle negation and intensifiers as scalars you multiply in.
+- The hot path is just sum(weights), maybe with per-token factors (still a sum or a dot). No branches, small memory, cache-friendly.
+
+If you later want VADER-like heuristics, layer them on the scalar path around the SIMD sum; keep SIMDy bits branchless.
+
+## A SIMD kernel in Rust (WASM + AVX2 + scalar fallback)
+
+We’ll implement:
+- sum_f32_simd: lane-wise sum with wide adds, horizontal fold at the end.
+- score_batch_weights: batch API taking a flat f32 buffer and message offsets.
+
+```rust
+// src/lib.rs
+use wasm_bindgen::prelude::*;
+
+#[inline]
+fn sum_f32_scalar(xs: &[f32]) -> f32 {
+    let mut acc = 0.0f32;
+    // Manual unroll helps even scalar
+    let mut i = 0;
+    let len = xs.len();
+    while i + 4 <= len {
+        acc += xs[i] + xs[i + 1] + xs[i + 2] + xs[i + 3];
+        i += 4;
+    }
+    while i < len { acc += xs[i]; i += 1; }
+    acc
+}
+
+// wasm32 simd128 path
+#[cfg(all(target_arch = "wasm32"))]
+#[inline]
+unsafe fn sum_f32_wasm128(xs: &[f32]) -> f32 {
+    use core::arch::wasm32::*;
+    let mut acc = f32x4_splat(0.0);
+    let mut i = 0;
+    let len = xs.len();
+    // Process 4 floats per iteration
+    while i + 4 <= len {
+        let v = v128_load(xs.as_ptr().add(i) as *const v128);
+        acc = f32x4_add(acc, v);
+        i += 4;
+    }
+    // Horizontal add 4 lanes
+    let mut sum = f32x4_extract_lane::<0>(acc)
+        + f32x4_extract_lane::<1>(acc)
+        + f32x4_extract_lane::<2>(acc)
+        + f32x4_extract_lane::<3>(acc);
+    // Remainder
+    while i < len { sum += *xs.get_unchecked(i); i += 1; }
+    sum
+}
+
+// x86_64 AVX2 path
+#[cfg(all(target_arch = "x86_64", target_feature = "avx2"))]
+#[inline]
+unsafe fn sum_f32_avx2(xs: &[f32]) -> f32 {
+    use core::arch::x86_64::*;
+    let mut acc = _mm256_setzero_ps();
+    let mut i = 0;
+    let len = xs.len();
+    while i + 8 <= len {
+        let v = _mm256_loadu_ps(xs.as_ptr().add(i));
+        acc = _mm256_add_ps(acc, v);
+        i += 8;
+    }
+    // Fold 8 lanes -> 4 -> 1
+    let hi = _mm256_extractf128_ps(acc, 1);
+    let lo = _mm256_castps256_ps128(acc);
+    let s128 = _mm_add_ps(lo, hi);                 // 4 lanes
+    // Use hadd (SSE3) to horizontally reduce
+    let s64 = _mm_hadd_ps(s128, s128);             // [a0+a1, a2+a3, a0+a1, a2+a3]
+    let s32 = _mm_hadd_ps(s64, s64);               // [sum, sum, sum, sum]
+    let mut sum = _mm_cvtss_f32(s32);
+    while i < len { sum += *xs.get_unchecked(i); i += 1; }
+    sum
+}
+
+#[inline]
+fn sum_f32_simd(xs: &[f32]) -> f32 {
+    #[cfg(all(target_arch = "wasm32"))]
+    unsafe { return sum_f32_wasm128(xs); }
+
+    #[cfg(all(target_arch = "x86_64", target_feature = "avx2"))]
+    unsafe { return sum_f32_avx2(xs); }
+
+    // Fallback
+    sum_f32_scalar(xs)
+}
+
+#[wasm_bindgen]
+pub fn score_batch_weights(flat: Vec<f32>, offsets: Vec<u32>) -> Vec<f32> {
+    // offsets[i]..offsets[i+1] form a message; final offset == flat.len()
+    assert!(offsets.len() >= 2, "need at least start and end offset");
+    let mut out = Vec::with_capacity(offsets.len() - 1);
+
+    // Safety: we only take sub-slices within flat bounds
+    for w in offsets.windows(2) {
+        let a = w[0] as usize;
+        let b = w[1] as usize;
+        let slice = &flat[a..b];
+        let s = sum_f32_simd(slice);
+        out.push(s);
+    }
+    out
+}
+
+#[wasm_bindgen]
+pub fn score_message_weights(weights: Vec<f32>) -> f32 {
+    sum_f32_simd(&weights)
+}
+```
+
+Notes:
+- Both wasm32 and x86_64 variants compile, but only the target you build for is included. The scalar path always exists as a portable fallback.
+- The wasm path uses unaligned loads; that’s fine in wasm. AVX2 uses `_mm256_loadu_ps` (unaligned).
+
+### Building for wasm32 with SIMD
+
+```bash
+# 1) Add target
+rustup target add wasm32-unknown-unknown
+
+# 2) Build with simd128 enabled
+RUSTFLAGS="-C target-feature=+simd128" \
+  cargo build --release --target wasm32-unknown-unknown
+
+# Or use wasm-pack (recommended for bundlers)
+cargo install wasm-pack
+RUSTFLAGS="-C target-feature=+simd128" \
+  wasm-pack build --release --target web
+```
+
+All evergreen browsers ship wasm SIMD. If you must support legacy browsers, feature-detect at runtime and fall back to a JS implementation or a non-SIMD wasm module.
+
+## Wiring a Web Worker in a React/Next chat
+
+We’ll micro-batch messages, compute token weights in the worker, and post scores back. To keep the example focused, assume the UI thread already maps tokens to weights and just ships Float32Array buffers (copy) to the worker. In real apps, move tokenization and lookup into the worker too.
+
+```ts
+// sentiment.worker.ts
+// Vite/Next build: let the bundler treat this as a module worker
+import init, { score_batch_weights } from './pkg/sentiment_wasm.js';
+
+let ready: Promise<void> | null = null;
+
+self.onmessage = async (ev: MessageEvent) => {
+  const { flatWeights, offsets } = ev.data as {
+    flatWeights: Float32Array; // concatenated weights
+    offsets: Uint32Array;      // message boundaries
+  };
+
+  if (!ready) ready = init().then(() => {});
+  await ready;
+
+  // Copy into wasm (simple path). Optimize later with shared memory.
+  const flat = Array.from(flatWeights);
+  const offs = Array.from(offsets);
+  const scores = score_batch_weights(flat, offs);
+  // scores is a JS array (Vec<f32> from wasm-bindgen)
+  (self as any).postMessage({ scores });
+};
+```
+
+Main thread (React/Next): batch messages produced within a small time window (e.g., 8–16 ms) to amortize copies.
+
+```ts
+// ui-sentiment.ts
+const worker = new Worker(new URL('./sentiment.worker.ts', import.meta.url), { type: 'module' });
+
+let batch: number[] = [];      // flat weights
+let offsets: number[] = [0];   // starts at 0
+
+function enqueueWeights(weights: number[]) {
+  batch.push(...weights);
+  offsets.push(batch.length);
+}
+
+let scheduled = false;
+function flush() {
+  if (scheduled) return;
+  scheduled = true;
+  requestIdleCallback(() => {
+    const flat = new Float32Array(batch);
+    const offs = new Uint32Array(offsets);
+    worker.postMessage({ flatWeights: flat, offsets: offs });
+    batch = []; offsets = [0]; scheduled = false;
+  }, { timeout: 16 });
+}
+
+// Usage per message (post-tokenization and lexicon lookup):
+export function scoreMessageSoon(weights: number[]) {
+  enqueueWeights(weights);
+  flush();
+}
+
+worker.onmessage = (ev) => {
+  const { scores } = ev.data as { scores: number[] };
+  // Bind scores back to messages in the same order
+  for (const score of scores) {
+    // e.g., dispatch to store, colorize row, etc.
+    // store.dispatch(updateMessageScore({ id, score }))
+  }
+};
+```
+
+This basic path copies buffers across the worker boundary and into wasm. For most chat workloads (short messages), it’s fine. If you need zero-copy:
+- Use a SharedArrayBuffer backing store for the flat weights, plus cross-origin isolation headers, and have wasm read from it via pointers.
+- Or allocate in wasm memory, expose a pointer/length to JS, and fill it from the worker using a view on `WebAssembly.Memory` (wasm-bindgen supports `wasm_bindgen::memory()`).
+
+## Negation, intensifiers, and still staying vectorized
+
+Handle scope modifiers as pre-multipliers in the weight stream:
+- Convert tokens to base weights w[i].
+- Compute a modifier m[i] (negation flips sign until punctuation, intensifiers scale by 1.5, etc.).
+- Feed SIMD the elementwise product v[i] = m[i] * w[i] and sum v. Either precompute v in scalar code, or extend the kernel to do a fused multiply-add if you also keep a ones-vector. For wasm, there’s no direct FMA, but `f32x4_mul` + `f32x4_add` is still cheap.
+
+## Performance characteristics and gotchas
+
+- Throughput: On an M2 Safari/Chrome, wasm SIMD summing ~64 floats commonly hits 10–20 GB/s effective bandwidth; per-message sums land in sub-microsecond time. AVX2 on desktop CPUs is similar or better. The dominant cost becomes JS↔WASM copies and worker dispatch.
+- Amortize overhead: Micro-batch multiple messages and flatten buffers, as shown.
+- Cache friendliness: Keep your lexicon lookup hot. If you tokenize in the worker, store weights in a contiguous f32 array and avoid hashmap churn in the hot loop.
+- Branchlessness: Keep the SIMD loop branch-free. Handle emoji/negation in pre-processing.
+- Feature gating: If you ship AVX2 in a native extension, also provide an SSE2 or scalar code path. For wasm, browsers that can’t decode SIMD won’t instantiate the module—feature-detect and fall back.
+- Numerics: f32 is enough for sentiment. If you sum thousands of tokens, consider Kahan or pairwise summation in scalar tail to reduce drift. For chat-length text, it’s overkill.
+
+## Optional: native Node/Electron path
+
+If you’re in Electron and want max throughput without wasm copies, expose the same kernel via N-API (e.g., `napi-rs`) and keep the worker-thread model. Compile with `RUSTFLAGS="-C target-cpu=native"` to enable AVX2/FMA on your deployment fleet, or ship multi-ISA binaries and dispatch at runtime.
+
+## What this buys you in a MERN stack
+
+- React stays smooth: All per-message analysis runs in a Worker.
+- Mongo/Express remain unperturbed: You can still persist scores server-side asynchronously.
+- If your chat uses SSR/Next, run the same Rust crate natively on the server for backfill and consistency; wasm in the client for immediacy.
+
+## Further optimizations
+
+- Pre-tokenize using a streaming SIMD-friendly tokenizer (ASCII fast path, `simdutf8` for validation), but don’t overcomplicate unless CPU shows up in profiles.
+- Use `wasm-bindgen`’s `--reference-types` and `WebAssembly.Memory` views for fewer copies.
+- If you switch to a dot-product over per-token feature vectors (k>1 features), vectorize both the mul and add, then horizontally sum per lane.
+
+## Checklist
+
+- SIMD in Rust: done with core::arch (wasm32 and avx2) and a scalar fallback.
+- Off the UI thread: use a module Worker and micro-batching.
+- Portability: feature-detect and fall back gracefully.
+- Measured: profile with sampling CPU profiler and `performance.now()` around worker hops. Keep eyes on copies, not just kernel GFLOPs.
+
+This gets you pragmatic, low-latency sentiment without model serving, keeps battery happy, and preserves UI frame budget—even on busy channels.

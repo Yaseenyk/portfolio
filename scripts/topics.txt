@@ -1,4 +1,3 @@
-SIMD sentiment scoring in Rust: vectorizing per-message chat analysis to keep it off the UI thread
 Flamegraphs across the Tauri IPC boundary: tracing real frame cost from a Rust event to a React paint
 Memory-mapped scene-asset caching with memmap2 for instant loads without doubling resident memory
 Diagnosing and killing async deadlocks in a production Tauri app with tokio task dumps and tracing spans
