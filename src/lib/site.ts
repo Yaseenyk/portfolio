@@ -14,7 +14,7 @@ export const SITE_DESCRIPTION =
  */
 export const VERIFICATION = {
   google: "",
-  bing: "",
+  bing: "001424A9DC931D947201E7F6E9CA9A23",
 };
 
 export const SOCIALS = {

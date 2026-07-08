@@ -171,7 +171,7 @@ def main() -> None:
         state[slug] = article_id
         save_state(state)
         print(f"  -> dev.to draft created (id {article_id}): {post['title']}")
-        time.sleep(3)  # dev.to rate limit is strict on article creation
+        time.sleep(31)  # dev.to allows roughly one article creation per 30s
 
     print("\nDone. Review the drafts in https://dev.to/dashboard and publish.")
 
