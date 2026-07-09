@@ -81,6 +81,22 @@ const PROJECTS: Project[] = [
     ],
   },
   {
+    name: "Portfolio Concierge — RAG + MCP",
+    category: "AI Infrastructure · Edge",
+    description:
+      "One Cloudflare Worker, two interfaces: a grounded RAG API that answers questions about my work from a Vectorize index of my 95-article corpus (refusing anything out of scope), and an MCP server — add its URL to Claude and interrogate this portfolio from inside your own AI. Corpus re-embeds automatically after every deploy.",
+    metrics: ["Interview me via MCP", "Grounding Contract", "Auto-Reindexed"],
+    tech: ["Cloudflare Workers", "Vectorize", "Workers AI", "MCP", "TypeScript"],
+    Animation: RealtimeSync,
+    links: [
+      {
+        href: "https://github.com/Yaseenyk/portfolio/tree/main/worker",
+        label: "Worker source",
+        icon: "github",
+      },
+    ],
+  },
+  {
     name: "Automated LinkedIn Pipeline",
     category: "Automation · Agent",
     description:

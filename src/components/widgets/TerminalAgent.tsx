@@ -27,8 +27,11 @@ const BOOT_LINES = [
   "Type a question about Yaseen's experience to begin.",
 ];
 
-/** Grounded mock corpus — swap this lookup for the Vercel AI SDK `useChat`
- *  transport later; the rest of the component only consumes message objects. */
+/** When NEXT_PUBLIC_CONCIERGE_URL is set at build time, queries hit the real
+ *  Cloudflare Worker (worker/ — Vectorize RAG + Workers AI). The grounded
+ *  mock below remains as the graceful-degradation path: if the worker is
+ *  unreachable, the terminal still answers instead of erroring. */
+const CONCIERGE_URL = process.env.NEXT_PUBLIC_CONCIERGE_URL ?? "";
 const KNOWLEDGE: { match: RegExp; answer: string }[] = [
   {
     match: /stack|tech|tool|skill|language|framework/i,
@@ -225,6 +228,53 @@ export default function TerminalAgent() {
     intervalRef.current = interval;
   }, []);
 
+  // Local grounded mock — instant, deterministic, offline-safe.
+  const runMock = useCallback(
+    (query: string) => {
+      const trace = traces();
+      trace.forEach((t, i) =>
+        schedule(() => pushTrace(t), TRACE_STEP_MS * (i + 1)),
+      );
+      schedule(
+        () => streamAnswer(getMockAnswer(query)),
+        TRACE_STEP_MS * (trace.length + 1),
+      );
+    },
+    [pushTrace, schedule, streamAnswer],
+  );
+
+  // Real pipeline: Vectorize retrieval + Workers AI generation, with the
+  // worker's actual execution traces. Falls back to the mock on any failure.
+  const runRemote = useCallback(
+    async (query: string) => {
+      try {
+        const res = await fetch(`${CONCIERGE_URL}/api/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as {
+          answer?: string;
+          traces?: Trace[];
+        };
+        if (!data.answer) throw new Error("empty answer");
+        const trace = data.traces ?? [];
+        trace.forEach((t, i) =>
+          schedule(() => pushTrace(t), TRACE_STEP_MS * (i + 1)),
+        );
+        schedule(
+          () => streamAnswer(data.answer as string),
+          TRACE_STEP_MS * (trace.length + 1),
+        );
+      } catch {
+        runMock(query); // graceful degradation — never a dead terminal
+      }
+    },
+    [pushTrace, schedule, streamAnswer, runMock],
+  );
+
   const handleSubmit = useCallback(() => {
     const query = input.trim();
     if (!query || busy) return;
@@ -235,15 +285,9 @@ export default function TerminalAgent() {
     setBusy(true);
     push("user", query);
 
-    const trace = traces();
-    trace.forEach((t, i) =>
-      schedule(() => pushTrace(t), TRACE_STEP_MS * (i + 1)),
-    );
-    schedule(
-      () => streamAnswer(getMockAnswer(query)),
-      TRACE_STEP_MS * (trace.length + 1),
-    );
-  }, [input, busy, push, pushTrace, schedule, streamAnswer]);
+    if (CONCIERGE_URL) void runRemote(query);
+    else runMock(query);
+  }, [input, busy, push, runMock, runRemote]);
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const history = historyRef.current;

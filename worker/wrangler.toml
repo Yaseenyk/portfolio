@@ -1,0 +1,15 @@
+# Portfolio Concierge — grounded RAG API + MCP server on Cloudflare Workers.
+# Deployed by .github/workflows/worker.yml on push to main (worker/** paths).
+name = "yaseen-concierge"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+
+[ai]
+binding = "AI"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "portfolio-corpus"
+
+[observability]
+enabled = true
