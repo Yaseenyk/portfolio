@@ -1,0 +1,317 @@
+---
+title: 'Flamegraphs over Tauri IPC: from Rust event to React paint'
+slug: flamegraphs-over-tauri-ipc-from-rust-event-to-react-paint
+date: '2026-07-09'
+description: 'A practical, end-to-end method to profile Tauri apps: correlate Rust
+  spans with React paints, align clocks, and read a single cross-IPC flamegraph.'
+tags:
+- Tauri
+- Performance
+- Rust
+- React
+keywords:
+- tauri flamegraph
+- tracing-chrome rust
+- tauri performance profiling
+- ipc correlation id tauri
+- react paint time performance.now
+- perfetto chrome trace merge
+- react profiler tauri
+readingMinutes: 8
+takeaways:
+- Propagate a correlation ID across Tauri IPC and React to track a single frame.
+- Use tracing-chrome on Rust and User Timing in the webview, then merge traces.
+- Calibrate clocks to align Rust Instant with performance.now for a single timeline.
+- Read a single cross-IPC flamechart in Perfetto/Chrome to attribute frame cost.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why cross-IPC flamegraphs matter
+
+Tauri apps constantly cross a boundary: Rust emits an event, JavaScript receives it, React re-renders, the compositor paints. If your frame misses budget, who pays the bill? The Rust command? The bridge? React’s reconciliation? A flamegraph that spans both sides removes the guesswork.
+
+This article shows a concrete, repeatable setup to:
+- Tag a single user-flow with a correlation ID across Rust and React.
+- Record Rust spans (with arguments) to Chrome Trace Events via `tracing-chrome`.
+- Record React commit/paint with the User Timing API.
+- Calibrate clocks and merge into one trace you can open in Perfetto or chrome://tracing.
+
+## What we’ll build
+
+- Rust: `tracing` spans for the emitting code path; `tracing-chrome` writes a Chrome trace JSON.
+- IPC: Correlation ID propagated from Rust payload -> React state -> commit.
+- JS: `performance.mark/measure` for receive -> commit -> paint; export to Chrome Trace format.
+- Merge: a Node script aligns timestamps using a measured offset and concatenates events.
+
+## Step 1: Instrument Rust with tracing-chrome
+
+Add dependencies:
+
+```toml
+# Cargo.toml
+[dependencies]
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter", "registry"] }
+tracing-chrome = "0.7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "1", features = ["api-all"] }
+```
+
+Initialize a chrome layer and expose a clock endpoint and event emitter. We’ll tag spans with `corr_id` and include args. We also return a monotonic timestamp from Rust to help clock sync.
+
+```rust
+// src/main.rs
+use std::{sync::atomic::{AtomicU64, Ordering}, time::{Duration, Instant}};
+use tauri::{AppHandle, Manager};
+use tracing::{info_span, instrument};
+use tracing_subscriber::{layer::SubscriberExt, Registry};
+
+static NEXT_ID: AtomicU64 = AtomicU64::new(1);
+static START: once_cell::sync::Lazy<Instant> = once_cell::sync::Lazy::new(Instant::now);
+
+#[derive(serde::Serialize)]
+struct Payload {
+  id: u64,
+  msg: String,
+}
+
+#[tauri::command]
+fn rust_now_ns() -> u128 {
+  START.elapsed().as_nanos()
+}
+
+#[tauri::command]
+#[instrument(skip(app), fields(corr_id))]
+async fn do_work(app: AppHandle, msg: String) -> Result<(), String> {
+  let id = NEXT_ID.fetch_add(1, Ordering::Relaxed);
+  tracing::Span::current().record("corr_id", &id);
+
+  // Simulate some Rust-side work attributed to this frame.
+  let span = info_span!("prepare_payload", corr_id = id, len = msg.len());
+  let _e = span.enter();
+  tokio::time::sleep(Duration::from_millis(3)).await;
+
+  let payload = Payload { id, msg };
+
+  // Span around the actual emit as well.
+  let emit_span = info_span!("emit_all", corr_id = id, event = "work_done");
+  let _e2 = emit_span.enter();
+  app.emit_all("work_done", &payload).map_err(|e| e.to_string())?;
+  Ok(())
+}
+
+fn main() {
+  // Chrome trace layer dumps to a file your CI can collect.
+  let (chrome_layer, _guard) = tracing_chrome::ChromeLayerBuilder::new()
+    .include_args(true)
+    .build();
+  let subscriber = Registry::default().with(chrome_layer);
+  tracing::subscriber::set_global_default(subscriber).expect("set global subscriber");
+
+  tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![do_work, rust_now_ns])
+    .run(tauri::generate_context!())
+    .expect("error while running tauri app");
+}
+```
+
+Notes:
+- `tracing-chrome` writes a Chrome Trace Events file (default to `trace-*.json`) containing spans with microsecond timestamps. Keep the `_guard` alive until shutdown to flush.
+- We include `corr_id` as a span field so the merged timeline shows exactly which Rust work belongs to which frame.
+
+## Step 2: Calibrate clocks and propagate the ID
+
+Rust’s `Instant` and the webview’s `performance.now()` don’t share a clock. We estimate an offset via ping-pong:
+
+```ts
+// src/ui/clock.ts
+import { invoke } from "@tauri-apps/api";
+
+export async function calibrateClock(samples = 10) {
+  // Returns {offsetUs, stddevUs} where
+  // ts_ui_ms ~= perf.now(); ts_rust_us = rust_now_ns / 1000; ts_ui_us = ts_ui_ms * 1000;
+  let best: {offsetUs: number; rttMs: number} | null = null;
+  for (let i = 0; i < samples; i++) {
+    const t0 = performance.now();
+    const rustNs = await invoke<number>("rust_now_ns");
+    const t1 = performance.now();
+    const midMs = (t0 + t1) / 2; // reduce IPC jitter bias
+    const uiUs = midMs * 1000;
+    const rustUs = Number(rustNs) / 1000;
+    const offsetUs = uiUs - rustUs; // add this to Rust-us to get UI-us
+    const rttMs = t1 - t0;
+    if (!best || rttMs < best.rttMs) best = { offsetUs, rttMs };
+  }
+  if (!best) throw new Error("clock calibration failed");
+  return best;
+}
+```
+
+We take the minimum round-trip sample to approximate the offset with least jitter. We’ll store `offsetUs` and use it when merging traces.
+
+## Step 3: Mark React commit and paint
+
+We listen for the Rust event, carry the `id`, and measure:
+- receive -> state update (setState)
+- commit time via React Profiler callback
+- next paint via `requestAnimationFrame`
+
+```tsx
+// src/ui/App.tsx
+import React, { Profiler, useEffect, useRef, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { calibrateClock } from "./clock";
+
+type Payload = { id: number; msg: string };
+
+let OFFSET_US = 0; // UI_us - Rust_us
+
+function mark(name: string, detail?: any) {
+  performance.mark(name);
+  if (detail) (performance as any).mark(name, { detail });
+}
+
+function AppInner() {
+  const [msgs, setMsgs] = useState<string[]>([]);
+  const lastCorr = useRef<number | null>(null);
+
+  useEffect(() => {
+    calibrateClock().then(({ offsetUs }) => (OFFSET_US = offsetUs));
+
+    const unlisten = listen<Payload>("work_done", (e) => {
+      const { id, msg } = e.payload;
+      lastCorr.current = id;
+      mark(`ipc:${id}:recv`);
+      setMsgs((xs) => [...xs, msg]);
+    });
+    return () => { unlisten.then((f) => f()); };
+  }, []);
+
+  // React Profiler gets commitTime in ms (UI clock)
+  const onRender: React.ProfilerOnRenderCallback = (
+    id, phase, actualDuration, baseDuration, startTime, commitTime
+  ) => {
+    const corr = lastCorr.current;
+    if (corr == null) return;
+    performance.measure(`corr:${corr}:commit`, {
+      start: `ipc:${corr}:recv`,
+      end: performance.now(),
+    });
+    // Next paint boundary
+    requestAnimationFrame(() => {
+      mark(`corr:${corr}:paint`);
+      performance.measure(`corr:${corr}:recv->paint`, {
+        start: `ipc:${corr}:recv`,
+        end: `corr:${corr}:paint`,
+      });
+    });
+  };
+
+  return (
+    <Profiler id="App" onRender={onRender}>
+      <ul>
+        {msgs.map((m, i) => (
+          <li key={i}>{m}</li>
+        ))}
+      </ul>
+    </Profiler>
+  );
+}
+
+export default AppInner;
+```
+
+At this point, Chrome DevTools Performance panel will show your `mark/measure` slices on the User Timing track, and React’s work on the Main thread. But we want the Rust spans in the same timeline.
+
+## Step 4: Export and merge traces
+
+We dump UI marks to Chrome Trace Events and merge with Rust’s `tracing-chrome` output.
+
+```ts
+// src/ui/export.ts
+// Build Chrome Trace Events from Performance entries in UI timebase (us)
+export function buildUiTrace(cat = "ui", pid = 1, tid = 1) {
+  const events: any[] = [];
+  const marks = performance.getEntriesByType("mark");
+  const measures = performance.getEntriesByType("measure");
+  for (const m of measures as PerformanceMeasure[]) {
+    const name = m.name; // e.g., corr:123:recv->paint
+    const ts_us = m.startTime * 1000; // ms -> us
+    const dur_us = m.duration * 1000;
+    events.push({ name, cat, ph: "X", ts: ts_us, dur: dur_us, pid, tid, args: {} });
+  }
+  for (const mk of marks as PerformanceMark[]) {
+    const name = mk.name; // e.g., ipc:123:recv
+    const ts_us = mk.startTime * 1000;
+    events.push({ name, cat, ph: "i", s: "t", ts: ts_us, pid, tid, args: {} });
+  }
+  return { traceEvents: events };
+}
+```
+
+Now write a tiny Node script to merge the two JSONs. `tracing-chrome` uses microseconds; we shift the Rust trace by `OFFSET_US` to land in the UI’s timebase.
+
+```js
+// scripts/merge-traces.js
+// Usage: node merge-traces.js rust.json ui.json offset_us > merged.json
+const fs = require('fs');
+
+function load(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
+
+const [,, rustPath, uiPath, offsetArg] = process.argv;
+const rust = load(rustPath); // { traceEvents: [...] }
+const ui = load(uiPath);
+const offsetUs = Number(offsetArg || 0);
+
+const rustShifted = rust.traceEvents.map(e => ({ ...e, ts: e.ts + offsetUs }));
+const all = rustShifted.concat(ui.traceEvents).sort((a,b) => a.ts - b.ts);
+
+const merged = { traceEvents: all };
+process.stdout.write(JSON.stringify(merged));
+```
+
+Workflow:
+- Run your app and reproduce the flow.
+- Rust emits a trace file (e.g., `trace-<pid>.json`).
+- In devtools console, call `const ui = buildUiTrace();` then save with `JSON.stringify(ui)` (or build a button to download it).
+- Compute `offsetUs` from `calibrateClock()` (you can print it once at startup and reuse).
+- `node merge-traces.js trace-rust.json ui.json <offsetUs> > merged.json`.
+- Open `merged.json` in chrome://tracing or https://ui.perfetto.dev/.
+
+You now have a single flamechart-like timeline: Rust spans with `corr_id` alongside your User Timing slices and paints.
+
+## Reading the cross-IPC flamechart
+
+- Look for `prepare_payload` and `emit_all` spans that share `corr_id = N`.
+- On the UI track, find `ipc:N:recv` then `corr:N:commit` and `corr:N:recv->paint`.
+- The delta between Rust `emit_all` end and `ipc:N:recv` is bridge latency (IPC + webview scheduling).
+- The slice from `ipc:N:recv` to React commit is your reconciliation + rendering cost. The following rAF-to-paint indicates compositor timeline.
+
+Now you can say, with evidence, which side exceeded the frame budget.
+
+## Production hardening and deeper stacks
+
+- Rust CPU flamegraphs: pair `tracing` with sampling via `pprof` to capture CPU stacks under the `corr_id` span. Name the sampling profile with `corr_id` so you can correlate stack-heavy functions with a specific frame.
+- JS CPU profile: you can additionally record a CPU profile in DevTools and filter by the time window between `ipc:N:recv` and paint to attribute pure JS cost.
+- Sampling overhead: keep tracing minimal in hot paths in release builds; you can enable via env flags and only for suspicious codepaths.
+- Drift: if your sessions run long, re-run `calibrateClock()` periodically and version the offset alongside trace chunks.
+- Multiple windows/threads: assign distinct `pid/tid` when building UI events to separate tracks (e.g., pid=1 main, pid=2 worker), and propagate `corr_id` everywhere.
+
+## Platform notes
+
+- Tauri WebView timebases: Windows (WebView2/Chromium) and macOS/Linux (WebKit) both expose high-res `performance.now()`. The ping-pong method still works; take the minimum RTT.
+- `tracing-chrome` timestamps are in microseconds. Our exporter converts `performance.now()` (ms) to µs to match.
+- The event you emit (`emit_all`) is synchronous on the Rust side but delivery to the webview is asynchronous; measure the gap explicitly.
+
+## Minimal checklist
+
+- Add `tracing-chrome`, tag spans with `corr_id`.
+- Emit Tauri events with `{ id }` and ensure every important Rust function is under a span.
+- On UI, measure `recv -> commit -> paint` with Performance marks and React Profiler.
+- Calibrate clocks; shift Rust trace by `offsetUs`.
+- Merge, open in Perfetto, and read a single flamechart across IPC.
+
+Once you’ve done this once, it becomes a standard playbook: every frame is a lineage you can defend. You’ll stop guessing and start deleting the right bottlenecks.
