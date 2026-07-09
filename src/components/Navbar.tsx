@@ -26,7 +26,7 @@ function MenuToggle({ open, onClick }: { open: boolean; onClick: () => void }) {
       onClick={onClick}
       aria-label="Toggle menu"
       aria-expanded={open}
-      className="flex h-6 w-6 items-center justify-center text-zinc-300 transition-colors hover:text-zinc-50 md:hidden"
+      className="flex h-6 w-6 items-center justify-center text-zinc-300 transition-colors hover:text-zinc-50 lg:hidden"
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
         <motion.path
@@ -68,21 +68,21 @@ export default function Navbar() {
         transition={{ duration: 0.5, ease: EASE }}
         className="fixed left-1/2 top-6 z-50 -translate-x-1/2"
       >
-        <div className="flex items-center gap-2 rounded-full border border-zinc-800/50 bg-zinc-950/60 px-6 py-3 shadow-2xl shadow-cyan-900/20 backdrop-blur-md">
+        <div className="flex items-center gap-2 rounded-full border border-zinc-800/50 bg-zinc-950/60 px-5 py-3 shadow-2xl shadow-cyan-900/20 backdrop-blur-md">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 pr-1">
-            <span className="text-sm font-bold tracking-tight text-zinc-50">
+            <span className="whitespace-nowrap text-sm font-bold tracking-tight text-zinc-50">
               Yaseen Khatib
             </span>
             <PulseDot />
           </Link>
 
           {/* Divider */}
-          <span className="hidden h-4 w-px bg-zinc-800 md:block" />
+          <span className="hidden h-4 w-px bg-zinc-800 lg:block" />
 
           {/* Desktop links — sliding glass highlight via layoutId */}
           <div
-            className="hidden items-center gap-1 md:flex"
+            className="hidden items-center gap-0.5 lg:flex"
             onMouseLeave={() => setHovered(null)}
           >
             {LINKS.map((link) => (
@@ -90,7 +90,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onMouseEnter={() => setHovered(link.href)}
-                className="relative rounded-full px-4 py-1.5 text-sm"
+                className="relative whitespace-nowrap rounded-full px-3 py-1.5 text-sm"
               >
                 {hovered === link.href && (
                   <motion.span
@@ -125,7 +125,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: EASE }}
-            className="fixed right-6 top-24 z-[60] flex w-[min(80vw,18rem)] flex-col gap-y-4 rounded-2xl border border-zinc-800/50 bg-zinc-950/90 px-4 py-6 shadow-2xl shadow-cyan-900/20 backdrop-blur-md md:hidden"
+            className="fixed right-6 top-24 z-[60] flex w-[min(80vw,18rem)] flex-col gap-y-4 rounded-2xl border border-zinc-800/50 bg-zinc-950/90 px-4 py-6 shadow-2xl shadow-cyan-900/20 backdrop-blur-md lg:hidden"
           >
             {LINKS.map((link) => (
               <Link
