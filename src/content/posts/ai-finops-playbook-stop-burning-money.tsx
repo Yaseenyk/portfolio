@@ -24,7 +24,7 @@ function Body() {
         not an AI cost. It is an architecture failure invoiced monthly.
       </p>
 
-      <h2>The cascade: cache → flash → frontier</h2>
+      <h2>How do you cut LLM costs by 80%? The cache → flash → frontier cascade</h2>
       <p>
         The fix I implement is a three-tier router, and its economics are the
         whole story:

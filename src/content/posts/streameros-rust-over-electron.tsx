@@ -24,7 +24,7 @@ function Body() {
         weightless on a machine under siege.</em>
       </p>
 
-      <h2>What the Rust bet bought</h2>
+      <h2>What does Rust buy you over Electron?</h2>
       <ul>
         <li>
           <strong>A native core:</strong> Tauri boots a Rust process with an

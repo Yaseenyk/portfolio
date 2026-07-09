@@ -27,6 +27,21 @@
   ::selection {
     @apply bg-cyan text-ink;
   }
+
+  /* Honor the OS "reduce motion" setting for CSS-driven animation
+     (framer-motion is handled separately via MotionConfig reducedMotion). */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer utilities {

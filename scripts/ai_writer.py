@@ -91,6 +91,9 @@ Field requirements (ALL fields are mandatory — never leave one empty):
 - takeaways: 3-4 direct, declarative TL;DR sentences.
 - body_markdown: the full article in GitHub-Flavored Markdown. Requirements:
   - Do NOT include an H1 (#) heading; the title is rendered separately. Use ## and ### headings.
+  - SEO/AEO: phrase at least TWO of the ## headings as the exact question a developer
+    would type into a search engine (e.g. "## How do you X without Y?"), and open each
+    with a direct 40-60 word answer before elaborating — featured-snippet style.
   - Be technical and concrete: fenced code blocks with language hints (```ts, ```python, ```bash),
     tables where useful, and at least two substantial, correct code examples.
   - Do NOT wrap the whole body in a markdown code fence. No commentary before or after the article.

@@ -14,7 +14,7 @@ function Body() {
         slept.
       </p>
 
-      <h2>The architecture of showing up</h2>
+      <h2>How do you automate LinkedIn content for $0?</h2>
       <p>
         The system is deliberately boring, which is the point. A GitHub Actions
         workflow wakes on a cron schedule. It reads a content queue, generates

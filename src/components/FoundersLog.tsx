@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { getPostBySlug, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
-// Narrative order from the registry — each row is a headline built to be
-// read in the first scroll, before any project card.
-const ENTRIES = FOUNDERS_LOG_SLUGS.map((slug) => getPostBySlug(slug)).filter(
-  (p): p is NonNullable<typeof p> => Boolean(p),
-);
+// Plain serializable shape — the server page maps the registry to this so
+// the post bodies never enter the client bundle.
+export interface LogEntry {
+  slug: string;
+  title: string;
+  description: string;
+}
 
-export default function FoundersLog() {
+export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
+  const ENTRIES = entries;
   return (
     <section id="founders-log" className="scroll-mt-24 py-16">
       <div className="flex flex-wrap items-end justify-between gap-4">

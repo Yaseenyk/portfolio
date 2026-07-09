@@ -61,7 +61,7 @@ function Body() {
         invoice?&quot;
       </blockquote>
 
-      <h2>What I&apos;m looking for</h2>
+      <h2>What roles is Yaseen Khatib looking for?</h2>
       <p>
         A team where the hard problems are architectural: AI systems that need
         trust boundaries, infrastructure that needs its economics fixed,

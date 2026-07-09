@@ -14,7 +14,7 @@ function Body() {
         a company looks like.
       </p>
 
-      <h2>The operating model</h2>
+      <h2>How does one architect replace a full engineering squad?</h2>
       <p>
         My setup has three layers. At the top, <strong>me</strong>: owning the
         data contracts, the trust boundaries, and the review. In the middle,{" "}

@@ -12,7 +12,7 @@ function Body() {
         engineering that no model generates for you.
       </p>
 
-      <h2>The whiteboard test</h2>
+      <h2>How do you design a product before writing any code?</h2>
       <p>
         Before I opened an editor for Sable, my finance agent, I could answer
         these on a whiteboard: Where does the data live? (On-device SQLite —

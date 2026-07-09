@@ -13,7 +13,7 @@ function Body() {
         $0 — and it has never missed a deadline.
       </p>
 
-      <h2>The whole stack is a Git repository</h2>
+      <h2>How does a blog run with zero infrastructure?</h2>
       <p>
         The design bet was to refuse infrastructure. The content queue is{" "}
         <code>scripts/topics.txt</code> — one topic per line, consumed

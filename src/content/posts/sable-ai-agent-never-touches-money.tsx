@@ -41,7 +41,7 @@ function Body() {
         engineering.
       </blockquote>
 
-      <h2>The unglamorous engineering that makes it real</h2>
+      <h2>What makes a local-first AI agent production-real?</h2>
       <ul>
         <li>
           <strong>Serialized writes:</strong> a queue funnels every SQLite

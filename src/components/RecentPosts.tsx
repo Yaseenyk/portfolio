@@ -2,23 +2,22 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { getAllPosts, formatDate } from "@/lib/blog";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
-// getAllPosts() is already sorted by publishedAt descending.
-const RECENT = getAllPosts()
-  .slice(0, 3)
-  .map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    description: p.description,
-    date: formatDate(p.publishedAt),
-    publishedAt: p.publishedAt,
-    readingMinutes: p.readingMinutes,
-  }));
+// Plain serializable shape — computed by the server page so the blog
+// registry (and every post body) stays out of the client bundle.
+export interface RecentPost {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  publishedAt: string;
+  readingMinutes: number;
+}
 
-export default function RecentPosts() {
+export default function RecentPosts({ posts }: { posts: RecentPost[] }) {
+  const RECENT = posts;
   return (
     <section id="writing" className="scroll-mt-24 py-24">
       <div className="flex items-center justify-between gap-4">

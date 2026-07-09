@@ -3,6 +3,7 @@ import { Inter, Fira_Code } from "next/font/google";
 import { SITE_URL, SITE_DESCRIPTION, VERIFICATION } from "@/lib/site";
 import { siteGraphJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
+import MotionProvider from "@/components/MotionProvider";
 import CommandPalette from "@/components/CommandPalette";
 import "./globals.css";
 
@@ -47,7 +48,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
     // AEO: standalone machine-readable manifest for AI recruiter agents.
-    types: { "application/ld+json": `${SITE_URL}/ai-briefing.json` },
+    types: {
+      "application/ld+json": `${SITE_URL}/ai-briefing.json`,
+      "application/rss+xml": `${SITE_URL}/rss.xml`,
+    },
   },
   openGraph: {
     type: "website",
@@ -94,8 +98,10 @@ export default function RootLayout({
             that every page-level schema block references instead of
             redeclaring. */}
         <JsonLd data={siteGraphJsonLd} />
-        {children}
-        <CommandPalette />
+        <MotionProvider>
+          {children}
+          <CommandPalette />
+        </MotionProvider>
         {/* GoatCounter — privacy-friendly, cookieless page analytics.
             Skips localhost automatically; dashboard at
             https://yaseen.goatcounter.com */}

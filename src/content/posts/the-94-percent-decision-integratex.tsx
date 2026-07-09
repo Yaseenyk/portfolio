@@ -14,7 +14,7 @@ function Body() {
         the reasoning that found it.
       </p>
 
-      <h2>The trap: persisting the view instead of the truth</h2>
+      <h2>Why are your saved payloads 10x bigger than they should be?</h2>
       <p>
         A React Flow canvas holds rich UI objects — every node carries
         positions, dimensions, selection state, handles, style, z-index,

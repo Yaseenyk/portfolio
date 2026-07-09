@@ -47,7 +47,7 @@ function Body() {
         </li>
       </ul>
 
-      <h2>What &quot;solo&quot; actually means</h2>
+      <h2>What does &quot;solo&quot; mean when AI writes the code?</h2>
       <p>
         Solo does not mean I typed every character by hand like it&apos;s 2015.
         It means every decision was mine: the data model, the trust boundaries,
