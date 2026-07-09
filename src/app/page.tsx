@@ -14,6 +14,7 @@ import Dashboard from "@/components/Dashboard";
 import ContactForm from "@/components/ContactForm";
 import RoadmapSection from "@/components/RoadmapSection";
 import RecentPosts from "@/components/RecentPosts";
+import Testimonials from "@/components/Testimonials";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import JsonLd from "@/components/JsonLd";
@@ -125,6 +126,7 @@ export default function Home() {
           <Dashboard />
           <RoadmapSection />
           <RecentPosts posts={recent} />
+          <Testimonials />
           <ContactForm />
         </main>
 
