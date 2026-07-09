@@ -55,9 +55,10 @@ jobs:
           # Custom domain → served at root, so no basePath. Used for
           # canonical/OG/JSON-LD/sitemap URLs.
           NEXT_PUBLIC_SITE_URL: https://yaseenkhatib.streamerosai.com
-          # Uncomment once the Concierge Worker is live (its workers.dev URL,
-          # no trailing slash) to switch the terminal from mock to real RAG:
-          # NEXT_PUBLIC_CONCIERGE_URL: https://yaseen-concierge.<subdomain>.workers.dev
+          # The Concierge Worker (worker/) — switches the terminal from its
+          # offline mock to real RAG; the terminal falls back to the mock if
+          # the worker is ever unreachable.
+          NEXT_PUBLIC_CONCIERGE_URL: https://yaseen-concierge.yaseenyk.workers.dev
 
       - name: Disable Jekyll
         run: touch ./out/.nojekyll
