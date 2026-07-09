@@ -23,7 +23,7 @@ export interface Env {
 }
 
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
-const GEN_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+const GEN_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const MIN_SCORE = 0.55;
 const SITE = "https://yaseenkhatib.streamerosai.com";
 

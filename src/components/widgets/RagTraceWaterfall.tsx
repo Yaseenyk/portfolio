@@ -99,11 +99,11 @@ export default function RagTraceWaterfall() {
             role="switch"
             aria-checked={cache}
             onClick={() => setCache((c) => !c)}
-            className={`relative h-5 w-9 rounded-full transition-colors ${cache ? "bg-cyan" : "bg-zinc-700"}`}
+            className={`flex h-5 w-9 shrink-0 items-center rounded-full px-0.5 transition-colors ${
+              cache ? "justify-end bg-cyan" : "justify-start bg-zinc-700"
+            }`}
           >
-            <span
-              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${cache ? "translate-x-4" : "translate-x-0.5"}`}
-            />
+            <span className="h-4 w-4 rounded-full bg-white" />
           </button>
           semantic cache
         </label>
