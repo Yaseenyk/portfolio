@@ -3,12 +3,16 @@ import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import GradientText from "@/components/GradientText";
 import WorkflowCanvas from "./WorkflowCanvas";
+import SerializationBench from "./SerializationBench";
 import FinOpsSimulator from "@/components/widgets/FinOpsSimulator";
 import ChaosToggle from "@/components/widgets/ChaosToggle";
+import RagTraceWaterfall from "@/components/widgets/RagTraceWaterfall";
+import GuardrailPlayground from "@/components/widgets/GuardrailPlayground";
+import WebVitalsPanel from "@/components/widgets/WebVitalsPanel";
 import { SITE_URL } from "@/lib/site";
 
 const DESCRIPTION =
-  "A live, interactive React Flow sandbox modelling a workflow-automation pipeline — Webhook Trigger → LLM Processor → Database Write. Drag the nodes, rewire the edges; state is managed with Zustand. A working demonstration of the IntegrateX node-graph architecture.";
+  "An interactive engineering lab: a live React Flow workflow canvas with a real-time serialization bench proving the 94% payload reduction, an AI FinOps cost simulator, a chaos-engineering degrader, a RAG trace waterfall with semantic caching, an attackable guardrail playground, and this page's own live Core Web Vitals.";
 
 export const metadata: Metadata = {
   title: { absolute: "Sandbox | Live React Flow Workflow Engine" },
@@ -70,6 +74,9 @@ export default function SandboxPage() {
             handles to connect
           </p>
 
+          {/* Live proof of the 94% serialization claim, fed by the canvas above */}
+          <SerializationBench />
+
           <section className="mt-24" aria-labelledby="lab-heading">
             <div className="flex items-center gap-3">
               <h2
@@ -92,6 +99,69 @@ export default function SandboxPage() {
             <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
               <FinOpsSimulator />
               <ChaosToggle />
+            </div>
+          </section>
+
+          <section className="mt-24" aria-labelledby="obs-heading">
+            <div className="flex items-center gap-3">
+              <h2
+                id="obs-heading"
+                className="font-mono text-xs uppercase tracking-[0.25em] text-cyan"
+              >
+                ~/observability
+              </h2>
+              <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
+            </div>
+            <h3 className="mt-6 max-w-3xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+              Every AI request is a <GradientText>trace</GradientText>.
+            </h3>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+              A RAG pipeline you can&apos;t see span-by-span is a pipeline you
+              can&apos;t debug or price. Run the query cold, then flip the
+              semantic cache on and watch the same question collapse to a
+              handful of milliseconds.
+            </p>
+            <div className="mt-10">
+              <RagTraceWaterfall />
+            </div>
+          </section>
+
+          <section className="mt-24" aria-labelledby="guard-heading">
+            <div className="flex items-center gap-3">
+              <h2
+                id="guard-heading"
+                className="font-mono text-xs uppercase tracking-[0.25em] text-cyan"
+              >
+                ~/guardrails
+              </h2>
+              <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
+            </div>
+            <h3 className="mt-6 max-w-3xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+              Go ahead — <GradientText>attack it</GradientText>.
+            </h3>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+              Production agents survive adversarial input through layered,
+              deterministic defenses — not polite prompting. Try an injection,
+              leak some PII, ask something off-topic, and watch each layer rule
+              on it.
+            </p>
+            <div className="mt-10">
+              <GuardrailPlayground />
+            </div>
+          </section>
+
+          <section className="mt-24" aria-labelledby="vitals-heading">
+            <div className="flex items-center gap-3">
+              <h2
+                id="vitals-heading"
+                className="font-mono text-xs uppercase tracking-[0.25em] text-cyan"
+              >
+                ~/vitals
+              </h2>
+              <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
+            </div>
+            <div className="mt-10">
+              <WebVitalsPanel />
             </div>
           </section>
         </main>

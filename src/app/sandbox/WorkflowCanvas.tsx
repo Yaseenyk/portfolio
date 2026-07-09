@@ -85,7 +85,8 @@ interface FlowState {
   onConnect: (connection: Connection) => void;
 }
 
-const useFlowStore = create<FlowState>((set, get) => ({
+// Exported so the SerializationBench can measure the live canvas state.
+export const useFlowStore = create<FlowState>((set, get) => ({
   nodes: initialNodes,
   edges: initialEdges,
   onNodesChange: (changes) =>
