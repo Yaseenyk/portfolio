@@ -37,6 +37,7 @@ ${latest.map((p) => `- [${p.title}](${SITE_URL}/blog/${p.slug}): ${p.description
 
 ## Full archives
 
+- [Full article corpus, plain text](${SITE_URL}/llms-full.txt)
 - [Blog index](${SITE_URL}/blog)
 - [RSS feed](${SITE_URL}/rss.xml)
 - [Sitemap](${SITE_URL}/sitemap.xml)

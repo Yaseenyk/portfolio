@@ -384,31 +384,34 @@ export default function ArchitecturePipeline() {
             )}
           </svg>
 
-          {/* Mini-dashboard nodes (positioned over the curves) */}
-          <NodeCard
-            title="Database"
-            engaged={engaged}
+          {/* Mini-dashboard nodes (positioned over the curves).
+              Positioning lives on plain wrapper divs: NodeCard is a motion.div
+              whose animated `x` (shake) writes an inline transform that would
+              clobber the -translate-x/y-1/2 centering classes. */}
+          <div
             className="absolute z-10 w-40 -translate-x-1/2 -translate-y-1/2 xl:w-52"
             style={POS.database}
           >
-            <DatabaseViz engaged={engaged} />
-          </NodeCard>
-          <NodeCard
-            title="Backend API"
-            engaged={engaged}
+            <NodeCard title="Database" engaged={engaged}>
+              <DatabaseViz engaged={engaged} />
+            </NodeCard>
+          </div>
+          <div
             className="absolute z-10 w-40 -translate-x-1/2 -translate-y-1/2 xl:w-52"
             style={POS.backend}
           >
-            <BackendViz engaged={engaged} />
-          </NodeCard>
-          <NodeCard
-            title="Frontend UI"
-            engaged={engaged}
+            <NodeCard title="Backend API" engaged={engaged}>
+              <BackendViz engaged={engaged} />
+            </NodeCard>
+          </div>
+          <div
             className="absolute z-10 w-40 -translate-x-1/2 -translate-y-1/2 xl:w-52"
             style={POS.frontend}
           >
-            <FrontendViz engaged={engaged} />
-          </NodeCard>
+            <NodeCard title="Frontend UI" engaged={engaged}>
+              <FrontendViz engaged={engaged} />
+            </NodeCard>
+          </div>
         </div>
       </div>
 

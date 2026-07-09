@@ -74,3 +74,34 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # AEO: tell Bing (whose index feeds ChatGPT search) about new/changed posts
+  # the moment they deploy, instead of waiting for a re-crawl. The key is not
+  # a secret — it is published at /​<key>.txt by design of the protocol.
+  indexnow:
+    needs: deploy
+    runs-on: ubuntu-latest
+    env:
+      SITE: https://yaseenkhatib.streamerosai.com
+      KEY: e8cf5c826c584768e21217b4ecbaaf79
+    steps:
+      - name: Checkout (with parent commit for the diff)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Submit changed URLs to IndexNow
+        run: |
+          urls=("$SITE/" "$SITE/blog/")
+          for f in $(git diff --name-only HEAD^ HEAD -- src/content 2>/dev/null); do
+            [ -f "$f" ] || continue
+            slug=$(grep -oP 'slug:\s*"?\K[^",]+' "$f" | head -1)
+            [ -z "$slug" ] && slug=$(basename "${f%.*}")
+            urls+=("$SITE/blog/$slug/")
+          done
+          printf 'submitting %s urls:\n' "${#urls[@]}"; printf '  %s\n' "${urls[@]}"
+          json=$(printf '"%s",' "${urls[@]}"); json="[${json%,}]"
+          curl -sS -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "{\"host\":\"yaseenkhatib.streamerosai.com\",\"key\":\"$KEY\",\"keyLocation\":\"$SITE/$KEY.txt\",\"urlList\":$json}" \
+            -w "\nHTTP %{http_code}\n" || true

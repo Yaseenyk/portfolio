@@ -16,6 +16,7 @@ import {
 import { getMdxSlugs, getMdxPostBySlug, getAllMdxMeta } from "@/lib/mdx";
 import { resolveLesson } from "@/lib/series";
 import { PERSON_ID, personRef, breadcrumbJsonLd } from "@/lib/seo";
+import { tagSlug } from "@/lib/tags";
 import JsonLd from "@/components/JsonLd";
 import ReadingProgress from "@/components/blog/ReadingProgress";
 import RoadmapStepper from "@/components/blog/RoadmapStepper";
@@ -250,6 +251,21 @@ export default async function BlogPostPage({ params }: PageProps) {
             {post.author.name} · {post.author.role}
           </span>
         </div>
+
+        {/* Tag links — internal routes to the tag archive pages */}
+        {post.tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {post.tags.map((tag) => (
+              <Link
+                key={tag}
+                href={`/blog/tag/${tagSlug(tag)}`}
+                className="rounded-full border border-zinc-800 bg-white/[0.02] px-3 py-1 font-mono text-[11px] text-zinc-400 transition-colors hover:border-cyan/50 hover:text-cyan"
+              >
+                #{tag}
+              </Link>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Cover image — same asset served as the og:image share card */}
@@ -339,6 +355,36 @@ export default async function BlogPostPage({ params }: PageProps) {
           </ul>
         </nav>
       )}
+
+      {/* Author box — entity reinforcement, funnels to the canonical bio */}
+      <aside className="mt-16 flex items-center gap-5 rounded-2xl border border-zinc-800/60 bg-zinc-950/60 p-6 backdrop-blur-md">
+        <div
+          aria-hidden
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-purple/10"
+        >
+          <span className="text-gradient animate-gradient text-lg font-semibold tracking-tight">
+            YK
+          </span>
+        </div>
+        <div className="text-sm">
+          <p className="font-semibold text-zinc-100">
+            {post.author.name}{" "}
+            <span className="font-normal text-zinc-500">
+              · {post.author.role}
+            </span>
+          </p>
+          <p className="mt-1 leading-relaxed text-zinc-400">
+            Ships autonomous AI products solo — five in the last twelve
+            months.{" "}
+            <Link
+              href="/about"
+              className="text-ice underline-offset-4 hover:underline"
+            >
+              More about Yaseen →
+            </Link>
+          </p>
+        </div>
+      </aside>
 
       {/* Footer CTA */}
       <div className="mt-16 overflow-hidden rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-purple/10 p-8 text-center backdrop-blur-md sm:p-10">
