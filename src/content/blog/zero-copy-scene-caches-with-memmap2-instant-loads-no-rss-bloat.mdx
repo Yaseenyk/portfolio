@@ -1,0 +1,290 @@
+---
+title: 'Zero-copy scene caches with memmap2: instant loads, no RSS bloat'
+slug: zero-copy-scene-caches-with-memmap2-instant-loads-no-rss-bloat
+date: '2026-07-10'
+description: Use memory-mapped files to load massive scene assets instantly and safely
+  without duplicating data in heap and page cache. Concrete Rust patterns inside.
+tags:
+- Rust
+- Systems
+- Graphics
+keywords:
+- rust memmap2 example
+- memory-mapped assets zero-copy
+- scene asset cache without doubling rss
+- mmap vs read performance rust
+- bytemuck zerocopy rust assets
+- gltf buffer zero-copy
+- windows file mapping rust memmap2
+readingMinutes: 8
+takeaways:
+- Memory-map asset packs to avoid duplicating data in heap and OS page cache, keeping
+  RSS flat during “loads.”
+- Design your pack format for alignment, offset indexing, and zero-copy typed views
+  using bytemuck/zerocopy.
+- Use Arc<Mmap> for thread-safe sharing and OS-backed eviction; prefer replace-on-write
+  file updates over in-place mutations.
+- mmap shines for large, read-mostly assets; if you must decompress, use seekable,
+  chunked codecs and recycle small decode buffers.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why memory maps fix your “double RSS” load problem
+
+If you read scene assets into heap buffers, the OS still holds those file pages in the page cache. You’ve effectively got two copies: page cache + heap. Memory-mapping lets your process directly reference the cached pages, so “loading” is just pointer math plus page faults. Result: instant open, flat RSS, and OS-managed eviction.
+
+## How do you load large scene assets instantly without doubling memory?
+
+Map your asset pack with memmap2 and parse structures in-place instead of copying into heap buffers. Store offsets and lengths for each asset in a small index, guarantee alignment in the packer, and present typed views using bytemuck/zerocopy. Share a single Arc<Mmap> across threads. Loading becomes tiny index reads and slice borrows.
+
+### Background: OS page cache and RSS gotchas
+
+- read() copies file data into your heap; the same data often remains in the OS page cache. That inflates RSS and kills warm-starts.
+- mmap() maps file pages directly into your virtual address space. Accessing them faults pages in, but you don’t allocate heap for the payload.
+- With read-only maps and immutable packs, you get ideal sharing across processes and zero extra copies.
+
+### A zero-copy scene pack layout
+
+Design a single file “pack” with a fixed header, a compact index, and payload blobs aligned for zero-copy typed views.
+
+- Header: magic, version, entry count
+- Entry: offset (u64), length (u32), kind (u16), align (u16), name_hash (u64)
+- Payloads: blobs aligned to entry.align (e.g., 16 for f32x4)
+
+This lets you:
+- Compute &[u8] slices by offset/length without parsing.
+- Cast slices to typed views if alignment matches (e.g., &[f32], &[u16]).
+
+## Rust implementation with memmap2
+
+Install deps:
+
+```bash
+cargo add memmap2 bytemuck anyhow thiserror
+```
+
+Pack structs and a reader that uses zero-copy views:
+
+```rust
+use std::{fs::File, mem::size_of, path::Path, sync::Arc};
+use anyhow::{bail, Context, Result};
+use bytemuck::{bytes_of, cast_slice, Pod, Zeroable};
+use memmap2::{Mmap, MmapOptions};
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Pod, Zeroable)]
+struct PackHeader {
+    magic: [u8; 4],   // b"SCN\0"
+    version: u32,     // 1
+    count: u32,       // number of entries
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Pod, Zeroable)]
+struct PackEntry {
+    offset: u64,      // byte offset into file where payload starts
+    len: u32,         // payload length in bytes
+    kind: u16,        // app-specific (e.g., 1=positions, 2=uvs, 3=index, 100=texture)
+    align: u16,       // required alignment of payload
+    name_hash: u64,   // stable id or hashed path
+}
+
+#[derive(Clone)]
+pub struct ScenePack {
+    mmap: Arc<Mmap>,
+    entries: Arc<[PackEntry]>,
+}
+
+impl ScenePack {
+    pub fn open(path: impl AsRef<Path>) -> Result<Self> {
+        let file = File::open(path)?;
+        let mmap = unsafe { MmapOptions::new().map(&file)? };
+        if mmap.len() < size_of::<PackHeader>() { bail!("pack too small"); }
+        let (hdr_bytes, rest) = mmap.split_at(size_of::<PackHeader>());
+        let hdr: &PackHeader = bytemuck::from_bytes(hdr_bytes);
+        if &hdr.magic != b"SCN\0" { bail!("bad magic"); }
+        if hdr.version != 1 { bail!("unsupported version"); }
+        let need = hdr.count as usize * size_of::<PackEntry>();
+        if rest.len() < need { bail!("truncated entries"); }
+        let entries: &[PackEntry] = cast_slice(&rest[..need]);
+        Ok(ScenePack { mmap: Arc::new(mmap), entries: Arc::from(entries) })
+    }
+
+    pub fn entry_by_hash(&self, name_hash: u64) -> Option<&PackEntry> {
+        self.entries.iter().find(|e| e.name_hash == name_hash)
+    }
+
+    pub fn bytes(&self, e: &PackEntry) -> Result<&[u8]> {
+        let start = e.offset as usize;
+        let end = start.checked_add(e.len as usize).context("overflow")?;
+        if end > self.mmap.len() { bail!("slice OOB"); }
+        let slice = &self.mmap[start..end];
+        // cheap alignment assertion (helpful during bring-up)
+        if (slice.as_ptr() as usize) % (e.align.max(1) as usize) != 0 {
+            bail!("payload not properly aligned: required {}", e.align);
+        }
+        Ok(slice)
+    }
+
+    // Common typed views
+    pub fn as_u16(&self, e: &PackEntry) -> Result<&[u16]> {
+        let b = self.bytes(e)?;
+        if b.len() % 2 != 0 { bail!("len not multiple of u16"); }
+        Ok(bytemuck::try_cast_slice(b)?)
+    }
+
+    pub fn as_f32(&self, e: &PackEntry) -> Result<&[f32]> {
+        let b = self.bytes(e)?;
+        if b.len() % 4 != 0 { bail!("len not multiple of f32"); }
+        Ok(bytemuck::try_cast_slice(b)?)
+    }
+}
+```
+
+Notes:
+- Mapping is unsafe because concurrent mutation of the file can cause UB; keep packs immutable and update by rename.
+- Entry alignment is enforced by the packer, verified by the reader.
+- Arc<Mmap> makes sharing across threads trivial; no copies, just borrowed slices.
+
+### Packer sketch: aligned payloads, compact index
+
+A minimal packer that aligns payloads and writes header+entries+blobs:
+
+```rust
+use std::{fs::File, io::{Seek, SeekFrom, Write}, path::Path};
+
+fn align_to(x: u64, a: u64) -> u64 { ((x + a - 1) / a) * a }
+
+pub fn write_pack(out: impl AsRef<Path>, mut blobs: Vec<(u64 /*name_hash*/, u16 /*kind*/, u16 /*align*/, Vec<u8>)>) -> anyhow::Result<()> {
+    blobs.sort_by_key(|b| b.2.max(1)); // optional: group by alignment
+    let mut file = File::create(out)?;
+
+    let header = PackHeader { magic: *b"SCN\0", version: 1, count: blobs.len() as u32 };
+    file.write_all(bytes_of(&header))?;
+    let entries_pos = file.seek(SeekFrom::Current(0))?;
+    // reserve space for entries
+    let zero = PackEntry::zeroed();
+    for _ in 0..blobs.len() { file.write_all(bytes_of(&zero))?; }
+
+    let mut entries = Vec::with_capacity(blobs.len());
+    let mut cursor = file.seek(SeekFrom::Current(0))?;
+
+    for (name_hash, kind, align, data) in &blobs {
+        let a = (*align).max(1) as u64;
+        let aligned = align_to(cursor, a);
+        if aligned > cursor {
+            let pad = (aligned - cursor) as usize;
+            file.write_all(&vec![0u8; pad])?;
+            cursor = aligned;
+        }
+        file.write_all(data)?;
+        let entry = PackEntry { offset: cursor, len: data.len() as u32, kind: *kind, align: *align, name_hash: *name_hash };
+        cursor += data.len() as u64;
+        entries.push(entry);
+    }
+
+    // Write entries
+    file.seek(SeekFrom::Start(entries_pos))?;
+    for e in &entries { file.write_all(bytemuck::bytes_of(e))?; }
+    Ok(())
+}
+```
+
+With this layout, a “load” path becomes: open file, mmap, cast header and entry table, then borrow slices for each asset — no per-asset I/O syscalls, no heap copies.
+
+## When should you choose mmap over read() for asset caching?
+
+Choose mmap for large, read-mostly assets you access repeatedly or randomly; it avoids heap duplication and leverages the page cache. Prefer read() for tiny files, streaming sockets, or when you must control buffer lifetime independent from a file descriptor.
+
+### Quick comparison
+
+| Scenario | mmap | read() |
+|---|---|---|
+| Large, random-access meshes/textures | Excellent | Poor (many small reads/copies) |
+| Instant warm-start (data cached) | Excellent | Good but doubles memory |
+| Tiny config files | Overkill | Fine |
+| Shared across processes | Great (shared pages) | Not shared |
+| Needs mutation | Risky (COW/consistency) | Safer (explicit buffers) |
+
+## Concurrency, eviction, and partial prefetch
+
+- Sharing: memmap2’s Mmap is Send + Sync; wrap in Arc and hand out typed views. Slices borrow the same mapping, so overhead is near-zero.
+- Eviction: the OS evicts cold pages transparently. Dropping the Arc unmaps our VMA, and the kernel can drop pages sooner.
+- Prefetch: on Linux/macOS you can call madvise(WILLNEED)/posix_fadvise to warm pages. In Rust, call libc::madvise on mmap.as_ptr() as needed. Keep it optional; readahead is usually good enough.
+
+## Example: scene graph that hands out typed buffers
+
+Suppose your app expects position buffers (f32 triplets) and index buffers (u16). The cache maps once and returns typed slices by hash.
+
+```rust
+use std::collections::HashMap;
+use anyhow::{Result, bail};
+
+#[derive(Clone)]
+pub struct SceneCache {
+    pack: ScenePack,
+    // maps logical names to entry indices
+    lut: HashMap<u64, usize>,
+}
+
+impl SceneCache {
+    pub fn from_pack(pack: ScenePack) -> Self {
+        let lut = pack.entries.iter().enumerate().map(|(i, e)| (e.name_hash, i)).collect();
+        Self { pack, lut }
+    }
+
+    pub fn positions(&self, name_hash: u64) -> Result<&[f32]> {
+        let idx = *self.lut.get(&name_hash).ok_or_else(|| anyhow::anyhow!("missing"))?;
+        let e = &self.pack.entries[idx];
+        if e.kind != 1 { bail!("not positions"); }
+        let f = self.pack.as_f32(e)?;
+        if f.len() % 3 != 0 { bail!("positions not multiple of 3"); }
+        Ok(f)
+    }
+
+    pub fn indices(&self, name_hash: u64) -> Result<&[u16]> {
+        let idx = *self.lut.get(&name_hash).ok_or_else(|| anyhow::anyhow!("missing"))?;
+        let e = &self.pack.entries[idx];
+        if e.kind != 3 { bail!("not indices"); }
+        self.pack.as_u16(e)
+    }
+}
+```
+
+This supports instant “loading” of scenes: on a cold start, you incur page faults proportional to what you actually touch; on warm starts, all buffers are ready without growing RSS.
+
+## Does mmap still help if my assets are compressed?
+
+Yes, but map a seekable, chunk-compressed container (e.g., zstd-seekable) and decompress on demand into small, recyclable scratch buffers. You still avoid a giant monolithic heap buffer. Align and bound chunk sizes (e.g., 128–512 KiB) to balance random access and CPU cost.
+
+### A note on glTF and friends
+
+For glTF/GLB, the binary buffer is already contiguous. If you can pack buffers in-place and ensure alignment, you can cast directly to typed slices. Avoid copying into temporary Vecs; prefer borrowing ranges from the mapped buffer and validating bounds with the accessors.
+
+## Production notes: updates, portability, and safety
+
+- Immutable updates: never mutate a mapped file. Write a new pack, fsync, then rename over the old path. Keep the old pack mapped until references drop; the OS keeps the inode alive.
+- Windows sharing: std::fs::File opens with sharing flags that typically allow readers and writers. Still, avoid in-place overwrite; prefer replace-on-rename for consistency.
+- 32-bit processes: address space is limited; mapping very large packs can fail. Keep packs <2–3 GiB or move to 64-bit.
+- Bounds and lifetimes: always validate offsets/lengths and keep entries tied to the Arc<Mmap) owner (as in ScenePack). Avoid leaking &'static references.
+- Security: treat packs as untrusted if user-supplied; validate magic, version, counts, alignment, and all arithmetic.
+
+## Micro-optimizations that matter (sometimes)
+
+- Group entries by alignment or spatial locality to reduce TLB pressure.
+- Place frequently co-accessed buffers adjacently to leverage readahead.
+- Consider huge pages only after measuring. Random access patterns rarely benefit.
+- If you must drop cache explicitly (for massive level swaps), madvise(DONTNEED) on ranges you no longer need. Measure; the kernel is usually smarter.
+
+## Debugging and measuring
+
+- RSS/VSZ: watch with top/htop. With mmap, RSS should not jump during “load.”
+- mincore/fincore: shows which pages are resident.
+- perf/ETW: page fault counts and I/O.
+- Flamegraphs: ensure no memcpy dominates your load path.
+
+## The bottom line
+
+Memory mapping flips asset “loading” into a metadata problem. Validate a tiny header, cast an index, and borrow slices out of a single Arc<Mmap>. No redundant copies, no ballooning RSS, and instant warm-starts. Design your pack for alignment and immutability, and let the kernel do the heavy lifting.
