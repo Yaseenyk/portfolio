@@ -1,0 +1,343 @@
+---
+title: Kill Async Deadlocks in Tauri with Tokio Task Dumps + Tracing
+slug: kill-async-deadlocks-in-tauri-with-tokio-task-dumps-tracing
+date: '2026-07-11'
+description: A field guide to diagnosing and terminating async deadlocks in production
+  Tauri apps using Tokio task dumps, tokio-console, and end-to-end tracing spans.
+tags:
+- Backend
+- Rust
+- Tauri
+- Observability
+keywords:
+- tokio task dump tauri
+- tokio-console production setup
+- tauri tracing spans rust
+- abort stuck tokio task safely
+- tokio deadlock detection tracing
+- async deadlock tauri rust
+- tokio_unstable console subscriber
+readingMinutes: 7
+takeaways:
+- Instrument your Tauri runtime with tokio-console and tracing to get actionable task
+  dumps in production.
+- Name, scope, and time-box every long-running task; register CancellationTokens so
+  you can abort safely.
+- 'Most Tauri deadlocks are self-inflicted: blocking in async, holding std::sync::Mutex
+  across awaits, or cyclic waits.'
+- Expose a guarded diagnostics command in Tauri to fetch task dumps and kill pathological
+  tasks without restarting.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why Tauri apps deadlock under load (and what “deadlock” really means here)
+A “deadlock” in async Rust is often not a classic lock-order cycle; it’s cooperative-scheduler starvation. Common causes:
+- Using std::sync::Mutex/Blocking IO inside an async context, holding it across `.await`.
+- Awaiting a task that is itself awaiting you (cyclic dependency via channels/locks).
+- Overloaded single-threaded sections (e.g., local tasks, JS event loop handoffs) with no budget for progress.
+- Back-pressure without timeouts: bounded channels at capacity with no cancellation path.
+
+Tokio and Tauri won’t save you; you need visibility into tasks and spans, plus the ability to cancel work.
+
+## How do I dump Tokio tasks in a production Tauri app?
+Enable tokio-console via console-subscriber and compile with tokio_unstable. Bind the console server on an internal/loopback port and connect with the tokio-console TUI. In production, guard this behind a feature flag or an authenticated command, then capture a task dump to correlate with tracing spans.
+
+### 1) Wire up console-subscriber and tracing
+
+```toml
+# Cargo.toml
+[dependencies]
+tauri = "1" # or "2"; works the same for the Rust side
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
+console-subscriber = "0.2"
+once_cell = "1"
+dashmap = "5"
+tokio-util = { version = "0.7", features = ["rt"] } # for CancellationToken
+uuid = { version = "1", features = ["v4"] }
+```
+
+```toml
+# .cargo/config.toml
+[build]
+rustflags = ["--cfg", "tokio_unstable"]  # required by console-subscriber/console
+```
+
+```rust
+// src/main.rs
+use once_cell::sync::Lazy;
+use dashmap::DashMap;
+use std::time::{Duration, Instant};
+use tokio::{task::JoinHandle, time};
+use tokio_util::sync::CancellationToken;
+use tracing::{info, warn};
+use tracing_subscriber::{prelude::*, EnvFilter, Registry};
+
+#[derive(Clone)]
+struct TrackedTask {
+    name: &'static str,
+    started: Instant,
+    cancel: CancellationToken,
+    handle: JoinHandle<()>,
+}
+
+static TASKS: Lazy<DashMap<uuid::Uuid, TrackedTask>> = Lazy::new(DashMap::new);
+
+fn init_observability() {
+    let console_layer = console_subscriber::spawn();
+    let fmt = tracing_subscriber::fmt::layer().with_target(false);
+    let filter = EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| EnvFilter::new("info,tauri_app=trace,tokio=info"));
+
+    Registry::default().with(console_layer).with(filter).with(fmt).init();
+}
+
+fn spawn_named<F>(name: &'static str, fut: F) -> uuid::Uuid
+where
+    F: std::future::Future<Output = ()> + Send + 'static,
+{
+    let id = uuid::Uuid::new_v4();
+    let cancel = CancellationToken::new();
+    let span = tracing::info_span!("task", %id, name);
+    let handle = tokio::spawn({
+        let cancel = cancel.clone();
+        async move {
+            let _e = span.enter();
+            tokio::select! {
+                _ = fut => {},
+                _ = cancel.cancelled() => warn!(%id, name, "task cancelled"),
+            }
+        }
+    });
+
+    TASKS.insert(
+        id,
+        TrackedTask {
+            name,
+            started: Instant::now(),
+            cancel,
+            handle,
+        },
+    );
+    id
+}
+
+#[tauri::command]
+async fn diagnostics_start_console() -> String {
+    // With console-subscriber this env var controls the bind address for the gRPC server
+    // Set once at startup via env: TOKIO_CONSOLE_BIND=127.0.0.1:6669
+    // Here we just return where to connect.
+    std::env::var("TOKIO_CONSOLE_BIND").unwrap_or_else(|_| "127.0.0.1:6669".to_string())
+}
+
+#[tauri::command]
+async fn diagnostics_dump_tasks() -> Vec<String> {
+    TASKS
+        .iter()
+        .map(|e| format!("{} {} age={:?}", e.key(), e.value().name, e.value().started.elapsed()))
+        .collect()
+}
+
+#[tauri::command]
+async fn diagnostics_kill_task(id: String) -> bool {
+    if let Ok(uuid) = uuid::Uuid::parse_str(&id) {
+        if let Some((_, t)) = TASKS.remove(&uuid) {
+            t.cancel.cancel();
+            t.handle.abort();
+            return true;
+        }
+    }
+    false
+}
+
+fn main() {
+    init_observability();
+
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![
+            diagnostics_start_console,
+            diagnostics_dump_tasks,
+            diagnostics_kill_task
+        ])
+        .setup(|_app| {
+            // watchdog: log any task older than N seconds
+            tokio::spawn(async move {
+                loop {
+                    for e in TASKS.iter() {
+                        if e.started.elapsed() > Duration::from_secs(30) {
+                            warn!(task.id=%e.key(), name=e.name, age=?e.started.elapsed(), "long-running task");
+                        }
+                    }
+                    time::sleep(Duration::from_secs(5)).await;
+                }
+            });
+            Ok(())
+        })
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
+```
+
+### 2) Run tokio-console against your live app
+
+```bash
+# Build with tokio_unstable, run locally or on a host you can port-forward from
+export RUST_LOG=info,tauri_app=trace,tokio=info
+export TOKIO_CONSOLE_BIND=127.0.0.1:6669
+./YourTauriApp
+
+# On your workstation
+cargo install tokio-console
+TOKIO_CONSOLE_ADDR=127.0.0.1:6669 tokio-console
+```
+
+You’ll see every task, its state (running/idle), waker counts, and spans. Filter by span fields to find long-lived tasks and their causal chain.
+
+## How do I kill a stuck Tokio task safely?
+Track long-running jobs with CancellationTokens and JoinHandles. On an admin command, cancel first (cooperative), then abort if it ignores cancellation. Always wrap work in `tokio::select!` listening on the token; don’t forget timeouts on awaits and channels to avoid re-deadlocking abort logic.
+
+```rust
+#[tracing::instrument(name = "index_large_tree", skip_all, fields(req_id=%req_id))]
+pub async fn index_large_tree(req_id: &str, root: String) {
+    let id = spawn_named("indexer", async move {
+        // Simulate: walk filesystem + channel fanout with timeout guards
+        if let Err(e) = do_index(root).await {
+            tracing::error!(?e, "index failed");
+        }
+    });
+    info!(%id, "spawned indexer");
+}
+
+async fn do_index(root: String) -> anyhow::Result<()> {
+    use tokio::fs;
+    use tokio::time::{timeout, Duration};
+
+    // Time-box IO hot spots
+    let entries = timeout(Duration::from_secs(10), fs::read_dir(&root)).await??;
+    // ... fan out work over channels with bounded capacity and timeouts
+    Ok(())
+}
+
+#[tauri::command]
+async fn kill_long_tasks(older_than_secs: u64) -> usize {
+    let mut killed = 0;
+    let threshold = Duration::from_secs(older_than_secs);
+    for e in TASKS.iter() {
+        if e.started.elapsed() > threshold {
+            e.cancel.cancel();
+            e.handle.abort();
+            killed += 1;
+        }
+    }
+    killed
+}
+```
+
+Key points:
+- Always provide a cooperative cancellation path.
+- Add timeouts around external IO/channel sends.
+- Abort as a last resort; it unwinds the future immediately and drops resources.
+
+## What are the classic async deadlocks in Tokio (and how do I avoid them)?
+
+### Holding a std::sync::Mutex across awaits
+
+```rust
+use std::sync::Mutex; // Bad in async hot-paths
+use tokio::task;
+
+struct Shared { data: Mutex<Vec<u8>> }
+
+async fn bad(shared: &'static Shared) {
+    let mut g = shared.data.lock().unwrap();
+    // Any .await here can starve other threads waiting for this OS mutex
+    task::yield_now().await; // <- boom: other tasks can’t progress
+    g.push(1);
+}
+```
+
+Fix: use `tokio::sync::Mutex` (or better: design to avoid holding locks across await points), and keep critical sections tiny.
+
+```rust
+use tokio::sync::Mutex; // Async-aware lock
+
+struct Shared { data: Mutex<Vec<u8>> }
+
+async fn good(shared: &'static Shared) {
+    {
+        let mut g = shared.data.lock().await;
+        g.push(1);
+    } // lock released before any .await following
+    tokio::task::yield_now().await;
+}
+```
+
+### Cyclic waits via channels
+Bounded channels without timeouts commonly freeze pipelines.
+
+```rust
+use tokio::sync::mpsc;
+
+async fn bad_cycle() {
+    let (tx, mut rx) = mpsc::channel::<()>(1);
+    let tx2 = tx.clone();
+
+    let _t1 = tokio::spawn(async move {
+        // waits for t2, but t2 waits for t1 to recv -> deadlock
+        tx2.send(()).await.ok();
+    });
+
+    // t2
+    let _t2 = tokio::spawn(async move {
+        rx.recv().await; // waiting forever if no capacity
+    });
+}
+```
+
+Fix: break cycles and add `select!` with timeouts/cancellation; use `try_send` where appropriate.
+
+## How do I propagate a request ID from React to Rust tracing?
+Attach a UUID in your frontend request and pass it as a command argument. In Rust, record it as a tracing span field via `#[instrument]`. This gives you end-to-end correlation in logs and in tokio-console, so you can filter the exact stuck workflow.
+
+```ts
+// src/renderer/diagnostics.ts
+import { invoke } from "@tauri-apps/api/tauri";
+import { v4 as uuid } from "uuid";
+
+export async function runIndex(root: string) {
+  const reqId = uuid();
+  await invoke("index_large_tree_cmd", { reqId, root });
+  return reqId;
+}
+```
+
+```rust
+// src/commands.rs
+use tracing::instrument;
+
+#[tauri::command]
+#[instrument(name = "index_large_tree_cmd", skip_all, fields(req_id = %req_id, root = %root))]
+pub async fn index_large_tree_cmd(req_id: String, root: String) -> Result<(), String> {
+    index_large_tree(&req_id, root).await;
+    Ok(())
+}
+```
+
+Now `RUST_LOG=tauri_app=trace` will emit structured logs with `req_id=...`. In tokio-console, filter by that field to see every task/span involved.
+
+## Operating this in production
+- Gate diagnostics with a feature flag and a role check in your Tauri command handler.
+- Bind tokio-console to loopback and use SSH/tailscale port-forwarding; never expose it publicly.
+- Emit JSON logs with tracing-subscriber and include `span.current` fields for ingestion (Loki/ELK).
+- Budget every await with a timeout and cancellation path; log anything older than an SLO threshold.
+
+## Troubleshooting checklist
+- Are any tasks >30s in “running” with no waker activity? They’re likely blocking or in a cycle.
+- Do long tasks hold std::sync::Mutex or do filesystem work without `spawn_blocking`? Move to `spawn_blocking` or async IO.
+- Are channels bounded and full? Add `select!` with timeout and cancellation.
+- Can you reproduce under tokio-console with simulated load? If yes, wire automated kill via `diagnostics_kill_task`.
+
+With task dumps from tokio-console and precise tracing spans, you’ll stop guessing. You’ll see who’s waiting on whom, abort the right tasks safely, and keep your Tauri UI responsive without a full restart.
