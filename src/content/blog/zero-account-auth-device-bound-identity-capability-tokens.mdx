@@ -1,0 +1,287 @@
+---
+title: 'Zero-Account Auth: Device-Bound Identity + Capability Tokens'
+slug: zero-account-auth-device-bound-identity-capability-tokens
+date: '2026-07-12'
+description: 'Build secure apps without accounts or an auth server: bind identity
+  to device keys, mint PASETO capability tokens, and enforce DPoP for stateless, least-privilege
+  access.'
+tags:
+- Backend
+- Security
+- Architecture
+keywords:
+- zero-account authentication architecture
+- device-bound tokens DPoP Node.js example
+- PASETO capability tokens example
+- WebCrypto device key storage IndexedDB
+- no auth server stateless authorization
+- macaroons vs paseto capabilities
+- DPoP verification middleware Express
+readingMinutes: 8
+takeaways:
+- Bind identity to device public keys; never create user accounts.
+- Authorize via short-lived, least-privilege capability tokens bound to the device
+  key with DPoP.
+- No auth server is required; any service can verify tokens with a shared public key.
+- 'Revocation is lifecycle-based: short TTLs, key rotation, and replay-protected proofs,
+  not per-user state.'
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why “zero-account” and what problem does it solve?
+Zero-account systems replace user accounts with device-bound identity and capability-based authorization. The device generates a key pair; the public key (or its thumbprint) is the identity. Access is granted via signed capability tokens. This eliminates passwords, reduces PII, and removes the central auth server while maintaining strong, auditable security properties.
+
+## How do you authenticate devices without an auth server?
+Use proof-of-possession. Each device generates a non-extractable key pair locally. Every request includes a DPoP proof (a signed JWT containing method, URL, and a fresh jti) and a capability token bound to that key. Resource servers verify the DPoP and ensure the capability’s confirmation claim matches the device key thumbprint—no centralized login needed.
+
+### Core pieces
+- Device key pair (identity): P-256 or Ed25519, private key stored in platform keystore or non-extractable WebCrypto key.
+- DPoP proof per request: Signed JWT with htm/htu/iat/jti to prevent replay and bind requests to the device key.
+- Capability token: A signed, scoped token (e.g., PASETO v4.public) encoding what the device can do and for how long.
+- Stateless verification: Services hold the signer’s public key and a lightweight jti-replay cache, not a user DB.
+
+## How do capability tokens replace user accounts?
+Encode permissions, resource scopes, rate/usage limits, and expiration directly in a signed token. Bind the token to the device key via a confirmation (cnf) claim. Services only need the issuer’s public key to verify and authorize requests; no per-user record, session, or cookie jar is required.
+
+### Token shape (recommended)
+- Format: PASETO v4.public (Ed25519) or Macaroons for attenuation/delegation chains.
+- Claims:
+  - sub: device identifier (e.g., JWK thumbprint)
+  - cnf: { jkt: base64url(thumbprint) } to bind token to device key
+  - cap: list of capabilities [{ act, res, limit?, nbf?, exp? }]
+  - iat/exp/jti: temporal and anti-replay metadata
+
+Example capability list:
+- act=read, res=/notes/*
+- act=write, res=/notes/{noteId}
+- limit=100 writes/24h (enforced server-side by metering on jti or sub)
+
+## Bootstrapping without accounts
+You still need an initial trust handshake, but not a login.
+- Local-first: app generates key pair on first run; shows a pairing code. A one-shot provisioning endpoint mints a first capability (e.g., via purchase receipt, license, or admin console) scoped to the device’s jkt.
+- Recurring: device refreshes capabilities via a narrow “refresh” capability, still device-bound. No username/password, no session cookies.
+
+## Client: device key generation and DPoP
+Generate a non-extractable key and send DPoP-bound API calls. In a browser, use WebCrypto; in native, use Keychain/Keystore.
+
+```ts
+// browser-client.ts
+import { exportJWK, calculateJwkThumbprint, SignJWT } from 'jose';
+
+// 1) Generate a non-extractable ES256 keypair and persist via IndexedDB (omitted for brevity)
+const { publicKey, privateKey } = await crypto.subtle.generateKey(
+  { name: 'ECDSA', namedCurve: 'P-256' },
+  false, // non-extractable private key
+  ['sign', 'verify']
+);
+
+const pubJwk = await exportJWK(publicKey as CryptoKey);
+const jkt = await calculateJwkThumbprint(pubJwk, 'sha256');
+
+// 2) DPoP signer
+async function dpopProof(method: string, url: string) {
+  return await new SignJWT({ htm: method, htu: url, jti: crypto.randomUUID() })
+    .setProtectedHeader({ typ: 'dpop+jwt', alg: 'ES256', jwk: pubJwk })
+    .setIssuedAt()
+    .sign(privateKey as CryptoKey);
+}
+
+// 3) Call API with capability token bound to this key
+export async function callApi(capToken: string, method: string, url: string, body?: any) {
+  const proof = await dpopProof(method, url);
+  const res = await fetch(url, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${capToken}`,
+      'DPoP': proof,
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+```
+
+Notes
+- privateKey is non-extractable; malware in the page can’t steal it.
+- DPoP includes htm/htu/jti/iat; replay to another URL or method fails.
+- capToken is issued out-of-band (provisioning or refresh flow) and must include cnf.jkt = jkt.
+
+## Server: verifying DPoP and PASETO capabilities
+The resource server performs two independent checks: (1) DPoP correctness and replay protection, (2) capability verification and scope enforcement.
+
+```ts
+// server-auth.ts
+import { decodeProtectedHeader, importJWK, jwtVerify, calculateJwkThumbprint } from 'jose';
+import { V4 } from 'paseto';
+import express from 'express';
+import Redis from 'ioredis';
+
+const app = express();
+app.use(express.json());
+
+// PASETO issuer keys (provisioned at deploy time)
+// In production, load from HSM or env and rotate.
+const { secretKey, publicKey } = await V4.generateKey('public');
+
+const redis = new Redis(process.env.REDIS_URL!);
+
+// Authorization middleware
+app.use(async (req, res, next) => {
+  try {
+    const dpop = req.header('DPoP');
+    const auth = req.header('Authorization');
+    if (!dpop || !auth?.startsWith('Bearer ')) return res.status(401).end();
+    const capToken = auth.slice('Bearer '.length);
+
+    // 1) Verify DPoP proof
+    const hdr = decodeProtectedHeader(dpop);
+    if (hdr.typ !== 'dpop+jwt' || !hdr.jwk) return res.status(401).end();
+    const dpopKey = await importJWK(hdr.jwk as any, hdr.alg as any);
+    const { payload } = await jwtVerify(dpop, dpopKey, {
+      typ: 'dpop+jwt',
+      clockTolerance: '5s'
+    });
+
+    const method = (payload.htm as string || '').toUpperCase();
+    const url = payload.htu as string;
+    if (method !== req.method.toUpperCase()) return res.status(401).end();
+    const expectedUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+    if (!url || !expectedUrl.startsWith(url)) return res.status(401).end();
+
+    // Anti-replay: store jti with short TTL
+    const jti = payload.jti as string;
+    if (!jti) return res.status(401).end();
+    const replay = await redis.setnx(`dpop:jti:${jti}`, '1');
+    if (!replay) return res.status(401).send('replay');
+    await redis.expire(`dpop:jti:${jti}`, 10); // seconds window
+
+    const jkt = await calculateJwkThumbprint(hdr.jwk as any, 'sha256');
+
+    // 2) Verify capability token (PASETO v4.public)
+    const cap = await V4.verify(capToken, publicKey);
+
+    // cnf binding check
+    if (!cap.cnf || cap.cnf.jkt !== jkt) return res.status(401).send('key mismatch');
+
+    // Temporal checks (paseto verifies exp/nbf if present, still validate policy)
+    if (cap.exp && Date.now() / 1000 >= cap.exp) return res.status(401).send('expired');
+
+    // Scope enforcement
+    if (!allows(cap.cap, req.method, req.path)) return res.status(403).send('forbidden');
+
+    // Optional: per-capability metering (rate/limit)
+    // await enforceLimits(cap.sub, cap.jti, cap.cap)
+
+    // Attach identity to request
+    (req as any).device = { sub: cap.sub, jkt };
+    next();
+  } catch (e) {
+    console.error(e);
+    res.status(401).end();
+  }
+});
+
+function allows(caps: any[], method: string, path: string) {
+  // Minimal example: method+path prefix match
+  return (caps || []).some(c =>
+    (!c.act || c.act.toUpperCase() === method.toUpperCase()) &&
+    pathMatch(c.res, path)
+  );
+}
+
+function pathMatch(pattern: string, path: string) {
+  // naive: '/notes/*' => prefix match
+  if (!pattern) return false;
+  if (pattern.endsWith('/*')) return path.startsWith(pattern.slice(0, -1));
+  return pattern === path;
+}
+
+app.get('/notes/*', (req, res) => {
+  res.json({ ok: true, device: (req as any).device });
+});
+
+app.listen(3000);
+```
+
+Key points
+- DPoP header contains the public JWK; we verify and compute its thumbprint.
+- Capability token verification is stateless: only the publicKey is required.
+- cnf.jkt ensures a stolen token is useless without the device’s private key.
+
+## Issuing capability tokens (no auth server required)
+Any internal service with the signing key can mint capabilities. You can do this during provisioning, purchase validation, or admin workflows.
+
+```ts
+// issuer.ts
+import { V4 } from 'paseto';
+import { randomUUID } from 'crypto';
+
+export async function issueCapability(secretKey: any, deviceJkt: string, caps: any[], ttlSec = 3600) {
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    sub: `device:${deviceJkt}`,
+    cnf: { jkt: deviceJkt },
+    cap: caps,
+    iat: now,
+    exp: now + ttlSec,
+    jti: randomUUID(),
+    iss: 'cap-issuer:v1',
+    aud: 'api'
+  };
+  return await V4.sign(payload, secretKey);
+}
+
+// Example cap set: read-only notes
+await issueCapability(secretKey, 'kQ2…thumbprint…', [
+  { act: 'GET', res: '/notes/*' }
+], 900);
+```
+
+## How do you revoke a leaked capability token without a DB?
+Prefer lifecycle controls over stateful revocation. Use very short token TTLs, bind to device keys via cnf.jkt + DPoP, rotate signing keys, and keep a small jti denylist cache only for high-risk incidents. For long-lived tokens, include a refresh capability that you can stop minting by rotating a signer or revoking a cohort.
+
+### Practical revocation strategies
+- Short TTLs everywhere (5–15 minutes typical; seconds for high-value actions).
+- Rotate issuer keys regularly; invalidate cohorts by key ID (kid) rollover.
+- Maintain a Redis-backed jti denylist only for incident response; TTL entries to auto-expire.
+- Attenuate via nested capabilities or macaroons for delegations; revoke by refusing to mint downstream.
+
+## Macaroons vs PASETO
+| Aspect | PASETO v4.public | Macaroons |
+|---|---|---|
+| Simplicity | Single signature, flat claims | Attenuation via chained caveats |
+| Delegation | Explicit via minting new token | Natural via third-party caveats |
+| Verification | Public key verify | Shared root key + caveat verify |
+| Fit here | Great for stateless caps | Great for delegation-heavy flows |
+
+For most zero-account APIs, PASETO v4.public with cnf binding and DPoP is both simple and robust. Choose macaroons if you need on-chain attenuation and delegation proofs across services.
+
+## Threat model and mitigations
+- Token theft: neutered by cnf.jkt + DPoP; proofs replay-protected by jti cache and htm/htu binding.
+- Device compromise: out of scope; limit blast radius with least-privilege caps and short TTLs.
+- Phishing: no passwords, no sessions; phishing becomes much less effective.
+- MITM: enforce HTTPS, pin HSTS; DPoP helps detect target URL tampering.
+- Key exfiltration (browser): make private key non-extractable; prefer platform keystores in native apps.
+
+## Operational checklist
+- Rotate issuer keys and publish their public half to all services.
+- Enforce DPoP on every protected endpoint; maintain small jti replay cache.
+- Keep cap TTLs short; implement a refresh flow using a narrow-scoped refresh cap.
+- Log cap.jti, sub, and decision outcomes for auditing.
+- Use deterministic resource matching and method checks for capabilities.
+
+## What about multi-device and recovery?
+Use delegation. A primary device mints a short-lived delegation capability for a new device’s jkt via a QR or pairing code. The server issues the new device its own first-party capabilities. For recovery, rely on out-of-band ownership proofs (purchase receipt, email link that mints a new device capability) rather than a persistent account record.
+
+## MERN integration notes
+- React: hydrate app state from capabilities; no cookies. Use SWR/React Query with automatic DPoP per request.
+- Node/Express: middleware as shown; add route-level capability specs for static analysis.
+- MongoDB: index audit logs by cap.jti and sub for post-incident triage. Store no PII.
+- Next.js/SSR: avoid embedding private keys; only sign on the client or via server actions tied to device-bound refresh flows.
+
+## Closing thoughts
+Zero-account doesn’t mean zero security—quite the opposite. Device-bound identity plus capability tokens and DPoP yields strong, stateless, least-privilege authorization with less operational burden than a traditional auth server. Start with short TTLs, strict binding, and clean issuance flows; iterate toward delegation and rotation as you scale.

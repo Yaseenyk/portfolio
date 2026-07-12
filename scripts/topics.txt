@@ -1,4 +1,3 @@
-Designing a zero-account architecture: device-bound identity and capability tokens with no auth server
 Encrypting local storage at rest in a zero-cloud Tauri app with age and the OS keychain
 Server-less local-first sync: replicating settings across devices over LAN with automerge CRDTs and mDNS
 Ingesting Twitch IRC entirely on-device: a resilient WebSocket reconnect and exponential-backoff state machine in Rust
