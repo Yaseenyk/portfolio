@@ -1,0 +1,321 @@
+---
+title: Serverless local-first settings sync over LAN with Automerge + mDNS
+slug: serverless-local-first-settings-sync-over-lan-with-automerge-mdns
+date: '2026-07-14'
+description: Replicate user settings across devices on the same LAN without servers
+  by combining Automerge CRDT sync messages with mDNS peer discovery and a tiny TCP
+  transport.
+tags:
+- Backend
+- CRDTs
+- Networking
+- Local-First
+keywords:
+- automerge mDNS LAN sync example
+- local-first settings replication
+- Node.js multicast-dns peer discovery
+- TypeScript automerge sync TCP
+- serverless CRDT replication
+- Electron LAN settings sync
+- encrypt automerge sync messages
+- bonjour-service dns-sd Node
+readingMinutes: 7
+takeaways:
+- Use mDNS (DNS-SD) to discover peers and a tiny TCP socket to move Automerge sync
+  messages—no server required.
+- Automerge’s sync protocol is transport-agnostic; maintain a SyncState per peer and
+  keep generating messages until null.
+- Encrypt payloads with a pre-shared key for LAN confidentiality; authenticate peers
+  via TXT records and version pinning.
+- Persist a single CRDT snapshot locally; conflicts are safely merged and schema migrations
+  ride along as CRDT changes.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why local-first LAN sync for settings?
+Local-first keeps user data with the user, works offline, and eliminates cloud infrastructure. For “settings,” the data model is tiny yet UX-critical. A LAN-only setup uses zero-cost transports and converges instantly when devices meet. CRDTs (Automerge) remove conflict anxiety; mDNS removes bootstrapping overhead.
+
+## How do you replicate app settings over LAN without a server?
+Advertise a service via mDNS (DNS-SD) so peers on the same LAN discover each other. Each peer exposes a small TCP port. On discovery, connect and exchange Automerge sync messages. Persist the document locally. Automerge guarantees convergence, so any device can be turned off anytime without breaking consistency.
+
+High level:
+- Each device holds the full CRDT document (settings).
+- Advertise/browse a service: _app-settings._tcp with a docId and deviceId.
+- Connect peers over TCP; run Automerge’s sync protocol until there’s no more to send.
+- Persist the doc snapshot locally and rehydrate on boot.
+
+## How does Automerge sync work over arbitrary transports?
+Automerge generates compact binary sync messages that you ship over any bytestream (TCP, WebRTC, BLE). Maintain a SyncState per peer. When you receive a message, feed it to Automerge, which updates both the document and that peer’s SyncState. Keep generating messages for a peer until Automerge returns null.
+
+Key API shape (Automerge 2.x):
+- init(), change(), save(), load()
+- initSyncState(), generateSyncMessage(doc, syncState), receiveSyncMessage(doc, syncState, msg)
+
+### Code example: Node + TypeScript mDNS + TCP sync service
+The example below shows a LAN-sync sidecar suitable for Electron/Tauri or a Node service embedding. It uses bonjour-service for mDNS/DNS-SD and net for TCP. We advertise a service with a shared docId. Peers connect deterministically to avoid connection storms.
+
+```ts
+// src/lan-sync.ts
+import fs from 'node:fs'
+import net from 'node:net'
+import crypto from 'node:crypto'
+import Bonjour from 'bonjour-service'
+import * as Automerge from '@automerge/automerge'
+
+// ---- Types ----
+type Settings = {
+  version: number
+  prefs: {
+    theme: 'light' | 'dark'
+    accent: string
+    shortcuts: Record<string, string>
+  }
+}
+
+// ---- Config ----
+const SERVICE_TYPE = 'app-settings' // becomes _app-settings._tcp local
+const DOC_FILE = 'settings.amrg'
+const DOC_ID = process.env.DOC_ID ?? 'settings-v1' // all devices for this user share this
+const DEVICE_ID = loadOrCreateId('.device-id')
+const PORT = 0; // ephemeral
+
+// Optional pre-shared secret for LAN encryption/auth
+const PRESHARED = process.env.LAN_SECRET // undefined -> plaintext
+const KEY = PRESHARED ? crypto.createHash('sha256').update(PRESHARED).digest() : undefined
+
+// ---- Automerge state ----
+let doc: Automerge.Doc<Settings> = loadDoc(DOC_FILE) ?? Automerge.from<Settings>({
+  version: 1,
+  prefs: { theme: 'light', accent: '#4f46e5', shortcuts: {} },
+})
+
+// Per-socket SyncState
+const peerStates = new Map<net.Socket, Automerge.SyncState>()
+
+// ---- TCP server ----
+const server = net.createServer((socket) => {
+  setupSocket(socket)
+})
+server.listen(PORT, () => {
+  const address = server.address()
+  if (address && typeof address !== 'string') {
+    advertise(address.port)
+    browse(address.port)
+    console.log(`LAN sync listening on ${address.port}`)
+  }
+})
+
+function setupSocket(socket: net.Socket) {
+  socket.setNoDelay(true)
+  peerStates.set(socket, Automerge.initSyncState())
+
+  // Immediately drive sync for this peer
+  drainSync(socket)
+
+  let buf = Buffer.alloc(0)
+  socket.on('data', (chunk) => {
+    buf = Buffer.concat([buf, chunk])
+    while (buf.length >= 4) {
+      const len = buf.readUInt32BE(0)
+      if (buf.length < 4 + len) break
+      const frame = buf.subarray(4, 4 + len)
+      buf = buf.subarray(4 + len)
+      const payload = KEY ? openBox(frame, KEY) : new Uint8Array(frame)
+      if (!payload) return socket.destroy() // auth fail
+
+      const state = peerStates.get(socket)!
+      const { doc: newDoc, syncState: newState } = Automerge.receiveSyncMessage(doc, state, payload)
+      doc = newDoc
+      peerStates.set(socket, newState)
+      persist()
+
+      // Respond with any messages Automerge wants to send now
+      drainSync(socket)
+    }
+  })
+
+  socket.on('close', () => peerStates.delete(socket))
+  socket.on('error', (e) => console.warn('peer error', e.message))
+}
+
+function drainSync(socket: net.Socket) {
+  let state = peerStates.get(socket)!
+  while (true) {
+    const msg = Automerge.generateSyncMessage(doc, state)
+    if (!msg) break
+    state = Automerge.initSyncStateFrom(state) // keep type, though generate returns updated via receive
+    peerStates.set(socket, state)
+
+    const payload = KEY ? sealBox(msg, KEY) : Buffer.from(msg)
+    const frame = Buffer.alloc(4 + payload.length)
+    frame.writeUInt32BE(payload.length, 0)
+    Buffer.from(payload).copy(frame, 4)
+    socket.write(frame)
+  }
+}
+
+// Broadcast local change entrypoint you can call from your app
+export function applyLocalChange(mutator: (d: Settings) => void) {
+  const next = Automerge.change(doc, mutator)
+  if (next !== doc) {
+    doc = next
+    persist()
+    // Nudge all peers
+    for (const s of peerStates.keys()) drainSync(s)
+  }
+}
+
+// ---- mDNS advertise/browse ----
+let bonjour: Bonjour | null = null
+function advertise(port: number) {
+  bonjour = new Bonjour()
+  bonjour.publish({
+    name: `settings-${DEVICE_ID}`,
+    type: SERVICE_TYPE,
+    port,
+    txt: { deviceId: DEVICE_ID, docId: DOC_ID, v: '1' },
+  })
+}
+
+function browse(port: number) {
+  const browser = bonjour!.find({ type: SERVICE_TYPE })
+  browser.on('up', (service) => {
+    const txt = service.txt as any
+    if (!txt || txt.docId !== DOC_ID || txt.deviceId === DEVICE_ID) return
+
+    // Deterministic initiator: larger deviceId dials
+    if (DEVICE_ID < txt.deviceId) {
+      const host = (service.addresses.find(a => a.includes('.')) || service.host || service.fqdn)
+      const peerPort = service.port
+      const socket = net.connect(peerPort, host, () => setupSocket(socket))
+    }
+  })
+}
+
+// ---- Persistence ----
+function persist() {
+  const bin = Automerge.save(doc)
+  fs.writeFileSync(DOC_FILE, Buffer.from(bin))
+}
+
+function loadDoc(path: string) {
+  if (!fs.existsSync(path)) return undefined
+  const buf = fs.readFileSync(path)
+  return Automerge.load<Settings>(new Uint8Array(buf))
+}
+
+function loadOrCreateId(path: string) {
+  if (fs.existsSync(path)) return fs.readFileSync(path, 'utf8').trim()
+  const id = crypto.randomUUID()
+  fs.writeFileSync(path, id)
+  return id
+}
+
+// ---- Minimal secretbox using tweetnacl ----
+import nacl from 'tweetnacl'
+function sealBox(msg: Uint8Array, key: Buffer) {
+  const nonce = crypto.randomBytes(24)
+  const box = nacl.secretbox(new Uint8Array(msg), nonce, new Uint8Array(key))
+  return Buffer.concat([nonce, Buffer.from(box)])
+}
+function openBox(frame: Buffer, key: Buffer): Uint8Array | null {
+  const nonce = frame.subarray(0, 24)
+  const box = frame.subarray(24)
+  const m = nacl.secretbox.open(new Uint8Array(box), new Uint8Array(nonce), new Uint8Array(key))
+  return m ?? null
+}
+```
+
+Notes:
+- We use a simple length-prefixed framing on TCP.
+- Deterministic dial avoids double connections.
+- Use a stable DOC_ID per user/silo; a single doc can carry many logical namespaces (e.g., prefs, feature flags).
+- Productionize with backoff, timeouts, and SIGINT cleanup of Bonjour.
+
+## How do you secure peer-to-peer LAN sync without a server?
+Use a pre-shared secret to derive a symmetric key and encrypt Automerge messages with XChaCha20-Poly1305 (secretbox). Authenticate peers using TXT records (docId/version) and drop frames that fail decryption. Rotate secrets per user/org. For higher assurance, derive keys from QR-paired ECDH and pin device IDs.
+
+Minimal hardening steps:
+- Require LAN_SECRET on both peers; refuse plaintext in production builds.
+- TXT record includes docId and a protocol version v; mismatches are ignored.
+- Deny connections across subnets if you must; mDNS is link-local by design anyway.
+
+### React/Electron: using the LAN-sync sidecar from UI
+Most apps will call into the sidecar to mutate settings and rely on Automerge to replicate. A thin hook abstracts it:
+
+```ts
+// src/useSettings.ts (renderer)
+import { useEffect, useState, useCallback } from 'react'
+import type { Settings } from './types'
+import { ipcRenderer } from 'electron'
+
+export function useSettings() {
+  const [settings, setSettings] = useState<Settings | null>(null)
+
+  useEffect(() => {
+    ipcRenderer.invoke('settings:get').then(setSettings)
+    const sub = (_: any, next: Settings) => setSettings(next)
+    ipcRenderer.on('settings:updated', sub)
+    return () => ipcRenderer.off('settings:updated', sub)
+  }, [])
+
+  const update = useCallback((patch: Partial<Settings['prefs']>) => {
+    ipcRenderer.invoke('settings:update', patch)
+  }, [])
+
+  return { settings, update }
+}
+```
+
+Main process wires that to the Automerge sidecar’s applyLocalChange:
+
+```ts
+// src/main-ipc.ts
+import { ipcMain } from 'electron'
+import { applyLocalChange, getDoc } from './lan-sync-adapter' // thin wrapper exporting doc snapshot
+
+ipcMain.handle('settings:get', () => getDoc())
+ipcMain.handle('settings:update', (_evt, patch) => {
+  applyLocalChange(d => {
+    Object.assign(d.prefs, patch)
+  })
+})
+```
+
+## Operational caveats and testing
+- mDNS is link-local; cross-VLAN needs relays or unicast DNS-SD. Consumer Wi‑Fi extenders may filter multicast.
+- Windows firewalls often block inbound by default; ship a friendly prompt.
+- Sleep/wake churn: re-browse on network change; re-advertise on IP change.
+- Use a monotonic clock only for logs; Automerge does not require clocks.
+
+Smoke test:
+- Start the sidecar on two machines on the same SSID.
+- Flip theme on A; observe near-instant update on B.
+- Kill A; update on B; restart A; convergence should happen immediately on connect.
+
+## What about conflicts, migrations, and schema?
+Conflicts are first-class in Automerge: concurrent writes to prefs.shortcuts merge naturally as a map. For vectors or counters, use CRDT types (lists, counters). Migrations: use a version key in the doc; when bumping, run a deterministic change transforming fields. Since it’s just another change, peers will apply it exactly once and converge.
+
+Example migration:
+- version 1 -> 2: split "theme" into {mode, accent}
+- Gate with if (doc.version === 1) inside a change block.
+
+## Tradeoffs
+| Concern | mDNS + TCP + Automerge |
+|---|---|
+| Infra cost | Zero (no server) |
+| Discovery | Automatic on LAN; brittle across VLANs |
+| Security | PSK acceptable on LAN; can evolve to ECDH pairing |
+| Consistency | Strong eventual via CRDTs |
+| Complexity | Low-medium; you own the transport |
+
+## Production checklist
+- Backpressure and partial writes on TCP sockets
+- Rate-limit advertise/browse; debounce re-connections
+- Persist snapshots plus periodic incremental saves
+- Metrics: peer count, message sizes, convergence latency
+- Feature-flag to disable LAN sync for regulated environments
+
+With these pieces, you’ve got a robust, serverless, local-first settings sync that “just works” whenever devices meet on the same network—and vanishes when they don’t, without paging anyone at 3 a.m.
