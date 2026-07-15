@@ -1,0 +1,344 @@
+---
+title: 'On-Device Twitch IRC in Rust: Reconnect State Machine + Backoff'
+slug: on-device-twitch-irc-in-rust-reconnect-state-machine-backoff
+date: '2026-07-15'
+description: Build a fully local Twitch chat ingestor in Rust with a resilient WebSocket
+  reconnect loop, exponential backoff with jitter, and a pragmatic state machine that
+  survives flaky networks.
+tags:
+- Rust
+- Backend
+- Realtime
+keywords:
+- twitch irc websocket rust
+- rust websocket reconnect exponential backoff
+- twitch chat on-device ingestion
+- tokio tungstenite twitch example
+- rust state machine reconnect pattern
+- twitch irc ping pong handling
+- decorrelated jitter backoff rust
+readingMinutes: 8
+takeaways:
+- Model the connection as an explicit state machine; do not bake reconnection into
+  ad-hoc loops.
+- Use exponential backoff with full/decorrelated jitter to avoid thundering herds
+  and burst retries.
+- 'Honor Twitch IRC specifics: CAP REQ, PASS/NICK, JOIN, and PING/PONG. Handle RECONNECT
+  as a signal to fast-retry.'
+- 'Keep everything on-device: a single async task with tokio + tungstenite is enough
+  for robust ingestion.'
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why run Twitch IRC on-device?
+On-device ingestion means no middlebox or serverless bill just to read chat. For desktop apps, stream overlays, or edge agents driving local LLMs, you want a single binary with no cloud dependency. Rust gives you a tiny footprint, deterministic resource usage, and precise control over reconnect behavior.
+
+## How do you build a robust Twitch IRC reconnect loop in Rust?
+A robust reconnect loop is a small, explicit state machine around tokio-tungstenite. Connect, authenticate, join, then read/write with ping/pong handling. On errors or Twitch RECONNECT, transition to Backoff with jitter, clamp to a maximum, and try again. Keep state pure, I/O isolated, and cancellation-safe with tokio::select!.
+
+Let’s outline the states and transitions:
+- Disconnected → Connecting → Authenticating → Joining → Connected
+- Any error/close/RECONNECT → Backoff(delay) → Connecting
+- Shutdown can interrupt at any point
+
+Each state owns only the operations it must perform; no hidden retries inside functions.
+
+### Dependencies and project setup
+```toml
+# Cargo.toml
+[package]
+name = "twitch-irc-on-device"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+futures-util = "0.3"
+rand = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# TLS via rustls webpki roots; works cross-platform
+tokio-tungstenite = { version = "0.21", features = ["rustls-tls-webpki-roots"] }
+```
+
+### Twitch IRC handshake in 4 frames
+You need this exact sequence on a fresh socket:
+
+- CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership
+- PASS oauth:YOUR_TOKEN
+- NICK your_nick
+- JOIN #channel
+
+Twitch responds with 001..004 numeric messages, then ROOMSTATE/NAMES, and eventually PRIVMSG for chat lines. Respond to PING :tmi.twitch.tv with PONG :tmi.twitch.tv.
+
+#### Minimal command cheat sheet
+| From | Message                          | Action |
+|------|----------------------------------|--------|
+| Srv  | PING :tmi.twitch.tv              | Send PONG :tmi.twitch.tv |
+| Srv  | RECONNECT                        | Close immediately, reconnect |
+| You  | CAP REQ :twitch.tv/...           | Enable tags/commands/membership |
+| You  | PASS oauth:token                 | Auth via OAuth token |
+| You  | NICK nick                        | Set nick (login) |
+| You  | JOIN #channel                    | Subscribe to a channel |
+
+## What’s the best exponential backoff with jitter for WebSockets?
+Use exponential backoff with jitter. Prefer Full Jitter or Decorrelated Jitter to avoid synchronized retry spikes. Start at a small base (e.g., 250ms), cap at a ceiling (e.g., 60s or 120s), and add randomization each attempt. Reset the backoff after any successful, stable connection period.
+
+Here’s a decorrelated-jitter backoff utility that’s deterministic and testable.
+
+```rust
+// backoff.rs
+use rand::{rngs::StdRng, Rng, SeedableRng};
+
+#[derive(Debug, Clone)]
+pub struct JitterBackoff {
+    base: f64,       // seconds
+    cap: f64,        // seconds
+    factor: f64,     // multiplicative factor (typically 3.0)
+    prev: f64,       // previous delay
+    rng: StdRng,
+}
+
+impl JitterBackoff {
+    pub fn new(base_ms: u64, cap_ms: u64, seed: u64) -> Self {
+        Self {
+            base: base_ms as f64 / 1000.0,
+            cap: cap_ms as f64 / 1000.0,
+            factor: 3.0,
+            prev: 0.0,
+            rng: StdRng::seed_from_u64(seed),
+        }
+    }
+
+    // Decorrelated Jitter: next = min(cap, rand(base, prev * factor))
+    pub fn next_delay_secs(&mut self) -> f64 {
+        let low = self.base;
+        let high = (self.prev * self.factor).max(self.base);
+        let next = self.rng.gen_range(low..=high).min(self.cap);
+        self.prev = next;
+        next
+    }
+
+    pub fn reset(&mut self) { self.prev = 0.0; }
+}
+```
+
+- base=0.25s, cap=60s is a good starting point for chat.
+- Reset backoff after you’ve been Connected for, say, 10–30s.
+
+## End-to-end: a resilient Twitch IRC client state machine
+Below is a single-task runner that:
+- Connects to wss://irc-ws.chat.twitch.tv:443
+- Authenticates and joins one channel
+- Handles PING/PONG and server RECONNECT
+- Reconnects with decorrelated-jitter backoff
+- Emits lines downstream via a channel (stubbed as println! here)
+
+```rust
+// main.rs
+use futures_util::{SinkExt, StreamExt};
+use tokio::{select, time::{sleep, Duration}};
+use tokio_tungstenite::tungstenite::protocol::Message;
+use tokio_tungstenite::connect_async;
+use tracing::{error, info, warn};
+
+mod backoff;
+use backoff::JitterBackoff;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Phase { Disconnected, Connecting, Authenticating, Joining, Connected, Backoff, Shutdown }
+
+struct Config {
+    token: String,   // oauth:XXXXXXXXX (include prefix)
+    nick: String,    // your login
+    channel: String, // e.g. #somechannel
+}
+
+struct Client {
+    cfg: Config,
+    boff: JitterBackoff,
+}
+
+impl Client {
+    fn new(cfg: Config) -> Self {
+        Self { cfg, boff: JitterBackoff::new(250, 60_000, 0xBEEF) }
+    }
+
+    async fn run(mut self, mut shutdown: tokio::sync::watch::Receiver<bool>) -> anyhow::Result<()> {
+        tracing_subscriber::fmt()
+            .with_env_filter("info")
+            .with_target(false)
+            .init();
+
+        let mut phase = Phase::Disconnected;
+        let mut stable_connected_since: Option<std::time::Instant> = None;
+
+        loop {
+            if *shutdown.borrow() { phase = Phase::Shutdown; }
+
+            match phase {
+                Phase::Shutdown => {
+                    info!("shutdown requested");
+                    return Ok(());
+                }
+                Phase::Disconnected | Phase::Backoff => {
+                    let delay = if phase == Phase::Backoff { self.boff.next_delay_secs() } else { 0.0 };
+                    if delay > 0.0 { 
+                        info!(delay_ms = (delay*1000.0) as u64, "backing off");
+                        select! {
+                            _ = sleep(Duration::from_secs_f64(delay)) => {},
+                            _ = shutdown.changed() => continue,
+                        }
+                    }
+                    phase = Phase::Connecting;
+                }
+                Phase::Connecting => {
+                    info!("connecting wss://irc-ws.chat.twitch.tv:443");
+                    let fut = connect_async("wss://irc-ws.chat.twitch.tv:443");
+                    let (ws_stream, _resp) = match fut.await {
+                        Ok(ok) => ok,
+                        Err(e) => { error!(?e, "connect failed"); phase = Phase::Backoff; continue; }
+                    };
+
+                    let (mut sink, mut stream) = ws_stream.split();
+                    phase = Phase::Authenticating;
+
+                    // Handshake
+                    if let Err(e) = sink.send(Message::Text("CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership\r\n".into())).await { error!(?e, "cap req failed"); phase = Phase::Backoff; continue; }
+                    if let Err(e) = sink.send(Message::Text(format!("PASS {}\r\n", self.cfg.token))).await { error!(?e, "pass failed"); phase = Phase::Backoff; continue; }
+                    if let Err(e) = sink.send(Message::Text(format!("NICK {}\r\n", self.cfg.nick))).await { error!(?e, "nick failed"); phase = Phase::Backoff; continue; }
+
+                    phase = Phase::Joining;
+                    if let Err(e) = sink.send(Message::Text(format!("JOIN {}\r\n", self.cfg.channel))).await { error!(?e, "join failed"); phase = Phase::Backoff; continue; }
+
+                    phase = Phase::Connected;
+                    stable_connected_since = Some(std::time::Instant::now());
+                    self.boff.reset();
+
+                    // Connected pump loop
+                    let mut write = sink;
+                    loop {
+                        select! {
+                            // Handle shutdown
+                            _ = shutdown.changed() => { warn!("shutdown while connected"); phase = Phase::Shutdown; break; }
+
+                            // Read incoming frames
+                            msg = stream.next() => {
+                                match msg {
+                                    None => { warn!("ws closed by server"); phase = Phase::Backoff; break; }
+                                    Some(Err(e)) => { error!(?e, "ws read error"); phase = Phase::Backoff; break; }
+                                    Some(Ok(Message::Text(text))) => {
+                                        for line in text.split("\r\n").filter(|l| !l.is_empty()) {
+                                            if let Some(new_phase) = Self::handle_line(line, &mut write).await? { phase = new_phase; break; }
+                                        }
+                                        if phase != Phase::Connected { break; }
+                                    }
+                                    Some(Ok(Message::Ping(payload))) => {
+                                        let _ = write.send(Message::Pong(payload)).await;
+                                    }
+                                    Some(Ok(Message::Close(frame))) => {
+                                        warn!(?frame, "close frame"); phase = Phase::Backoff; break;
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
+
+                        // If we've been stable for >30s, reset backoff entirely (helps after captive portals)
+                        if let Some(since) = stable_connected_since {
+                            if since.elapsed() > Duration::from_secs(30) { self.boff.reset(); stable_connected_since = None; }
+                        }
+                    }
+                }
+                _ => unreachable!(),
+            }
+        }
+    }
+
+    // Returns Some(new_phase) to break connection loop transitions (e.g., Backoff on RECONNECT)
+    async fn handle_line(line: &str, write: &mut (impl SinkExt<Message, Error=tokio_tungstenite::tungstenite::Error> + Unpin)) -> anyhow::Result<Option<Phase>> {
+        // PING
+        if line.starts_with("PING ") {
+            let payload = line.trim_start_matches("PING ");
+            write.send(Message::Text(format!("PONG {}\r\n", payload))).await?;
+            return Ok(None);
+        }
+
+        // Server asks us to reconnect without penalty
+        if line.contains(" RECONNECT") {
+            warn!("server requested RECONNECT");
+            return Ok(Some(Phase::Backoff));
+        }
+
+        // Basic chat printout: look for PRIVMSG
+        if let Some(idx) = line.find(" PRIVMSG ") {
+            // Example: @tags;more :nick!user@host PRIVMSG #chan :hello
+            let payload = line[idx+9..].to_string();
+            if let Some(colon) = payload.find(" :") {
+                let channel = &payload[..colon].trim();
+                let message = &payload[colon+2..];
+                println!("{} | {}", channel, message);
+            }
+        }
+
+        Ok(None)
+    }
+}
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let token = std::env::var("TWITCH_OAUTH").expect("TWITCH_OAUTH=oauth:... env var required");
+    let nick = std::env::var("TWITCH_NICK").expect("TWITCH_NICK required");
+    let channel = std::env::var("TWITCH_CHANNEL").expect("TWITCH_CHANNEL like #shroud required");
+
+    let cfg = Config { token, nick, channel };
+    let client = Client::new(cfg);
+
+    let (tx, rx) = tokio::sync::watch::channel(false);
+
+    // Graceful Ctrl+C
+    tokio::spawn(async move {
+        let _ = tokio::signal::ctrl_c().await;
+        let _ = tx.send(true);
+    });
+
+    client.run(rx).await
+}
+```
+
+Notes:
+- Keep oauth: prefix in TWITCH_OAUTH (e.g., oauth:abcd...). Generate via Twitch OAuth flows or developer token utilities.
+- We split the stream/sink to control backpressure; for high volume multi-channel ingestion, prefer a bounded mpsc for writer and a dedicated pump.
+
+## How do you avoid rate limits and message loss without a server?
+Batch writes and keep a small token bucket on the writer; Twitch allows modest command rates. Never block reads: process frames, emit to an internal queue, and let your consumer apply backpressure separately. On reconnect, re-send only the minimal handshake; don’t replay historical JOINs or messages.
+
+Quick token bucket sketch for commands:
+```rust
+struct Bucket { cap: u32, tokens: u32, refill_per_sec: f32, last: std::time::Instant }
+impl Bucket {
+    fn new(cap: u32, refill_per_sec: f32) -> Self { Self { cap, tokens: cap, refill_per_sec, last: std::time::Instant::now() } }
+    fn allow(&mut self) -> bool {
+        let now = std::time::Instant::now();
+        let dt = now.duration_since(self.last).as_secs_f32();
+        self.last = now;
+        let add = (dt * self.refill_per_sec) as u32;
+        self.tokens = (self.tokens + add).min(self.cap);
+        if self.tokens > 0 { self.tokens -= 1; true } else { false }
+    }
+}
+```
+
+## Production hardening tips
+- Parse tags: Twitch tags carry user-id, room-id, emote spans; zero-copy parse with nom or a small hand-rolled splitter.
+- TLS roots: the rustls webpki roots feature avoids OS-level surprises across platforms.
+- RECONNECT fast-path: Treat as successful connection (reset backoff), then one small jitter (10–500ms) to spread clients.
+- Telemetry: log close codes, RTT (PING→PONG delta), backoff stage, and successful session durations.
+- Testing: simulate a flaky network by killing the socket, dropping to Backoff, and verifying eventual Connected progression within a max wall time.
+
+## Where to go from here?
+- Multi-channel: maintain a set of JOINs and re-issue on reconnect (rate-limit JOIN bursts).
+- Structured output: map PRIVMSG into a typed event and forward to an internal queue, LLM, or overlay.
+- Mobile: this pattern runs fine on Android/iOS with rustls; gate network transitions with OS reachability signals to pause/resume the state machine.
