@@ -237,7 +237,9 @@ export default async function BlogPostPage({ params }: PageProps) {
           </div>
         )}
 
-        <h1 className="text-gradient animate-gradient text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
+        {/* Solid near-white for readability — gradient titles wash out and
+            read as decoration; the title is the one thing that must be calm. */}
+        <h1 className="text-balance text-4xl font-bold leading-[1.12] tracking-tight text-zinc-50 sm:text-5xl">
           {post.title}
         </h1>
 
@@ -303,8 +305,9 @@ export default async function BlogPostPage({ params }: PageProps) {
       {/* Body */}
       <div
         className="prose prose-invert mt-12 max-w-none
-          prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight
-          prose-h2:mt-12 prose-h2:text-cyan sm:prose-h2:mt-16 prose-h3:mt-10 prose-h3:text-zinc-50
+          prose-headings:scroll-mt-24 prose-headings:font-bold prose-headings:tracking-tight
+          prose-h2:mt-12 prose-h2:border-l-[3px] prose-h2:border-cyan prose-h2:pl-4 prose-h2:text-zinc-50 sm:prose-h2:mt-16
+          prose-h3:mt-10 prose-h3:font-semibold prose-h3:text-zinc-100
           prose-p:text-zinc-300 prose-p:leading-[1.8] sm:prose-p:leading-relaxed
           prose-li:leading-[1.7] sm:prose-li:leading-relaxed
           prose-a:text-ice prose-a:no-underline prose-a:underline-offset-4 hover:prose-a:underline

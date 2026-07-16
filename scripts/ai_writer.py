@@ -83,6 +83,22 @@ def build_prompt(topic: str) -> str:
 Write a highly technical, opinionated, practical article on this topic:
 "{topic}"
 
+VOICE — this is the most important requirement. Write like a tired senior
+engineer sharing hard-won specifics, NOT like a content writer:
+- Concrete over rhetorical: real commands, actual error messages, specific
+  version numbers, realistic latency/size/cost figures (clearly framed as
+  typical/illustrative, never presented as your own measured benchmarks).
+- Vary the rhythm: mix long technical paragraphs with short ones. Do NOT
+  write in a steady drumbeat of punchy two-sentence paragraphs.
+- At most ONE rhetorical question in the whole article. No "Let's dive in",
+  no "In conclusion", no "game-changer", no "delve", and never the
+  "this isn't just X — it's Y" construction.
+- Use em-dashes sparingly (a few per article, not per paragraph).
+- Include at least one honest limitation, failure mode, or "when NOT to do
+  this" — real engineering writing always has tradeoffs.
+- First person is fine for opinions ("I'd reach for X here"), but do not
+  invent personal war stories, clients, or specific past incidents.
+
 Field requirements (ALL fields are mandatory — never leave one empty):
 - title: a specific, punchy, keyword-rich title (<=70 chars).
 - description: one compelling meta-description sentence, 120-160 chars, plain text, no quotes.
@@ -97,7 +113,7 @@ Field requirements (ALL fields are mandatory — never leave one empty):
   - Be technical and concrete: fenced code blocks with language hints (```ts, ```python, ```bash),
     tables where useful, and at least two substantial, correct code examples.
   - Do NOT wrap the whole body in a markdown code fence. No commentary before or after the article.
-  - Target 900-1400 words.
+  - Target 1100-1600 words — depth over volume.
 """
 
 
