@@ -29,23 +29,22 @@ author:
   name: Yaseen Khatib
   role: MERN + AI Architect
 ---
-
 ## Why your Tauri v2 IPC is slower than it should be
 
-Round-tripping tiny JSON blobs across the Rust↔WebView bridge is deceptively expensive. The fixed overhead of each IPC hop (dispatch, serialization, V8 parse, JS callback) dominates, especially under chatty telemetry, logs, and UI metrics.
+Shuttling small JSON payloads over the Rust↔WebView bridge costs more than it looks. The constant work per hop—dispatch, serialization, V8 parse, JS callback—dominates, especially with noisy telemetry, logs, and UI metrics.
 
-Two levers consistently move the needle:
+Two changes move real numbers:
 - Batch multiple logical events into one IPC envelope.
-- Encode with MessagePack (rmp-serde in Rust, @msgpack/msgpack in JS) to reduce CPU and payload overhead versus JSON.
+- Use MessagePack (rmp-serde in Rust, @msgpack/msgpack in JS) to cut CPU and payload overhead versus JSON.
 
-This post shows a concrete, production-friendly pattern for both. It focuses on Tauri v2 APIs and works without custom native plugins. If you need raw bytes, see the advanced note at the end.
+Below is a concrete, production-ready pattern that does both. It targets Tauri v2 and needs no native plugins. If you want raw bytes, see the advanced note at the end.
 
 ## Strategy
 
-- Push or pull batches across the bridge at a fixed cadence (e.g., every 8–16 ms) and/or when a max size is reached.
-- Encode the batch with rmp-serde on Rust side into a Vec<u8>.
-- Transport over Tauri events or command return as base64 (safe across the JSON-only bridge). Yes, base64 adds ~33% size, but you still get fewer round-trips and faster (de)serialization than JSON.
-- Decode once per batch in the WebView; fan out to your app state.
+- Send batches on a fixed cadence (about 8–16 ms) and/or when a size cap trips.
+- Encode the batch on the Rust side with rmp-serde into a Vec<u8>.
+- Carry it over Tauri events or command returns as base64, which is safe across the JSON-only bridge. Base64 adds ~33% size, but you still win on round-trips and (de)serialization cost compared to JSON.
+- Decode once per batch in the WebView and then fan out to your app state.
 
 ## Rust: rmp-serde batcher and Tauri v2 wiring
 
@@ -60,7 +59,7 @@ anyhow = "1"
 # Use Tauri's async runtime re-export to avoid direct tokio coupling
 ```
 
-A minimal event type. Use an enum with a compact tagged representation for small payloads:
+Define a small event type. An enum with a compact tagged layout keeps payloads lean:
 ```rust
 // src/models.rs
 use serde::{Deserialize, Serialize};
@@ -73,7 +72,7 @@ pub enum Evt {
 }
 ```
 
-The batcher accumulates events and encodes when time/size thresholds are met:
+The batcher collects events and encodes when time/size thresholds trip:
 ```rust
 // src/batcher.rs
 use crate::models::Evt;
@@ -130,7 +129,7 @@ impl Batcher {
 }
 ```
 
-Wire it into Tauri v2. We expose two commands: `push_event` and `drain_batch`. We also run a periodic flusher that emits to all windows.
+Wire it into Tauri v2. Expose two commands, `push_event` and `drain_batch`, and run a periodic flusher that emits to all windows.
 
 ```rust
 // src/main.rs
@@ -185,9 +184,9 @@ fn main() {
 ```
 
 Notes:
-- We use `emit("rmp_batch", &b64)` to broadcast base64-encoded MessagePack to all WebViews.
-- Pull mode is available via `invoke('drain_batch')` from JS to reduce push pressure or to control backpressure explicitly.
-- The estimate function is a heuristic to avoid frequent encoding; the hard limit is enforced by `max_bytes`.
+- `emit("rmp_batch", &b64)` broadcasts base64-encoded MessagePack to all WebViews.
+- Pull mode is available with `invoke('drain_batch')` from JS if you want to dial back push pressure or manage backpressure directly.
+- The estimate function is a heuristic to reduce eager encoding; `max_bytes` remains the hard stop.
 
 ## WebView: decoding MessagePack batches efficiently
 
@@ -196,7 +195,7 @@ Install a small, fast decoder:
 npm i @msgpack/msgpack
 ```
 
-Hook both push and pull flows. Decode once per batch and fan-out to your reducers.
+Wire up push and pull. Decode once per batch, then fan out to reducers.
 
 ```ts
 // src/ipc.ts
@@ -260,56 +259,56 @@ export function startPullLoop() {
 ```
 
 Guidelines:
-- Prefer push for low latency streams; prefer pull to align with your render loop and enforce backpressure.
-- Always decode once per batch and do a single state update per frame to avoid layout thrashing.
+- Use push for low-latency streams; use pull to align with the render loop and enforce backpressure.
+- Decode once per batch and do a single state update per frame to avoid layout thrash.
 
 ## Does MessagePack help if we still base64?
 
 Yes, because:
-- CPU: rmp-serde and @msgpack/msgpack avoid deep JSON stringify/parse work for many nested objects.
-- Payload: MessagePack is ~20–50% smaller than JSON for typical telemetry. Base64 adds ~33%, so size savings vary; however, the dominant win is fewer IPC crossings via batching.
+- CPU: rmp-serde and @msgpack/msgpack avoid deep JSON stringify/parse for lots of nested objects.
+- Payload: MessagePack is ~20–50% smaller than JSON for typical telemetry. Base64 adds ~33%, so size gains vary; the larger win comes from fewer IPC crossings via batching.
 
 Back-of-the-envelope comparison for 10k events/sec, each ~48B logical content:
 - JSON, unbatched: ~10k invokes + JSON parse/stringify; payload ~1.6–2.2× expansion → 0.8–1.1 MB/s.
-- MsgPack + base64, batched at 250 events: ~40 emits/sec; payload roughly similar or slightly smaller than JSON, but with 250× fewer crossings and cheaper (de)serialization per object.
+- MsgPack + base64, batched at 250 events: ~40 emits/sec; payload roughly similar or slightly smaller than JSON, with 250× fewer crossings and cheaper (de)serialization per object.
 
-In practice, I see 2–4× less CPU in both Rust and JS for the same stream, and much lower jank from reduced GC pressure and callback churn.
+In practice, expect roughly 2–4× less CPU on both Rust and JS for the same stream, plus less jank from reduced GC and callback churn.
 
 ## Tuning knobs that matter
 
-- Flush cadence: 8–16 ms aligns with 60–120 Hz render budgets. Lower if you need latency; higher if you need throughput.
-- Max events and max bytes: guardrails to avoid oversized payloads. I use 256 events and 64–128 KB.
-- Event schema: Compact enums with `#[serde(tag = "t", content = "p")]` cut map overhead and JS property churn.
+- Flush cadence: 8–16 ms lines up with 60–120 Hz budgets. Go lower for latency, higher for throughput.
+- Max events and max bytes: keep payloads bounded. 256 events and 64–128 KB work well.
+- Event schema: Compact enums with `#[serde(tag = "t", content = "p")]` trim map overhead and JS property churn.
 - Threading: Push into the batcher from any thread; the periodic flush runs on Tauri’s async runtime.
 
 ## Pitfalls and gotchas
 
-- Strings vs bytes: Tauri’s default event/command pipe is JSON; hence the base64 hop. If you must avoid base64, use a custom protocol (see below).
-- Dates, bigints, and floats: MessagePack supports them as numbers; JS decoders map 64-bit ints to JS numbers (53-bit safe). Send timestamps as u64 but validate on JS if ranges exceed 2^53-1; or encode as strings.
-- Backpressure: If the JS side ignores batches, buffers grow. Pull mode helps. In push mode, drop batches if the UI is busy.
-- Schemas: Validate once in Rust, not in JS, to remove expensive runtime checks. If you must in JS, precompile zod/superstruct schemas and run on batch boundaries.
+- Strings vs bytes: the default event/command path is JSON, so base64 is required. If you must avoid base64, use a custom protocol (see below).
+- Dates, bigints, and floats: MessagePack carries them as numbers; JS decoders map 64-bit ints to JS numbers (53-bit safe). Send timestamps as u64 but validate in JS if they can exceed 2^53-1, or encode as strings.
+- Backpressure: If JS doesn’t handle batches, buffers grow. Pull mode helps. In push mode, drop batches if the UI is busy.
+- Schemas: Validate once in Rust to avoid expensive JS checks. If you must validate in JS, precompile zod/superstruct and run at batch boundaries.
 
 ## Advanced: true binary over the bridge
 
-If you control both ends and want zero base64 tax:
-- Register a custom protocol endpoint (e.g., `tauri://ipc/batch`) and serve `application/msgpack` from Rust. Then `fetch('tauri://ipc/batch')` in JS and `await resp.arrayBuffer()` to get raw bytes. This keeps MsgPack binary end-to-end.
-- Or implement a small plugin command that returns `Vec<u8>` via a binary-safe channel. As of v2, the stock invoke/event path is JSON; plugins or custom protocol are the escape hatch.
+If you control both ends and want to skip base64:
+- Register a custom protocol (for example, `tauri://ipc/batch`) and serve `application/msgpack` from Rust. In JS, `fetch('tauri://ipc/batch')` and `await resp.arrayBuffer()` to read raw bytes. This keeps MsgPack binary end to end.
+- Or add a small plugin command that returns `Vec<u8>` over a binary-safe channel. As of v2, the stock invoke/event path is JSON; plugins or a custom protocol are the escape hatch.
 
-Both approaches preserve the batching logic shown here.
+Both approaches keep the batching logic intact.
 
 ## Quick checklist
 
-- Batch all high-frequency streams (logs, telemetry, UI perf marks).
-- Encode with rmp-serde on Rust and decode with @msgpack/msgpack on JS.
+- Batch high-frequency streams (logs, telemetry, UI perf marks).
+- Encode with rmp-serde in Rust and decode with @msgpack/msgpack in JS.
 - Flush on time and size thresholds.
-- Prefer a single state transition per batch in the WebView.
+- Prefer one state transition per batch in the WebView.
 - Move to a custom protocol if you need raw bytes.
 
 ## Where to go next
 
 - Add sequence numbers to batches; detect drops and request replay.
-- Split channels by topic and priority to avoid head-of-line blocking.
-- Pre-size vectors and reuse buffers for zero-alloc hot paths.
-- Profile with flamegraphs on both ends; IPC wins shouldn’t regress your main thread.
+- Split channels by topic and priority to prevent head-of-line blocking.
+- Pre-size vectors and reuse buffers on hot paths to avoid allocations.
+- Profile with flamegraphs on both ends; don’t win on IPC only to regress the main thread.
 
-Halve the IPC cost first with batching; MessagePack compounds the win. After that, only move to binary transport if your payload volume justifies the plumbing.
+Start by cutting IPC cost with batching; MessagePack amplifies the gain. Only switch to binary transport when the payload volume makes the extra plumbing worthwhile.

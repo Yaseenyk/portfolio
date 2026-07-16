@@ -33,12 +33,11 @@ author:
   name: Yaseen Khatib
   role: MERN + AI Architect
 ---
-
 ## Why local-first LAN sync for settings?
-Local-first keeps user data with the user, works offline, and eliminates cloud infrastructure. For “settings,” the data model is tiny yet UX-critical. A LAN-only setup uses zero-cost transports and converges instantly when devices meet. CRDTs (Automerge) remove conflict anxiety; mDNS removes bootstrapping overhead.
+Local-first keeps data on the user’s machines, works without the internet, and removes the need for cloud services. For settings, the data is small but impacts UX everywhere. Restricting sync to the LAN uses free transports and gives immediate convergence when devices are on the same network. CRDTs (Automerge) take the sting out of concurrent edits, and mDNS covers discovery without a bootstrap service.
 
 ## How do you replicate app settings over LAN without a server?
-Advertise a service via mDNS (DNS-SD) so peers on the same LAN discover each other. Each peer exposes a small TCP port. On discovery, connect and exchange Automerge sync messages. Persist the document locally. Automerge guarantees convergence, so any device can be turned off anytime without breaking consistency.
+Advertise a service with mDNS (DNS-SD) so peers on the LAN can find each other. Each peer listens on a small TCP port. When a peer shows up, connect and exchange Automerge sync messages, then persist the document locally. Because Automerge guarantees convergence, devices can drop off or power down at any time without risking consistency.
 
 High level:
 - Each device holds the full CRDT document (settings).
@@ -47,14 +46,14 @@ High level:
 - Persist the doc snapshot locally and rehydrate on boot.
 
 ## How does Automerge sync work over arbitrary transports?
-Automerge generates compact binary sync messages that you ship over any bytestream (TCP, WebRTC, BLE). Maintain a SyncState per peer. When you receive a message, feed it to Automerge, which updates both the document and that peer’s SyncState. Keep generating messages for a peer until Automerge returns null.
+Automerge emits compact binary sync messages you can send over any byte stream (TCP, WebRTC, BLE). Keep a SyncState per peer. On receive, pass the message to Automerge; it updates both the document and that peer’s SyncState. Keep generating messages for that peer until Automerge returns null.
 
 Key API shape (Automerge 2.x):
 - init(), change(), save(), load()
 - initSyncState(), generateSyncMessage(doc, syncState), receiveSyncMessage(doc, syncState, msg)
 
 ### Code example: Node + TypeScript mDNS + TCP sync service
-The example below shows a LAN-sync sidecar suitable for Electron/Tauri or a Node service embedding. It uses bonjour-service for mDNS/DNS-SD and net for TCP. We advertise a service with a shared docId. Peers connect deterministically to avoid connection storms.
+The example below is a LAN-sync sidecar you can run alongside Electron/Tauri or embed in a Node service. It uses bonjour-service for mDNS/DNS-SD and net for TCP. The service is advertised with a shared docId, and peers initiate connections deterministically to prevent connection storms.
 
 ```ts
 // src/lan-sync.ts
@@ -229,21 +228,21 @@ function openBox(frame: Buffer, key: Buffer): Uint8Array | null {
 ```
 
 Notes:
-- We use a simple length-prefixed framing on TCP.
-- Deterministic dial avoids double connections.
-- Use a stable DOC_ID per user/silo; a single doc can carry many logical namespaces (e.g., prefs, feature flags).
-- Productionize with backoff, timeouts, and SIGINT cleanup of Bonjour.
+- TCP framing is a simple length prefix.
+- Deterministic dialing prevents duplicate connections.
+- Keep a stable DOC_ID per user or silo; one document can host multiple logical namespaces (prefs, feature flags, etc.).
+- For production, add backoff, timeouts, and SIGINT cleanup for Bonjour.
 
 ## How do you secure peer-to-peer LAN sync without a server?
-Use a pre-shared secret to derive a symmetric key and encrypt Automerge messages with XChaCha20-Poly1305 (secretbox). Authenticate peers using TXT records (docId/version) and drop frames that fail decryption. Rotate secrets per user/org. For higher assurance, derive keys from QR-paired ECDH and pin device IDs.
+Use a pre-shared secret to derive a symmetric key and encrypt Automerge messages with XChaCha20-Poly1305 (secretbox). Gate peers using TXT records (docId/version) and drop any frame that fails decryption. Rotate secrets per user or org. If you need stronger guarantees, derive keys via QR-paired ECDH and pin device IDs.
 
 Minimal hardening steps:
-- Require LAN_SECRET on both peers; refuse plaintext in production builds.
-- TXT record includes docId and a protocol version v; mismatches are ignored.
-- Deny connections across subnets if you must; mDNS is link-local by design anyway.
+- Require LAN_SECRET on both peers; forbid plaintext in production builds.
+- Include docId and a protocol version v in the TXT record; ignore mismatches.
+- If necessary, reject connections across subnets; mDNS is link-local by default.
 
 ### React/Electron: using the LAN-sync sidecar from UI
-Most apps will call into the sidecar to mutate settings and rely on Automerge to replicate. A thin hook abstracts it:
+Most apps will forward local mutations to the sidecar and let Automerge take care of replication. A thin hook is enough:
 
 ```ts
 // src/useSettings.ts (renderer)
@@ -285,18 +284,18 @@ ipcMain.handle('settings:update', (_evt, patch) => {
 ```
 
 ## Operational caveats and testing
-- mDNS is link-local; cross-VLAN needs relays or unicast DNS-SD. Consumer Wi‑Fi extenders may filter multicast.
-- Windows firewalls often block inbound by default; ship a friendly prompt.
-- Sleep/wake churn: re-browse on network change; re-advertise on IP change.
-- Use a monotonic clock only for logs; Automerge does not require clocks.
+- mDNS is link-local; cross-VLAN paths need relays or unicast DNS-SD. Some consumer Wi‑Fi gear filters multicast.
+- Windows firewalls often default-block inbound; ship a clear prompt.
+- Sleep/wake churn: re-browse on network changes and re-advertise on IP changes.
+- Use a monotonic clock for logs only; Automerge does not depend on clocks.
 
 Smoke test:
 - Start the sidecar on two machines on the same SSID.
 - Flip theme on A; observe near-instant update on B.
-- Kill A; update on B; restart A; convergence should happen immediately on connect.
+- Kill A; update on B; restart A; they should converge immediately on reconnect.
 
 ## What about conflicts, migrations, and schema?
-Conflicts are first-class in Automerge: concurrent writes to prefs.shortcuts merge naturally as a map. For vectors or counters, use CRDT types (lists, counters). Migrations: use a version key in the doc; when bumping, run a deterministic change transforming fields. Since it’s just another change, peers will apply it exactly once and converge.
+Automerge treats conflicts as normal: concurrent writes to prefs.shortcuts merge as a map. For lists or counters, use the CRDT types provided (lists, counters). For migrations, include a version field; when you bump it, run a deterministic transformation inside a change. It’s just another change, so each peer applies it exactly once and they converge.
 
 Example migration:
 - version 1 -> 2: split "theme" into {mode, accent}
@@ -318,4 +317,4 @@ Example migration:
 - Metrics: peer count, message sizes, convergence latency
 - Feature-flag to disable LAN sync for regulated environments
 
-With these pieces, you’ve got a robust, serverless, local-first settings sync that “just works” whenever devices meet on the same network—and vanishes when they don’t, without paging anyone at 3 a.m.
+With these pieces in place, you get a solid, serverless, local-first settings sync that works when devices share a network and disappears when they don’t, without waking anyone up.

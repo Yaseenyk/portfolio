@@ -24,40 +24,41 @@ author:
   name: Yaseen Khatib
   role: MERN + AI Architect
 ---
-
 ## The problem: desktop chat floods meet a tiny event loop
 
-Tauri gives you a Rust core and a WebView UI. It’s easy to emit a UI event per token from an LLM or per message from a chat gateway. It’s also easy to accidentally buffer millions of events and nuke memory because the WebView can’t keep up.
+Tauri pairs a Rust core with a WebView front end. Firing one UI event per token from an LLM, or per message from a gateway, is trivial. It’s also how you end up buffering millions of events when the WebView can’t drain them fast enough.
 
-The failure mode is classic: unbounded channels in the core + window.emit per message = unbounded memory growth when the UI stalls (GC, devtools open, heavy React reconciliation) or the network spikes.
+The root cause is simple: unbounded channels in the core plus window.emit on every message. Memory climbs without limit the moment the UI slows down (GC, devtools, expensive React work) or inbound traffic bursts.
 
-You need backpressure. In Rust that means bounded channels, clear overload semantics (block, drop, or coalesce), and batching.
+You need backpressure. In Rust that means bounded channels, explicit overload behavior (block, drop, or coalesce), and batching.
 
 ## Bounded vs unbounded channels in Rust (Tauri context)
 
 - tokio::sync::mpsc::unbounded_channel
-  - Pros: zero backpressure; send is infallible.
-  - Cons: unbounded memory; catastrophic under floods.
-- tokio::sync::mpsc::channel(cap)
-  - Pros: bounded memory; send().await backpressures producers when full.
-  - Cons: if used on hot paths in a Tauri command, you can stall request handlers unless you carefully spawn.
-- tokio::sync::broadcast::channel(cap)
-  - Pros: bounded ring buffer; when receivers lag, old messages are overwritten (drop-oldest) and receivers see RecvError::Lagged(n); send is non-async and never blocks. Perfect when you prefer shedding over blocking.
-  - Cons: no per-receiver ordering guarantees if you count lost messages as gaps; requires handling Lagged.
+  - Pros: no backpressure; send never fails.
+  - Cons: memory grows without limit; collapses under floods.
 
-For a chat viewer, you typically want “best effort latest view” rather than “block the world and buffer everything.” That maps well to broadcast channels plus coalescing.
+- tokio::sync::mpsc::channel(cap)
+  - Pros: memory bounded; send().await slows producers when full.
+  - Cons: if called directly on a hot Tauri command path, you can stall handlers unless you spawn work off-thread.
+
+- tokio::sync::broadcast::channel(cap)
+  - Pros: bounded ring buffer; late receivers lose oldest items (drop-oldest) and get RecvError::Lagged(n); send is sync and non-blocking. Good when shedding is better than blocking.
+  - Cons: receivers observe gaps when they lag; you must handle Lagged and tolerate missing items.
+
+For a chat viewer, “latest view wins” beats “buffer everything and freeze.” That’s a fit for broadcast with coalescing.
 
 ## Design goals
 
-- Bounded memory regardless of producer rate or WebView slowness.
-- Keep the UI responsive by reducing event fan-out and work per frame.
-- Provide metrics about how often we drop or lag.
+- Memory capped even if producers outrun the WebView.
+- Keep UI work per frame low; avoid event storms.
+- Surface metrics for drops and lag to guide tuning.
 
 ## Architecture
 
-- Producers (network/LLM stream) publish ChatEvent into a bounded broadcast channel.
-- A single emitter task subscribes, coalesces events into batches every 8–16ms (one frame), and emits to the WebView.
-- On receiver lag, we record the drop count and continue.
+- Producers (network/LLM) push ChatEvent into a bounded broadcast channel.
+- One emitter task subscribes, batches for ~one frame (8–16 ms), and emits to the WebView.
+- If the receiver lags, record the drop count and keep going.
 
 ## Implementation: broadcast with drop-oldest + frame-time batching
 
@@ -182,13 +183,13 @@ async function bootstrap() {
 ```
 
 Why this works under floods:
-- Memory bounded: broadcaster ring buffer caps memory at O(capacity), plus the small batching buffer.
-- UI load bounded: coalescing amortizes per-message overhead to one emit per frame or per 256 events.
-- When overloaded: old deltas are dropped; users see the latest state, not a lagging backlog.
+- Memory is bounded: the broadcast ring caps usage at O(capacity), plus a small batching vector.
+- UI work is bounded: coalescing turns many messages into one emit per frame or per 256 events.
+- Under overload, old deltas are discarded; users see current state rather than a massive backlog.
 
 ## Anti-pattern: unbounded channels + per-message emits
 
-This is how you OOM a desktop app under flood:
+This is how you OOM a desktop app under load:
 
 ```rust
 use tokio::sync::mpsc;
@@ -200,11 +201,11 @@ while let Some(ev) = rx.recv().await {
 }
 ```
 
-Never do this for UI event streams. The WebView will stall and this buffer grows without bound.
+Avoid this for UI-bound streams. When the WebView stalls, the buffer grows forever.
 
 ## Alternative: bounded mpsc to block producers (strict delivery)
 
-If you prefer blocking producers over dropping events (e.g., you must deliver every message to persistence), use a bounded mpsc and move the blocking off the Tauri command thread:
+If dropping is unacceptable (e.g., feeding persistence that must receive every item), use a bounded mpsc and move the wait off the Tauri command path:
 
 ```rust
 use tokio::sync::mpsc;
@@ -252,26 +253,26 @@ async fn deliver_all(bus: State<'_, StrictBus>, room_id: String, text: String) -
 }
 ```
 
-This design gives strict delivery (no drops) at the cost of slowing producers when the UI is slow. If your producers are network tasks, that may be acceptable; if they’re CPU-bound tokenizers, consider yielding to avoid starving the runtime.
+This keeps delivery strict (no drops) by slowing producers when the UI is slow. That’s often fine for network-bound producers; for CPU-heavy tokenization, make sure you yield so the runtime doesn’t starve.
 
 ## Tuning knobs that actually matter
 
-- Channel capacity: start with 1–4k for broadcast (ring buffer). For strict mpsc, 256–1k is usually enough because batching drains fast.
-- Batch window: 8–16ms fits 60Hz rendering and keeps UI snappy. Increase to 33ms if your payloads are large.
-- Max batch size: 128–512. Too big increases JSON serialization and JS parsing time per emit.
-- Per-room fairness: use one channel per room and a fair round-robin in the emitter if you serve multiple chats.
-- Drop metrics: track dropped_total and expose it via a Tauri command or periodic event to inform tuning.
+- Channel capacity: for broadcast, start at 1–4k. For strict mpsc, 256–1k usually works because batching drains quickly.
+- Batch window: 8–16 ms lines up with 60 Hz and keeps the UI quick. If payloads are large, 33 ms can help.
+- Max batch size: 128–512. Oversizing just taxes JSON serialization and JS parsing.
+- Per-room fairness: one channel per room with a fair round-robin in the emitter when serving multiple chats.
+- Drop metrics: expose dropped_total via a Tauri command or periodic event so you can adjust sizing with data.
 
 ## Failure modes and guardrails
 
-- Deadlocks: don’t call send().await on a bounded mpsc inside a synchronous path that blocks the same runtime workers. Always spawn.
-- Emitter reentrancy: don’t call window.emit in a tight loop without batching; JSON serialization costs are real.
-- Shutdown: dropping all senders closes channels; make emitter exit cleanly on Closed.
-- Observability: add tracing spans around batching and emission; emit a heartbeat metric including drops and current batch sizes.
+- Deadlocks: don’t await send() on a bounded mpsc inside a path that ties up the same runtime workers. Spawn instead.
+- Emitter reentrancy: emitting per message without batching burns time on JSON work.
+- Shutdown: when all senders drop, channels close; exit the emitter cleanly on Closed.
+- Observability: add tracing around batching and emitting; publish a heartbeat with drops and batch sizes.
 
 ## TL;DR recipe
 
-- Prefer tokio::broadcast::channel for UI-bound streams: it gives bounded memory with drop-oldest semantics.
-- Always coalesce to frame time or a max batch size before emitting to the WebView.
-- If you must not lose data, use bounded mpsc and push back on producers—off the UI path.
-- Instrument and tune capacity and batch windows. You’ll ship a desktop chat that survives floods without memory blowups.
+- Use tokio::broadcast::channel for UI-facing streams to bound memory with drop-oldest behavior.
+- Batch to frame time or a max size before calling window.emit.
+- If you can’t lose data, use a bounded mpsc and backpressure producers off the UI path.
+- Measure drops and tune capacity and batch windows so floods don’t sink the app.

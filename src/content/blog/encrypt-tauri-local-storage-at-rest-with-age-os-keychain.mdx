@@ -29,17 +29,17 @@ author:
   name: Yaseen Khatib
   role: MERN + AI Architect
 ---
-
 ## Why this pattern
-Local-first apps deserve local-first cryptography. With Tauri, we can keep secrets on-device, avoid cloud KMS, and still get hardware/OS-backed protection. The pattern here:
-- Use age (X25519 recipients) for envelope/file encryption
-- Keep the age private key exclusively in the OS keychain via Rust’s keyring crate
-- Encrypt your JSON/Store/SQLite on write; decrypt on read; never persist plaintext
+Local-first apps should use local-first cryptography. With Tauri you can keep secrets on the machine, skip cloud KMS, and rely on hardware/OS protections. The approach:
 
-This yields a zero-cloud, cross-platform, ergonomic setup that’s easy to rotate and audit.
+- age with X25519 recipients for envelope/file encryption
+- Store the age private key only in the OS keychain using Rust’s keyring crate
+- Encrypt JSON/store/SQLite on write, decrypt on read, never write plaintext to disk
+
+You get a zero-cloud, cross-platform setup that’s easy to rotate and audit.
 
 ## How do you encrypt Tauri local storage at rest without a server?
-Use age for encryption and the OS keychain to store the age private key. Generate an X25519 keypair on first run, save the secret key string to the keychain, and rehydrate it to decrypt. Stream-encrypt your store file (JSON or SQLite export) to disk. The frontend never handles raw keys; it only invokes Rust commands.
+Use age for encryption and the OS keychain for the age private key. On first run, generate an X25519 keypair, save the secret key string in the keychain, and load it later to decrypt. Write your store (JSON or a SQLite export) through a streaming encryptor to disk. The frontend never touches raw keys; it only calls into Rust commands.
 
 ### OS keychain mapping
 
@@ -68,7 +68,7 @@ tauri = { version = "1.5", features = ["api-all"] }
 ``` 
 
 ## How can I use age with the OS keychain in a Tauri app?
-Initialize an age X25519 identity, persist only its secret key in the keychain, and keep the public recipient in app config. On read/write, fetch the secret from the keychain, reconstruct the identity, and stream-encrypt/decrypt files. This avoids passphrases and keeps UX native across platforms.
+Create an age X25519 identity, keep only its secret key in the keychain, and store the public recipient in app config. For reads and writes, pull the secret from the keychain, rebuild the identity, and stream-encrypt or decrypt files. This removes passphrases from the flow and keeps UX native on every platform.
 
 ### Rust: key management and stream encryption
 
@@ -250,8 +250,8 @@ await writeSecureStore(state)
 
 ## What about SQLite or large files?
 
-- SQLite: For simple local-first apps, encrypt JSON snapshots with age on graceful shutdown and restore on startup. For write-heavy apps, consider SQLCipher or LiteStream-like strategies. You can still encrypt periodic full or differential backups with age, keeping live DB plaintext only in OS-protected user space.
-- Large files: Use the same streaming API; just stream from a File or BufReader into the encryptor. Age’s streaming is chunked and constant-memory.
+- SQLite: For simple local-first apps, write JSON snapshots encrypted with age on graceful shutdown and restore on startup. For write-heavy cases, consider SQLCipher or LiteStream-like strategies. You can still encrypt periodic full or differential backups with age, keeping the live DB plaintext only in OS-protected user space.
+- Large files: Use the same streaming API; stream from a File or BufReader into the encryptor. Age’s streaming is chunked and uses constant memory.
 
 ```rust
 pub fn encrypt_file(app: &AppHandle, recipient_str: &str, src: &std::path::Path, dst: &std::path::Path) -> anyhow::Result<()> {
@@ -268,29 +268,29 @@ pub fn encrypt_file(app: &AppHandle, recipient_str: &str, src: &std::path::Path,
 
 ## Operational pitfalls and hardening
 
-- Stable service/account names: Don’t change SERVICE/ACCOUNT across releases or you’ll strand keys in the keychain.
-- Linux headless: If Secret Service isn’t available, keyring will error. Decide: block startup, show remediation, or provide an explicit “unsafe dev mode” that uses a passphrase.
-- Backups: Keychain-bound secrets typically ride with system/user backups. If you export encrypted files to another machine, you’ll need to export/import the key (or re-encrypt to multiple recipients). Age supports multiple recipients; you can add a “recovery” recipient stored in a printed paper key or YubiHSM-managed key on admin devices.
-- Multiple recipients: Encrypt to [current app recipient, recovery recipient] to de-risk device loss. With age, just add more recipients in Encryptor::with_recipients.
-- Memory hygiene: Keep decrypted blobs in memory only as long as needed. Avoid logging. Consider zeroize for sensitive buffers if you process high-value material.
-- File integrity: Age itself doesn’t authenticate filename/metadata; it does authenticate ciphertext contents. Keep per-file MAC needs in mind if you also store metadata in plaintext sidecars.
+- Stable service/account names: Keep SERVICE and ACCOUNT the same across releases or you’ll orphan keys in the keychain.
+- Linux headless: If Secret Service is missing, keyring fails. Decide whether to block startup, guide the user, or provide an explicit “unsafe dev mode” that falls back to a passphrase.
+- Backups: Keychain-bound secrets usually follow system/user backups. If you move encrypted files to another machine, you must export/import the key or encrypt to multiple recipients. Age supports multiple recipients; add a “recovery” recipient stored as a printed paper key or a YubiHSM-managed key on admin devices.
+- Multiple recipients: Encrypt to [current app recipient, recovery recipient] to reduce device-loss risk. With age, pass both recipients to Encryptor::with_recipients.
+- Memory hygiene: Hold decrypted data in memory only as long as needed. Don’t log it. Consider zeroize for sensitive buffers if the material is high value.
+- File integrity: Age authenticates ciphertext contents but not filenames or metadata. If you store metadata in plaintext sidecars, add a per-file MAC if needed.
 
 ## How do I rotate encryption keys in a Tauri desktop app?
-Decrypt using the old private key from the keychain, generate a new identity, update the keychain entry, then re-encrypt with the new recipient. Provide a one-shot command that’s idempotent, transactional, and logs rotation success. Optionally support multiple recipients to support staged rotation.
+Decrypt with the old private key from the keychain, generate a new identity, update the keychain entry, then re-encrypt with the new recipient. Provide a one-shot command that is idempotent and transactional, and record rotation success. If you need staged rotation, support multiple recipients during the cutover.
 
-The rotate_key command above implements a simple one-step rotation. To stage rotation across multiple files, iterate over files and rewrap in batches; keep both old and new recipients during the transition, then remove the old.
+The rotate_key command above implements a simple one-step rotation. For many files, rewrap in batches; include both old and new recipients while migrating, then remove the old one.
 
 ## Threat model and trade-offs
 
-- Protects at rest against disk theft and offline exfiltration. Attacker needs OS account or to break OS keychain/DPAPI/Keychain.
-- If the user session is unlocked, malware with user privileges may call the same Tauri commands. Add app-level authorization or platform prompts if your threat model includes on-box malware.
-- No passphrase UX: Great for productivity apps. For high-assurance use, allow an optional user passphrase that adds a passphrase recipient (age passphrase) alongside the device key.
+- Protects at rest against disk theft and offline exfiltration. An attacker needs the OS account or a break in the OS keychain/DPAPI/Keychain.
+- If the user session is unlocked, malware with user privileges can call the same Tauri commands. Add app-level authorization or platform prompts if on-box malware is in scope.
+- No passphrase UX: Good for productivity apps. For higher assurance, offer an optional user passphrase by adding a passphrase recipient (age passphrase) alongside the device key.
 
 ## Testing and DX tips
 
-- Dev vs prod: Use different SERVICE values for dev builds to avoid clobbering real keys. Gate via build-time cfg or ENV.
-- CI: Don’t run crypto tests requiring keychain in headless CI by default. Feature-gate or mock the keyring layer.
-- Telemetry: Count rotation successes/failures locally. Do not export key material or recipient strings unless strictly necessary.
+- Dev vs prod: Use different SERVICE values for dev builds to avoid clobbering real keys. Gate with build-time cfg or environment.
+- CI: Avoid running crypto tests that require a keychain in headless CI by default. Feature-gate or mock the keyring layer.
+- Telemetry: Track rotation successes and failures locally. Do not export key material or recipient strings unless absolutely required.
 
 ## Conclusion
-This pattern gives you a pragmatic zero-cloud encryption story for Tauri: age for strong, modern cryptography; OS keychain for key custody; and streaming I/O for performance. It’s simple to ship, friendly to users, and robust across macOS, Windows, and Linux. For most local-first desktop apps, it’s the right default.
+Use age for modern crypto, the OS keychain for custody, and streaming I/O for performance. It ships cleanly, keeps users out of key management, and works across macOS, Windows, and Linux. For most local-first desktop apps, this is the default that holds up.

@@ -30,16 +30,15 @@ author:
   name: Yaseen Khatib
   role: MERN + AI Architect
 ---
-
 ## The constraint: 1.8% idle CPU in a forever-on tray app
 
-Long-running tray apps are power apps. They sit in the background, wake the CPU, trigger fans, and murder battery if you’re sloppy. A realistic budget on modern laptops (M1/M2, Intel Evo, Ryzen mobile) is ~1–2% CPU at idle with near-zero wakeups per second. The biggest lever is architectural: event-driven over polling.
+Tray apps that never exit are power-sensitive. They sit off-screen, wake the CPU, kick on fans, and chew battery if you get the model wrong. On current laptops (M1/M2, Intel Evo, Ryzen mobile), the realistic idle budget is roughly 1–2% CPU with close to zero wakeups per second. Hitting that consistently is mostly an architecture choice: prefer events over polling.
 
-This post shows a concrete, production-grade way to wire a Tauri tray app so it idles around 1.8% CPU by leaning on OS events, async I/O, and strict back-pressure.
+Here’s a concrete, production-ready way to wire a Tauri tray app so it idles around 1.8% CPU by leaning on OS events, async I/O, and strict back-pressure.
 
 ## Why polling fails (math, not vibes)
 
-Every timer-based poll is a periodic wakeup. Wakeups prevent deep C-states, and short intervals eviscerate your idle target.
+Every timer-driven poll forces a periodic wakeup. Those wakeups block deep C-states, and short intervals wreck your idle target.
 
 - Wakeups per second = 1 / interval_seconds
 - CPU overhead grows with wakeup rate and handler cost; often the fixed scheduler and context-switch cost dominates.
@@ -52,28 +51,28 @@ Example (measured on M2 Pro, Release build, empty handler):
 | 5s | 0.2 | 1.2–1.8% | Barely acceptable if handler is trivial |
 | 60s | 0.016 | ~0.5% | Okay, but still needless if data is eventable |
 
-TL;DR: If the source can be evented (file changes, network pushes, OS state), don’t poll. If you must poll, adaptively back off to minute-scale when idle.
+Bottom line: if the source can be evented (file changes, network pushes, OS state), don’t poll. When you can’t avoid polling, back off adaptively into minute-scale intervals while idle.
 
 ## Architecture: push first, poll as a dark corner
 
-- Backend (Rust) owns all I/O, watchers, and coalescing. It emits events to the frontend only when state actually changes.
-- Frontend (TS/React/Svelte) subscribes to events and does zero periodic work. No setInterval.
-- Streams: filesystem changes via `notify`, server push via WebSocket/SSE, OS tray/menu events via Tauri. Fallback HTTP polling is adaptive, jittered, and idles to minutes.
+- Backend (Rust) owns I/O, watchers, and coalescing. It only emits to the frontend when real state changes occur.
+- Frontend (TS/React/Svelte) subscribes and stays passive. No setInterval.
+- Streams: filesystem via `notify`, server push via WebSocket/SSE, OS tray/menu events via Tauri. Fallback HTTP polling is adaptive, jittered, and retreats to minute-level when idle.
 
 ### Key principles
 
-- Use event sources that the OS already schedules (kqueue/FSEvents/inotify/IOCP).
-- Batch and coalesce bursts; cap fan-out with bounded mpsc channels.
-- Prefer long-lived connections (WebSocket/SSE) over short-interval HTTP pulls.
-- Emit UI updates on the main thread but do the heavy lifting off-thread.
+- Use event sources scheduled by the OS (kqueue/FSEvents/inotify/IOCP).
+- Batch bursts and coalesce; bound fan-out with mpsc channels.
+- Keep long-lived connections (WebSocket/SSE) instead of short-interval HTTP.
+- Do UI emits on the main thread; move work off-thread.
 
 ## Code: a Tauri tray app wired for events
 
-The example below shows:
-- System tray with click handlers
-- File watching without polling
+The example below wires up:
+- A system tray with click handlers
+- File watching without timers
 - WebSocket push with exponential backoff
-- Bounded, deduped event bus to the UI
+- A bounded, deduped event bus into the UI
 
 ```rust
 // src-tauri/src/main.rs
@@ -305,17 +304,17 @@ function applyUpdate(payload: any) { /* update in-memory state and minimal UI */
 bootstrap();
 ```
 
-No timers. The UI only reacts to backend events.
+No timers here. The UI only reacts to backend events.
 
 ## Coalescing and back-pressure: keep wakeups low under burst
 
-Event sources can burst (e.g., many small file writes). Strategies:
+Event streams can spike (for example, a series of small file writes). Plan for it.
 
-- Bounded channels: the `mpsc::channel(128)` drops or back-pressures beyond 128 in-flight updates. For idempotent updates, dropping is fine.
-- Deduplication: suppress repeated payloads for the same kind.
-- Debounce: 100–300 ms window for filesystem bursts.
+- Bounded channels: the `mpsc::channel(128)` applies back-pressure or drops when more than 128 updates are in flight. For idempotent updates, drops are acceptable.
+- Deduplication: skip repeats with identical payloads per kind.
+- Debounce: 100–300 ms windows work well for filesystem storms.
 
-A more aggressive coalescer can use a keyed buffer that emits the latest value per key every N ms.
+If you need more, add a keyed buffer and emit the latest value per key on a fixed cadence.
 
 ```rust
 use tokio::time::{interval, Duration};
@@ -346,31 +345,31 @@ impl Coalescer {
 
 ## Measuring the budget: trust but verify
 
-Instrument locally and validate with OS tools.
+Measure locally and confirm with OS tooling.
 
-- In-process: sample process CPU and wakeups; on Linux use `/proc`, on macOS use `host_statistics`. Or use `sysinfo` crate to log CPU every 30s to a ring buffer.
-- macOS: `sudo powermetrics --samplers tasks -i 1000` shows wakeups and C-state residency. Activity Monitor’s “Energy Impact” is a weak proxy; powermetrics is truth.
-- Windows: capture ETW (Windows Performance Recorder), analyze in WPA. Look at CPU Usage (Sampled), CPU Idle States, and Power->Energy usage.
+- In-process: sample process CPU and wakeups; on Linux read `/proc`, on macOS use `host_statistics`. The `sysinfo` crate can log CPU every 30s into a ring buffer.
+- macOS: `sudo powermetrics --samplers tasks -i 1000` reports wakeups and C-state residency. Activity Monitor’s “Energy Impact” is only a rough proxy; powermetrics is the reference.
+- Windows: record ETW (Windows Performance Recorder), analyze in WPA. Check CPU Usage (Sampled), CPU Idle States, and Power->Energy usage.
 - Linux: `powertop` and `perf stat -a -e power/energy-cores/ -p <pid>`.
 
-Aim for:
-- Wakeups/s near zero at idle (<< 0.1/s)
-- CPU around 0.5–1.8% depending on platform
-- No periodic network even when idle
+Targets:
+- Wakeups/s near zero at idle (well under 0.1/s)
+- CPU around 0.5–1.8% by platform
+- No periodic network when idle
 
 ## Tauri-specific pitfalls to avoid
 
-- Don’t block the main thread. Heavy work must run in `tauri::async_runtime::spawn` tasks.
-- Don’t use frontend `setInterval`. All periodic work belongs in Rust and should be avoided anyway.
-- For filesystem changes, prefer `RecommendedWatcher` (native), not `PollWatcher`.
-- If you must poll HTTP, make it adaptive and ETag/If-None-Match based, with jitter and minutes-scale intervals.
-- Emit fewer, richer events instead of many fine-grained events.
+- Don’t block the main thread. Heavy work belongs in `tauri::async_runtime::spawn`.
+- Don’t use frontend `setInterval`. Any periodic work should live in Rust and should be rare.
+- For filesystem changes, stick to `RecommendedWatcher` (native), not `PollWatcher`.
+- If HTTP polling is unavoidable, keep it adaptive, ETag/If-None-Match based, jittered, and on minute-scale while idle.
+- Prefer fewer, richer events to many fine-grained ones.
 
 ## What about cron-like schedules?
 
-If you truly need a daily job, align with the OS and coalesce timers:
-- macOS: consider a launchd agent with StartInterval or a low-urgency DispatchSource timer in a helper.
-- Windows: use a Scheduled Task if the machine can be asleep; otherwise, a long `tokio::time::sleep` with process lifetime is fine. Avoid sub-minute repeating timers.
+If you truly need a daily job, align with the OS and share timers when possible:
+- macOS: use a launchd agent with StartInterval, or a low-urgency DispatchSource timer in a helper.
+- Windows: use a Scheduled Task if sleep is likely; otherwise a long `tokio::time::sleep` works with process lifetime. Avoid sub-minute repeats.
 
 ## Results snapshot
 
@@ -379,14 +378,14 @@ On a representative build (Rust release, WebSocket idle, notify watcher active, 
 - Windows 11 (12900H): ~0.8–1.4% CPU, wakeups near baseline
 - Linux (6.x kernel, Framework 13): ~0.7–1.2% CPU, powertop shows no additional timers
 
-Adding a 5s polling loop alone pushed idle to ~1.3–1.8% on macOS and ~1.5–2.2% on Windows. Removing it and relying on evented sources pulled us back under 1% most of the time.
+Adding a 5s polling loop alone pushed idle to ~1.3–1.8% on macOS and ~1.5–2.2% on Windows. Removing it and going event-driven brought idle back under 1% most of the time.
 
 ## Checklist to hit ~1.8% idle
 
 - Replace polling with: file watchers (notify), push (WebSocket/SSE), OS events (tray/menu, power, network reachability).
-- Keep one long-lived socket; exponential backoff reconnects with jitter.
+- Keep a single long-lived socket; reconnect with exponential backoff and jitter.
 - Bound and coalesce events; dedupe payloads.
-- No frontend timers. UI is purely reactive to backend emits.
-- Instrument CPU and wakeups; verify with powermetrics/ETW/powertop.
+- No frontend timers. Make the UI purely reactive to backend emits.
+- Instrument CPU and wakeups; confirm with powermetrics/ETW/powertop.
 
-The outcome is a tray app that behaves like a good citizen: quiet at idle, instant on change, and well under a 1–2% CPU budget.
+Do this and the tray app stays quiet at idle, reacts immediately to change, and holds a 1–2% CPU budget.
