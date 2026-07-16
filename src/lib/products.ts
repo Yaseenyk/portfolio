@@ -83,5 +83,5 @@ export function getProduct(slug: string): ProductMeta | undefined {
 }
 
 export function productUrl(slug: ProductSlug): string {
-  return `${SITE_URL}/products/${slug}`;
+  return `${SITE_URL}/products/${slug}/`;
 }

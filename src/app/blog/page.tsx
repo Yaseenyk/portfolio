@@ -9,13 +9,13 @@ export const metadata: Metadata = {
   title: "Field Notes",
   description:
     "Field notes on architecting MERN stacks, agentic AI workflows, and shipping production systems at AI-speed.",
-  alternates: { canonical: `${SITE_URL}/blog` },
+  alternates: { canonical: `${SITE_URL}/blog/` },
   openGraph: {
     type: "website",
     title: "Field Notes | Yaseen Khatib",
     description:
       "Field notes on architecting MERN stacks, agentic AI workflows, and shipping production systems at AI-speed.",
-    url: `${SITE_URL}/blog`,
+    url: `${SITE_URL}/blog/`,
     siteName: "Yaseen Khatib",
   },
 };

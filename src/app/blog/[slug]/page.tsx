@@ -119,9 +119,11 @@ export async function generateMetadata({
   const post = await resolvePost(params.slug);
   if (!post) return {};
 
-  const url = `${SITE_URL}/blog/${post.slug}`;
+  const url = `${SITE_URL}/blog/${post.slug}/`;
   const ogImage = resolveOgImage(post.slug, post.ogImage);
-  const images = ogImage ? [{ url: ogImage }] : undefined;
+  const images = ogImage
+    ? [{ url: ogImage, width: 1536, height: 1024, alt: post.title }]
+    : undefined;
 
   return {
     title: post.title,
@@ -154,7 +156,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const post = await resolvePost(params.slug);
   if (!post) notFound();
 
-  const url = `${SITE_URL}/blog/${post.slug}`;
+  const url = `${SITE_URL}/blog/${post.slug}/`;
   const lesson = resolveLesson(post.slug);
   const ogImage = resolveOgImage(post.slug, post.ogImage);
   const related = relatedPosts(post);
@@ -181,7 +183,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             isPartOf: {
               "@type": "Course",
               name: lesson.series.courseName,
-              url: `${SITE_URL}${lesson.series.hubPath}`,
+              url: `${SITE_URL}${lesson.series.hubPath}/`,
             },
             position: lesson.lesson.step,
           }

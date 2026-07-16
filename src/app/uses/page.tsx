@@ -26,12 +26,12 @@ export const metadata: Metadata = {
     "Cursor IDE",
     "GitHub Copilot",
   ],
-  alternates: { canonical: `${SITE_URL}/uses` },
+  alternates: { canonical: `${SITE_URL}/uses/` },
   openGraph: {
     type: "article",
     title: "Uses | AI & MERN Development Stack",
     description: DESCRIPTION,
-    url: `${SITE_URL}/uses`,
+    url: `${SITE_URL}/uses/`,
     siteName: "Yaseen Khatib",
   },
 };
@@ -152,7 +152,7 @@ const usesJsonLd = {
   dateModified: "2026-06-06",
   author: { "@id": PERSON_ID, name: PERSON.name },
   publisher: personRef,
-  mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/uses` },
+  mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/uses/` },
   about: "Developer hardware, software, and AI orchestration tooling",
   mentions: CLUSTERS.flatMap((c) =>
     c.items.map((i) => ({

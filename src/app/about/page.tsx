@@ -22,12 +22,12 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: "About Yaseen Khatib",
   description: DESCRIPTION,
-  alternates: { canonical: `${SITE_URL}/about` },
+  alternates: { canonical: `${SITE_URL}/about/` },
   openGraph: {
     type: "profile",
     title: "About Yaseen Khatib — Senior Full-Stack AI Engineer",
     description: DESCRIPTION,
-    url: `${SITE_URL}/about`,
+    url: `${SITE_URL}/about/`,
     siteName: "Yaseen Khatib",
   },
 };
@@ -42,7 +42,7 @@ const HAS_PORTRAIT = fs.existsSync(
 const aboutJsonLd = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
-  url: `${SITE_URL}/about`,
+  url: `${SITE_URL}/about/`,
   name: "About Yaseen Khatib",
   description: DESCRIPTION,
   isPartOf: { "@id": WEBSITE_ID },

@@ -27,12 +27,12 @@ export const metadata: Metadata = {
     "IntegrateX",
     "TypeScript",
   ],
-  alternates: { canonical: `${SITE_URL}/sandbox` },
+  alternates: { canonical: `${SITE_URL}/sandbox/` },
   openGraph: {
     type: "website",
     title: "Sandbox | Live React Flow Workflow Engine",
     description: DESCRIPTION,
-    url: `${SITE_URL}/sandbox`,
+    url: `${SITE_URL}/sandbox/`,
     siteName: "Yaseen Khatib",
   },
 };
@@ -46,15 +46,16 @@ export default function SandboxPage() {
       <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-24">
         <main className="pt-28">
           <div className="flex items-center gap-3">
-            <h1 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
+            <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
               ~/sandbox
-            </h1>
+            </span>
             <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
           </div>
 
-          <h2 className="mt-6 max-w-3xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+          {/* The descriptive title is the h1 — the eyebrow is decoration */}
+          <h1 className="mt-6 max-w-3xl text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl">
             A live <GradientText>workflow engine</GradientText>, not a screenshot.
-          </h2>
+          </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
             This is the architecture behind IntegrateX, running in your browser.
             Drag the nodes, drag from one handle to another to rewire the graph —

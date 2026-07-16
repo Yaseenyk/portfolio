@@ -5,7 +5,7 @@ import RoadmapHub from "@/components/blog/RoadmapHub";
 import { personRef, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 
-const url = `${SITE_URL}/claude-code`;
+const url = `${SITE_URL}/claude-code/`;
 
 export const metadata: Metadata = {
   title: CC_META.title,

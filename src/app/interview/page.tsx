@@ -52,12 +52,12 @@ export const metadata: Metadata = {
     "Zustand",
     "Agentic Workflows",
   ],
-  alternates: { canonical: `${SITE_URL}/interview` },
+  alternates: { canonical: `${SITE_URL}/interview/` },
   openGraph: {
     type: "article",
     title: "Interview Context | Yaseen Khatib",
     description: DESCRIPTION,
-    url: `${SITE_URL}/interview`,
+    url: `${SITE_URL}/interview/`,
     siteName: "Yaseen Khatib",
   },
 };

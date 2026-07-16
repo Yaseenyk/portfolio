@@ -17,7 +17,7 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: PageProps): Metadata {
   const entry = getTagIndex().get(params.tag);
   if (!entry) return {};
-  const url = `${SITE_URL}/blog/tag/${params.tag}`;
+  const url = `${SITE_URL}/blog/tag/${params.tag}/`;
   const description = `${entry.posts.length} article${entry.posts.length === 1 ? "" : "s"} on ${entry.label} by Yaseen Khatib — production lessons from shipped AI systems.`;
   return {
     title: `${entry.label} — Articles`,

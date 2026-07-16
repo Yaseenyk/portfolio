@@ -5,7 +5,7 @@ import RoadmapHub from "@/components/blog/RoadmapHub";
 import { personRef, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 
-const url = `${SITE_URL}/anthropic-roadmap`;
+const url = `${SITE_URL}/anthropic-roadmap/`;
 
 export const metadata: Metadata = {
   title: AN_META.title,

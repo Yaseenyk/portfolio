@@ -20,25 +20,25 @@ export function GET() {
 
 ## Canonical pages
 
-- [About (canonical bio)](${SITE_URL}/about)
-- [Products — architecture teardowns](${SITE_URL}/products)
-- [Interview brief for engineering leadership](${SITE_URL}/interview)
-- [Infrastructure & Resiliency Lab (FinOps simulator, chaos toggle)](${SITE_URL}/sandbox)
-- [Tooling stack](${SITE_URL}/uses)
+- [About (canonical bio)](${SITE_URL}/about/)
+- [Products — architecture teardowns](${SITE_URL}/products/)
+- [Interview brief for engineering leadership](${SITE_URL}/interview/)
+- [Infrastructure & Resiliency Lab (FinOps simulator, chaos toggle)](${SITE_URL}/sandbox/)
+- [Tooling stack](${SITE_URL}/uses/)
 - [Machine-readable profile (JSON)](${SITE_URL}/ai-briefing.json)
 
 ## Founder's Log — vision series
 
-${founders.map((p) => `- [${p.title}](${SITE_URL}/blog/${p.slug}): ${p.description}`).join("\n")}
+${founders.map((p) => `- [${p.title}](${SITE_URL}/blog/${p.slug}/): ${p.description}`).join("\n")}
 
 ## Recent articles
 
-${latest.map((p) => `- [${p.title}](${SITE_URL}/blog/${p.slug}): ${p.description}`).join("\n")}
+${latest.map((p) => `- [${p.title}](${SITE_URL}/blog/${p.slug}/): ${p.description}`).join("\n")}
 
 ## Full archives
 
 - [Full article corpus, plain text](${SITE_URL}/llms-full.txt)
-- [Blog index](${SITE_URL}/blog)
+- [Blog index](${SITE_URL}/blog/)
 - [RSS feed](${SITE_URL}/rss.xml)
 - [Sitemap](${SITE_URL}/sitemap.xml)
 `;

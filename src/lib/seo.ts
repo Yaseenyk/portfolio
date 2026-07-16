@@ -51,6 +51,14 @@ export interface Crumb {
   path: string;
 }
 
+/** Canonical form of a site-relative path: served URLs carry a trailing
+ *  slash (trailingSlash + GitHub Pages), so canonicals/sitemap/JSON-LD must
+ *  too — otherwise they point at 301s. */
+export function canonicalUrl(path: string): string {
+  if (!path || path === "/") return SITE_URL;
+  return `${SITE_URL}${path.endsWith("/") ? path : `${path}/`}`;
+}
+
 /** BreadcrumbList for a nested page — pass the trail below Home. */
 export function breadcrumbJsonLd(trail: Crumb[]) {
   const crumbs = [{ name: "Home", path: "" }, ...trail];
@@ -61,7 +69,7 @@ export function breadcrumbJsonLd(trail: Crumb[]) {
       "@type": "ListItem",
       position: i + 1,
       name: c.name,
-      item: `${SITE_URL}${c.path}`,
+      item: canonicalUrl(c.path),
     })),
   };
 }
