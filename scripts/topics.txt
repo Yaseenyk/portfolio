@@ -1,4 +1,3 @@
-Merging Twitch and YouTube Live chat into one local event stream with ordered, de-duplicated delivery
 Proving zero network leakage: a deny-by-default egress test harness for a desktop app in CI
 Embedding SQLite in Tauri with sqlx: schema migrations and WAL tuning for a single-user local datastore
 Content-addressed local media storage: deduplication and integrity verification with BLAKE3
