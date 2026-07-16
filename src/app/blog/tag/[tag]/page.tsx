@@ -5,7 +5,6 @@ import { SITE_URL, formatDate } from "@/lib/blog";
 import { getTagIndex } from "@/lib/tags";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
-import GradientText from "@/components/GradientText";
 
 interface PageProps {
   params: { tag: string };
@@ -66,8 +65,8 @@ export default function TagPage({ params }: PageProps) {
         <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
           ~/blog/tag
         </span>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-zinc-50">
-          <GradientText>{entry.label}</GradientText>
+        <h1 className="mt-4 text-4xl font-bold tracking-tight text-zinc-50">
+          #{entry.label}
         </h1>
         <p className="mt-3 text-zinc-400">
           {entry.posts.length} article{entry.posts.length === 1 ? "" : "s"} —

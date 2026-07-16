@@ -16,6 +16,7 @@ import ShadowDocs from "./projects/ShadowDocs";
 import SupportAgentDocs from "./projects/SupportAgentDocs";
 import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
 import AiBloggerArt from "./products/art/AiBloggerArt";
+import SableArt from "./products/art/SableArt";
 
 interface ProjectLink {
   href: string;
@@ -76,6 +77,22 @@ const PROJECTS: Project[] = [
       {
         href: "https://github.com/Yaseenyk/streamer-os-website/tree/main/api",
         label: "Agent API source",
+        icon: "github",
+      },
+    ],
+  },
+  {
+    name: "Sable",
+    category: "Local-First · AI Finance Agent",
+    description:
+      "A personal-finance agent where the AI is structurally incapable of touching the money: every record lives in on-device SQLite (no cloud backend), and the model's function calls render as Review & Confirm cards — it proposes, only a human commits. Serialized writes, offline-first, and a daily on-device briefing.",
+    metrics: ["Propose/Confirm Boundary", "Zero-Cloud", "On-Device RAG"],
+    tech: ["React Native", "SQLite", "Function Calling", "TypeScript"],
+    Animation: SableArt,
+    links: [
+      {
+        href: "https://github.com/Yaseenyk/sable",
+        label: "Source code",
         icon: "github",
       },
     ],

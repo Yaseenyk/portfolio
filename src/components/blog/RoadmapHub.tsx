@@ -151,7 +151,7 @@ export default function RoadmapHub({
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
           [ {eyebrow} ]
         </p>
-        <h1 className="text-gradient animate-gradient mt-4 text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
+        <h1 className="mt-4 text-balance text-4xl font-bold leading-[1.12] tracking-tight text-zinc-50 sm:text-5xl">
           {meta.title}
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-zinc-400">
