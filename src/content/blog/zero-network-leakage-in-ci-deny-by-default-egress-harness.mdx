@@ -1,0 +1,306 @@
+---
+title: 'Zero Network Leakage in CI: Deny-by-Default Egress Harness'
+slug: zero-network-leakage-in-ci-deny-by-default-egress-harness
+date: '2026-07-17'
+description: A practical, cross-platform harness to prove your desktop app makes zero
+  outbound network calls in CI by default—block, log, count, and assert.
+tags:
+- Security
+- CI/CD
+- Desktop
+keywords:
+- deny-by-default egress testing
+- nftables egress policy CI
+- Electron desktop app network namespace
+- iptables log drop attempts
+- pfctl deny egress CI macOS
+- Windows firewall outbound block test harness
+- GitHub Actions network namespace firewall
+- cgroup-bpf connect hook CI
+readingMinutes: 9
+takeaways:
+- Run the app in an isolated network namespace with deny-by-default egress and explicit
+  counters.
+- Fail the build if any egress drop counters increment—publish logs and pcaps for
+  auditability.
+- Prefer nftables on Linux, pf on macOS, and Windows Filtering Platform on Windows;
+  keep the policy self-contained.
+- 'This is not free: it adds CI complexity and can mask timing-sensitive bugs if overused;
+  use where compliance warrants.'
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Why prove zero network leakage at all?
+A desktop app that “never phones home” is a compliance line item until an auditor asks for proof. Proof means instrumentation and repeatability, not a Slack promise. The simplest credible artifact: a deny-by-default egress policy enforced around your app, counters and logs showing zero attempts, and the harness running in CI on every build.
+
+## How do you prove zero egress in CI without breaking everything?
+Run the app in an isolated network context with a default-drop egress policy. Allow only loopback and any test stubs you control. Log and count all denied packets. Execute your test suite. At the end, assert that the deny counters are zero. Publish the firewall rules, counters, and a pcap/log excerpt as build artifacts.
+
+I’ll show Linux first (GitHub Actions ubuntu-22.04), then quick notes for macOS and Windows. If you’re shipping Electron/Node (e.g., Electron 28.x on Node 18.20.x), this slots in cleanly.
+
+## Linux: network namespace + nftables (deny-by-default, audited)
+Typical environment: Ubuntu 22.04.4 LTS, nft v1.0.2, GitHub Actions runner 2.317.0. The pattern:
+- Create a dedicated netns for the test.
+- Wire in a veth pair so we can run stubs on the host (optional) and keep loopback available.
+- Apply an nftables table that drops everything by default, with log+counter on the deny path.
+- Run the app inside the netns.
+- Assert counters are zero.
+
+### Setup script (idempotent) and policy
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+NS=egress_test
+TABLE=egressctl
+CHAIN=out
+HOST_IF=veth0
+NS_IF=veth1
+HOST_IP=10.200.0.1
+NS_IP=10.200.0.2
+
+# Clean old netns if present
+ip netns del "$NS" 2>/dev/null || true
+
+# Create netns and veth pair
+ip netns add "$NS"
+ip link add "$HOST_IF" type veth peer name "$NS_IF"
+ip addr add "$HOST_IP/24" dev "$HOST_IF"
+ip link set "$HOST_IF" up
+ip link set "$NS_IF" netns "$NS"
+ip netns exec "$NS" ip addr add "$NS_IP/24" dev "$NS_IF"
+ip netns exec "$NS" ip link set lo up
+ip netns exec "$NS" ip link set "$NS_IF" up
+
+# Optional: no default route — anything non-local must match explicit allow
+ip netns exec "$NS" ip route add 10.200.0.0/24 dev "$NS_IF"
+
+# Prepare nftables table in the namespace using its own netns instance
+# We use the namespace's own net stack; nft runs in-target with ip netns exec
+ip netns exec "$NS" nft -f - <<'EOF'
+flush ruleset
+
+table inet egressctl {
+  counter c_egress_drop {}
+  counter c_egress_allow {}
+
+  chain out {
+    type filter hook output priority 0; policy drop;
+
+    # Always allow loopback inside the ns
+    oifname "lo" counter name c_egress_allow accept
+
+    # Allow talking to our host stub (if any)
+    ip daddr 10.200.0.1 counter name c_egress_allow accept
+
+    # Log+drop everything else (covers TCP/UDP/ICMP/IPv6 by default)
+    log prefix "EGRESS DROP: " flags all counter name c_egress_drop drop
+  }
+}
+EOF
+
+# Verify
+ip netns exec "$NS" nft list table inet "$TABLE"
+```
+
+If you see an error like:
+- Error: Could not process rule: No such file or directory — you probably tried to add a rule referencing an object before declaring it, or you’re mixing iptables-legacy with nft. Stick to nft end-to-end on 22.04.
+
+This policy denies all egress except loopback and a single host stub at 10.200.0.1. No DNS. No NTP. No IPv6 outside. If your app tries anything else, the drop counter increments and a kernel log line with prefix “EGRESS DROP:” appears.
+
+### A small Node harness to execute and assert
+This harness runs your desktop app inside the namespace, captures nft counters, and fails if any drop occurred. Replace the command with your actual runner (e.g., electron-mocha, playwright, or the packaged binary).
+
+```ts
+// harness.ts — Node 18.20.x
+type ExecResult = { stdout: string; stderr: string; code: number };
+import { spawn } from 'node:child_process';
+
+function sh(cmd: string, args: string[] = [], opts: any = {}): Promise<ExecResult> {
+  return new Promise((resolve) => {
+    const p = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'], ...opts });
+    let out = '', err = '';
+    p.stdout.on('data', (b) => (out += b.toString()));
+    p.stderr.on('data', (b) => (err += b.toString()));
+    p.on('close', (code) => resolve({ stdout: out, stderr: err, code: code ?? 0 }));
+  });
+}
+
+async function main() {
+  const NS = process.env.NS || 'egress_test';
+
+  // Optional: start a local stub server on the host (10.200.0.1) that the app may legitimately call
+  const http = await import('node:http');
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ ok: true }));
+  });
+  await new Promise<void>((resolve, reject) => server.listen(3000, '10.200.0.1', () => resolve()));
+
+  // Run the app inside the namespace
+  const appCmd = process.env.APP_CMD || 'node';
+  const appArgs = (process.env.APP_ARGS || '-e console.log("app under test")').split(' ');
+  const run = await sh('ip', ['netns', 'exec', NS, appCmd, ...appArgs], { env: process.env });
+  process.stdout.write(run.stdout);
+  process.stderr.write(run.stderr);
+
+  // Read counters and fail if any drops
+  const counters = await sh('ip', ['netns', 'exec', NS, 'nft', 'list', 'table', 'inet', 'egressctl']);
+  const drop = /counter c_egress_drop \{ packets (\d+) bytes (\d+) \}/.exec(counters.stdout);
+  const droppedPackets = drop ? parseInt(drop[1], 10) : NaN;
+
+  // Publish a short audit line
+  console.log(`egress_drop_packets=${droppedPackets}`);
+
+  server.close();
+
+  if (!Number.isFinite(droppedPackets)) {
+    console.error('Could not parse nft counters');
+    process.exit(2);
+  }
+  if (droppedPackets > 0) {
+    console.error('Egress attempts detected. See kernel logs for EGRESS DROP entries.');
+    // Surface some journal tail (GitHub Actions preserves job logs)
+    const log = await sh('ip', ['netns', 'exec', NS, 'dmesg']);
+    console.error(log.stdout.split('\n').filter(line => line.includes('EGRESS DROP')).slice(-20).join('\n'));
+    process.exit(1);
+  }
+}
+
+main().catch((e) => { console.error(e); process.exit(3); });
+```
+
+Notes:
+- If you prefer pcaps, run `ip netns exec egress_test tcpdump -i any -n -w /tmp/egress.pcap` in parallel and upload it as an artifact. Expected size is tiny (tens of KB) if there’s truly no traffic.
+- Overhead is negligible in CI: netns+ruleset setup is ~50–150 ms on a cold runner; nft counters are O(1) to read.
+
+### GitHub Actions wiring
+```yaml
+name: egress-guard
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with: { node-version: '18.20.3' }
+      - name: Netns + nft policy
+        run: |
+          sudo bash ./scripts/netns_setup.sh
+      - name: Install deps
+        run: npm ci
+      - name: Run harness
+        run: node ./scripts/harness.js
+      - name: Export nft counters
+        if: always()
+        run: |
+          sudo ip netns exec egress_test nft list table inet egressctl | tee egress.nft.txt
+      - name: Upload audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: egress-audit
+          path: |
+            egress.nft.txt
+            /tmp/egress.pcap
+```
+
+If the app attempts egress, your logs will include lines like:
+- kernel: EGRESS DROP: IN= OUT=veth1 SRC=10.200.0.2 DST=142.250.72.14 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=12345 DF PROTO=TCP SPT=46952 DPT=443
+
+That’s an immediate, auditable failure.
+
+## How do you allow just one domain but still verify no leaks elsewhere?
+Resolve the domain ahead of time and allow the resolved IPs explicitly in your egress chain, then run tests with a frozen hosts file or embedded resolver. Log and count everything else. If IPs are dynamic, pin through a proxy on a static RFC1918 address you control and allow only that.
+
+A realistic pattern is to force the app to use your stub/proxy:
+- Allow to 10.200.0.1:8443 only.
+- Run a local TLS proxy that validates SNI/ALPN and origin.
+- Deny everything else.
+
+With nftables, that’s just one more accept rule:
+
+```bash
+ip netns exec egress_test nft add rule inet egressctl out tcp dport 8443 ip daddr 10.200.0.1 counter name c_egress_allow accept
+```
+
+Don’t chase live DNS in CI if you can avoid it. It’s non-deterministic and auditors like determinism.
+
+## macOS: pf anchor (quick-and-dirty)
+On macOS 13/14 runners, use pf with an anchor. This blocks all outbound except loopback and your stub. Logs go to pflog0.
+
+```bash
+cat >/tmp/egress_anchor.conf <<'PF'
+block drop out all
+pass out quick on lo0 all
+pass out quick inet proto tcp from any to 127.0.0.1 port 3000 keep state
+PF
+
+sudo pfctl -f /tmp/egress_anchor.conf
+sudo pfctl -E || true  # "pfctl: pf already enabled"
+sudo ifconfig pflog0 create || true
+sudo tcpdump -n -ttt -i pflog0 -c 1 >/tmp/pf_sanity.txt || true
+
+# Run your app/tests here
+
+# Check for any blocks
+sudo tcpdump -n -i pflog0 -c 100 -w /tmp/pf_egress.pcap &
+TPID=$!
+sleep 1
+# ... run tests ...
+kill $TPID || true
+
+# Quick textual grep
+sudo tcpdump -n -vvv -r /tmp/pf_egress.pcap | grep -i 'block' && exit 1 || echo 'no blocks'
+```
+
+pf doesn’t give you nft-style named counters, but pflog is reliable. Expect a few KB pcap if nothing happens.
+
+## Windows: WFP rules scoped to the process
+Windows Firewall (WFP) can be scoped to a specific program. It’s not as ergonomic for counters; capture with wfpdiag or netsh trace.
+
+```powershell
+$exe = Join-Path $env:RUNNER_TEMP 'app-under-test.exe'
+
+# Deny-by-default for the process
+New-NetFirewallRule -DisplayName 'EgressDenyApp' -Direction Outbound -Action Block -Program $exe -Profile Any -Enabled True | Out-Null
+
+# Allow loopback via low-level exemption is tricky; instead ensure the app binds to 127.0.0.1 and avoid outbound
+# Allow a specific stub on RFC1918 if needed
+New-NetFirewallRule -DisplayName 'EgressAllowStub' -Direction Outbound -Action Allow -Program $exe -RemoteAddress 10.200.0.1 -Protocol TCP -RemotePort 3000 -Profile Any -Enabled True | Out-Null
+
+# Start a capture
+netsh wfp capture start file=$env:RUNNER_TEMP\wfp.etl > $null
+
+# Run tests invoking $exe here
+
+netsh wfp capture stop > $null
+
+# Basic parse: look for FWPM_LAYER_ALE_AUTH_CONNECT_V4 denies for $exe
+# (Use Windows Performance Analyzer in audits; in CI, just archive the ETL)
+```
+
+Yes, less pleasant than nft+netns. It works and gives an audit trail.
+
+## When not to do this
+- If your app legitimately needs Internet during tests (live OAuth, S3, license checks), this harness will become an allowlist maintenance project. Better: inject a local proxy that simulates those flows.
+- If your CI stack runs nested containers/VMs that you don’t control, netns or pf may not be available or will conflict with the runner. Use job isolation (containerized runners) instead.
+- If you rely on OS auto-updaters (e.g., WebView2, .NET Desktop Runtime), they may spawn outside your harness. That yields noisy false positives.
+
+## Failure modes you will hit (so you don’t have to ask me later)
+- IPv6 leakage: your ruleset must be inet family (v4+v6). If you use iptables-legacy v4 rules only, v6 will happily egress. nft inet avoids this.
+- DNS stub resolvers: systemd-resolved inside netns isn’t running. If your app tries UDP 53, that’s a good thing—it should drop and be logged. Don’t “fix” it; assert it.
+- Helper processes: some frameworks spawn update helpers outside your process tree. If they aren’t launched under `ip netns exec`, they’ll bypass your policy. Wrap the test runner, not just the app binary.
+- Racy teardown: nft `flush ruleset` affects the namespace-local ruleset here; if you install host-global tables, don’t flush indiscriminately in multi-tenant runners.
+
+## Practical audit artifacts to keep
+- The exact nft table dump (`nft list table inet egressctl`) with packet/byte counters.
+- A small pcap from tcpdump or pflog.
+- The command transcript showing the policy was installed before the app launched.
+- The app stdout/stderr proving it actually ran tests, not just exited early.
+
+None of this is theory. The harness is short, fast, and boring—in a good way. Set it up once, fail loudly on regressions, and stop arguing about whether “it doesn’t really call out except for…”.
