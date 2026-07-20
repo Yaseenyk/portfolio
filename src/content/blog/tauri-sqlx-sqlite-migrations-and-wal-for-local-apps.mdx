@@ -1,0 +1,312 @@
+---
+title: 'Tauri + sqlx + SQLite: migrations and WAL for local apps'
+slug: tauri-sqlx-sqlite-migrations-and-wal-for-local-apps
+date: '2026-07-20'
+description: 'Practical guide to embedding SQLite in Tauri with sqlx: file location,
+  compile-time migrations, WAL pragmas, and failure modes for single-user datastores.'
+tags:
+- Tauri
+- SQLite
+- Rust
+keywords:
+- tauri sqlite sqlx
+- sqlx migrations sqlite example
+- sqlite wal tuning single user
+- tauri path_resolver app_data_dir sqlite
+- sqlx after_connect PRAGMA
+- libsqlite3-sys bundled tauri
+- sqlx offline prepare cargo
+- sqlite busy_timeout database is locked
+readingMinutes: 7
+takeaways:
+- Use sqlx::migrate! to embed and run SQLite migrations in your Tauri binary.
+- Enable WAL with NORMAL sync, a sane wal_autocheckpoint, and busy_timeout to avoid
+  user-facing lock errors.
+- Attach pragmas in after_connect so every pooled connection gets the same tuning.
+- Bundle libsqlite3 for reproducible builds; skip this setup for multi-user or multi-GB
+  datasets.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## Scope and versions
+
+This is about a single-user Tauri desktop app with a local SQLite file, using Rust + sqlx. Concrete stack that works today:
+
+- Tauri 1.6.x
+- Rust 1.79+
+- sqlx 0.7.x (SQLite)
+- SQLite via libsqlite3-sys 0.28 (bundled)
+
+Target: predictable startup, embedded migrations, WAL tuned for snappy UX, and no “database is locked (code 5)” support tickets.
+
+## Dependencies that won’t bite you later
+
+Cargo.toml (backend crate inside src-tauri):
+
+```toml
+[dependencies]
+tauri = { version = "1.6", features = ["path-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+
+# sqlx with SQLite + Tokio runtime
+sqlx = { version = "0.7", default-features = false, features = [
+  "runtime-tokio-rustls",
+  "macros",
+  "sqlite"
+] }
+
+# Make SQLite consistent across platforms (adds ~1–2 MB)
+libsqlite3-sys = { version = "0.28", features = ["bundled"] }
+```
+
+Install the CLI for migrations and offline prepares:
+
+```bash
+cargo install sqlx-cli --no-default-features --features rustls,sqlite
+```
+
+## Where should I store the SQLite file in a Tauri app?
+Use app-local data dir from Tauri’s path_resolver. On Windows this lands in %APPDATA%/<app>, on macOS in ~/Library/Application Support/<app>, and on Linux in ~/.local/share/<app>. Don’t write next to the executable; antivirus and permissions will hurt you.
+
+```rust
+// src-tauri/src/main.rs
+use std::{fs, time::Duration};
+use tauri::{Manager, State};
+use sqlx::{sqlite::{SqliteConnectOptions, SqliteJournalMode, SqliteSynchronous}, Sqlite, Pool};
+use anyhow::Context;
+
+struct Db(pub Pool<Sqlite>);
+
+#[tauri::command]
+async fn count_notes(db: State<'_, Db>) -> Result<i64, String> {
+    let row: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM notes")
+        .fetch_one(&db.0)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(row.0)
+}
+
+#[tokio::main]
+async fn main() {
+  tauri::Builder::default()
+    .setup(|app| {
+      let resolver = app.path_resolver();
+      let mut db_path = resolver
+        .app_data_dir()
+        .context("no app_data_dir; check bundle identifier")?;
+      db_path.push("db");
+      fs::create_dir_all(&db_path).ok();
+      db_path.push("app.sqlite3");
+
+      // Connection options with WAL baked in
+      let opts = SqliteConnectOptions::new()
+        .filename(&db_path)
+        .create_if_missing(true)
+        .journal_mode(SqliteJournalMode::Wal)
+        .synchronous(SqliteSynchronous::Normal) // FULL if you can’t lose a few ms of data on power loss
+        .foreign_keys(true)
+        .busy_timeout(Duration::from_millis(5000))
+        .read_only(false);
+
+      // A small pool: concurrent reads, single writer effectively
+      let pool = sqlx::pool::PoolOptions::new()
+        .max_connections(4)
+        .min_connections(1)
+        .idle_timeout(Duration::from_secs(300))
+        .after_connect(|conn, _meta| {
+          Box::pin(async move {
+            // Per-connection pragmas that sqlx doesn’t expose as options
+            // Keep these modest; they’re per-connection.
+            sqlx::query("PRAGMA wal_autocheckpoint=1000;") // ~4MB with 4KB pages
+              .execute(conn).await?;
+            sqlx::query("PRAGMA journal_size_limit=67108864;") // 64MB cap
+              .execute(conn).await?;
+            sqlx::query("PRAGMA temp_store=MEMORY;")
+              .execute(conn).await?;
+            sqlx::query("PRAGMA mmap_size=134217728;") // 128MB, safe default on 64-bit
+              .execute(conn).await?;
+            // Optional tuning: ~-16384 => ~16MB page cache per connection
+            sqlx::query("PRAGMA cache_size=-16384;")
+              .execute(conn).await?;
+            Ok(())
+          })
+        })
+        .connect_with(opts);
+
+      let pool = tauri::async_runtime::block_on(pool)?;
+
+      // Run embedded migrations at startup
+      tauri::async_runtime::block_on(async {
+        sqlx::migrate!("./migrations").run(&pool).await
+      })?;
+
+      app.manage(Db(pool));
+      Ok(())
+    })
+    .invoke_handler(tauri::generate_handler![count_notes])
+    .run(tauri::generate_context!())
+    .expect("error while running tauri app");
+}
+```
+
+## How do I run SQLite migrations in a Tauri app with sqlx?
+Embed migrations with sqlx::migrate!("./migrations") and run them at startup. Generate .sql files with sqlx-cli, commit them, and let the macro bake them into the binary so packaging works offline. If you see “no such table” at runtime, your macro path or CLI directory is wrong.
+
+Create migrations:
+
+```bash
+# in src-tauri (where Cargo.toml lives)
+sqlx migrate add -r init
+```
+
+This creates two files (reversible):
+
+```
+migrations/
+  20240101120000_init.sql
+  20240101120000_init.down.sql
+```
+
+Example up migration:
+
+```sql
+-- migrations/20240101120000_init.sql
+CREATE TABLE IF NOT EXISTS notes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+  updated_at INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_notes_updated_at ON notes(updated_at);
+```
+
+Down migration:
+
+```sql
+-- migrations/20240101120000_init.down.sql
+DROP INDEX IF EXISTS idx_notes_updated_at;
+DROP TABLE IF EXISTS notes;
+```
+
+At build time, sqlx::migrate!("./migrations") reads the directory relative to the crate root. If you get:
+
+- error: `migrations directory not found at "./migrations"` — check the relative path and that you’re in src-tauri.
+- runtime: `SQL logic error: no such table: _sqlx_migrations` — your run() never executed (setup path), or you pointed to the wrong database file.
+
+Optional: SQL type-checked queries offline. If you use query! macros, prep a dev database once:
+
+```bash
+# pick a temp dev db for schema checking
+export DATABASE_URL=sqlite://./dev-check.sqlite3
+sqlx database create
+sqlx migrate run
+# snapshot metadata for offline mode
+SQLX_OFFLINE=true cargo sqlx prepare
+```
+
+Then set SQLX_OFFLINE=true in your CI/build to avoid requiring DATABASE_URL.
+
+## What PRAGMA settings should I use for SQLite WAL in a single-user app?
+Use WAL mode with synchronous=NORMAL, a 64MB journal_size_limit, wal_autocheckpoint around 1000 pages, and a busy_timeout of ~5s. Turn on foreign_keys. Apply per-connection pragmas via PoolOptions::after_connect so every pooled connection enforces the same behavior.
+
+A quick rationale:
+
+- journal_mode=WAL: concurrent reads with a single writer, fewer fsyncs on commit. Good desktop UX.
+- synchronous=NORMAL: durable enough for most apps; FULL if you absolutely must never lose a few ms.
+- wal_autocheckpoint=1000: keeps WAL from ballooning; with 4KB pages that’s ~4MB between checkpoints.
+- journal_size_limit=64MB: caps worst-case WAL + shared memory growth.
+- busy_timeout=5000ms: avoids immediate “database is locked (code 5)” under antivirus/file indexer pressure.
+- temp_store=MEMORY and a modest cache_size: fewer disk hits for temp data and page cache.
+
+Keep max_connections small (3–6). SQLite serializes writers; you won’t win by piling connections.
+
+### Suggested baseline (illustrative)
+
+| Setting | Value | Note |
+|---|---:|---|
+| journal_mode | WAL | via connect options |
+| synchronous | NORMAL | switch to FULL for stronger guarantees |
+| wal_autocheckpoint | 1000 | ~4MB on 4KB pages |
+| journal_size_limit | 64 MB | avoid unbounded WAL |
+| busy_timeout | 5000 ms | practical for UI |
+| temp_store | MEMORY | better locality |
+| cache_size | -16384 | ~16MB per connection |
+| mmap_size | 128 MB | safe on 64-bit |
+
+If your average note/blob sizes are large, raise wal_autocheckpoint and cache_size proportionally.
+
+## How do I expose the pool to Tauri commands safely?
+Keep a sqlx::Pool<Sqlite> in Tauri state and use transactions for writes. Reads can be concurrent; writes should be batched to reduce checkpoint churn. Avoid long-lived transactions from the UI thread.
+
+```rust
+#[tauri::command]
+async fn create_note(db: State<'_, Db>, title: String, body: String) -> Result<i64, String> {
+  let mut tx = db.0.begin().await.map_err(|e| e.to_string())?;
+  sqlx::query("INSERT INTO notes (title, body) VALUES (?, ?)")
+    .bind(&title)
+    .bind(&body)
+    .execute(&mut *tx)
+    .await
+    .map_err(|e| e.to_string())?;
+  let id: (i64,) = sqlx::query_as("SELECT last_insert_rowid()")
+    .fetch_one(&mut *tx)
+    .await
+    .map_err(|e| e.to_string())?;
+  tx.commit().await.map_err(|e| e.to_string())?;
+  Ok(id.0)
+}
+```
+
+If you switch to query! macros, remember the offline prepare step, otherwise builds will require a live DATABASE_URL.
+
+## Typical results and expectations
+
+- Cold-start pool + migration check: ~10–50 ms after first launch (no schema changes), measurable but fine for splash screens.
+- Simple row INSERT with WAL and NORMAL: sub-millisecond to a few milliseconds on SSDs.
+- WAL checkpoint at 1000 pages: a brief spike when rolling the log; usually invisible unless the device is under I/O pressure.
+
+These are illustrative, not your benchmarks. Measure on the slowest disk you support.
+
+## Failure modes you’ll actually see
+
+- database is locked (code 5): increase busy_timeout, ensure one writer at a time, and keep transactions short. Antivirus can hold read locks; you can’t fix the user’s machine, only wait.
+- _sqlx_migrations missing: your sqlx::migrate! didn’t run, or you pointed at the wrong file. Print the db path at startup during dev.
+- Ship works on macOS, fails on Windows: bundle SQLite (libsqlite3-sys = { features = ["bundled"] }). System SQLite versions vary wildly.
+- Giant WAL (hundreds of MB): your checkpointing is too loose, or a reader is holding the WAL open for long periods. Check for a long-lived read transaction you forgot to drop.
+- VACUUM takes ages: you stored blobs or the db grew past a couple GB. Consider a file store for blobs and references in SQLite.
+
+## When not to do this
+
+- Multi-user concurrency on a shared network drive. SQLite will punish you with lock contention and corruptions under flaky I/O.
+- Cross-device sync as a hard requirement. You’ll end up rebuilding CRDTs or conflict resolvers over a file format; not fun.
+- Databases that regularly exceed a few GB with frequent rewrites. Backups, vacuum, and checkpoints will become user-visible events.
+
+## Build, run, and package
+
+Dev loop:
+
+```bash
+# optional: offline prepare if using query! macros
+export DATABASE_URL=sqlite://./dev-check.sqlite3
+sqlx database create
+sqlx migrate run
+SQLX_OFFLINE=true cargo sqlx prepare
+
+# run your app
+yarn tauri dev  # or: pnpm tauri dev / cargo tauri dev
+```
+
+Packaging pulls migrations into the binary via sqlx::migrate!. No extra resource files. The bundled SQLite adds ~1–2 MB to the installer, which is worth the uniform behavior.
+
+## Final opinions
+
+- Use WAL. NORMAL sync is the sane default; bump to FULL only for transaction-level durability that truly matters.
+- 3–6 pooled connections is enough. You can read concurrently; you’ll still serialize writes.
+- Keep pragmas centralized and per-connection via after_connect. “Set it once” in a single connection is a trap with pools.
+- Don’t chase micro-optimizations until you’ve profiled real user workloads.
