@@ -12,6 +12,25 @@ const path = require('path');
     // All projects live on page 2.
     const PROJECTS = [
       {
+        name: 'Portfolio Concierge — RAG + MCP Server',
+        badge: 'Live AI Infrastructure',
+        desc: 'One zero-dependency Cloudflare Worker, two interfaces: a grounded RAG API answering questions about my work from a Vectorize index of my 100-article corpus (hard refusal below a similarity threshold — no hallucinated answers), and a public MCP server any recruiter can add to Claude to interrogate this résumé from inside their own AI. Corpus re-embeds automatically after every site deploy.',
+        tags: ['Cloudflare Workers', 'Vectorize', 'Workers AI', 'MCP', 'Grounded RAG', 'TypeScript'],
+        links: [
+          { label: 'Try It', url: 'https://yaseenkhatib.streamerosai.com/#rag-concierge' },
+          { label: 'Code', url: 'https://github.com/Yaseenyk/portfolio/tree/main/worker' },
+        ],
+      },
+      {
+        name: 'Path Saathi LMS',
+        badge: 'Client · 1-Day Delivery',
+        desc: 'A free vocational-skilling LMS built for a client with existing video/PDF course content. Brief and MVP sketch arrived on a Monday; a working platform — auth, course delivery, self-paced flow — was live on the dev environment the next day. Next.js, React, Tailwind.',
+        tags: ['Next.js', 'React', 'Tailwind', 'TypeScript', 'Client Delivery'],
+        links: [
+          { label: 'Live (dev)', url: 'https://devlms.pathsaathi.in/login' },
+        ],
+      },
+      {
         name: 'Sable',
         badge: 'Flagship Product',
         desc: 'A local-first AI financial agent (React Native / Expo). Keeps 100% of financial data on-device in SQLite with no cloud backend; an OpenAI function-calling agent tracks peer-to-peer debts and pushes proactive briefings, with every database mutation gated behind a Review & Confirm boundary. Automated bank-SMS ingestion uses the Adapter Pattern and a p-queue to serialize SQLite writes.',
@@ -33,30 +52,17 @@ const path = require('path');
         ],
       },
       {
-        name: 'Police Agentic RAG System (POSCO Matrix)',
-        desc: 'An autonomous agentic RAG engine for law-enforcement workflows. Scans massive multi-format legal archives with custom vector embeddings to trace, evaluate, and output secure, court-admissible verdict matrices.',
-        tags: ['Agentic AI', 'Vector Retrieval', 'LLM Orchestration', 'Python'],
-      },
-      {
         name: 'IntegrateX Automation Core',
         desc: 'A node-routing workflow-automation environment with responsive connectors, processing layers, and directional edge bindings. A custom state Serialization Adapter compresses graph definitions over the wire.',
         tags: ['94% Payload Compression', 'React Flow', 'Zustand', 'TypeScript'],
       },
       {
-        name: 'Automated LinkedIn Pipeline',
-        desc: 'A Python autonomous agent on GitHub Actions that drafts and publishes technical LinkedIn content on a cron via the Gemini API — zero servers, zero manual posting.',
-        tags: ['Autonomous Agent', 'Python', 'GitHub Actions', 'Gemini API', 'Cron'],
-        links: [
-          { label: 'Code', url: 'https://github.com/Yaseenyk/linkedin-bot' },
-        ],
-      },
-      {
-        name: 'Zero-Cost AI Blog Writer',
-        desc: 'A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles to this site — Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships it at $0 runtime cost.',
-        tags: ['Autonomous Pipeline', 'Next.js', 'MDX', 'google-genai', 'GitHub Actions'],
+        name: 'Autonomous Content Machine',
+        desc: 'Two cooperating pipelines on GitHub Actions, running unattended for $0: an AI writer that drafts a technical article with a branded cover three times a week, commits it, and deploys the static site — and a LinkedIn agent that turns each post into scheduled, UTM-tracked social content with its state ledger committed to Git.',
+        tags: ['Autonomous Pipelines', 'GitHub Actions', 'Python', 'Next.js', 'Zero-Cost Infra'],
         links: [
           { label: 'Case Study', url: 'https://yaseenkhatib.streamerosai.com/products/ai-blogger' },
-          { label: 'Code', url: 'https://github.com/Yaseenyk/portfolio' },
+          { label: 'Code', url: 'https://github.com/Yaseenyk/linkedin-bot' },
         ],
       },
     ];
@@ -95,9 +101,9 @@ const path = require('path');
   <div class="flex justify-between items-start border-b border-zinc-200 pb-5">
     <div>
       <h1 class="text-3xl font-bold tracking-tight text-zinc-900">Yaseen Khatib</h1>
-      <p class="text-md font-medium text-cyan-600 mt-0.5">Senior Full-Stack AI Engineer · Builds &amp; Ships AI Products</p>
+      <p class="text-md font-medium text-cyan-600 mt-0.5">Senior Full-Stack Developer · AI Systems</p>
       <p class="text-zinc-600 max-w-xl mt-3 text-[12px] leading-normal">
-        Senior Full-Stack AI Engineer with 4.5+ years building and shipping autonomous AI products — Agentic RAG, LLM orchestration, and OpenAI function-calling agents on scalable MERN foundations. Open to remote roles.
+        Five years building for the web end to end — React, Node.js, TypeScript, MongoDB — now applied to production AI systems: Agentic RAG, LLM orchestration, MCP, and function-calling agents. Five products designed, built, and shipped solo in the last twelve months. Open to remote, hybrid, or on-site roles.
       </p>
       <div class="max-w-xl mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-zinc-500">
         <span class="font-bold uppercase tracking-wider text-zinc-400">Core</span>
@@ -116,7 +122,8 @@ const path = require('path');
       <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-cyan-700 font-medium">linkedin.com/in/yaseen-yk</a></div>
       <div><a href="https://github.com/Yaseenyk" class="text-zinc-600">github.com/Yaseenyk</a></div>
       <div><a href="https://yaseenkhatib.streamerosai.com/" class="text-cyan-700 font-medium">yaseenkhatib.streamerosai.com</a></div>
-      <div class="text-[11px] text-zinc-400 mt-1 font-medium tracking-wider uppercase">Hyderabad, INDIA · Open to Remote</div>
+      <div class="text-[11px] text-zinc-400 mt-1 font-medium tracking-wider uppercase">Hyderabad, INDIA · Remote / Hybrid / On-site</div>
+      <div class="text-[10px] text-zinc-500 mt-1.5 leading-snug">Interview this résumé from inside Claude —<br/>MCP: <span class="text-cyan-700 font-medium">yaseen-concierge.yaseenyk.workers.dev/mcp</span></div>
     </div>
   </div>
 
@@ -144,8 +151,8 @@ const path = require('path');
               <span class="italic">Hyderabad, India (Hybrid)</span>
             </div>
             <ul class="list-disc pl-4 text-zinc-600 space-y-1 text-[12px]">
-              <li><strong class="text-zinc-800">AI Framework Orchestration:</strong> Engineering complex Agentic RAG models and sovereign system integrations inside enterprise MERN architecture.</li>
-              <li><strong class="text-zinc-800">Workflow Compilations:</strong> Overseeing system transition paths to use highly optimized prompt logic and automated logic layers.</li>
+              <li>Integrating <strong class="text-zinc-800">LLMs and agentic workflows</strong> into production MERN systems — owning them from architecture and orchestration through deployment.</li>
+              <li>Building <strong class="text-zinc-800">Agentic RAG services</strong> with guardrailed, schema-validated outputs and cost-aware model routing.</li>
             </ul>
           </div>
 
@@ -201,9 +208,10 @@ const path = require('path');
             <h4 class="text-[11px] uppercase tracking-wider text-zinc-400 font-bold mb-1.5">AI Engineering</h4>
             <div class="flex flex-wrap gap-1">
               <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Agentic RAG</span>
-              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">OpenAI Function Calling</span>
-              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Local / On-Device RAG</span>
-              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Claude / GPT</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">MCP Servers</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Function Calling</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Cloudflare Workers AI / Vectorize</span>
+              <span class="bg-zinc-100 text-zinc-800 px-2 py-0.5 rounded text-[11px] font-medium border border-zinc-200">Claude / GPT / Gemini</span>
             </div>
           </div>
           <div>
