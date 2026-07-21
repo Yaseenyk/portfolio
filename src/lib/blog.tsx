@@ -12,15 +12,6 @@ import { deathOfTheBackendRouter } from "@/content/posts/death-of-the-traditiona
 import { fromWireframeToWeb } from "@/content/posts/from-wireframe-to-web-ai-speed";
 import { stateManagementAiEra } from "@/content/posts/state-management-ai-era-zustand-vs-redux";
 import { chatgptChangedEngineering } from "@/content/posts/chatgpt-changed-full-stack-engineering";
-import { promptEngineeringFundamentals } from "@/content/posts/prompt-engineering-fundamentals";
-import { buildingYourFirstRag } from "@/content/posts/building-your-first-rag-system";
-import { vectorDatabasesForMern } from "@/content/posts/vector-databases-for-mern-developers";
-import { fineTuningVsRag } from "@/content/posts/fine-tuning-vs-rag";
-import { streamingLlmToReact } from "@/content/posts/streaming-llm-responses-to-react";
-import { embeddingsSemanticSearch } from "@/content/posts/embeddings-semantic-search-mongodb";
-import { tokenEconomics } from "@/content/posts/token-economics-cost-optimizing-llm-apps";
-import { functionCallingToolUse } from "@/content/posts/function-calling-tool-use-patterns";
-import { evaluatingLlmOutputs } from "@/content/posts/evaluating-llm-outputs";
 // Advanced MERN + AI architecture series.
 import { agenticVsCopilots } from "@/content/posts/agentic-workflows-vs-copilots";
 import { customSerializationAdapters } from "@/content/posts/custom-serialization-adapters";
@@ -216,16 +207,7 @@ const POSTS: BlogPost[] = [
   fromWireframeToWeb,
   stateManagementAiEra,
   architectingMernAtAiSpeed,
-  // Foundational series (fundamentals-first primers).
-  functionCallingToolUse,
-  evaluatingLlmOutputs,
-  tokenEconomics,
-  embeddingsSemanticSearch,
-  streamingLlmToReact,
-  fineTuningVsRag,
-  vectorDatabasesForMern,
-  buildingYourFirstRag,
-  promptEngineeringFundamentals,
+  // Foundational primer (kept: the origin-story piece).
   chatgptChangedEngineering,
 ];
 
