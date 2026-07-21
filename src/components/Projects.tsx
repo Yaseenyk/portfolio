@@ -24,7 +24,7 @@ interface ProjectLink {
   icon: "github" | "external";
 }
 
-interface Project {
+export interface Project {
   name: string;
   /** Whole-card click destination (deep-dive page, live demo, or exhibit). */
   href?: string;
@@ -50,7 +50,12 @@ const FLAGSHIP_NAMES = new Set([
   "IntegrateX",
 ]);
 
-const PROJECTS: Project[] = [
+/** Anchor id for a project's detail card (used by the /projects bento). */
+export function projectAnchor(name: string): string {
+  return `p-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}`;
+}
+
+export const PROJECTS: Project[] = [
   {
     name: "streamerOS",
     href: "/products/streameros",
@@ -271,11 +276,12 @@ function ProjectRow({ project }: { project: Project }) {
   const external = project.href?.startsWith("http");
   return (
     <motion.article
+      id={projectAnchor(project.name)}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6 }}
-      className="group relative overflow-hidden rounded-2xl border border-zinc-800/50 bg-ink/40 backdrop-blur-xl transition-all duration-300 hover:border-ice/30 hover:shadow-[0_0_44px_-12px_rgba(103,232,249,0.4)]"
+      className="group relative scroll-mt-28 overflow-hidden rounded-2xl border border-zinc-800/50 bg-ink/40 backdrop-blur-xl transition-all duration-300 hover:border-ice/30 hover:shadow-[0_0_44px_-12px_rgba(103,232,249,0.4)]"
     >
       {/* Stretched link: the whole card clicks through to the project's
           destination. Icon links / buttons sit above it via z-20. */}
