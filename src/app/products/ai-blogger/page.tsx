@@ -94,7 +94,7 @@ export default function AiBloggerPage() {
       </Section>
 
       <Section label="02 · The Stack">
-        <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-zinc-800/70 bg-zinc-800/40 sm:grid-cols-2">
+        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
             ["Framework", "Next.js (App Router) with output: 'export' — pure static HTML."],
             ["Content", "MDX files + gray-matter frontmatter, compiled at build with remark/rehype."],
@@ -103,7 +103,7 @@ export default function AiBloggerPage() {
             ["Hosting", "GitHub Pages — free static hosting, no server runtime."],
             ["Queue", "scripts/topics.txt — one topic per line, consumed top-down."],
           ].map(([term, desc]) => (
-            <div key={term} className="bg-ink/60 p-5">
+            <div key={term} className="rounded-xl border border-zinc-800/60 bg-zinc-950/60 p-5 backdrop-blur-md">
               <dt className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan">
                 {term}
               </dt>

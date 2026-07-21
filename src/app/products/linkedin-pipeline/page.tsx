@@ -95,7 +95,7 @@ export default function LinkedInPipelinePage() {
       </Section>
 
       <Section label="02 · The Stack">
-        <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-zinc-800/70 bg-zinc-800/40 sm:grid-cols-2">
+        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
             ["Language", "Python — the agent, prompt assembly, and publishing client."],
             ["Runtime / CD", "GitHub Actions — scheduled ubuntu-latest runner, zero infra."],
@@ -104,7 +104,7 @@ export default function LinkedInPipelinePage() {
             ["State", "published.json — committed back to the repo for idempotency."],
             ["Secrets", "GitHub Actions encrypted secrets — keys injected at runtime only."],
           ].map(([term, desc]) => (
-            <div key={term} className="bg-ink/60 p-5">
+            <div key={term} className="rounded-xl border border-zinc-800/60 bg-zinc-950/60 p-5 backdrop-blur-md">
               <dt className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan">
                 {term}
               </dt>

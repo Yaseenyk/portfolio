@@ -96,7 +96,7 @@ export default function StreamerOsPage() {
       </Section>
 
       <Section label="02 · The Stack">
-        <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-zinc-800/70 bg-zinc-800/40 sm:grid-cols-2">
+        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
             ["Core language", "Rust — the async runtime, ingestion, parsing, and OBS routing."],
             ["Desktop shell", "Tauri v2 — OS-native WebView (no bundled Chromium) + typed IPC."],
@@ -105,7 +105,7 @@ export default function StreamerOsPage() {
             ["Concurrency", "tokio tasks, bounded crossbeam channels, zero-copy byte parsing."],
             ["Transport", "MessagePack (rmp-serde) over the Rust ↔ WebView IPC bridge."],
           ].map(([term, desc]) => (
-            <div key={term} className="bg-ink/60 p-5">
+            <div key={term} className="rounded-xl border border-zinc-800/60 bg-zinc-950/60 p-5 backdrop-blur-md">
               <dt className="font-mono text-[11px] uppercase tracking-[0.18em] text-cyan">
                 {term}
               </dt>
