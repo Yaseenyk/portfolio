@@ -33,7 +33,7 @@ const TINTS = [
 
 export default function ProjectsBento() {
   return (
-    <div className="grid grid-flow-dense grid-cols-2 gap-4 md:grid-cols-4 auto-rows-[9.5rem] sm:auto-rows-[11rem]">
+    <div className="grid grid-flow-dense grid-cols-1 gap-4 auto-rows-auto sm:grid-cols-2 sm:auto-rows-[11rem] md:grid-cols-4">
       {PROJECTS.map((project, i) => {
         const span = SPANS[i % SPANS.length];
         const featured = span.includes("row-span-2");
@@ -95,14 +95,18 @@ export default function ProjectsBento() {
                 </span>
               </span>
 
-              {featured && (
-                <span className="mt-2 hidden text-xs leading-relaxed text-zinc-400 sm:line-clamp-2">
-                  {project.description}
-                </span>
-              )}
+              {/* Description: shown on all cards on mobile (full-width single
+                  column); on tablet+ only the featured tiles keep it. */}
+              <span
+                className={`mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-400 ${
+                  featured ? "" : "sm:hidden"
+                }`}
+              >
+                {project.description}
+              </span>
 
               <span className="mt-3 flex flex-wrap gap-1.5">
-                {(featured ? project.metrics.slice(0, 3) : project.tech.slice(0, 2)).map(
+                {(featured ? project.metrics.slice(0, 3) : project.tech.slice(0, 3)).map(
                   (t) => (
                     <span
                       key={t}
