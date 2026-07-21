@@ -374,7 +374,7 @@ function ProjectRow({ project }: { project: Project }) {
   );
 }
 
-export default function Projects() {
+export default function Projects({ all = false }: { all?: boolean }) {
   return (
     <section id="projects" aria-label="Selected projects" className="scroll-mt-24">
       <div className="flex items-center gap-3">
@@ -385,21 +385,24 @@ export default function Projects() {
       </div>
 
       <div className="mt-10 space-y-12">
-        {PROJECTS.filter((p) => FLAGSHIP_NAMES.has(p.name)).map((project) => (
+        {(all
+          ? PROJECTS
+          : PROJECTS.filter((p) => FLAGSHIP_NAMES.has(p.name))
+        ).map((project) => (
           <ProjectRow key={project.name} project={project} />
         ))}
       </div>
-      <p className="mt-10 text-sm text-zinc-500">
-        More builds — support agents, enterprise portals, TV apps — live in{" "}
-        <a href="/products" className="text-ice underline-offset-4 hover:underline">
-          /products
-        </a>{" "}
-        and the{" "}
-        <a href="/blog" className="text-ice underline-offset-4 hover:underline">
-          field notes
-        </a>
-        .
-      </p>
+      {!all && (
+        <p className="mt-10 text-sm text-zinc-500">
+          These are the five flagships —{" "}
+          <a
+            href="/projects"
+            className="text-ice underline-offset-4 hover:underline"
+          >
+            all {PROJECTS.length} builds →
+          </a>
+        </p>
+      )}
     </section>
   );
 }
