@@ -1,4 +1,6 @@
 import Link from "next/link";
+import fs from "node:fs";
+import path from "node:path";
 import Hero from "@/components/Hero";
 import FoundersLog from "@/components/FoundersLog";
 import { getPostBySlug, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
@@ -66,13 +68,20 @@ const projectsJsonLd = [
 
 export default function Home() {
   // Server-side mapping to plain props — keeps the blog registry (and every
-  // post body) out of the client JS bundle. Top 5 only: the homepage sells
-  // the strongest headlines; the full list lives at /blog.
-  const logEntries = FOUNDERS_LOG_SLUGS.slice(0, 5).flatMap((slug) => {
+  // post body) out of the client JS bundle. Top 6 (a full 3×2 card grid);
+  // the full list lives at /blog. Covers resolve from public/og/ at build.
+  const logEntries = FOUNDERS_LOG_SLUGS.slice(0, 6).flatMap((slug) => {
     const p = getPostBySlug(slug);
-    return p
-      ? [{ slug: p.slug, title: p.title, description: p.description }]
-      : [];
+    if (!p) return [];
+    const cover = path.join(process.cwd(), "public", "og", `${p.slug}.jpg`);
+    return [
+      {
+        slug: p.slug,
+        title: p.title,
+        description: p.description,
+        image: fs.existsSync(cover) ? `/og/${p.slug}.jpg` : undefined,
+      },
+    ];
   });
 
   return (

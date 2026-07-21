@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 
@@ -60,6 +61,8 @@ export interface LogEntry {
   slug: string;
   title: string;
   description: string;
+  /** Root-relative cover path (the post's real og image), when one exists. */
+  image?: string;
 }
 
 export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
@@ -95,36 +98,47 @@ export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
         <Stat value={1} suffix=" day" label="fastest client ship" />
       </div>
 
-      <ol className="mt-8 divide-y divide-zinc-800/60 border-y border-zinc-800/60">
+      <ol className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {ENTRIES.map((post, i) => (
           <motion.li
             key={post.slug}
-            initial={{ opacity: 0, x: -16 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.45, ease: EASE, delay: (i % 5) * 0.05 }}
+            transition={{ duration: 0.45, ease: EASE, delay: (i % 3) * 0.08 }}
           >
             <Link
               href={`/blog/${post.slug}`}
-              className="group flex items-baseline gap-4 py-4 transition-colors sm:gap-6"
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-800/60 bg-zinc-950/60 backdrop-blur-md transition-colors hover:border-cyan/50"
             >
-              <span className="shrink-0 font-mono text-xs text-zinc-600 transition-colors group-hover:text-cyan">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="flex-1">
-                <span className="block text-base font-semibold leading-snug tracking-tight text-zinc-200 transition-colors group-hover:text-zinc-50 sm:text-lg">
+              {post.image && (
+                <div className="overflow-hidden border-b border-zinc-800/60">
+                  <Image
+                    src={post.image}
+                    alt=""
+                    width={1536}
+                    height={1024}
+                    className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
+                </div>
+              )}
+              <div className="flex flex-1 flex-col p-5">
+                <span className="font-mono text-[10px] text-zinc-600">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="mt-1.5 text-base font-semibold leading-snug tracking-tight text-zinc-100 transition-colors group-hover:text-cyan">
                   {post.title}
                 </span>
-                <span className="mt-1 hidden text-sm leading-relaxed text-zinc-500 sm:line-clamp-1">
+                <span className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-500">
                   {post.description}
                 </span>
-              </span>
-              <span
-                aria-hidden
-                className="shrink-0 font-mono text-sm text-zinc-600 transition-all group-hover:translate-x-1 group-hover:text-cyan"
-              >
-                →
-              </span>
+                <span
+                  aria-hidden
+                  className="mt-auto pt-3 font-mono text-xs text-zinc-600 transition-all group-hover:translate-x-1 group-hover:text-cyan"
+                >
+                  read →
+                </span>
+              </div>
             </Link>
           </motion.li>
         ))}
