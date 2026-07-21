@@ -40,15 +40,12 @@ function Stat({
   }, [inView, value]);
 
   return (
-    <div
-      ref={ref}
-      className="rounded-xl border border-zinc-800/60 bg-white/[0.02] px-4 py-3 text-center"
-    >
-      <span className="block text-2xl font-bold tracking-tight text-transparent bg-gradient-to-r from-cyan to-purple bg-clip-text tabular-nums">
+    <div ref={ref} className="flex-1 px-5 py-4">
+      <span className="block text-2xl font-bold tabular-nums tracking-tight text-zinc-50 sm:text-3xl">
         {n}
-        {suffix}
+        {suffix && <span className="text-cyan">{suffix}</span>}
       </span>
-      <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-wider text-zinc-500">
+      <span className="mt-1 block font-mono text-[10px] uppercase tracking-wider text-zinc-500">
         {label}
       </span>
     </div>
@@ -91,8 +88,12 @@ export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
         </Link>
       </div>
 
-      {/* Live proof-stats — count up on first view */}
-      <div className="mt-6 grid max-w-xl grid-cols-3 gap-3">
+      {/* Live proof-stats — one glass strip, counting up on first view */}
+      <div className="relative mt-6 flex max-w-xl divide-x divide-zinc-800/60 overflow-hidden rounded-2xl border border-zinc-800/60 bg-zinc-950/60 backdrop-blur-md">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-cyan/50 via-purple/30 to-transparent"
+        />
         <Stat value={5} label="products · solo" />
         <Stat value={100} suffix="+" label="dispatches" />
         <Stat value={1} suffix=" day" label="fastest client ship" />
