@@ -68,7 +68,9 @@ export default function SiteFooter() {
               </h2>
               <ul className="mt-3 space-y-2">
                 {col.links.map((l) =>
-                  l.external ? (
+                  // Plain <a> for external links, static files, and same-page
+                  // hash links — Next <Link> often fails to scroll to an anchor.
+                  l.external || l.href.includes("#") ? (
                     <li key={l.href}>
                       <a
                         href={l.href}
