@@ -114,6 +114,23 @@ const PROJECTS: Project[] = [
     ],
   },
   {
+    name: "Path Saathi LMS",
+    category: "Client Delivery · EdTech",
+    description:
+      "A free vocational-skilling LMS (“Learning to Livelihood”) for a client sitting on a library of course videos and PDFs. The brief arrived on a Monday — an MVP sketch and a vision of what it should become — and a working platform was live on the dev environment the next day: auth, course delivery for the client's video and PDF content, self-paced learning flow. One day from vision to a URL the client could click.",
+    roi: "Brief on Monday → live on dev in 1 day",
+    metrics: ["1-Day Delivery", "Client Work", "Self-Paced LMS"],
+    tech: ["Next.js", "React", "Tailwind", "TypeScript"],
+    Animation: TVScreen,
+    links: [
+      {
+        href: "https://devlms.pathsaathi.in/login",
+        label: "Live (dev)",
+        icon: "external",
+      },
+    ],
+  },
+  {
     name: "Automated LinkedIn Pipeline",
     category: "Automation · Agent",
     description:
