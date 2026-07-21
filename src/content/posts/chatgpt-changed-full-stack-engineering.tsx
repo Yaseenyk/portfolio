@@ -4,54 +4,68 @@ function Body() {
   return (
     <>
       <p>
-        In late 2022 the cost of writing software dropped overnight. Not
-        gradually, not for early adopters — for everyone, at once. A general-
-        purpose model that could read intent and emit working code turned the
-        single most time-consuming part of engineering, translation, into a
-        conversation. Every assumption about how long a feature takes was
-        suddenly wrong.
+        Late 2022 flipped the table: code went from scarce to cheap almost
+        overnight. Not gradual, not gated by early adopters — everyone got the
+        same accelerant at once. A general-purpose model could read intent and
+        emit working code, turning the slowest part of the job — translating a
+        design into syntax — into a conversation. Timelines based on keystrokes
+        and boilerplate instantly stopped mapping to reality.
       </p>
 
       <h2>From Stack Overflow to a collaborator</h2>
       <p>
-        The old loop was: hit a problem, search, read three threads, adapt an
-        answer, move on. The new loop collapsed that into a dialogue with a
-        system that already knew the libraries, the idioms, and the edge cases.
-        The friction that defined day-to-day engineering — looking things up,
-        boilerplate, glue code — mostly evaporated. What remained was the part
-        that was always the actual job: deciding what to build and how it should
-        be shaped.
+        The old loop: hit a snag, trawl threads, stitch together an answer,
+        adapt, repeat. The new loop: describe the target — a React prop contract,
+        a clean RTK Query slice, a Mongoose schema with indexes — and get a
+        runnable draft that already speaks the local idioms. The grind that used
+        to tax most days — glue code, adapter shims, the same five edge cases —
+        mostly evaporated. What was left was the actual work: shaping behavior,
+        owning the seams, and deciding where state lives.
       </p>
 
       <h2>The bottleneck moved to judgment</h2>
       <p>
-        When typing is cheap, the constraint becomes knowing what to type. The
-        engineers who got faster were not the ones who prompted best; they were
-        the ones who already held a clear architecture in their head and could
-        direct the model toward it. The model amplifies clarity — and, just as
-        ruthlessly, amplifies confusion. Point it at a vague spec and it
-        generates vague software very quickly.
+        When typing is cheap, correctness of intent is the constraint. The
+        people who got faster weren&apos;t “better prompters”; they carried a
+        crisp architecture and steered the model to it. The pattern I call
+        Trinity Architecture did the heavy lifting for me: a strict split
+        between Presentation (React components that only render and dispatch),
+        Reactive State / Orchestration (Zustand, RTK Query, or an event bus as
+        the runtime source of truth with optimistic updates), and a Data /
+        Serialization Adapter (the bridge that converts rich in-memory state to
+        lean wire payloads). Keep those boundaries and the model locks into the
+        grain; blur them and it produces fast spaghetti — state-synchronization
+        lag, render thrash, and vague code that compiles but won&apos;t
+        survive real-time pressure.
       </p>
 
       <h2>What it meant for MERN engineers</h2>
       <p>
-        Full-stack developers were positioned perfectly. The MERN surface — typed
-        contracts from MongoDB to React — is exactly the kind of structured,
-        well-understood domain a model navigates well. The engineers who treated
-        the model as a force multiplier on a sound architecture pulled ahead. The
-        ones who treated it as a replacement for understanding the system shipped
-        faster bugs.
+        Full‑stack folks were sitting on the right surface area. MERN with
+        TypeScript — contracts from Mongo through Express to React — is exactly
+        the structured domain models navigate well. On IntegrateX, a React Flow
+        workflow canvas with real-time node execution on a Zustand store, the
+        model could draft nodes, hooks, and endpoints quickly. But the leap
+        came from honoring the Trinity split and inserting a Serialization
+        Adapter at the data boundary: it stripped non-essential React Flow UI
+        metadata before persistence and cut payloads 94%. The model wrote the
+        first pass; judgment decided what was wire-worthy, what stayed in
+        orchestrated client state, and how to keep optimistic updates from
+        outrunning the backend.
       </p>
 
       <blockquote>
         The day code became cheap to write was the day architecture became the
-        entire job. Everything since has been a footnote to that shift.
+        job. Everything else is an implementation detail moving at 10x speed.
       </blockquote>
 
       <p>
-        Everything else on this blog — RAG, orchestration, type-safe outputs —
-        is downstream of that 2022 inflection. It is where the{" "}
-        <a href="/#projects">work</a> went next.
+        The next arc — RAG, orchestration, type‑safe outputs — sits downstream
+        of that shift. It&apos;s why the{" "}
+        <a href="/#projects">work</a> on IntegrateX, streamerOS, Path Saathi,
+        and SANKALP reads like systems design under new physics: same
+        constraints, but now the time goes to boundaries, contracts, and flow
+        control instead of scaffolding.
       </p>
     </>
   );

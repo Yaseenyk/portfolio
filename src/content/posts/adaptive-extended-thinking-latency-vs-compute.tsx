@@ -6,13 +6,16 @@ function Body() {
   return (
     <>
       <p>
-        Two failure modes, opposite causes. Your classifier got slow and
-        expensive because every trivial call now burns thousands of reasoning
-        tokens before answering &quot;billing.&quot; Meanwhile your planning agent
-        gives shallow, wrong answers on genuinely hard multi-constraint problems
-        because it never stops to think. Reasoning isn&apos;t free, and it
-        isn&apos;t always worth it. Adaptive extended thinking is the dial — and
-        most teams either leave it off or peg it to max, both of which are wrong.
+        Two failure modes, opposite causes. I&apos;ve watched teams turn a snappy
+        classifier into molasses by forcing every request through a thousand-token
+        &quot;thinking&quot; preamble just to answer &quot;billing.&quot; At the
+        same time, their planning agent face-plants on real multi-constraint work
+        because it never budgets time to think. In production, tokens are compute;
+        compute is latency and money. On streamerOS the 60fps path can&apos;t
+        stall behind a model burning cycles; on IntegrateX the planner only got
+        reliable once we let it think. Reasoning isn&apos;t free, and it isn&apos;t
+        always worth it. Adaptive extended thinking is the dial — most teams either
+        leave it off or pin it to max, and both are wrong.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -24,7 +27,8 @@ function Body() {
         a <code>budget_tokens</code> ceiling, the model spends reasoning effort
         proportional to the difficulty it perceives, stopping early on easy
         requests and going deep only when the problem warrants. The budget is a
-        cap, not a quota — setting 16K doesn&apos;t mean every call spends 16K.
+        cap, not a quota — set 16K and you&apos;re allowing depth when it&apos;s
+        earned, not forcing every call to burn 16K.
       </p>
       <p>
         The core trade-off is latency for accuracy, and it is not linear. On
@@ -33,8 +37,10 @@ function Body() {
         be the difference between right and confidently wrong, and it pays for
         itself many times over. On easy, high-volume tasks — classification,
         extraction, formatting — that same budget buys nothing but time-to-first-
-        token and cost. The engineering decision is per-task-tier, not global:
-        match the budget to the hardest thing that tier actually does.
+        token and cost. I tier this in the orchestration layer of the pattern I
+        call Trinity Architecture: Presentation renders; the Reactive State /
+        Orchestrator picks the budget per task; the Data / Serialization Adapter
+        stays out of it. One dial per tier, not a global sledgehammer.
       </p>
       <p>
         Thinking composes with tool use in a way that matters for agents.{" "}
@@ -48,17 +54,19 @@ function Body() {
       <p>
         Two operational notes. First, thinking blocks are part of the assistant
         turn — preserve them in the transcript on multi-turn tool loops or you
-        degrade the model&apos;s continuity. Second, thinking interacts with
-        caching (Lesson 9): the reasoning is dynamic, so it lives past your cached
-        static prefix, not inside it. Budget thinking where it earns its latency,
-        cache the stable context around it, and you get deep reasoning only on the
-        turns that need it.
+        degrade the model&apos;s continuity. On IntegrateX, dropping those blocks
+        between tool calls caused state-synchronization drift and brittle retries.
+        Second, thinking interacts with caching (Lesson 9): the reasoning is
+        dynamic, so it lives past your cached static prefix, not inside it. Budget
+        thinking where it earns its latency, cache the stable context around it,
+        and you get deep reasoning only on the turns that need it.
       </p>
 
       <h2>Budgeting Thinking by Task Tier</h2>
       <p>
         Don&apos;t set one global thinking budget. Tier it: zero for plumbing, a
-        modest budget for analysis, a deep budget for planning.
+        modest budget for analysis, a deep budget for planning. Put the switch in
+        the orchestrator, not the UI — that&apos;s my Trinity split doing its job.
       </p>
       <Terminal title="thinking-tiers.ts">
         <span className="tok-com">{"// budget_tokens is a CEILING, not a quota — the model spends to difficulty."}</span>
@@ -96,7 +104,8 @@ await ask("planning", SYS, "Sequence this 9-step migration under these 4 constra
       <p>
         The same model, the same code path — the only variable is how much
         reasoning each tier is allowed to buy. Your classifier stays instant; your
-        planner gets the depth it needs.
+        planner gets the depth it needs, and your p95 stays inside the SLO that
+        pays the bills.
       </p>
 
       <h2>Effort Should Track Difficulty</h2>

@@ -56,35 +56,29 @@ function Body() {
   return (
     <>
       <p>
-        You can&apos;t fine-tune away hallucination, but you can engineer around it.
-        The production answer to &quot;what if the model is wrong?&quot; isn&apos;t a
-        better prompt — it&apos;s a set of deterministic checks wrapped around the
-        probabilistic core. Guardrails treat the model as an untrusted component:
-        validate what goes in, ground what it sees, verify what comes out, and fail
-        closed when something doesn&apos;t check.
+        After shipping LLMs into real products, I stopped trying to erase hallucination and started boxing it in.
+        The production answer to &quot;what if the model is wrong?&quot; isn&apos;t a prettier prompt — it&apos;s a sequence
+        of deterministic checks wrapped around the probabilistic core. I treat the model like an untrusted dependency:
+        validate what goes in, ground what it&apos;s allowed to see, verify what comes out, and fail closed the moment a check trips.
       </p>
 
       <h2>Treat the model as untrusted</h2>
       <p>
-        The mindset shift is to stop hoping the model behaves and start assuming it
-        might not. You wouldn&apos;t trust raw user input; don&apos;t trust raw model
-        output either. That means input validation at the front (reject prompt
-        injection, malformed or out-of-scope requests) and output verification at
-        the back (does the answer actually follow from the cited context?). The
-        model is a powerful, unreliable subsystem — architect for the unreliable
-        half.
+        Assume it will sometimes be confidently wrong. You wouldn&apos;t pipe raw user input into your database; don&apos;t pipe raw model
+        output into your product. On IntegrateX, one invented parameter could have triggered a bad workflow call, so we built guards:
+        input validation up front (reject prompt injection, malformed or out-of-scope asks) and output verification at the back (claims trace to context).
+        I apply the same boundary discipline as the pattern I call Trinity Architecture: orchestration owns the contract, the model never sees raw user input,
+        and the adapter layer sanitizes what crosses the wire. No component talks past its neighbor, and the model never gets to write directly to state or side effects.
       </p>
 
       <GuardrailDiagram />
 
       <h2>Grounding plus &quot;refuse if unsupported&quot; beats hoping</h2>
       <p>
-        The single highest-leverage guardrail is the grounding contract from RAG:
-        give the model only the retrieved context and instruct it to answer solely
-        from that — and to refuse when the context doesn&apos;t support an answer. A
-        post-generation verifier then checks that every claim traces to a cited
-        source. An answer that can&apos;t be grounded doesn&apos;t get
-        &quot;improved&quot;; it gets rejected. Refusal is a feature, not a failure.
+        The highest leverage move is a strict grounding contract: give the model only the retrieved context and require it to answer solely from that —
+        and refuse when the context doesn&apos;t support an answer. Then back it with a post-generation verifier that proves every claim maps to a cited source.
+        Answers that can&apos;t be grounded don&apos;t get &quot;improved&quot;; they get rejected or escalated. In production, refusal is a feature that prevents
+        silent data drift and bad side effects.
       </p>
 
       <Terminal title="guardrails.ts">
@@ -101,17 +95,13 @@ function Body() {
 
       <h2>Layer the guardrails so each catches what the others miss</h2>
       <p>
-        No single check is sufficient. Input validation catches the bad request the
-        model would have mishandled; grounding constrains what it can say; output
-        verification catches the confident fabrication that slipped through anyway;
-        the fail-closed gate ensures that &quot;unsure&quot; resolves to escalation,
-        not a shipped guess. Defense in depth means a failure has to defeat every
-        layer, and you&apos;ve designed each layer to fail in a different direction.
+        No single check covers the space. Input validation blocks the bad ask the model would mangle; grounding fences what it&apos;s allowed to say;
+        output verification catches confident fiction that sneaks through; the fail-closed gate ensures &quot;unsure&quot; flows to escalation, not production.
+        Think of it like backpressure for semantics: each stage reduces risk, and failures terminate early rather than flooding downstream systems with garbage.
       </p>
 
       <blockquote>
-        You don&apos;t prevent hallucination by trusting the model harder. You
-        prevent it by wrapping it in deterministic checks that fail closed — so the
+        You don&apos;t stop hallucination by willing the model to behave. You stop it by surrounding it with deterministic gates that fail closed — so the
         worst case is a refusal, never a confident lie.
       </blockquote>
 
@@ -119,7 +109,7 @@ function Body() {
         Guardrails are the production payoff of{" "}
         <a href="/blog/rag-grounding-the-agent">grounding</a> and the discipline that
         makes <a href="/blog/agentic-control-loops">autonomous loops</a> safe to
-        deploy. The series closes with the{" "}
+        ship without gambling on luck. The series closes with the{" "}
         <a href="/blog/ai-native-portfolio-landing-lead-roles">AI-native portfolio</a>{" "}
         — see the full <a href="/roadmap">roadmap</a>.
       </p>

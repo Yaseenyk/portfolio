@@ -6,60 +6,61 @@ function Body() {
   return (
     <>
       <p>
-        You tweaked the system prompt to fix one customer&apos;s edge case, shipped
-        it, and three days later a different flow is quietly returning garbage —
-        because the &quot;fix&quot; regressed six cases nobody re-checked. Prompts
-        are code with no type system and no test suite by default, so every change
-        is a blind edit to production behavior. You wouldn&apos;t merge a refactor
-        without tests. Eval-driven prompt engineering is how you stop merging
-        prompts without them.
+        I patched a system prompt to calm one customer&apos;s edge case, shipped,
+        and three days later a different path started returning junk — the
+        &quot;fix&quot; quietly regressed six flows nobody re-ran. Prompts are
+        code with no type system and no test suite by default, so every change is
+        a blind edit to production behavior. I wouldn&apos;t merge a refactor
+        without tests; same rule applies here. Eval-driven prompt engineering is
+        how you stop merging prompts without them.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
       <p>
         The foundation is a <strong>golden dataset</strong>: a curated set of
-        representative inputs paired with their expected outputs or acceptance
-        criteria. It is the prompt&apos;s test suite. The discipline that makes it
-        valuable is sourcing it from <em>reality</em> — real production inputs,
-        especially the failures and edge cases that bit you — not synthetic
-        happy-path examples you invented. Every bug you fix becomes a permanent
-        case in the set, so the same regression can never ship twice. A golden set
-        is a living record of everything your prompt must keep getting right.
+        representative inputs paired with expected outputs or acceptance
+        criteria. It is the prompt&apos;s test suite. The only way it stays
+        honest is sourcing it from <em>reality</em> — production traffic,
+        especially the failures and edge cases that burned you — not toy happy
+        paths. Every fix graduates into the set so that bug can&apos;t ship
+        twice. Over time the golden set becomes a living contract for what the
+        prompt must keep getting right. It mirrors the boundary discipline in the
+        pattern I call Trinity Architecture: lock the contract, and make it
+        executable.
       </p>
       <p>
         Scoring splits by output type. Structured outputs (Lesson 3) get{" "}
         <strong>deterministic assertions</strong> — exact match, schema validity,
-        a numeric field in range — fast, free, and unambiguous. Open-ended outputs
-        need an <strong>LLM-as-judge</strong>: a separate model call scoring the
-        response against a rubric (is it grounded? does it answer? is the tone
-        right?). The judge is powerful but fallible, so pin it to a concrete rubric
-        and validate the judge itself against human labels before you trust its
-        scores — an unanchored judge just launders your bias into a number.
+        a numeric field in range — fast, cheap, and unambiguous. Open-ended
+        outputs need an <strong>LLM-as-judge</strong>: a separate model call that
+        scores against a rubric (is it grounded, does it answer, is the tone
+        right). The judge is useful but noisy; anchor it to a concrete rubric and
+        sanity-check the judge against human labels before you trust the numbers —
+        otherwise you just launder bias into a score.
       </p>
       <p>
-        The payoff is turning prompt engineering from vibes into a measurable
-        loop. Change the prompt, run the whole golden set, read the
-        pass-rate delta. A change that fixes three cases and breaks five is now{" "}
+        The payoff is turning prompt work from vibes into a measurable loop.
+        Change the prompt, run the golden set, read the pass-rate delta. A change
+        that fixes three and breaks five is now{" "}
         <em>visibly</em> a regression instead of a surprise next week. Wire the
-        eval suite into CI as a gate — a prompt change that drops below the pass
-        threshold fails the build, exactly like a unit test — and prompts inherit
-        the same safety net as the rest of your code.
+        suite into CI as a gate; if the pass rate drops below the bar, the build
+        fails — same as unit tests — and prompts get the same safety net as the
+        rest of your code.
       </p>
       <p>
-        The trade-offs are dataset maintenance and judge cost. A golden set rots if
-        you don&apos;t feed it new production failures, and an LLM judge adds a
-        model call per case, so a large suite on every commit costs real tokens and
-        time — route the judge to a cheaper tier (Lesson 3) and reserve the full
-        suite for merge gates while a fast subset runs on every push. The deeper
-        risk is overfitting: optimize too hard against a fixed set and you tune the
-        prompt to the test, not the task. Keep the dataset growing and
-        representative, and it stays an honest proxy for production.
+        The trade-offs are dataset maintenance and judge cost. The set decays if
+        you don&apos;t feed it fresh production failures, and an LLM judge adds a
+        call per case, so large suites on every commit burn tokens and time —
+        route the judge to a cheaper tier (Lesson 3), run a fast subset on push,
+        and hold the full battery for merge. The deeper risk is overfitting:
+        chase the set too hard and you optimize for the test, not the task. Keep
+        it growing and representative so it stays an honest proxy for production.
       </p>
 
       <h2>An Eval Harness</h2>
       <p>
         Golden cases, deterministic assertions where you can, an anchored judge
-        where you can&apos;t, and a pass-rate gate.
+        where you can&apos;t, and a pass-rate gate. That&apos;s the harness.
       </p>
       <Terminal title="eval.ts">
         <span className="tok-com">{"// Prompts are code. This is their test suite — sourced from real failures."}</span>
@@ -101,9 +102,9 @@ export async function runEvals(): Promise<number> {
 }`}
       </Terminal>
       <p>
-        Run it in CI and a prompt edit that drops the pass rate below threshold
-        fails the build — the same gate a broken unit test would trip. The prompt
-        can no longer regress silently.
+        Run it in CI. If a prompt edit drops the pass rate below threshold, the
+        build fails — the same gate a broken unit test would trip. Silent
+        regressions stop at the door.
       </p>
 
       <h2>The Eval Gate</h2>
@@ -151,8 +152,8 @@ export async function runEvals(): Promise<number> {
         </svg>
       </Diagram>
       <p>
-        With behavior measurable and gated, the agent is finally trustworthy
-        enough to run unattended. The series closes there:{" "}
+        Once behavior is measurable and gated, the agent is stable enough to run
+        unattended. The series closes there:{" "}
         <a href="/blog/long-running-automated-agent-routines-cron-workflows">
           autonomous agent routines on a cron
         </a>

@@ -5,31 +5,41 @@ function Body() {
   return (
     <>
       <p>
-        &quot;AI coding tool&quot; collapses two fundamentally different things
-        into one phrase. A copilot completes the line you are typing. An agent
-        executes a task you described. One accelerates the keystroke; the other
-        removes it entirely. Confusing them is why some teams see a 10% speedup
-        from AI and others see a 10x one — they are using different categories of
-        tool and expecting the same result.
+        &quot;AI coding tool&quot; hides two different jobs behind one label. A
+        copilot completes the line I&apos;m on. An agent executes the task I
+        describe. One accelerates the keystroke; the other deletes the keystroke
+        from the plan. That&apos;s why teams report anything from a 10% bump to a
+        10x jump — same umbrella term, different class of tool. On Path Saathi
+        the copilot shaved minutes off scaffolding; on IntegrateX the agent moved
+        a feature across modules while I just curated the diffs.
       </p>
 
       <h2>Copilots: faster keystrokes</h2>
       <p>
-        A copilot operates inside the file you are editing, predicting the next
-        token from local context. It is exceptional at the mechanical layer —
-        boilerplate, obvious continuations, the line you were going to write
-        anyway. But it never leaves the cursor. You are still the one holding the
-        whole task in your head and driving every step; the AI just types faster
-        than you can.
+        A copilot lives at the cursor, predicting the next token from local
+        context. It&apos;s excellent at the mechanical layer — boilerplate,
+        obvious continuations, the thing you were about to type anyway. But it
+        never leaves the buffer. You still keep the invariants in your head and
+        drive every edit. On streamerOS it happily wrote typed plumbing and tiny
+        hooks; I still had to design the backpressure path and protect 60fps. In
+        the pattern I call Trinity Architecture, a copilot sits comfortably in the
+        Presentation layer; it won&apos;t reconcile cross-file state in the
+        orchestrator or reason about what the serialization needs on the wire.
       </p>
 
       <h2>Agents: removed steps</h2>
       <p>
         An agent operates a layer up. You give it a goal and a set of tools, and
         it runs a loop — plan, act, observe, repeat — across multiple files,
-        commands, and the codebase as a whole, until the task is done. The unit of
-        work is no longer the line; it is the feature. The human stops typing the
-        solution and starts specifying and reviewing it.
+        commands, and the codebase until the task is done. The unit of work isn&apos;t
+        the line; it&apos;s the feature. In my Trinity split, I give the agent
+        guardrails: Presentation stays declarative; the Reactive State /
+        Orchestration owns runtime truth and optimistic updates; the Data /
+        Serialization Adapter translates to a lean payload. On IntegrateX that
+        meant the loop touched React Flow nodes, Zustand slices, and the
+        Serialization Adapter that strips UI-only metadata — the same adapter that
+        cut payloads 94% and solved our state-sync churn — while I reviewed the
+        diffs and tests.
       </p>
 
       <Terminal title="leverage.ts">
@@ -46,18 +56,19 @@ await agent.run({
 
       <h2>The leverage is categorical, not incremental</h2>
       <p>
-        The jump from copilot to agent is not &quot;a bit faster.&quot; It is a
-        change in what the human does. With a copilot you still execute the work,
-        only quicker. With an agent you direct the work and verify the result —
-        which is exactly the shift that lets one architect ship the volume of a
-        team. The bottleneck moves from typing to specifying, and specifying is a
-        skill that compounds.
+        The jump from copilot to agent isn&apos;t &quot;a bit faster.&quot; It&apos;s
+        a role change. With a copilot you still execute the work, just quicker.
+        With an agent you specify constraints, review diffs, and protect
+        boundaries — the work that actually scales one architect to a team&apos;s
+        output. The bottleneck moves from typing to specifying. When payload bloat,
+        state-synchronization lag, and render thrash are owned by the orchestrator
+        and adapter, the agent can compose the feature while you guard the
+        interfaces.
       </p>
 
       <blockquote>
-        A copilot makes you a faster typist. An agent makes you an architect who
-        no longer types. Those are not the same tool, and they do not produce the
-        same multiplier.
+        A copilot makes me a faster typist. An agent makes me the architect who
+        stops typing. Different tools, different multipliers.
       </blockquote>
 
       <p>

@@ -73,37 +73,45 @@ function Body() {
   return (
     <>
       <p>
-        FinOps for AI is treating token spend as a unit-economics problem with an
-        owner, not a surprise on the monthly invoice. At scale, cost per request is an
-        architectural property you design — with three levers in order of leverage:
-        a semantic cache so you never pay for the same answer twice, a router so easy
-        queries don&apos;t hit a frontier model, and per-tenant attribution so every
-        dollar has a name. Optimizing a single prompt is tactics; governing the cost
-        curve is architecture.
+        I treat token spend like unit economics with a named owner, not a line item I
+        discover after finance runs the card. At scale, cost per request is something
+        you engineer. The three levers with the most leverage are simple: a semantic
+        cache so you never pay for the same answer twice, a router so trivial queries
+        don&apos;t touch a frontier model, and per-tenant attribution so every dollar
+        has a name. Tuning a single prompt is tactics; designing the cost curve is
+        architecture. The same mindset that drove my Serialization Adapter on
+        IntegrateX — stripping non-essential React Flow UI metadata before persistence
+        for a 94% payload reduction — applies here: stop shipping what you don&apos;t
+        need, whether that&apos;s UI chrome on the wire or redundant context to a
+        model.
       </p>
 
       <h2>The cheapest token is the one you never spend</h2>
       <p>
-        Real traffic is repetitive — the same question phrased a hundred ways. A{" "}
+        Real traffic repeats. The same question shows up a hundred slightly different
+        ways. A{" "}
         <a href="/blog/semantic-caching-edge-rag">semantic cache</a> embeds the query
-        and returns a prior answer when a near-identical one exists, which collapses
-        your most common questions to roughly zero cost and zero latency. It&apos;s
-        the first lever because it&apos;s pure subtraction: a cache hit isn&apos;t a
-        cheaper model call, it&apos;s no model call at all. Everything downstream only
-        sees genuine cache misses.
+        and returns a prior answer when a near-identical one exists, collapsing your
+        heaviest edges to roughly zero cost and near-zero latency. That&apos;s pure
+        subtraction: a hit isn&apos;t a cheaper call, it&apos;s no call at all. It
+        also trims load-induced tail latency and streaming backpressure — the miss
+        path is the only thing downstream systems ever see.
       </p>
 
       <CostCascadeDiagram />
 
       <h2>Route to the cheapest model that can answer</h2>
       <p>
-        Sending every request to your most capable model is paying frontier prices
-        for questions a small model answers perfectly. A router classifies difficulty
-        first and sends the easy majority to a cheap, fast model, escalating only the
-        hard minority. If a small model handles 80% of traffic at a fraction of the
-        per-token price, your blended cost drops by most of that 80% — without the
-        users on the easy path noticing anything but lower latency. Quality gates on
-        the cheap path catch the rare misroute and escalate it.
+        Sending everything to your best model is how you get a heroic demo and a
+        painful invoice. Classify difficulty first, send the easy majority to a
+        smaller, faster model, and escalate the hard minority. If a small model handles
+        ~80% at a fraction of the rate, your blended cost drops with it and latency
+        improves for most users. Guard the cheap path with quality gates and fall back
+        when they trip. In the pattern I call Trinity Architecture, the router lives
+        in the Reactive State / Orchestration layer: the UI only renders and dispatches,
+        and the Data / Serialization Adapter translates model choices and payloads —
+        no layer talks past its neighbor. That clean split keeps routing decisions
+        testable and cost-aware instead of sprinkled through components.
       </p>
 
       <Terminal title="route.ts — cache, route, attribute">
@@ -120,26 +128,29 @@ function Body() {
 
       <h2>Attribution turns a bill into a budget</h2>
       <p>
-        An unlabeled invoice is undebuggable: you can see spend doubled but not which
-        tenant, feature, or model did it. Tag every call with the tenant and write a
-        ledger entry, and cost becomes a dimension you can group by — showback per
-        customer, a budget alert before a runaway loop empties the account, a clear
-        answer to &quot;is this feature profitable?&quot;. Attribution is the
-        difference between knowing your costs and merely paying them.
+        An unlabeled invoice is undebuggable. Spend can double and you still won&apos;t
+        know which tenant, feature, or model is driving it. Tag every call with the
+        tenant and write a ledger entry, and cost becomes a dimension you can group,
+        alert, and forecast on — showback per customer, a budget tripwire before a loop
+        burns cash, and a real answer to &quot;is this feature profitable?&quot;. In my
+        Trinity split, the orchestrator owns the ledger updates, and the adapter only
+        shapes usage data; the UI never touches attribution, it just benefits from the
+        guardrails.
       </p>
 
       <blockquote>
-        AI cost isn&apos;t a number you discover at month end — it&apos;s one you
-        architect. Cache so you never pay twice, route so you never overpay, and
+        AI cost isn&apos;t something you learn at month end — it&apos;s something you
+        wire in. Cache so you never pay twice, route so you don&apos;t overpay, and
         attribute so every token traces to an owner.
       </blockquote>
 
       <p>
         FinOps is the governance layer over the tactical{" "}
         <a href="/blog/token-economics-cost-optimizing-llm-apps">token economics</a> of
-        a single app, and it leans on the same{" "}
+        a single app, and it rides the same{" "}
         <a href="/blog/router-agent-multi-agent-orchestration">router pattern</a> that
-        directs multi-agent work. Continue on the <a href="/roadmap">roadmap</a>.
+        coordinates multi-agent work. Keep the layers tight — presentation, orchestration,
+        adapter — and the costs stay predictable. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );

@@ -6,62 +6,66 @@ function Body() {
   return (
     <>
       <p>
-        Your production agent needs to query Postgres, read a Figma design, and
-        drive a Playwright browser — so you wired in three MCP servers (Lesson 5)
-        and shipped it. Now every request drags three servers&apos; worth of tool
-        schemas through the context window, three sets of credentials live in
-        three configs, and a teammate&apos;s agent re-does the same wiring with
-        subtly different auth. Connecting MCP servers is easy; <em>governing</em>{" "}
-        a fleet of them is the enterprise problem.
+        The moment a production agent has to hit Postgres, read a Figma file, and
+        drive a Playwright browser, you wire up three MCP servers and call it a
+        day. Then reality lands: every turn drags three servers&apos; tool schemas
+        through the window, three sets of secrets leak across three configs, and a
+        teammate rebuilds the same stack with slightly different auth. Hooking up
+        MCP servers is easy; keeping payloads lean, auth sane, and behavior
+        consistent is the real job.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
       <p>
-        The pattern is an <strong>MCP aggregation gateway</strong>: a single MCP
-        server that the agent connects to, which itself fans out to many backend
-        MCP servers. The agent sees one governed surface; the gateway owns the
-        connections to Postgres, Figma, Playwright, and the rest. This is the same
-        N+M collapse MCP gave you for integrations (Lesson 5), now applied to the
-        servers themselves — one connection point, one auth boundary, one place to
-        enforce policy, instead of every agent managing the full mesh.
+        The move is an <strong>MCP aggregation gateway</strong>: a single MCP
+        server the agent talks to that fans out to many backend MCP servers. The
+        agent gets one governed surface; the gateway owns Postgres, Figma,
+        Playwright, and friends behind the curtain. It&apos;s the same N+M collapse
+        MCP gave you for integrations (Lesson 5), now applied to servers — one
+        connection point, one auth boundary, one policy engine — instead of every
+        agent juggling the full mesh. I treat this as the orchestration tier in
+        the pattern I call <em>Trinity Architecture</em>: the agent is pure
+        Presentation (intents in, responses out), the gateway is Reactive
+        State/Orchestration (routing, policy, rate limits), and each backend
+        client is a Data/Serialization Adapter that speaks the backend&apos;s shape
+        without bleeding it into the agent.
       </p>
       <p>
-        Aggregation forces <strong>namespacing</strong>, because tool names
-        collide. Postgres and Playwright might both expose <code>query</code>; the
-        gateway prefixes them — <code>postgres__query</code>,{" "}
-        <code>browser__query</code> — so the agent can address the right one
-        unambiguously. The gateway also becomes the natural <strong>auth
-        broker</strong>: it holds the scoped credentials for each backend, and the
-        agent never sees a database password or a Figma token. Credentials live in
-        one audited place with least privilege per backend, not scattered across
-        every agent&apos;s environment.
+        Aggregation requires <strong>namespacing</strong> because tool names
+        collide. Postgres and Playwright both want <code>query</code>; the gateway
+        prefixes them — <code>postgres__query</code>,{" "}
+        <code>browser__query</code> — so the agent can target the right one
+        deterministically. The gateway is also your <strong>auth broker</strong>:
+        it holds scoped credentials per backend so the agent never sees a DB
+        password or a Figma token. One audited vault, least privilege per
+        backend, no secret sprawl in every agent&apos;s environment.
       </p>
       <p>
-        The dominant cost is context, and the gateway is where you control it.
-        Every backend tool schema the gateway exposes is re-sent on every turn
-        (Lesson 1), so naively aggregating ten servers can put a hundred tool
-        definitions in the window — token bloat and worse tool selection, because
-        the model is choosing from noise. The gateway should <strong>filter and
-        lazily expose</strong>: present only the tools an agent&apos;s role needs,
-        and cache the aggregated schema as a stable prefix (Lesson 9) so the whole
-        toolset bills at cache rates. Governance and cost control are the same
-        knob.
+        The dominant cost is context, and the gateway is the choke you can tune.
+        Every exposed tool schema is re-sent each turn (Lesson 1). Naively
+        aggregating ten servers means a hundred tool definitions in the window —
+        token bloat and worse tool selection because the model is choosing through
+        noise. Filter and <strong>lazily expose</strong> only what a role needs,
+        and cache the aggregated schema as a stable prefix (Lesson 9) so it bills
+        at cache rates. On IntegrateX we built a <em>Serialization Adapter</em> to
+        strip React Flow UI metadata before persistence and cut payloads 94%; the
+        same instinct applies here: expose lean wrappers around heavy backends,
+        and keep the noise out of the window.
       </p>
       <p>
-        The trade-off is a new hop and a single point of failure. The gateway adds
-        latency and an availability dependency — if it&apos;s down, every agent
-        loses every tool — so it needs health checks, per-backend timeouts, and
-        graceful degradation when one backend is unreachable (a failing Figma
-        server shouldn&apos;t take down database access). You&apos;re trading the
-        sprawl of an unmanaged mesh for the discipline of a managed chokepoint;
-        that&apos;s the right trade at scale, but only if the chokepoint is built
-        to stay up.
+        You pay for the control with a hop and a single point of failure. The
+        gateway adds latency and becomes an availability dependency — if it&apos;s
+        down, every tool is down — so give it health checks, per-backend timeouts,
+        and graceful degradation when a backend flakes (a failing Figma server
+        shouldn&apos;t block database access). On streamerOS, backpressure and
+        frame budgets forced similar guardrails; the gateway deserves the same
+        discipline or it will turn into a throughput sink.
       </p>
 
       <h2>An Aggregation Gateway</h2>
       <p>
-        One gateway server, three namespaced backends, role-filtered tools, and
-        per-backend scoped credentials the agent never sees.
+        One gateway, namespaced backends, role-scoped tools, and per-backend
+        credentials the agent never touches.
       </p>
       <Terminal title="mcp-gateway.ts">
         <span className="tok-com">{"// One surface to the agent; the gateway owns the fan-out, auth, and policy."}</span>
@@ -100,9 +104,9 @@ export async function buildGateway(role: string) {
 }`}
       </Terminal>
       <p>
-        The agent connects to one server and sees a handful of role-scoped,
-        namespaced tools. The database password, the Figma token, and the
-        full backend mesh stay behind the gateway.
+        The agent sees one server and a small, role-scoped surface. Secrets stay
+        behind the gateway with the backend mesh. That keeps context tight, auth
+        tidy, and tool calls predictable.
       </p>
 
       <h2>One Governed Surface</h2>
@@ -148,8 +152,8 @@ export async function buildGateway(role: string) {
         </svg>
       </Diagram>
       <p>
-        A governed tool surface is only trustworthy if you can prove the agent
-        behaves. The next lesson makes that measurable:{" "}
+        A governed surface only matters if the agent actually behaves. Next up:
+        {" "}
         <a href="/blog/evaluation-driven-prompt-engineering-golden-datasets">
           eval-driven prompt engineering with golden datasets
         </a>

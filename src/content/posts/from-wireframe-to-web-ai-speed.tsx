@@ -5,32 +5,35 @@ function Body() {
   return (
     <>
       <p>
-        The gap between a Figma frame and production React used to be measured in
-        days — slicing, naming, wiring tokens, fighting responsive edge cases.
-        That gap has collapsed. Feed an AI a real design system rather than a
-        screenshot and it will produce complex, on-brand bento layouts and
-        glassmorphic interfaces in minutes. The skill that matters now is not
-        drawing the UI; it is specifying the system precisely enough that the
-        generated output is production-grade rather than generic.
+        The gap between a Figma frame and production React used to cost days of
+        naming, token wiring, and wrestling breakpoints. That gap is now minutes.
+        Point an AI at a real design system instead of a screenshot and it will
+        assemble on-brand bento layouts and glass surfaces fast. The work that
+        matters is the spec: define the contract so well that the output ships
+        without rework. I keep the generator boxed into the Presentation layer of
+        the pattern I call Trinity Architecture — components render from state and
+        dispatch events, no data or persistence logic leaks into the JSX.
       </p>
 
       <h2>The bottleneck was translation, not taste</h2>
       <p>
-        Designers were never the slow part. The slow part was the mechanical
-        translation of intent into markup: turning a spacing decision into the
-        right utility classes, a motion idea into the right transition, a layout
-        into a responsive grid that survives every breakpoint. That translation
-        is exactly what AI does well — and what it does badly if you hand it a
-        picture and hope.
+        Taste wasn&apos;t slow; typing was. The drag was turning intent into
+        markup — mapping spacing to utilities, motion ideas to transitions,
+        layouts to resilient responsive grids. That translation is exactly what
+        AI is good at when given structure, and exactly what it botches when you
+        toss it a picture. On Path Saathi, the day-one push was mostly that
+        mechanical grind; today I&apos;d hand that layer to a model and keep my
+        attention on the contract and the state boundaries.
       </p>
 
       <h2>Feed the system, not the screenshot</h2>
       <p>
-        Generic AI output comes from generic prompts. The fix is to make your
-        design system the context: the tokens, the primitive components, and the
-        hard rules the output must obey. Constrain the model to your palette,
-        your motion library, your aesthetic constraints, and it stops inventing a
-        new look and starts assembling yours.
+        Generic in, generic out. Make your design system the context: tokens,
+        primitives, and hard rules the output must obey. Constrain the model to
+        your palette, motion library, and compositional limits, and it stops
+        inventing a new brand and starts assembling your own. That also guards
+        the Trinity split — UI stays declarative, orchestration owns behavior, and
+        nothing downstream has to guess at presentation rules.
       </p>
 
       <Terminal title="design-context.ts">
@@ -76,31 +79,31 @@ function Body() {
 
       <h3>Constraints produce fidelity</h3>
       <p>
-        Counter-intuitively, the more you constrain the generator, the more
-        polished the result. &quot;Build a dashboard&quot; yields a template.
-        &quot;Build a dashboard using only these three primitives, this palette,
-        Framer Motion for every transition, and no raster images&quot; yields
-        something that looks designed. Fidelity is downstream of specificity.
+        Counter-intuitively, tighter constraints make the output look finished.
+        &quot;Build a dashboard&quot; gets you a template. &quot;Build a dashboard
+        using only these three primitives, this palette, Framer Motion on every
+        transition, and no raster images&quot; yields something that reads as
+        designed. Specificity is what turns patterns into polish.
       </p>
 
       <h2>Bento and glassmorphism, at speed</h2>
       <p>
-        The modern dark-mode aesthetic — bento grids, glass surfaces, gradient
-        accents, restrained motion — is highly systematic, which is precisely why
-        AI reproduces it so well. Once the primitives exist (a glass card, a
-        gradient text span, a pulsing node), generating a new page is composition,
-        not creation. The portfolio you are reading was built exactly this way:
-        a small set of primitives, assembled at AI-speed into distinct,
-        high-fidelity sections.
+        The modern dark aesthetic — bento grids, glass, gradients, restrained
+        motion — is highly systematic, which is why AI reproduces it cleanly. Once
+        the primitives exist (glass card, gradient text, pulse), new pages are
+        composition, not invention. That&apos;s how this portfolio was built: a
+        small, sharp primitive set assembled at model speed into distinct,
+        production-tight sections — and kept in the Presentation lane so state and
+        data flows don&apos;t bleed into renders or cause thrash.
       </p>
 
       <h2>What the human still owns</h2>
       <p>
-        The model assembles; the architect decides. Hierarchy, restraint, what to
-        leave out, when motion serves the content versus distracting from it —
-        these are taste judgments that do not come from a prompt. AI removed the
-        cost of producing the interface. It did not remove the cost of knowing
-        which interface is worth producing.
+        The model assembles; the architect exercises judgment. Hierarchy,
+        restraint, omission, and when motion serves meaning instead of stealing
+        it — that&apos;s on us. AI removed the cost of producing the interface. It
+        did not remove the cost of choosing which interface should exist and where
+        the boundaries live.
       </p>
 
       <blockquote>

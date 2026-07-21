@@ -77,20 +77,26 @@ function Body() {
       <p>
         A React Flow canvas is gorgeous and entirely inert. It is a set of nodes
         and edges with positions. The interesting engineering question is the one
-        the demos skip: <strong>how do you actually run it?</strong> A freeform
-        graph has no inherent order, may fan out and back in, and — because a user
-        drew it — may contain a cycle that would loop forever. Turning that into a
-        deterministic, runnable pipeline is a compilation problem, and it has a
-        clean, classic solution.
+        the demos skip: <strong>how do you actually run it?</strong> On IntegrateX,
+        the pretty graph was useless until we made it deterministic. A user-drawn
+        graph has no inherent order, can fan out and then converge, and it may
+        hide a cycle that will happily spin your workers forever. Turning that into
+        a predictable, runnable pipeline is a compilation problem with a battle‑tested
+        answer.
       </p>
 
       <h2>From render graph to execution plan</h2>
       <p>
         First, strip the canvas down to its essence. The executor does not care
         about positions or selection state; it cares about which capability feeds
-        which. Reduce the React Flow state to a dependency map: for every node,
-        the set of nodes that must complete before it can start. That adjacency
-        structure — not the visual graph — is what you compile.
+        which. In the pattern I call Trinity Architecture, React Flow lives in the
+        Presentation layer; the Reactive State / Orchestration layer (Zustand for
+        IntegrateX) holds the active graph; and a Data / Serialization Adapter
+        prepares what the runner needs. That adapter reduces rich UI state to a
+        dependency map: for each node, the set of nodes that must finish before it
+        can start. That adjacency — not the visual graph — is what you compile. A
+        bonus from the same adapter on IntegrateX: we stripped UI‑only metadata and
+        cut payload size by 94% before persisting.
       </p>
 
       <Diagram />
@@ -99,10 +105,11 @@ function Body() {
       <p>
         A workflow graph is a DAG, and a DAG has a topological order: a linear
         sequence in which every node appears after all of its dependencies.
-        Kahn&apos;s algorithm computes it by repeatedly taking nodes with no
-        remaining unmet dependencies. As a bonus, it doubles as your cycle
-        detector — if you finish with nodes still unprocessed, the graph contains a
-        cycle, and you refuse to run rather than hang.
+        Kahn&apos;s algorithm handles this cleanly. I let it pop nodes with no
+        unmet deps, push successors when their indegree drops, and treat any
+        leftovers as a hard error. That same pass becomes the cycle guard — if the
+        processed count doesn&apos;t match, we fail fast before allocating a single
+        worker or opening a stream.
       </p>
 
       <Terminal title="compile.ts">
@@ -132,8 +139,10 @@ function Body() {
         Nodes that share the same dependency depth have no ordering constraint
         between them, which means they can run concurrently. In the diagram, A and
         B occupy step one and execute in parallel; C waits for both; D waits for C.
-        You get correct concurrency not by hand-annotating it but by reading it
-        off the structure.
+        Read concurrency from the structure and you avoid hand‑tuned queues, head‑of‑line
+        blocking, and the kind of backpressure bugs I fought in streamerOS. Cap
+        parallelism per level, stream results, and you won&apos;t thrash renders or
+        starve downstream consumers.
       </p>
 
       <h2>Why compile at all</h2>
@@ -141,15 +150,17 @@ function Body() {
         Compilation is the seam that makes everything downstream tractable. A
         compiled plan is cacheable, serialisable, and — crucially — verifiable
         before a single agent runs. You can reject invalid graphs, estimate cost,
-        and replay a run deterministically because the order is fixed. The visual
-        graph is for humans; the compiled plan is for the machine, and keeping them
-        separate is what makes the system both editable and reliable.
+        and replay a run deterministically because the order is fixed. It also
+        enforces the Trinity boundary: UI edits don&apos;t leak DB schemas, and the
+        adapter never mutates UI state — it feeds the orchestrator, which drives the
+        runner. The visual graph is for humans; the compiled plan is for the machine,
+        and keeping them separate is what keeps edits fast and execution reliable.
       </p>
 
       <blockquote>
-        The canvas is the source; the compiled plan is the program. Topological
-        sort is the compiler — and the same pass that orders your nodes is the one
-        that proves the graph can run at all.
+        The canvas is how you think; the compiled plan is how you guarantee it runs.
+        Topological sort does both jobs in one pass: it orders the work and proves
+        the graph is runnable.
       </blockquote>
 
       <p>
@@ -161,7 +172,7 @@ function Body() {
         <a href="/blog/94-percent-payload-reduction-react-flow">
           serialization adapter pattern
         </a>
-        .
+        {" "}— the adapter layer in my Trinity split that made IntegrateX practical at scale.
       </p>
     </>
   );

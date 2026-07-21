@@ -71,23 +71,22 @@ function Body() {
   return (
     <>
       <p>
-        Evaluation-Driven Development makes a golden dataset the test suite for your
-        AI: a curated set of labelled cases that every prompt or model change runs
-        against in CI, gated on a regression threshold. Without it, a prompt is code
-        with no tests — you tweak a line, it feels better on the three examples you
-        tried, and you ship a silent regression on the other ninety-seven. The golden
-        set turns &quot;feels better&quot; into a number that either clears the bar or
+        Evaluation-Driven Development treats a golden dataset like your AI&apos;s test
+        suite. Every prompt or model tweak runs in CI against labelled cases with a
+        regression threshold. Without that harness, a prompt is code with no tests —
+        you nudge a line, it looks better on the three examples you stared at, and
+        you ship a silent regression on the other ninety-seven. The golden set turns
+        &quot;feels better&quot; into a measurable score that either clears the bar or
         blocks the merge.
       </p>
 
       <h2>A prompt change is a diff without a test</h2>
       <p>
-        The danger of prompt engineering is how cheap it is to change and how
-        invisible the side effects are. Fix one failing case by adding an
-        instruction, and you may quietly break a category you weren&apos;t looking at.
-        Manual spot-checking can&apos;t catch it because you check what you expect to
-        change, not what you don&apos;t. The only defense is the same one that works
-        for code: a fixed set of cases, run every time, that fails loudly when
+        Prompt engineering is cheap to change and hides side effects. Fix one failing
+        case by sprinkling an instruction, and you can quietly break a whole category
+        you weren&apos;t watching. Manual spot-checks bias toward what you expect to
+        move; they miss the collateral. The only defense is the same one that works
+        for code: a fixed set of cases, run on every change, that fails loudly when
         behavior regresses.
       </p>
 
@@ -102,7 +101,11 @@ function Body() {
         input, a way to judge the output (exact match, a rubric, an{" "}
         <a href="/blog/evaluating-llm-outputs">LLM-as-judge</a> score), and a label.
         Curating that set is the real engineering work; the prompt is just the current
-        candidate being measured against it.
+        candidate being measured against it. Keep the artifact lean and reproducible:
+        store only inputs, expected judgments, and minimal context. On IntegrateX, a
+        Serialization Adapter stripped non-essential React Flow UI metadata before
+        persistence and cut payloads 94% — the same discipline keeps eval records
+        small, portable, and free of view-specific noise.
       </p>
 
       <Terminal title="eval.test.ts — golden set as a CI gate">
@@ -120,19 +123,22 @@ function Body() {
 
       <h2>Gate the merge, not the vibe</h2>
       <p>
-        The discipline only bites when the threshold is wired into CI. Store the
+        The discipline only sticks when the threshold is wired into CI. Store the
         current pass-rate as the baseline; a pull request that drops below it fails
         the check and can&apos;t merge, exactly like a broken unit test. That single
         gate changes the culture: prompt changes stop being judged by whoever argues
         hardest and start being judged by the dataset. &quot;Trust me, it&apos;s
-        better&quot; becomes &quot;the pass-rate went from 91% to 94%.&quot;
+        better&quot; becomes &quot;the pass-rate went from 91% to 94%.&quot; In the
+        pattern I call Trinity Architecture, that gate lives in the Reactive
+        State/Orchestration layer — the UI just renders status, and the adapter
+        persists eval records — so no layer talks past its neighbor.
       </p>
 
       <blockquote>
-        You don&apos;t earn confidence in an AI feature by trying a few prompts until
-        one feels right. You earn it with a golden dataset that fails the build the
-        moment a change makes things worse — and grows every time production finds a
-        case you missed.
+        Confidence in an AI feature isn&apos;t earned by trying prompts until one
+        feels right. It&apos;s earned by a golden dataset that fails the build the
+        moment a change makes things worse — and that grows every time production
+        exposes a gap.
       </blockquote>
 
       <p>
@@ -140,7 +146,9 @@ function Body() {
         <a href="/blog/evaluating-llm-outputs">evaluating LLM outputs</a> and the
         safety net that lets{" "}
         <a href="/blog/guardrail-engineering-hallucination-prevention">guardrails</a>{" "}
-        evolve without silent regressions. Continue on the{" "}
+        evolve without silent regressions. Keep the Trinity split tight — presentation
+        renders, orchestration owns truth, and the adapter handles serialization —
+        and you get fast iteration without shipping vibes. Continue on the{" "}
         <a href="/roadmap">roadmap</a>.
       </p>
     </>

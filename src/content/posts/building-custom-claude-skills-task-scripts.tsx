@@ -6,13 +6,13 @@ function Body() {
   return (
     <>
       <p>
-        There&apos;s a workflow you&apos;ve typed into Claude forty times: &quot;cut
+        You know the drill you&apos;ve typed into Claude too many times: &quot;cut
         a release — bump the version, update the changelog from the commits since
         the last tag, run the build, then draft the GitHub release notes.&quot;
-        Every time you reconstruct the same paragraph from memory, miss a step
-        under pressure, and get slightly different output. Pasting instructions is
-        not reuse. A Skill is: a discoverable, versioned task script the agent
-        loads on demand and executes the same way every time.
+        Under deadline, human RAM drops a frame, a step gets skipped, and the
+        output drifts. Copy‑pasting prose isn&apos;t reuse; it&apos;s entropy. A
+        Skill is a small, discoverable, versioned task script the agent loads on
+        demand and runs the same way every time.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -23,9 +23,9 @@ function Body() {
         The crucial design property is <strong>progressive disclosure</strong>.
         Only the name and description sit in the context window by default — a few
         tokens advertising the capability. The full instruction body loads{" "}
-        <em>only</em> when the model decides the skill is relevant. You can ship
-        fifty skills without paying for fifty skills&apos; worth of context on
-        every turn.
+        <em>only</em> when the model decides the skill is relevant. That keeps the
+        wire lean, prevents context bloat, and lets you ship fifty skills without
+        paying for fifty skills&apos; worth of context on every turn.
       </p>
       <p>
         That makes the <code>description</code> the single most important line in
@@ -38,11 +38,15 @@ function Body() {
       </p>
       <p>
         Skills compose with everything earlier in the series, which is what makes
-        them more than prompt snippets. A skill body can instruct the agent to
+        them more than prompt snippets. In the pattern I call{" "}
+        <em>Trinity Architecture</em>, the chat surface is Presentation, the skill
+        body is the Reactive Orchestrator that sequences work and guards
+        boundaries, and MCP tools / structured output / gated shell calls play the
+        Data / Serialization Adapter role to touch the outside world. The body can
         call MCP tools (Lesson 5), enforce structured output (Lesson 3), and run
         shell commands that the permission layer gates (Lesson 7). It can bundle
         supporting files — scripts, templates, reference docs — that the agent
-        pulls in only when needed. The skill becomes the orchestration layer; the
+        pulls in only when needed. The skill becomes the orchestrator; the
         primitives underneath it do the work.
       </p>
       <p>

@@ -5,18 +5,23 @@ function Body() {
   return (
     <>
       <p>
-        Caching is the highest-leverage lever in a backend, and most teams use a
-        fraction of what Redis offers. On a portal serving thousands of active
-        endpoints, a disciplined caching layer is what cut API latency by 25%
-        while holding 99.9% uptime — not a faster database, but fewer trips to it.
+        Nothing moves tail latency like a cache, and most stacks use a sliver of
+        what Redis can do. On a portal with thousands of active endpoints, the
+        change that cut API latency by 25% while holding 99.9% uptime wasn’t a
+        faster database — it was fewer trips to it. Fewer round-trips, fewer
+        serializers on the hot path, less lock contention.
       </p>
 
       <h2>The interceptor pattern</h2>
       <p>
-        Rather than sprinkling cache logic through controllers, put it at a
-        single boundary: a middleware that reads through Redis and only falls
-        back to the handler on a miss. The controller stays oblivious; caching
-        becomes a cross-cutting concern you can reason about in one place.
+        Stop scattering cache branches through controllers. Put the policy at a
+        single boundary: a read-through middleware that checks Redis and only
+        falls back to the handler on a miss. Controllers stay boring and
+        testable; caching becomes a cross-cutting concern you can reason about
+        in one place. That boundary also cleanly fits the pattern I call Trinity
+        Architecture: controllers live in the orchestration layer, while this
+        middleware acts as the Data/Serialization Adapter — it shapes bytes and
+        TTLs, but never mutates application state directly.
       </p>
 
       <Terminal title="cache.middleware.ts">
@@ -39,27 +44,32 @@ export const cached = (ttl: number) => async (req, res, next) => {
       <h2>Choose the write strategy deliberately</h2>
       <p>
         Cache-aside (lazy) is the default — populate on read, expire on TTL.
-        Write-through keeps the cache hot by writing on every mutation, ideal for
-        read-heavy data that must never serve stale. The trap is forgetting
+        Write-through keeps hot sets warm by writing on every mutation, great
+        for read-heavy data that must not drift. The real foot-gun is partial
         invalidation: a write path that updates the database but not the cache
-        ships confidently wrong data until the TTL saves you. Pick the strategy
-        per data shape, not per project.
+        serves confidently wrong data until TTL bails you out. Decide per data
+        shape: payload size, fan-out of invalidation, and tolerance for
+        staleness. When I can’t guarantee atomic invalidation, I favor
+        cache-aside with short TTLs and versioned keys.
       </p>
 
       <h2>TTL, stampedes, and key hygiene</h2>
       <p>
-        Three details decide whether caching helps or hurts at scale. Set TTLs to
-        the data&apos;s actual volatility, not a global guess. Guard against cache
-        stampedes — when a hot key expires and a thousand requests hit the
-        database at once — with a short lock or a probabilistic early refresh.
-        And keep keys structured and namespaced so invalidation is surgical
-        rather than a blunt flush.
+        Three details decide whether caching helps or hurts at scale. Set TTLs
+        to the data&apos;s real volatility, not a global constant, and add a small
+        jitter to avoid synchronized expiry. Guard against cache stampedes —
+        when a hot key expires and a thousand requests dog-pile the database —
+        with single-flight locks or a probabilistic early refresh. And treat
+        keys like schemas: namespaced and structured so invalidation is
+        surgical, not a blunt flush. Payload size matters, too. On IntegrateX,
+        the Serialization Adapter stripped non-essential React Flow UI metadata
+        before persistence and cut payloads 94%; that same discipline keeps
+        Redis memory, bandwidth, and stampede blast radius under control.
       </p>
 
       <blockquote>
-        A cache is not a performance trick you add at the end. It is an
-        architecture decision about which data is allowed to be slightly stale —
-        and for how long.
+        A cache isn’t a last-minute speed hack; it’s an architectural contract
+        about which data may be slightly stale — and for how long.
       </blockquote>
 
       <p>

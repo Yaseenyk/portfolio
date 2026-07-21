@@ -5,31 +5,31 @@ function Body() {
   return (
     <>
       <p>
-        Every LLM call is the slowest, most expensive, most rate-limited hop in
-        your request path. Treat it like a fast database query and your portal
-        falls over the first time a thousand users hit it at once. The fix is not
-        a faster model — it is refusing to call the model at all when you do not
-        have to. A disciplined cache tier between the user and the LLM is what
-        keeps an enterprise admin portal at 99.9% uptime and 25% lower latency
-        under real load.
+        In production, the LLM hop is the tall pole — slow, pricey, and throttled
+        by someone else&apos;s quota. Treat it like a cheap database read and the
+        first thousand-user burst will crater your p95s. The practical move isn&apos;t
+        a faster model; it&apos;s not calling the model when you don&apos;t need to. A
+        hard cache tier between the user and the LLM is what kept our enterprise
+        admin portal steady at 99.9% uptime with ~25% lower latency when traffic
+        got noisy.
       </p>
 
       <h2>The LLM is a network call you cannot trust to be fast</h2>
       <p>
-        Provider latency is variable by design, throughput is capped by a rate
-        limit you do not control, and every token costs money. None of those are
-        problems you solve in the prompt — they are problems you solve in the
-        architecture, by putting a cache between your traffic and the model and
-        making sure the common case never reaches the provider.
+        Provider latency swings, throughput is rate-limited, and every token is a
+        bill. You don&apos;t paper over that in a prompt template — you solve it in the
+        shape of the system: put a cache in front of the model and make the common
+        paths terminate there. When the hot path never leaves your infra, your SLOs
+        stop depending on a vendor&apos;s Tuesday.
       </p>
 
       <h2>A cache between the user and the model</h2>
       <p>
-        Start with the obvious win: cache-aside on Redis. Before paying for a
-        completion, hash the resolved prompt and check for a hit. Deterministic
-        prompts — system summaries, classification, repeated lookups — return in
-        single-digit milliseconds instead of seconds, and never consume rate
-        budget.
+        Start with cache-aside on Redis. Normalize and hash the resolved prompt,
+        then check for a hit before you even look at the SDK. Deterministic asks —
+        system summaries, classification, idempotent lookups — come back in single
+        milliseconds and cost $0. Scope TTLs by volatility and evict on the write
+        paths that actually change meaning. Save the tokens for the true unknowns.
       </p>
 
       <Terminal title="cache.ts">
@@ -79,45 +79,45 @@ function Body() {
 
       <h3>Exact-match is not enough — add a semantic layer</h3>
       <p>
-        Users phrase the same question ten ways. An exact-match key misses all
-        ten. Layer a semantic cache on top: embed the incoming prompt, search a
-        vector index of recent prompts, and if the nearest neighbor is within a
-        tight similarity threshold, return its cached answer. This converts a
-        long tail of near-duplicates into hits — the single biggest lever on
-        provider load in a high-traffic portal.
+        Users ask the same thing twelve different ways. An exact key misses most
+        of them. Add a semantic cache: embed the incoming prompt, search a vector
+        index of recent prompts, and if the nearest neighbor clears a tight
+        similarity bar, return its cached answer. Keep the threshold conservative
+        to avoid clever-but-wrong hits. This turns the long tail of near-duplicates
+        into cache wins — the single biggest lever on provider load I&apos;ve seen in
+        high-traffic portals.
       </p>
 
       <h2>MongoDB indexing for the data the model reads</h2>
       <p>
-        Caching the model is half the story; the other half is the retrieval the
-        model depends on. If every completion is preceded by a slow Mongo query,
-        you have just moved the bottleneck. Index for the actual access
-        patterns — compound indexes on the fields your queries filter and sort
-        by, covered indexes where you can return straight from the index without
-        touching documents. The goal is that the data feeding the prompt is
-        never the thing keeping the user waiting.
+        Caching the model is only half the battle. If each request waits on a cold
+        Mongo scan, you just moved the bottleneck. Index to the actual query
+        shapes: compound indexes for your filter+sort pairs, projections to ship
+        only what the prompt needs, and covered indexes so common reads return
+        straight from the index. The point is simple — retrieval should never be
+        why a user stares at a spinner.
       </p>
 
       <h2>Insulating the rate limit at 4,000+ users</h2>
       <p>
-        With exact and semantic caching absorbing the repeat traffic, only
-        genuinely novel prompts reach the provider — and those you shape with a
-        request queue and a concurrency cap tuned to your rate limit, so a spike
-        degrades into a few hundred extra milliseconds of queueing rather than a
-        wall of 429s. The provider never sees your peak; it sees your cache-miss
-        rate, which is a fraction of it.
+        With exact and semantic caches eating repeats, only truly novel prompts
+        reach the provider. Those ride a request queue with a concurrency cap
+        tuned to your rate limit, so spikes turn into predictable queueing instead
+        of a 429 storm. Same playbook I used on streamerOS to keep 60fps while
+        ingesting chat + telemetry: embrace backpressure, smooth the burst, and
+        let the system breathe.
       </p>
 
       <blockquote>
-        Scaling an AI feature is not about making the model faster. It is about
-        ensuring the model is the exception in your request path, not the rule.
+        Scaling an AI feature isn&apos;t about making the model fast; it&apos;s about
+        making the model rare on your hot path.
       </blockquote>
 
       <p>
         This is the caching architecture behind the{" "}
         <a href="/#projects">CMZ enterprise portal</a> — Redis cache rings,
-        indexed reads, and rate-limit insulation holding latency and uptime
-        steady across thousands of active endpoints.
+        indexed reads, and rate-limit insulation that keep latency and uptime
+        boring across thousands of active endpoints.
       </p>
     </>
   );

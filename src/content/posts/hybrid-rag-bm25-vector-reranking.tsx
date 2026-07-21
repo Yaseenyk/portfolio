@@ -70,36 +70,41 @@ function Body() {
   return (
     <>
       <p>
-        Hybrid RAG runs two retrievers over the same query and fuses their results:
-        a sparse keyword index (BM25) and a dense vector index. Each catches what the
-        other is blind to — BM25 nails the exact error code or product SKU a vector
-        embedding smears away, and the vector finds the paraphrase that shares no
-        words with the document. Fusing them, then reranking the shortlist, is the
-        single most reliable retrieval-quality upgrade in production.
+        In production, one retriever is a coin flip on the user’s phrasing. I run two
+        lanes in parallel: a sparse keyword index (BM25) and a dense vector index.
+        BM25 is ruthless about exact tokens &mdash; error codes, SKUs, API field
+        names. Vectors forgive wording and catch the paraphrase BM25 would never see.
+        They fail in opposite directions, so I let them disagree at wire speed, fuse
+        the lists, then rerank the survivors. That sequence consistently moves answer
+        quality more than any prompt tweak, and it does it without blowing up latency
+        or context budget.
       </p>
 
       <h2>Dense retrieval has a precision hole</h2>
       <p>
-        Vector search is built for meaning, which is exactly why it fumbles
-        specifics. &quot;Error TX-409&quot; and &quot;Error TX-410&quot; sit almost on
-        top of each other in embedding space, and a rare identifier the embedding
-        never really learned lands somewhere vague. Keyword search has the opposite
-        profile: it&apos;s exact to a fault and goes blind the moment the user
-        paraphrases. Neither is wrong — they fail in different directions, which is
-        the whole reason to run both.
+        Vector search optimizes for meaning, which is why it trips on specifics.
+        &quot;Error TX-409&quot; and &quot;Error TX-410&quot; sit shoulder to shoulder
+        in embedding space, and a rare identifier the model never really learned
+        floats somewhere ambiguous. Keyword search flips the trade: perfect when the
+        token exists, useless the moment the user paraphrases or misspells. Neither
+        is broken &mdash; they&apos;re specialized tools. The operational lesson is
+        simple: lean on vectors for recall, lean on BM25 for precision on needles-in-
+        haystacks, and never ask either to be something it isn&apos;t.
       </p>
 
       <HybridRetrievalDiagram />
 
       <h2>Reciprocal Rank Fusion needs no shared scale</h2>
       <p>
-        The trap is trying to add a BM25 score to a cosine similarity — they live on
-        incompatible scales and the blend is meaningless. Reciprocal Rank Fusion
-        sidesteps it entirely by throwing away the scores and keeping only the{" "}
+        Don&apos;t average a BM25 score with a cosine similarity. They aren&apos;t
+        commensurate, so the math lies to you. Reciprocal Rank Fusion dodges the
+        scale problem by using only{" "}
         <em>ranks</em>: each document scores <code>1 / (k + rank)</code> in each list,
-        and you sum across lists. A document both retrievers rank highly wins; a
-        document only one finds still places. No tuning of relative weights, no
-        normalization — just position.
+        and you sum across lists. Items both retrievers rank highly rise; an item a
+        single retriever loves can still earn a spot. No score normalization, no
+        weight tuning, and far less config drift when corpora evolve or you swap
+        embedding models. Position is stable; that stability pays back in on-call
+        sanity.
       </p>
 
       <Terminal title="hybridSearch.ts">
@@ -116,27 +121,36 @@ function Body() {
 
       <h2>The cross-encoder earns its cost on a small top-k</h2>
       <p>
-        Retrieval is recall-first: cast a wide net, accept some noise. Reranking is
+        Retrieval is recall-first: cast a wide net and accept noise. Reranking is
         precision-last: a cross-encoder reads the query and each candidate{" "}
-        <em>together</em> — not as two pre-computed vectors — and scores true
-        relevance. It&apos;s too slow to run over the whole corpus, which is the
-        point: you only ever run it on the ~20 survivors of fusion, so you pay for
-        accuracy exactly where it changes the answer. Fewer, better chunks also means
-        a tighter context window and a cheaper generation.
+        <em>together</em> &mdash; not as two pre-computed vectors &mdash; and scores
+        true relevance. It&apos;s expensive, so it has to be surgical. Run it only on
+        the ~20 fused candidates that actually threaten to reach the prompt, then cut
+        down to a handful. You buy accuracy where it flips the answer, keep p95
+        latency inside budget, and avoid blowing tokens on filler. Fewer, better
+        chunks also keep generation stable instead of thrashing across irrelevant
+        context.
       </p>
 
       <blockquote>
-        One retriever is a bet that meaning or keywords matter more. Hybrid RAG
-        refuses the bet — retrieve both ways, fuse by rank, and let a cross-encoder
-        spend its compute on the handful of chunks that actually reach the prompt.
+        Don&apos;t pick between meaning and keywords. Run both, fuse by rank, then
+        spend cross-encoder compute exactly where it changes the outcome: the few
+        chunks that might enter the prompt.
       </blockquote>
 
       <p>
-        Hybrid retrieval builds directly on{" "}
+        In apps, I wire this into the pattern I call{" "}
+        <em>Trinity Architecture</em>: Presentation renders the chat or notebook;
+        Reactive State / Orchestration fans out to BM25 and vectors, runs fusion, and
+        triggers rerank; a Data /{" "}
+        <em>Serialization Adapter</em> trims the winners into lean, model-ready
+        payloads. That adapter discipline came from IntegrateX, where stripping
+        non-essential React Flow UI metadata before persistence cut payloads 94% —
+        the same instinct that keeps RAG context tight. Hybrid retrieval builds on{" "}
         <a href="/blog/vector-foundations-semantic-search">vector foundations</a> and
         only pays off when your{" "}
         <a href="/blog/rag-chunking-strategy-architecture">chunking strategy</a> gives
-        each retriever clean units to rank — the same pipeline that grounds the{" "}
+        clean, comparable units to rank — the same pipeline that grounds the{" "}
         <a href="/blog/edge-native-rag-cloudflare-workers-hono">streamerOS support agent</a>.
         Continue on the <a href="/roadmap">roadmap</a>.
       </p>

@@ -75,20 +75,23 @@ function Body() {
     <>
       <p>
         Prompt engineering is UX for a function you don&apos;t control. It matters,
-        but it&apos;s the surface. To architect <em>with</em> an LLM rather than
-        merely talk to one, you need the mechanics underneath: how text becomes
-        tokens, why the context window is a budget and not a memory, and why the
-        same prompt can give you a different answer every time.
+        but it&apos;s the surface. To architect <em>with</em> an LLM, not just chat at one,
+        I focus on the mechanics I can reason about: how text becomes tokens, why the
+        context window is a budget and not a memory, and why the same prompt can land
+        different answers run to run.
       </p>
 
       <h2>The context window is a byte budget, not a memory</h2>
       <p>
-        The most expensive misconception in AI engineering is treating the context
-        window like RAM the model &quot;remembers.&quot; It is a fixed-width budget
-        you allocate every single call: system instructions, retrieved context,
-        conversation history, and the question all compete for the same finite
-        token count. Overflow doesn&apos;t error — it silently truncates, and the
-        thing that gets dropped is usually the context you most needed.
+        The most expensive production bugs I&apos;ve seen came from treating the context
+        window like RAM the model &quot;remembers.&quot; It&apos;s a fixed byte budget you
+        re-allocate on every call: system instructions, retrieved context, conversation
+        history, and the question all compete for the same finite token count. Overflow
+        doesn&apos;t throw; it silently truncates — and what falls off is usually the very
+        context you needed read. My guardrail is procedural: treat prompt assembly as a
+        Serialization Adapter that strips anything non-essential before it hits the model.
+        On IntegrateX, that mindset — applied to graph state — cut persistence payloads
+        94%, and the same discipline keeps LLM context lean.
       </p>
 
       <ContextBudgetDiagram />
@@ -99,9 +102,9 @@ function Body() {
         probability distribution over the next token, then samples from it.
         Temperature reshapes that distribution: low temperature sharpens it toward
         the single most likely token (near-deterministic), high temperature
-        flattens it (more variance). When stakeholders ask why the system gave two
-        different answers to the same question, the honest answer is: because you
-        asked it to roll dice.
+        flattens it (more variance). When stakeholders ask why two identical prompts
+        diverged, the honest answer is: we asked it to roll dice. For workflows and tests
+        I lock temperature down; for ideation I open it up — different modes, different knobs.
       </p>
 
       <Terminal title="generate.ts">
@@ -120,13 +123,13 @@ function Body() {
         Cost, latency, and truncation are all denominated in tokens, not
         characters — and tokens don&apos;t map cleanly to words. A JSON blob, a
         non-English language, or a long ID can cost far more tokens than its length
-        suggests. Budgeting in characters is how you get a payload that fits in your
-        head but overflows the window in production. Measure in tokens, reserve
-        headroom for the output, and treat the count as a first-class constraint.
+        suggests. Budgeting in characters passes local checks and then overflows in
+        production. Measure with the tokenizer, reserve explicit headroom for the output,
+        and treat the count as a first-class constraint in both your API and UI.
       </p>
 
       <blockquote>
-        You can&apos;t architect a system whose core you model as magic. Tokens,
+        You can&apos;t ship reliable systems if the core is &quot;magic.&quot; Tokens,
         budgets, and sampling are the three mechanics that turn &quot;prompting&quot;
         into engineering.
       </blockquote>
@@ -136,7 +139,11 @@ function Body() {
         <a href="/blog/vector-foundations-semantic-search">retrieval has to be selective</a>,
         and sampling variance is why{" "}
         <a href="/blog/guardrail-engineering-hallucination-prevention">guardrails verify outputs</a>{" "}
-        instead of trusting them. Full series on the <a href="/roadmap">roadmap</a>.
+        instead of trusting them. In the pattern I call Trinity Architecture, the UI only
+        renders and dispatches; the orchestration layer owns runtime truth and retries; and a
+        Serialization Adapter shapes lean, token-aware payloads across the boundary. On IntegrateX,
+        that adapter stripped non-essential React Flow metadata and cut payloads 94% — the same habit
+        keeps LLM context tight. Full series on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );

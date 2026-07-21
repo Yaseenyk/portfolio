@@ -64,8 +64,9 @@ function Body() {
         demonstrates systems architecture — RAG with a grounding contract, agents
         with control loops, guardrails that fail closed, latency budgets defended at
         the edge — reads like the lead they&apos;re trying to hire. This final
-        lesson is about building the second kind, using everything the first nine
-        established.
+        lesson is about building the second kind, shaped by real constraints like
+        payload bloat, state-synchronization lag, and streaming backpressure, using
+        everything the first nine established.
       </p>
 
       <h2>Show the system, not the tool usage</h2>
@@ -73,7 +74,11 @@ function Body() {
         Anyone can call an API. Seniority is signalled by the decisions <em>around</em>
         the call: why retrieval is chunked the way it is, where determinism lives,
         what happens when the model is wrong, how you kept time-to-first-token under
-        300ms. Architecture diagrams and explicit tradeoffs are the artifacts that
+        300ms. On IntegrateX, the pattern I call Trinity Architecture kept us honest:
+        Presentation renders from state; a Reactive State layer (Zustand) owns truth
+        and orchestration; a Data/Serialization Adapter strips non-essential React
+        Flow UI metadata before persistence — that adapter alone cut payloads 94% and
+        fixed sync jitter. Architecture diagrams and explicit tradeoffs are the artifacts that
         separate someone who used a tool from someone who can be trusted to design
         the system. Lead with the tradeoffs.
       </p>
@@ -85,9 +90,11 @@ function Body() {
         The most credible proof that you can build production AI systems is a
         portfolio that <em>is</em> one. This site is the example: posts are typed
         objects in a registry, an autonomous pipeline drafts new ones, and every
-        page emits structured data so machines can read it. When the artifact
-        demonstrates the competence the artifact claims, you stop asking the reader
-        to take your word for it. This roadmap is proof-of-work, not a reading list.
+        page emits structured data so machines can read it. The same Serialization
+        Adapter idea turns rich in-memory objects into lean JSON-LD without leaking
+        view-only fields. When the artifact demonstrates the competence the artifact
+        claims, you stop asking the reader to take your word for it. This roadmap is
+        proof-of-work, not a reading list.
       </p>
 
       <Terminal title="post.ts — the artifact is the evidence">
@@ -109,7 +116,9 @@ function Body() {
         JSON-LD, a clean entity graph that ties every post to a named author who
         &quot;knowsAbout&quot; these topics. The same grounding discipline you apply
         to a RAG system, you apply to your own visibility — make yourself the
-        well-structured, citable source.
+        well-structured, citable source. In my Trinity split, the Presentation never
+        formats DB schemas; the Reactive State orchestrates; the Serialization
+        Adapter shapes the wire model for AEO — no layer talks past its neighbor.
       </p>
 
       <blockquote>

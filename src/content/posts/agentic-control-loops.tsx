@@ -67,19 +67,21 @@ function Body() {
   return (
     <>
       <p>
-        A chatbot answers. An agent acts. The line between them isn&apos;t a bigger
-        model or a cleverer prompt — it&apos;s a control loop. Observe the state,
-        decide the next action, act through a tool, observe the result, repeat. The
-        intelligence is in the loop, not in any single inference.
+        A chatbot answers. An agent acts. The split isn&apos;t parameter count or a
+        cuter prompt — it&apos;s a tight control loop. Observe real state, decide the
+        next action, act through a tool, observe again, repeat. The loop carries the
+        intelligence; any single inference is just one tick.
       </p>
 
       <h2>Agents are loops over tools, not bigger prompts</h2>
       <p>
-        The instinct when an LLM can&apos;t do something is to add more to the
-        prompt. The agentic instinct is to give it a tool and a loop. Each iteration
-        the model sees the current state, picks one action from a defined toolset,
-        and the runtime executes it and feeds the result back. A single inference
-        can&apos;t book a flight; a loop that can call <code>search</code>,{" "}
+        When an LLM can&apos;t reach, the reflex is to pour more words into the
+        prompt. The agent move is different: give it a tool and a loop. Each turn the
+        model sees the current state, chooses one action from a narrow, typed toolset,
+        and the runtime executes then feeds back the result. On IntegrateX, keeping a
+        small, deterministic tool surface forced the planner to be honest and made
+        failures debuggable. A single inference can&apos;t book a flight; a loop that
+        can call <code>search</code>,{" "}
         <code>select</code>, and <code>pay</code> across several turns can.
       </p>
 
@@ -87,12 +89,13 @@ function Body() {
 
       <h2>Every loop needs a way to stop</h2>
       <p>
-        The defining risk of autonomy is the runaway loop: an agent that never
-        decides it&apos;s done, burning tokens and calling tools in circles. So
-        termination is not an afterthought — it&apos;s a first-class part of the
-        design. Every loop needs an explicit success condition <em>and</em> a hard
-        step budget, so that &quot;it didn&apos;t finish&quot; degrades to a clean
-        stop instead of an unbounded spend.
+        The failure mode isn&apos;t &quot;bad answer&quot;; it&apos;s the runaway
+        loop: spinning tools, burning tokens, and hammering backends. So termination
+        is part of the design, not a TODO. Give the loop an explicit success check{" "}
+        <em>and</em> a hard step budget. If it can&apos;t finish, it should escalate
+        cleanly, not grind the meter. I learned this building streamerOS — once your
+        tick rate outruns the budget, you create backpressure and starve the next
+        frame. Agents are no different.
       </p>
 
       <Terminal title="agent.ts">
@@ -110,18 +113,21 @@ function Body() {
 
       <h2>State between iterations is the hard part</h2>
       <p>
-        The reasoning step is the part everyone demos; the state management is the
-        part that decides whether it works. What does the agent carry from one
-        iteration to the next, and how does it fit in the token budget? Naively
-        appending every tool result blows the context window in a handful of steps.
-        Real agents <em>reduce</em> state — summarising, pruning, and keeping only
-        what the next decision needs. The loop is easy; the memory is the
-        engineering.
+        The reasoning step demos well; the state work decides if it ships. What should
+        carry across turns, and how do you keep it inside the token budget? If you
+        just append every tool result, the context window and your bill vanish in a
+        few cycles. Real agents <em>reduce</em> state — summarise, prune, and keep
+        only what the next decision needs. I use the pattern I call Trinity
+        Architecture: the loop is the Reactive State / Orchestration layer; a
+        Serialization Adapter shapes rich in-memory context into lean prompts and tool
+        payloads; Presentation only renders traces. That adapter paid for itself on
+        IntegrateX when it stripped React Flow UI metadata before persistence — a 94%
+        payload cut — and the same idea keeps agent memory tight and stable.
       </p>
 
       <blockquote>
-        Autonomy isn&apos;t a smarter answer. It&apos;s a disciplined loop — with a
-        budget, a stop condition, and a memory you actively manage.
+        Autonomy isn&apos;t a smarter answer; it&apos;s a disciplined loop with a
+        budget, a stop gate, and a memory you curate on purpose.
       </blockquote>
 
       <p>

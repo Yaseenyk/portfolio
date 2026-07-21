@@ -78,7 +78,9 @@ function Body() {
         haven&apos;t changed: Mongo still stores, Express still routes, React still
         renders. What changed is that a probabilistic core now sits in the middle
         of your stack, and every architectural assumption you inherited from the
-        CRUD era has to be re-examined against it.
+        CRUD era has to be re-examined against it. Token budgets, latency targets,
+        cost ceilings, and streaming backpressure start dictating structure, not
+        the other way around.
       </p>
 
       <h2>Three new tiers, not a rewrite</h2>
@@ -89,7 +91,11 @@ function Body() {
         more LLMs with retries, budgets, and fallbacks, and an{" "}
         <strong>orchestration loop</strong> that decides what to retrieve, which
         tools to call, and when to stop. The data and UI tiers you already know;
-        the new tiers are where the architecture lives now.
+        the new tiers are where the architecture lives now. I map this cleanly to
+        the pattern I call Trinity Architecture: presentation stays declarative and
+        dumb, the orchestration loop is the reactive state layer making decisions,
+        and a strict data/serialization adapter shapes payloads at the model and
+        storage boundary.
       </p>
 
       <StackDiagram />
@@ -102,7 +108,10 @@ function Body() {
         history and tool results, fit it all inside the model&apos;s token budget,
         and broker the call. The endpoint that used to return a record now returns
         a grounded, generated answer — and the hard part is everything that
-        happens before the model is even invoked.
+        happens before the model is even invoked. On IntegrateX, our
+        <em> Serialization Adapter</em> stripped React Flow UI metadata from graph
+        state before retrieval and prompting; that single step cut payloads 94%,
+        kept us within token windows, and stabilized tail latency.
       </p>
 
       <Terminal title="route.ts — CRUD vs context assembly">
@@ -129,13 +138,18 @@ function Body() {
         and guardrails harden the <em>boundaries</em> — what goes into the model
         and what comes out — because you can no longer assume the core behaves the
         same way twice. This is the single biggest mental shift: you stop trying to
-        make the middle predictable and start making the edges trustworthy.
+        make the middle predictable and start making the edges trustworthy. On
+        streamerOS, we treat output as a stream with backpressure — the gateway can
+        emit tokens as fast as it wants, but the client only paints at 60fps to
+        avoid render thrash. On the input side we require typed tools and
+        JSON-shaped contracts, with retries and budgets enforced at the gateway,
+        not in the UI.
       </p>
 
       <blockquote>
         AI-native isn&apos;t a new framework. It&apos;s MERN with a probabilistic
-        core — and the realisation that your job moved from moving rows to
-        assembling context and defending the edges.
+        core — and the reality that your job moved from moving rows to assembling
+        context and defending the edges.
       </blockquote>
 
       <p>

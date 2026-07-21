@@ -8,11 +8,13 @@ function Body() {
       <p>
         Your pipeline expected <code>{`{ "category": "billing" }`}</code> and
         Claude returned &quot;Sure! This looks like a billing issue, here&apos;s
-        the JSON:&quot; wrapped in a markdown fence. So you reached for a regex to
-        rip the object out of the prose, and that regex has been the source of
-        every 2am page since. An LLM that returns prose can&apos;t drive a system.
-        The job is to make the model emit a typed object and to validate that
-        object at the boundary — before it ever touches your code.
+        the JSON:&quot; wrapped in a markdown fence. I&apos;ve watched teams (and
+        past-me) reach for a regex to fish the object out of the chatter; that
+        quick fix becomes the 2am pager. On IntegrateX&apos;s real-time canvas,
+        letting prose leak into structured lanes was enough to desync state and
+        back up workers. An LLM that returns prose can&apos;t drive a system. The
+        model must emit a typed object, and you validate that object at the
+        boundary — before it ever touches your code.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -20,11 +22,11 @@ function Body() {
         The reliable way to get JSON out of Claude is not &quot;please respond in
         JSON&quot; — it&apos;s <strong>tool use</strong>. Define a tool whose{" "}
         <code>input_schema</code> is the shape you want, then set{" "}
-        <code>tool_choice</code> to force that tool. The model is now constrained
-        to produce arguments matching your JSON Schema, and the API hands you the
-        object as the tool call&apos;s <code>input</code> — no fences, no
-        preamble, no parsing. You&apos;ve turned a generation problem into a
-        function-signature problem.
+        <code>tool_choice</code> to force that tool. Now the model is constrained
+        to arguments that match your JSON Schema, and the API returns the object
+        as the tool call&apos;s <code>input</code> — no fences, no preamble, no
+        parsing. Treat it like a function call: you&apos;ve turned generation into
+        a function-signature problem.
       </p>
       <p>
         But a schema the model <em>tried</em> to satisfy is not a guarantee. The
@@ -35,8 +37,11 @@ function Body() {
         <strong>Zod schema</strong> that is the real source of truth.{" "}
         <code>z.infer</code> gives you the static type for free, and{" "}
         <code>.parse()</code> enforces the runtime invariants the moment data
-        crosses the boundary. One definition, both a compile-time type and a
-        runtime gate.
+        crosses the boundary. In the pattern I call{" "}
+        <strong>Trinity Architecture</strong>, this validator lives in the Data /
+        Serialization Adapter, the orchestrator owns state transitions and
+        optimistic updates, and the Presentation layer only renders typed state —
+        the UI never touches raw model output.
       </p>
       <p>
         The trade-off is what to do on a validation miss, and the answer is rarely
@@ -44,22 +49,25 @@ function Body() {
         back to the model as a <code>tool_result</code> and ask it to correct the
         offending field. One repair round-trip fixes the overwhelming majority of
         misses cheaply. Bound the retries — two or three — so a genuinely
-        impossible request fails fast instead of looping. This is the same
-        discipline as the output-budget guard from Lesson 1: validate at the
-        edge, fail loudly, never let malformed data leak inward.
+        impossible request fails fast instead of looping. That keeps your
+        orchestrator from thrashing and prevents backpressure from creeping up the
+        queue. Same discipline as the output-budget guard from Lesson 1: validate
+        at the edge, fail loudly, never let malformed data leak inward.
       </p>
       <p>
         Note the model-routing angle: forced-tool JSON extraction is a
         well-structured, low-creativity task. You don&apos;t need Opus 4.8 for it
         — Sonnet 4.6 or even Haiku 4.5 hits the schema reliably at a fraction of
-        the cost and latency. Reserve the flagship for the reasoning, and let a
-        cheaper model do the structured plumbing.
+        the cost and latency. On streamerOS, this kind of split is how we protect
+        tight latency and render budgets: reserve the flagship for reasoning, let
+        a cheaper model handle the structured plumbing.
       </p>
 
       <h2>A Validated Extraction</h2>
       <p>
         One Zod schema is the contract. The tool forces the shape; Zod enforces
-        the invariants the JSON Schema can&apos;t.
+        the invariants the JSON Schema can&apos;t. Single definition, static type,
+        runtime gate — clean handoff in the Trinity split.
       </p>
       <Terminal title="classify.ts">
         <span className="tok-com">{"// One definition → a compile-time type AND a runtime gate."}</span>
@@ -107,7 +115,9 @@ export async function classify(text: string): Promise<Ticket> {
       <p>
         Wrap the call in a bounded retry that re-sends Zod&apos;s error message as
         a correction prompt, and the rare miss self-heals in one round-trip
-        instead of paging you.
+        instead of paging you. In my Trinity split, the orchestrator owns this
+        repair loop; the adapter never mutates UI state directly — it only feeds
+        validated objects back through the orchestrator.
       </p>
 
       <h2>The Validation Boundary</h2>

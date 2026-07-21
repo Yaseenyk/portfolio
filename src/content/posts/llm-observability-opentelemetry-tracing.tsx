@@ -56,12 +56,13 @@ function Body() {
   return (
     <>
       <p>
-        LLM observability is the practice of emitting a structured trace for every
-        agent request — one span per step, each tagged with tokens, cost, latency,
-        model, and outcome — so a slow or wrong answer becomes a thing you can read,
-        not a thing you guess at. A multi-step agent that only writes log lines is a
-        black box; the same agent instrumented with OpenTelemetry is a waterfall you
-        can open and point at the span that broke.
+        LLM observability means every agent request ships a structured trace — one
+        span per step, tagged with tokens, cost, latency, model, and outcome — so
+        &quot;why is this slow or wrong?&quot; turns from folklore into facts. A
+        multi‑step agent that only logs is a black box; wire it with OpenTelemetry
+        and you get a waterfall you can scan and point at the span that blew the
+        budget. In the pattern I call Trinity Architecture, tracing lives in the
+        orchestration layer, not the UI or the model client.
       </p>
 
       <h2>Logs tell you it happened; spans tell you the shape</h2>
@@ -69,9 +70,10 @@ function Body() {
         An agent call fans out: embed the query, retrieve, rerank, generate, verify,
         maybe loop. When the p95 latency creeps up or the bill doubles, scattered log
         lines can&apos;t tell you <em>which</em> step did it — they have no parent, no
-        duration, no shared trace id. A span does. Wrap each step in a span and one
-        request becomes a tree: total time at the root, a labelled child per stage,
-        and attributes hanging off each one. The regression stops being a hunch.
+        duration, no shared trace id. Spans do. Wrap each step and one request becomes
+        a tree: total time at the root, a labelled child per stage, and attributes on
+        each. On IntegrateX we caught a rerank burst exactly this way when canvas
+        executions started queuing; the hunch became one slow span you could fix.
       </p>
 
       <TraceWaterfallDiagram />
@@ -84,8 +86,8 @@ function Body() {
         Using the conventions instead of ad-hoc field names means any backend —
         Grafana, Honeycomb, Langfuse — renders your traces the same way, and
         cost-per-trace becomes a query over <code>output_tokens</code> rather than a
-        spreadsheet. Standard attributes are what turn one team&apos;s telemetry into
-        a dashboard anyone can read.
+        spreadsheet. I route these attributes through a thin Serialization Adapter so
+        telemetry stays lean and comparable without leaking UI or DB shapes across layers.
       </p>
 
       <Terminal title="otel.ts — one span per model call">
@@ -114,12 +116,12 @@ function Body() {
         before you ship. They answer different questions — &quot;is it fast and cheap
         right now?&quot; versus &quot;is it correct?&quot; — and neither covers the
         other. A trace can tell you a span took four seconds; only an eval tells you
-        the answer it produced was wrong. Wire up tracing for the live system, keep{" "}
-        <a href="/blog/evaluating-llm-outputs">evals</a> for the quality bar.
+        the answer it produced was wrong. On streamerOS we even sampled traces to
+        avoid backpressure and keep 60fps renders while offline evals guarded quality.
       </p>
 
       <blockquote>
-        You can&apos;t optimize what you can&apos;t see. A trace per request turns
+        You can&apos;t tune what you can&apos;t see. A trace per request turns
         &quot;the agent feels slow lately&quot; into &quot;the rerank span doubled on
         Tuesday&quot; — and that&apos;s the difference between debugging and guessing.
       </blockquote>

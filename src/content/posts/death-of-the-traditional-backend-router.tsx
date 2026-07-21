@@ -5,33 +5,33 @@ function Body() {
   return (
     <>
       <p>
-        The backend router has always been a polite fiction — a giant switch
-        statement dressed up as architecture. A request comes in, you match a URL
-        to a handler, and inside that handler a cascade of conditionals decides
-        what actually happens. That model held for two decades because requests
-        were structured and intent was implicit in the path. AI breaks the
-        assumption: when the request is natural language and the intent is
-        ambiguous, routing stops being a lookup and becomes a decision.
+        I’ve treated the backend router as a necessary lie for years — a switch
+        in a blazer. A request lands, you match a URL to a handler, and the real
+        work hides behind a pile of conditionals. That survived because inputs
+        were predictable and the path smuggled in intent. The moment the request
+        is natural language and the intent is fuzzy, routing stops being a
+        lookup and becomes a decision problem.
       </p>
 
       <h2>The router was always a conditional in disguise</h2>
       <p>
-        Look honestly at a mature enterprise API and you will find business logic
-        smeared across routing: nested if-branches on user role, feature flags,
-        request shape, and a dozen special cases that accreted over years. The
-        URL told you the noun; the conditionals decided the verb. That sprawl is
-        exactly the part an LLM is now better at navigating than a hand-written
-        decision tree.
+        Crack open a seasoned API and you’ll find rules smeared across the
+        router: role checks, feature flags, payload quirks, and fossils of
+        one-off incidents. The URL names the noun; the branches pick the verb.
+        On the node-routing work for IntegrateX I watched these branches sprawl
+        until they were harder to reason about than the feature itself. That
+        seam — ambiguity plus special cases — is where a model now outperforms a
+        hand-built decision tree.
       </p>
 
       <h2>Intent-driven routing</h2>
       <p>
-        In an intent-driven backend, the first hop is not a path match — it is a
-        classification. A schema-constrained model reads the request, decides
-        what the caller actually wants, and dispatches to a small, fixed set of
-        capabilities. The messy, fuzzy, many-to-one mapping from human intent to
-        system action moves out of brittle conditionals and into a model that was
-        built for ambiguity.
+        In an intent-first backend, the first hop isn’t path matching — it’s{" "}
+        classification. A schema-bound model reads the request, decides what the
+        caller actually means, and maps it to a tight, fixed set of
+        capabilities. The messy, many-to-one mapping from human phrasing to
+        system action leaves brittle if-chains and moves into a component built
+        to hold ambiguity. When confidence is low, it asks instead of guessing.
       </p>
 
       <Terminal title="router.ts">
@@ -80,20 +80,21 @@ function Body() {
       <p>
         Notice what the switch dispatches to: not routes, but{" "}
         <strong>tools</strong> — small, single-purpose, strongly-typed
-        capabilities the model is allowed to invoke. The endpoint sprawl
-        collapses into a capability registry. Adding a feature means adding a
-        tool and describing it, not threading another branch through a routing
-        file nobody wants to touch.
+        capabilities the model is allowed to invoke. Endpoint sprawl collapses
+        into a capability registry. Shipping a feature turns into: add a tool,
+        describe it, wire validation — not threading another brittle branch
+        through a routing file nobody wants to touch.
       </p>
 
       <h2>Where deterministic routing still wins</h2>
       <p>
         This is not an argument for putting a model in front of your payment
         endpoint. Anything that must be exact, auditable, and fast — auth,
-        billing, idempotent writes — stays deterministic, behind hard code. The
-        AI router governs the ambiguous front door; the moment intent is
-        resolved, execution drops back into ordinary, testable, type-safe
-        handlers.
+        billing, idempotent writes — stays deterministic, behind hard code and
+        keys. On streamerOS, the real-time path guarding 60fps surfaces stayed
+        pure and predictable for a reason. Let the AI router govern the fuzzy
+        front door; once intent is resolved, execution drops into ordinary,
+        testable, type-safe handlers.
       </p>
 
       <h2>The hybrid that actually ships</h2>
@@ -101,21 +102,25 @@ function Body() {
         The production shape is a layered one: an AI dispatcher resolves intent
         and selects a capability, a validation boundary enforces the contract,
         and deterministic code does the work. The model decides{" "}
-        <em>what</em>; your code controls <em>how</em>. You get the flexibility
-        of natural-language interfaces without surrendering correctness to a
-        probabilistic system.
+        <em>what</em>; your code controls <em>how</em>. It mirrors the pattern I
+        call Trinity Architecture: presentation stays declarative, the
+        orchestrator owns runtime truth and dispatch, and a serialization
+        adapter translates to lean wire payloads. No layer talks past its
+        neighbor — the model never formats DB schemas, the adapter never reaches
+        into UI state, and correctness doesn’t leak.
       </p>
 
       <blockquote>
-        The switch statement is not dead — it just stopped being where the hard
-        decisions live. The hard decision moved to a model, and the switch got
-        small enough to read in one screen.
+        The switch didn’t die; it got demoted. The hard choice moved into a
+        model, and the remaining switch fits on one screen.
       </blockquote>
 
       <p>
         This dispatch-then-execute pattern is the backbone of the{" "}
         <a href="/#projects">Police RAG Agent</a> and the node-routing core of{" "}
-        <a href="/#projects">IntegrateX</a>.
+        <a href="/#projects">IntegrateX</a> — where a Serialization Adapter
+        stripped non-essential React Flow UI metadata before persistence and cut
+        payloads 94%, keeping the capability calls fast and cheap.
       </p>
     </>
   );

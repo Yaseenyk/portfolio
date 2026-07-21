@@ -58,33 +58,35 @@ function Body() {
   return (
     <>
       <p>
-        Users forgive a wrong answer faster than a slow one. A wrong answer they can
-        correct; a spinner they just abandon. Latency-first AI means designing the
-        system so the first token lands in under 300 milliseconds — streamed from
-        the edge, with retrieval in parallel and repeat questions served from cache
-        — instead of a monolith sitting in silence while it thinks.
+        People will forgive a wrong answer faster than a slow one. You can fix a bad
+        take; you can&apos;t rescue a dead spinner. I budget for sub-300ms
+        time-to-first-token: open the stream from the edge, kick retrieval in
+        parallel, and let cache hits land instantly. That&apos;s how IntegrateX and
+        streamerOS stayed &quot;live&quot; under load; the monolith path sits quiet
+        through cold starts and serial I/O, and users bounce before the first byte.
       </p>
 
       <h2>Time-to-first-token beats total time</h2>
       <p>
-        Perceived performance is dominated by when output <em>starts</em>, not when
-        it finishes. A response that streams its first words in 280ms and completes
-        in three seconds feels faster than one that returns a complete answer after
-        two seconds of blank screen. So the architectural goal isn&apos;t a smaller
-        total — it&apos;s a smaller time-to-first-token. Everything else is detail.
+        Humans key off when text <em>starts</em> moving, not when it finishes. A
+        pipeline that shows words at ~280ms and wraps in three seconds feels faster
+        than a two-second silent build-then-dump. Optimize the front of the curve.
+        In the pattern I call Trinity Architecture, the Presentation layer just
+        paints arriving tokens; the Orchestrator owns the stream and retries; the
+        Adapter preps lean prompts. Shave TTFT first — everything else amortizes.
       </p>
 
       <LatencyWaterfallDiagram />
 
       <h2>The edge kills the round-trips</h2>
       <p>
-        Every hop between the user and the compute is latency you can&apos;t prompt
-        your way out of. Running the orchestration on an edge runtime — Hono on
-        Cloudflare Workers, deployed to hundreds of locations — puts the logic next
-        to the user and the model API. No cold-start penalty, no transcontinental
-        round-trip to a single region. The retrieval and history fetches that a
-        monolith does serially, you fire in parallel, because at the edge the only
-        thing worth waiting on is the model.
+        Every hop is a tax you can&apos;t prompt away. Put the orchestration on an
+        edge runtime — Hono on Cloudflare Workers — next to the user and the model.
+        Warm starts, cheap concurrency, and no region ping-pong just to fetch
+        history. Retrieval and history must fan out; don&apos;t queue them. With my
+        Trinity split, UI never formats data or waits on I/O; the Adapter only
+        shapes payloads; the Orchestrator coordinates and streams. The only thing
+        worth waiting on is tokens from the model.
       </p>
 
       <Terminal title="edge.ts — Hono on Workers">
@@ -102,25 +104,27 @@ function Body() {
 
       <h2>Semantic caching turns repeats into free, instant answers</h2>
       <p>
-        Real traffic is repetitive: the same questions, phrased a dozen ways. An
-        exact-match cache misses all of them. A <em>semantic</em> cache embeds the
-        query and checks whether a near-identical question has been answered before
-        — and if so, returns that answer for roughly zero cost and zero latency. It
-        turns your most common questions into the cheapest and fastest ones, which
-        is exactly backwards from a system that recomputes every time.
+        Real traffic repeats: &quot;reset password,&quot; &quot;forgot password,&quot;
+        and &quot;can&apos;t sign in&quot; are the same ask. Exact-match caching
+        whiffs all of them. Embed the query, do a KNN lookup, and if confidence
+        clears a floor, return the prior answer immediately and log provenance. Now
+        your heaviest FAQs become zero-cost, zero-latency hits. Add TTLs and drift
+        checks so freshness stays honest.
       </p>
 
       <blockquote>
-        Latency isn&apos;t a tuning pass you do at the end. It&apos;s an
-        architecture: stream first, run at the edge, retrieve in parallel, and never
-        compute the same answer twice.
+        Latency isn&apos;t a tuning pass; it&apos;s an operating posture: stream
+        first, run at the edge, fan out retrieval, and never recompute what you can
+        recall — with Trinity Architecture keeping each layer in its lane.
       </blockquote>
 
       <p>
         Streaming and parallelism only matter once the answer is{" "}
         <a href="/blog/rag-grounding-the-agent">grounded</a> and the payload is{" "}
-        <a href="/blog/payload-compression-serialization-patterns">small</a>. Continue
-        on the <a href="/roadmap">roadmap</a>.
+        <a href="/blog/payload-compression-serialization-patterns">small</a>. On
+        IntegrateX, a Serialization Adapter stripped non-essential React Flow UI
+        metadata before persistence and cut payloads 94%, which kept edge streams
+        snappy and avoided backpressure thrash. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );

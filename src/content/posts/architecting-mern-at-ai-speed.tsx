@@ -9,31 +9,38 @@ function Body() {
   return (
     <>
       <p>
-        Shipping a production MERN stack used to mean weeks of boilerplate before
-        the first real feature landed. With an agentic AI workflow, the
-        bottleneck shifts from <em>typing</em> to <em>architecture</em> — and the
-        timeline collapses from weeks to days.
+        Shipping a production MERN stack used to be a slog of auth glue, CRUD
+        scaffolds, and CI plumbing before a single feature shipped. With an
+        agentic AI workflow, the bottleneck shifts from <em>typing</em> to{" "}
+        <em>architecture</em> — and the calendar compresses when contracts lead.
+        Path Saathi went from a Monday brief to live-on-dev in a day because I
+        laid the rails first and let the agent fill them.
       </p>
 
       <h2>Why the architecture matters more than the code</h2>
       <p>
-        When AI handles the syntax, the engineer&apos;s leverage comes entirely
-        from the shape of the system: the data model, the boundaries between
-        services, and the contracts that flow across them. Get the pipeline right
-        and the implementation becomes almost mechanical.
+        When AI handles the syntax, my leverage comes from the system&apos;s
+        shape: data models that match access paths, boundaries that keep
+        ownership crisp, and the contracts that move between them. I use the
+        pattern I call Trinity Architecture: Presentation renders and dispatches
+        only; a Reactive State/Orchestration layer owns runtime truth, optimistic
+        updates, and side effects; a Data/Serialization Adapter translates rich
+        state into lean wire shapes. On IntegrateX, that Serialization Adapter
+        stripped React Flow UI metadata before persistence and cut payloads 94%,
+        which kept real-time sync tight instead of thrashing.
       </p>
 
       <blockquote>
-        The era of bloated engineering teams is over. An AI-specialized architect
-        can execute the work of a 10-person squad — if they own the data flow
-        end to end.
+        The era of bloated squads is fading. One AI-specialized architect who
+        owns the data flow end to end can routinely outpace a 10-person team.
       </blockquote>
 
       <h3>The pipeline, in one orchestration</h3>
       <p>
-        Here&apos;s a stripped-down agent loop that scaffolds a typed endpoint,
-        wires it to MongoDB, and generates the matching React Query hook in a
-        single pass:
+        Here&apos;s the minimal agent loop I lean on: define the contract once,
+        and the run scaffolds a typed endpoint, wires MongoDB, and emits the
+        matching React Query hook in a single pass. It keeps db → API → UI
+        aligned without hand-stitching.
       </p>
 
       <Terminal title="orchestrate.ts">
@@ -59,15 +66,15 @@ function Body() {
 
       <h2>What stays human</h2>
       <ul>
-        <li>Deciding the boundaries — what is a service, what is a module.</li>
-        <li>Designing the data model and its indexes for real query patterns.</li>
-        <li>Reviewing AI output for correctness, security, and intent.</li>
+        <li>Draw the seams: which concerns become services vs modules, and who owns the cache.</li>
+        <li>Design the data model and indexes for the actual query patterns under load.</li>
+        <li>Review AI output for correctness, security, and intent — and reject anything that smears layers together.</li>
       </ul>
 
       <p>
         Want the full pattern? See the{" "}
         <a href="/#projects">project breakdowns</a> for production systems built
-        exactly this way.
+        exactly this way — IntegrateX, streamerOS, and SANKALP.
       </p>
     </>
   );

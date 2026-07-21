@@ -5,33 +5,38 @@ function Body() {
   return (
     <>
       <p>
-        Most teams shipping &quot;RAG&quot; in 2026 are shipping a search box
-        with a language model stapled to the end of it. Retrieve the top-k
-        chunks, stuff them into a prompt, generate an answer. It demos well and
-        collapses the moment a real question requires more than one lookup.
-        Agentic RAG is the architecture that survives contact with production:
-        the model does not just retrieve, it <strong>decides</strong> — what to
-        look up, when it has enough, and what verdict the evidence supports.
+        Most of what passes for &quot;RAG&quot; in 2026 is a search box with a
+        model glued on the end. Top‑k, shove into a prompt, pray the context
+        window holds. It screenshots great and falls over the first time a real
+        question spans sources or needs iteration. Agentic RAG is what survives
+        production: the model doesn&apos;t just retrieve, it{" "}
+        <strong>decides</strong> — what to look up next, when evidence is
+        sufficient, and which conclusion the record actually supports.
       </p>
 
       <h2>Why naive RAG plateaus</h2>
       <p>
-        Retrieve-then-generate assumes the answer lives in a single neighborhood
-        of your vector space. Real questions rarely do. A case analyst asking
-        whether a statute was violated needs the statute, the precedent, the
-        timeline, and the specific record — four retrievals across three
-        sources, each one informed by the last. A fixed first-step retrieval
-        cannot express that. You end up with confident answers built on partial
-        evidence, which is the single most dangerous failure mode an
-        AI-augmented backend can have.
+        Retrieve‑then‑generate assumes the whole answer lives in one pocket of
+        your embedding space. Real work rarely cooperates. That analyst checking
+        a potential statute breach needs the statute, precedent, a timeline, and
+        the case record — different stores, different shapes, each query informed
+        by the last. A fixed first retrieval can&apos;t express that dependency
+        chain. You get fluent answers on partial evidence — the most dangerous
+        failure mode in an AI‑assisted backend — plus blown token budgets,
+        repeated chunks, and latency you can&apos;t justify.
       </p>
 
       <h2>The agentic loop</h2>
       <p>
-        Agentic RAG inverts the control flow. Retrieval stops being a step and
-        becomes a <strong>tool</strong> — one of several the model can invoke,
-        in a loop, until it has grounded itself enough to commit to a decision.
-        The Node.js backend owns the loop; the model owns the choices inside it.
+        Agentic RAG flips control flow. Retrieval stops being a step and becomes
+        a <strong>tool</strong> the model can invoke in a loop until it&apos;s
+        grounded enough to commit. The Node.js backend owns the loop; the model
+        chooses the tools. In the pattern I call Trinity Architecture, this loop
+        is the Reactive Orchestration layer: it holds state, sequences tool
+        calls, and enforces contracts. The tools sit behind a Data /
+        Serialization Adapter. Presentation — your React client — just renders
+        stream and citations and dispatches events. No layer talks past its
+        neighbor.
       </p>
 
       <Terminal title="agent.ts">
@@ -104,46 +109,50 @@ function Body() {
       <h3>Vector retrieval as a tool, not a step</h3>
       <p>
         The vector store (pgvector, Pinecone, or a Mongo Atlas vector index)
-        still does the heavy lifting of semantic recall — but it is invoked on
-        demand, with a query the model composes from what it has already learned.
-        The second retrieval is smarter than the first because it is conditioned
-        on the first. That conditioning is the entire point.
+        still does the heavy lifting — but only when called, with a query
+        composed from what the loop already learned. That makes the{" "}
+        second call strictly smarter than the first because it is conditioned on
+        prior evidence. That conditioning is the whole game, and it prevents the
+        prompt from filling with redundant chunks that inflate tokens and stall
+        the pipeline.
       </p>
 
       <h2>Prompt orchestration and grounding</h2>
       <p>
-        Each turn of the loop is a tightly scoped prompt: here is the question,
-        here is what you have gathered, here are your tools, choose one or
-        commit. The orchestration layer enforces that every claim in the final
-        output carries a citation back to a retrieved record. A decision the
-        system cannot ground, it is not allowed to make. This is what separates
-        an autonomous analyst from a confident fabricator.
+        Each loop turn is a tight prompt: the question, what you&apos;ve
+        gathered, allowed tools, choose or commit. The orchestrator forces every
+        claim in the final answer to cite a retrieved record. If a claim can&apos;t
+        be grounded, it doesn&apos;t make it into the output. Here the
+        Serialization Adapter earns its keep: it trims retrieval traces and
+        citations to only what the next tool or the final answer needs — the
+        same idea that, on IntegrateX, stripped React Flow UI metadata before
+        persistence and cut payloads 94%. Keep the model fed with context, not
+        cruft.
       </p>
 
       <h2>Autonomous decisions need hard contracts</h2>
       <p>
-        The dangerous moment in any agentic system is the commit — when the model
-        stops gathering and states a verdict. That output must be validated
-        against a strict schema before it leaves the backend: a typed
-        decision, a confidence, and an array of citations. If it does not
-        validate, it does not ship; the loop continues or the request fails
-        loudly.
+        The riskiest moment is commit — the switch from gathering to verdict.
+        That payload must validate against a strict schema before it ever leaves
+        Node: a typed decision, confidence, citations. If it fails validation,
+        it doesn&apos;t ship. The loop keeps working or returns a hard error.
+        Contracts over vibes.
       </p>
 
       <blockquote>
-        An agent that can act autonomously is only safe if it cannot act
-        ambiguously. The schema is the seatbelt.
+        Autonomy is safe only when ambiguity is impossible. The schema is the
+        seatbelt.
       </blockquote>
 
       <h2>A real shape: the case analyzer</h2>
       <p>
-        In a POSCO-style legal analyzer, the loop runs exactly this way: retrieve
-        the relevant statute, pull the specific case record, cross-check the
-        timeline, then commit to a Guilty / Not-Guilty statement with the
-        supporting passages attached. The LLM is not answering a question — it is
-        executing an investigation and returning a defensible conclusion. The
-        Node.js backend is the investigator&apos;s discipline: the loop, the
-        tools, the citations, and the contract that the verdict must satisfy.
+        In a POSCO‑style legal analyzer, the loop runs as described: retrieve
+        the statute, fetch the case record, reconcile the timeline, then commit
+        a Guilty / Not‑Guilty with supporting passages attached. The LLM isn&apos;t
+        chatting — it&apos;s conducting an investigation and returning a
+        defensible conclusion. The Node.js backend provides the discipline:
+        orchestration state, tool gating, citations, and the contract the verdict
+        must satisfy.
       </p>
       <p>
         See the{" "}
