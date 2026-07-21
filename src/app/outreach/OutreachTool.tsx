@@ -9,7 +9,8 @@ export default function OutreachTool() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
-  const [context, setContext] = useState("");
+  const [companyUrl, setCompanyUrl] = useState("");
+  const [goal, setGoal] = useState("");
 
   const [subject, setSubject] = useState("");
   const [emailBody, setEmailBody] = useState("");
@@ -31,12 +32,14 @@ export default function OutreachTool() {
       const res = await fetch(`${CONCIERGE_URL}/api/outreach`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passcode, name, company, context }),
+        body: JSON.stringify({ passcode, name, company, companyUrl, goal }),
       });
       const data = (await res.json()) as {
         subject?: string;
         body?: string;
         error?: string;
+        researched?: boolean;
+        grounded?: boolean;
       };
       if (!res.ok) {
         setStatus(data.error ?? `Error ${res.status}`);
@@ -44,7 +47,13 @@ export default function OutreachTool() {
       }
       setSubject(data.subject ?? "");
       setEmailBody(data.body ?? "");
-      setStatus("Draft ready — review, edit, then open in Gmail.");
+      const bits = [
+        data.grounded ? "grounded in your corpus" : null,
+        data.researched ? "read their website" : null,
+      ].filter(Boolean);
+      setStatus(
+        `Draft ready${bits.length ? ` (${bits.join(", ")})` : ""} — review, edit, then open in Gmail.`,
+      );
     } catch {
       setStatus("Network error reaching the drafter.");
     } finally {
@@ -75,8 +84,10 @@ export default function OutreachTool() {
         Outreach drafter
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-        Paste a prospect, get a personalized draft in your voice, then send it
-        yourself from Gmail. Nothing is sent automatically.
+        Give it a person, a company, and what you want. It reads their website,
+        pulls the most relevant proof from your own corpus, and drafts a
+        grounded, personalized email — then you send it from Gmail. Nothing is
+        sent automatically.
       </p>
 
       <div className="mt-8 space-y-3">
@@ -90,14 +101,16 @@ export default function OutreachTool() {
         />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="prospect email *" className={field} />
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="name" className={field} />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="person's name" className={field} />
         </div>
-        <input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="company" className={field} />
-        <textarea
-          value={context}
-          onChange={(e) => setContext(e.target.value)}
-          placeholder="context — what they do, why you're reaching out, anything specific to reference (this drives the personalization)"
-          rows={3}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="company" className={field} />
+          <input value={companyUrl} onChange={(e) => setCompanyUrl(e.target.value)} placeholder="company website (optional — it reads it)" className={field} />
+        </div>
+        <input
+          value={goal}
+          onChange={(e) => setGoal(e.target.value)}
+          placeholder="what you want — e.g. 'a senior full-stack role' or 'to build their MVP'"
           className={field}
         />
         <button

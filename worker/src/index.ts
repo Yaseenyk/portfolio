@@ -194,11 +194,49 @@ const OUTREACH_FACTS = `About Yaseen Khatib (the sender):
 - Open to project work and roles — remote, hybrid, or on-site (Hyderabad, IST).
 - Portfolio: ${SITE} · Email: contact@streamerosai.com`;
 
+// Best-effort read of the prospect's website → a short plain-text digest so
+// the opener can reference what they actually do. Fails soft (many sites
+// block bots or are JS-only); the typed goal/context still carries the email.
+async function fetchSiteDigest(rawUrl: string): Promise<string> {
+  try {
+    const url = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; OutreachResearch/1.0)" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return "";
+    const html = await res.text();
+    const title = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "").trim();
+    const desc = html.match(/<meta[^>]+name=["']description["'][^>]*content=["']([^"']+)/i)?.[1] ?? "";
+    const ogDesc = html.match(/<meta[^>]+property=["']og:description["'][^>]*content=["']([^"']+)/i)?.[1] ?? "";
+    const heads = [...html.matchAll(/<h[12][^>]*>([\s\S]*?)<\/h[12]>/gi)]
+      .map((m) => m[1].replace(/<[^>]+>/g, "").trim())
+      .filter(Boolean)
+      .slice(0, 6);
+    const digest = [
+      title && `Title: ${title}`,
+      (desc || ogDesc) && `Description: ${desc || ogDesc}`,
+      heads.length && `Headings: ${heads.join(" · ")}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+    return digest.slice(0, 900);
+  } catch {
+    return "";
+  }
+}
+
 async function handleOutreach(request: Request, env: Env, origin: string | null): Promise<Response> {
   if (!env.OUTREACH_PASSCODE) {
     return json({ error: "outreach drafter not configured (no passcode set)" }, 503, origin);
   }
-  let body: { passcode?: string; name?: string; company?: string; context?: string };
+  let body: {
+    passcode?: string;
+    name?: string;
+    company?: string;
+    companyUrl?: string;
+    goal?: string;
+  };
   try {
     body = await request.json();
   } catch {
@@ -210,34 +248,60 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
 
   const name = String(body.name ?? "").trim().slice(0, 80);
   const company = String(body.company ?? "").trim().slice(0, 120);
-  const context = String(body.context ?? "").trim().slice(0, 600);
-
-  const prompt =
-    `Write a short, human cold-outreach email from Yaseen to a prospect.\n\n` +
-    OUTREACH_FACTS +
-    `\n\nProspect: ${name || "(unknown name)"}${company ? ` at ${company}` : ""}.\n` +
-    `Context the sender noted: ${context || "(none)"}\n\n` +
-    `Rules:\n` +
-    `- Under 130 words. Plain, direct, no corporate fluff, no "I hope this email finds you well".\n` +
-    `- Open with one specific line tied to the prospect/company/context, not a generic hook.\n` +
-    `- Mention ONE relevant proof point (the 1-day delivery OR the 5 solo products OR the MCP interview trick) — whichever fits, not all.\n` +
-    `- End with a low-friction ask (a quick call, or "reply if useful"). Include the portfolio link once.\n` +
-    `- No em-dash chains, no exclamation marks, at most one question.\n` +
-    `Return EXACTLY this format:\n` +
-    `SUBJECT: <a short, specific subject line>\n` +
-    `<blank line>\n` +
-    `<the email body>`;
+  const companyUrl = String(body.companyUrl ?? "").trim().slice(0, 200);
+  const goal = String(body.goal ?? "").trim().slice(0, 300);
 
   try {
+    // 1) Ground the pitch in Yaseen's real work: retrieve the most relevant
+    //    proof from the corpus, keyed on the prospect + what he wants.
+    const query = `${company} ${goal}`.trim() || "full-stack AI engineering work";
+    let proof = "";
+    try {
+      const r = await retrieve(env, query, 3);
+      if (r.topScore >= 0.4) {
+        proof = r.chunks
+          .map((c) => `- ${c.title}: ${c.text.slice(0, 260)} (${c.url})`)
+          .join("\n");
+      }
+    } catch {
+      /* retrieval optional */
+    }
+
+    // 2) Read the prospect's site if a URL was given.
+    const siteDigest = companyUrl ? await fetchSiteDigest(companyUrl) : "";
+
+    const prompt =
+      `Write a short, human cold-outreach email from Yaseen to a prospect.\n\n` +
+      OUTREACH_FACTS +
+      (proof ? `\n\nMOST RELEVANT PROOF from Yaseen's real work (cite the single best-fit one, with its link):\n${proof}` : "") +
+      `\n\nProspect: ${name || "(unknown)"}${company ? ` at ${company}` : ""}.\n` +
+      (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
+      `What Yaseen wants from them: ${goal || "to explore working together"}\n\n` +
+      `Rules:\n` +
+      `- Under 130 words. Plain, direct. No "I hope this email finds you well", no corporate fluff.\n` +
+      `- Open with ONE specific line about their company (use the website info if present), not a generic hook.\n` +
+      `- Cite ONE best-fit proof point from Yaseen's real work above, with its link. Do not list several.\n` +
+      `- Tie it to what Yaseen wants, then a low-friction ask (quick call, or "reply if useful").\n` +
+      `- Mention they can interview his portfolio inside their own AI (MCP) only if it fits naturally.\n` +
+      `- No em-dash chains, no exclamation marks, at most one question. Sign off as "Yaseen".\n` +
+      `Return EXACTLY this format:\n` +
+      `SUBJECT: <short, specific subject>\n` +
+      `<blank line>\n` +
+      `<the email body>`;
+
     const res = await env.AI.run(GEN_MODEL, {
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 420,
+      max_tokens: 460,
     });
     const raw = String(res.response ?? "").trim();
     const m = raw.match(/^\s*SUBJECT:\s*(.+?)\s*\n([\s\S]*)$/i);
     const subject = (m ? m[1] : `Quick idea for ${company || "your team"}`).trim();
     const emailBody = (m ? m[2] : raw).trim();
-    return json({ subject, body: emailBody }, 200, origin);
+    return json(
+      { subject, body: emailBody, researched: Boolean(siteDigest), grounded: Boolean(proof) },
+      200,
+      origin,
+    );
   } catch (err) {
     return json({ error: `draft failed: ${String(err).slice(0, 200)}` }, 500, origin);
   }
