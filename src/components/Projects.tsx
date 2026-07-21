@@ -26,6 +26,8 @@ interface ProjectLink {
 
 interface Project {
   name: string;
+  /** Whole-card click destination (deep-dive page, live demo, or exhibit). */
+  href?: string;
   category: string;
   description: string;
   roi?: string;
@@ -51,6 +53,7 @@ const FLAGSHIP_NAMES = new Set([
 const PROJECTS: Project[] = [
   {
     name: "streamerOS",
+    href: "/products/streameros",
     category: "Flagship · Desktop Cockpit",
     description:
       "A Rust-powered desktop cockpit for streaming professionals, engineered via modular Claude orchestrations. Handles live system telemetry feeds, multi-platform chat velocity streams, and real-time automated OBS scene synchronization.",
@@ -72,6 +75,7 @@ const PROJECTS: Project[] = [
   },
   {
     name: "streamerOS AI Support Agent",
+    href: "https://yaseenyk.github.io/streamer-os-website/",
     category: "RAG · Tier-1 Support",
     description:
       "A Tier-1 support assistant for streamerOS built on a grounded RAG architecture. A Hono router on Cloudflare Workers embeds the product knowledge base into Upstash Vector, retrieves the relevant passages per question, and streams a gemini-flash answer constrained strictly to that context — refusing anything out of scope.",
@@ -94,6 +98,7 @@ const PROJECTS: Project[] = [
   },
   {
     name: "Sable",
+    href: "/products/sable",
     category: "Local-First · AI Finance Agent",
     description:
       "A personal-finance agent where the AI is structurally incapable of touching the money: every record lives in on-device SQLite (no cloud backend), and the model's function calls render as Review & Confirm cards — it proposes, only a human commits. Serialized writes, offline-first, and a daily on-device briefing.",
@@ -110,6 +115,7 @@ const PROJECTS: Project[] = [
   },
   {
     name: "Portfolio Concierge — RAG + MCP",
+    href: "/#rag-concierge",
     category: "AI Infrastructure · Edge",
     description:
       "One Cloudflare Worker, two interfaces: a grounded RAG API that answers questions about my work from a Vectorize index of my 95-article corpus (refusing anything out of scope), and an MCP server — add its URL to Claude and interrogate this portfolio from inside your own AI. Corpus re-embeds automatically after every deploy.",
@@ -126,6 +132,7 @@ const PROJECTS: Project[] = [
   },
   {
     name: "Path Saathi LMS",
+    href: "https://devlms.pathsaathi.in/login",
     category: "Client Delivery · EdTech",
     description:
       "A free vocational-skilling LMS (“Learning to Livelihood”) for a client sitting on a library of course videos and PDFs. The brief arrived on a Monday — an MVP sketch and a vision of what it should become — and a working platform was live on the dev environment the next day: auth, course delivery for the client's video and PDF content, self-paced learning flow. One day from vision to a URL the client could click.",
@@ -143,6 +150,7 @@ const PROJECTS: Project[] = [
   },
   {
     name: "Automated LinkedIn Pipeline",
+    href: "/products/linkedin-pipeline",
     category: "Automation · Agent",
     description:
       "A self-hosted autonomous agent that lives entirely in a GitHub repository. On a cron schedule, a GitHub Actions runner drafts a technical post with the Gemini API, publishes it, and commits its state back to the repo — no server, no subscription.",
@@ -159,6 +167,7 @@ const PROJECTS: Project[] = [
   },
   {
     name: "Zero-Cost AI Blog Writer",
+    href: "/products/ai-blogger",
     category: "Pipeline · Content",
     description:
       "A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles straight to this site. Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships the static export — at a steady-state cost of exactly $0.",
@@ -184,6 +193,7 @@ const PROJECTS: Project[] = [
   },
   {
     name: "IntegrateX",
+    href: "/sandbox",
     category: "Workflow Automation",
     description:
       "An interactive workflow-automation environment featuring responsive connectors, processing layers, and directional edge bindings. Developed a custom state Serialization Adapter architecture to optimize graph serialization over the wire.",
@@ -258,6 +268,7 @@ function MetricPills({ metrics }: { metrics: string[] }) {
 function ProjectRow({ project }: { project: Project }) {
   const { Animation, Supplement } = project;
   const [showDocs, setShowDocs] = useState(false);
+  const external = project.href?.startsWith("http");
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
@@ -266,6 +277,16 @@ function ProjectRow({ project }: { project: Project }) {
       transition={{ duration: 0.6 }}
       className="group relative overflow-hidden rounded-2xl border border-zinc-800/50 bg-ink/40 backdrop-blur-xl transition-all duration-300 hover:border-ice/30 hover:shadow-[0_0_44px_-12px_rgba(103,232,249,0.4)]"
     >
+      {/* Stretched link: the whole card clicks through to the project's
+          destination. Icon links / buttons sit above it via z-20. */}
+      {project.href && (
+        <a
+          href={project.href}
+          {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          aria-label={`Open ${project.name}`}
+          className="absolute inset-0 z-10 cursor-pointer"
+        />
+      )}
       <div className="grid grid-cols-1 items-center gap-12 p-8 lg:grid-cols-2 lg:p-12">
         {/* Left — content */}
         <div>
@@ -276,8 +297,16 @@ function ProjectRow({ project }: { project: Project }) {
             <PulseDot />
           </div>
 
-          <h3 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+          <h3 className="mt-5 text-2xl font-semibold tracking-tight text-zinc-50 transition-colors group-hover:text-cyan sm:text-3xl">
             {project.name}
+            {project.href && (
+              <span
+                aria-hidden
+                className="ml-3 inline-block font-mono text-xl text-zinc-600 transition-all group-hover:translate-x-1 group-hover:text-cyan"
+              >
+                →
+              </span>
+            )}
           </h3>
 
           <p className="mt-4 text-sm leading-relaxed text-zinc-400">
@@ -307,7 +336,7 @@ function ProjectRow({ project }: { project: Project }) {
           </div>
 
           {project.links && project.links.length > 0 && (
-            <div className="mt-7 flex items-center gap-3">
+            <div className="relative z-20 mt-7 flex items-center gap-3">
               {project.links.map((link) => (
                 <a
                   key={link.href}
@@ -336,7 +365,7 @@ function ProjectRow({ project }: { project: Project }) {
 
       {/* Supplementary architectural proof (e.g. ShadowDocs), toggled open */}
       {Supplement && (
-        <div className="border-t border-zinc-800/50 px-8 pb-8 lg:px-12 lg:pb-12">
+        <div className="relative z-20 border-t border-zinc-800/50 px-8 pb-8 lg:px-12 lg:pb-12">
           <button
             type="button"
             onClick={() => setShowDocs((v) => !v)}
