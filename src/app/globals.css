@@ -9,6 +9,10 @@
 
   body {
     @apply text-zinc-100 antialiased;
+    /* Never let a wide widget push the whole page into horizontal scroll on
+       mobile — the usual cause of "broken on mobile". Wide content scrolls
+       inside its own container instead. */
+    overflow-x: hidden;
     background-color: #05070a;
     background-image:
       radial-gradient(
