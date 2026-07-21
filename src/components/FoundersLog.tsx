@@ -28,9 +28,12 @@ export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
             from first dev job to five products shipped solo.
           </p>
         </div>
-        <span className="font-mono text-xs text-zinc-500">
-          {ENTRIES.length} dispatches · updated {ENTRIES[0] ? "July 2026" : ""}
-        </span>
+        <Link
+          href="/blog"
+          className="font-mono text-xs text-zinc-500 transition-colors hover:text-cyan"
+        >
+          All dispatches →
+        </Link>
       </div>
 
       <ol className="mt-8 divide-y divide-zinc-800/60 border-y border-zinc-800/60">

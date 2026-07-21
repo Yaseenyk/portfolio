@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import GradientText from "@/components/GradientText";
 import WorkflowCanvas from "./WorkflowCanvas";
 import SerializationBench from "./SerializationBench";
+import ArchitecturePipeline from "@/components/ArchitecturePipeline";
 import FinOpsSimulator from "@/components/widgets/FinOpsSimulator";
 import ChaosToggle from "@/components/widgets/ChaosToggle";
 import RagTraceWaterfall from "@/components/widgets/RagTraceWaterfall";
@@ -77,6 +78,12 @@ export default function SandboxPage() {
 
           {/* Live proof of the 94% serialization claim, fed by the canvas above */}
           <SerializationBench />
+
+          {/* The hold-to-engage pipeline mini-game (moved here from the
+              homepage — it belongs with the other interactive exhibits) */}
+          <div className="mt-24">
+            <ArchitecturePipeline />
+          </div>
 
           <section className="mt-24" aria-labelledby="lab-heading">
             <div className="flex items-center gap-3">

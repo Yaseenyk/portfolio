@@ -37,6 +37,17 @@ interface Project {
   links?: ProjectLink[];
 }
 
+// The homepage shows only the five flagships — a recruiter's first scroll
+// should meet the strongest work, not all of it. The rest of the entries
+// below are retained as data (deep dives live in /products and the blog).
+const FLAGSHIP_NAMES = new Set([
+  "streamerOS",
+  "Sable",
+  "Path Saathi LMS",
+  "Portfolio Concierge — RAG + MCP",
+  "IntegrateX",
+]);
+
 const PROJECTS: Project[] = [
   {
     name: "streamerOS",
@@ -374,10 +385,21 @@ export default function Projects() {
       </div>
 
       <div className="mt-10 space-y-12">
-        {PROJECTS.map((project) => (
+        {PROJECTS.filter((p) => FLAGSHIP_NAMES.has(p.name)).map((project) => (
           <ProjectRow key={project.name} project={project} />
         ))}
       </div>
+      <p className="mt-10 text-sm text-zinc-500">
+        More builds — support agents, enterprise portals, TV apps — live in{" "}
+        <a href="/products" className="text-ice underline-offset-4 hover:underline">
+          /products
+        </a>{" "}
+        and the{" "}
+        <a href="/blog" className="text-ice underline-offset-4 hover:underline">
+          field notes
+        </a>
+        .
+      </p>
     </section>
   );
 }

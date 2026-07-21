@@ -1,19 +1,12 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
 import FoundersLog from "@/components/FoundersLog";
-import {
-  getAllPosts,
-  getPostBySlug,
-  formatDate,
-  FOUNDERS_LOG_SLUGS,
-} from "@/lib/blog";
+import { getPostBySlug, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 import TerminalAgent from "@/components/widgets/TerminalAgent";
-import ArchitecturePipeline from "@/components/ArchitecturePipeline";
 import Products from "@/components/Products";
 import Dashboard from "@/components/Dashboard";
 import ContactForm from "@/components/ContactForm";
 import RoadmapSection from "@/components/RoadmapSection";
-import RecentPosts from "@/components/RecentPosts";
 import Testimonials from "@/components/Testimonials";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
@@ -73,23 +66,14 @@ const projectsJsonLd = [
 
 export default function Home() {
   // Server-side mapping to plain props — keeps the blog registry (and every
-  // post body) out of the client JS bundle.
-  const logEntries = FOUNDERS_LOG_SLUGS.flatMap((slug) => {
+  // post body) out of the client JS bundle. Top 5 only: the homepage sells
+  // the strongest headlines; the full list lives at /blog.
+  const logEntries = FOUNDERS_LOG_SLUGS.slice(0, 5).flatMap((slug) => {
     const p = getPostBySlug(slug);
     return p
       ? [{ slug: p.slug, title: p.title, description: p.description }]
       : [];
   });
-  const recent = getAllPosts()
-    .slice(0, 3)
-    .map((p) => ({
-      slug: p.slug,
-      title: p.title,
-      description: p.description,
-      date: formatDate(p.publishedAt),
-      publishedAt: p.publishedAt,
-      readingMinutes: p.readingMinutes,
-    }));
 
   return (
     <>
@@ -122,10 +106,8 @@ export default function Home() {
             </div>
           </section>
 
-          <ArchitecturePipeline />
           <Dashboard />
           <RoadmapSection />
-          <RecentPosts posts={recent} />
           <Testimonials />
           <ContactForm />
         </main>

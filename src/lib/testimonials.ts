@@ -12,26 +12,13 @@ export interface Testimonial {
   url?: string;
 }
 
-// LOCAL PREVIEW ONLY — sample entries to see the section's design.
-// Replace with real, verifiable quotes before committing this file.
+// Empty = the section renders nothing. Add real, verifiable quotes
+// (name, role, LinkedIn url) and it appears on the next build.
 export const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "Sample testimonial — this is placeholder text to preview the layout. Replace it with a real LinkedIn recommendation before publishing.",
-    name: "Sample Colleague",
-    role: "Placeholder — Engineering Manager",
-  },
-  {
-    quote:
-      "Sample testimonial — a second placeholder so you can see how the grid balances with multiple quotes of different lengths on desktop and mobile.",
-    name: "Sample Client",
-    role: "Placeholder — Founder",
-  },
-  {
-    quote:
-      "Sample testimonial — third placeholder. Cards link to the person's LinkedIn when a url is provided, which is what makes the proof verifiable.",
-    name: "Sample Peer",
-    role: "Placeholder — Senior Engineer",
-    url: "https://www.linkedin.com/",
-  },
+  // {
+  //   quote: "…",
+  //   name: "Full Name",
+  //   role: "Title, Company",
+  //   url: "https://www.linkedin.com/in/…",
+  // },
 ];
