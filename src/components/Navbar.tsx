@@ -5,14 +5,12 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import PulseDot from "./PulseDot";
 
+// Five essentials only — Products, Roadmaps, Stack, and Experience remain
+// reachable from the homepage sections, /projects, and the footer.
 const LINKS = [
   { href: "/about", label: "About" },
-  { href: "/products", label: "Products" },
   { href: "/projects", label: "Projects" },
-  { href: "/#experience", label: "Experience" },
-  { href: "/roadmap", label: "Roadmap" },
   { href: "/blog", label: "Blog" },
-  { href: "/uses", label: "Stack" },
   { href: "/sandbox", label: "Sandbox" },
   { href: "/#contact", label: "Contact" },
 ];
@@ -26,7 +24,7 @@ function MenuToggle({ open, onClick }: { open: boolean; onClick: () => void }) {
       onClick={onClick}
       aria-label="Toggle menu"
       aria-expanded={open}
-      className="flex h-6 w-6 items-center justify-center text-zinc-300 transition-colors hover:text-zinc-50 lg:hidden"
+      className="flex h-6 w-6 items-center justify-center text-zinc-300 transition-colors hover:text-zinc-50 md:hidden"
     >
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
         <motion.path
@@ -78,11 +76,11 @@ export default function Navbar() {
           </Link>
 
           {/* Divider */}
-          <span className="hidden h-4 w-px bg-zinc-800 lg:block" />
+          <span className="hidden h-4 w-px bg-zinc-800 md:block" />
 
           {/* Desktop links — sliding glass highlight via layoutId */}
           <div
-            className="hidden items-center gap-0.5 lg:flex"
+            className="hidden items-center gap-0.5 md:flex"
             onMouseLeave={() => setHovered(null)}
           >
             {LINKS.map((link) => (
@@ -125,7 +123,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: EASE }}
-            className="fixed right-6 top-24 z-[60] flex w-[min(80vw,18rem)] flex-col gap-y-4 rounded-2xl border border-zinc-800/50 bg-zinc-950/90 px-4 py-6 shadow-2xl shadow-cyan-900/20 backdrop-blur-md lg:hidden"
+            className="fixed right-6 top-24 z-[60] flex w-[min(80vw,18rem)] flex-col gap-y-4 rounded-2xl border border-zinc-800/50 bg-zinc-950/90 px-4 py-6 shadow-2xl shadow-cyan-900/20 backdrop-blur-md md:hidden"
           >
             {LINKS.map((link) => (
               <Link

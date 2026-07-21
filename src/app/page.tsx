@@ -138,7 +138,16 @@ export default function Home() {
               for my machine-readable manifest.
             </p>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link href="/products" className="text-zinc-600 transition-colors duration-200 hover:text-cyan">
+              Products
+            </Link>
+            <Link href="/roadmap" className="text-zinc-600 transition-colors duration-200 hover:text-cyan">
+              Roadmaps
+            </Link>
+            <Link href="/uses" className="text-zinc-600 transition-colors duration-200 hover:text-cyan">
+              Stack
+            </Link>
             <Link
               href="/interview"
               className="text-zinc-600 transition-colors duration-200 hover:text-cyan"
