@@ -3,7 +3,6 @@ import Link from "next/link";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import Projects from "@/components/Projects";
-import ProjectsBento from "@/components/ProjectsBento";
 import JsonLd from "@/components/JsonLd";
 import { SITE_URL } from "@/lib/site";
 import { breadcrumbJsonLd } from "@/lib/seo";
@@ -50,20 +49,9 @@ export default function ProjectsPage() {
               >
                 /products
               </Link>
-              . Tap any tile — it opens the live thing, or jumps to its
-              full breakdown below.
+              .
             </p>
           </header>
-
-          {/* Visual index — bento grid of all builds */}
-          <ProjectsBento />
-
-          <div className="mt-24 flex items-center gap-3">
-            <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-              ~/details
-            </span>
-            <span className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
-          </div>
 
           <Projects all />
         </main>
