@@ -20,6 +20,9 @@ export interface Env {
       options: Record<string, unknown>,
     ): Promise<{ matches: { id: string; score: number; metadata?: Record<string, unknown> }[] }>;
   };
+  /** Passcode for the private /outreach drafter. Set via:
+   *  npx wrangler secret put OUTREACH_PASSCODE  (or the CF dashboard). */
+  OUTREACH_PASSCODE?: string;
 }
 
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
@@ -178,6 +181,68 @@ async function handleChat(request: Request, env: Env, origin: string | null): Pr
   }
 }
 
+/* ------------------------------ /api/outreach --------------------------- */
+// Private, passcode-gated: drafts a personalized cold-outreach email in
+// Yaseen's voice. Returns a draft only — the human reviews and sends from
+// Gmail (propose/confirm boundary; never auto-sends).
+
+const OUTREACH_FACTS = `About Yaseen Khatib (the sender):
+- Senior Full-Stack Developer (React, Node.js, TypeScript, MongoDB) now building production AI systems: RAG, agents, MCP.
+- Shipped 5 products solo in ~12 months (streamerOS, IntegrateX, Sable, plus two autonomous pipelines).
+- Speed proof: for a client LMS (Path Saathi), took a Monday MVP brief to a working platform live on dev the next day.
+- Unusual proof point: recruiters/clients can add his portfolio to Claude as an MCP connector and interview it from inside their own AI.
+- Open to project work and roles — remote, hybrid, or on-site (Hyderabad, IST).
+- Portfolio: ${SITE} · Email: contact@streamerosai.com`;
+
+async function handleOutreach(request: Request, env: Env, origin: string | null): Promise<Response> {
+  if (!env.OUTREACH_PASSCODE) {
+    return json({ error: "outreach drafter not configured (no passcode set)" }, 503, origin);
+  }
+  let body: { passcode?: string; name?: string; company?: string; context?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "invalid JSON body" }, 400, origin);
+  }
+  if ((body.passcode ?? "") !== env.OUTREACH_PASSCODE) {
+    return json({ error: "wrong passcode" }, 401, origin);
+  }
+
+  const name = String(body.name ?? "").trim().slice(0, 80);
+  const company = String(body.company ?? "").trim().slice(0, 120);
+  const context = String(body.context ?? "").trim().slice(0, 600);
+
+  const prompt =
+    `Write a short, human cold-outreach email from Yaseen to a prospect.\n\n` +
+    OUTREACH_FACTS +
+    `\n\nProspect: ${name || "(unknown name)"}${company ? ` at ${company}` : ""}.\n` +
+    `Context the sender noted: ${context || "(none)"}\n\n` +
+    `Rules:\n` +
+    `- Under 130 words. Plain, direct, no corporate fluff, no "I hope this email finds you well".\n` +
+    `- Open with one specific line tied to the prospect/company/context, not a generic hook.\n` +
+    `- Mention ONE relevant proof point (the 1-day delivery OR the 5 solo products OR the MCP interview trick) — whichever fits, not all.\n` +
+    `- End with a low-friction ask (a quick call, or "reply if useful"). Include the portfolio link once.\n` +
+    `- No em-dash chains, no exclamation marks, at most one question.\n` +
+    `Return EXACTLY this format:\n` +
+    `SUBJECT: <a short, specific subject line>\n` +
+    `<blank line>\n` +
+    `<the email body>`;
+
+  try {
+    const res = await env.AI.run(GEN_MODEL, {
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 420,
+    });
+    const raw = String(res.response ?? "").trim();
+    const m = raw.match(/^\s*SUBJECT:\s*(.+?)\s*\n([\s\S]*)$/i);
+    const subject = (m ? m[1] : `Quick idea for ${company || "your team"}`).trim();
+    const emailBody = (m ? m[2] : raw).trim();
+    return json({ subject, body: emailBody }, 200, origin);
+  } catch (err) {
+    return json({ error: `draft failed: ${String(err).slice(0, 200)}` }, 500, origin);
+  }
+}
+
 /* --------------------------------- /mcp --------------------------------- */
 
 const TOOLS = [
@@ -280,6 +345,9 @@ export default {
 
     if (pathname === "/api/chat" && request.method === "POST") {
       return handleChat(request, env, origin);
+    }
+    if (pathname === "/api/outreach" && request.method === "POST") {
+      return handleOutreach(request, env, origin);
     }
     if (pathname === "/mcp") {
       if (request.method === "POST") return handleMcp(request, env, origin);

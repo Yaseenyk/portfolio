@@ -6,8 +6,8 @@ export const dynamic = "force-static";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // Allow all conventional crawlers.
-      { userAgent: "*", allow: "/" },
+      // Allow all conventional crawlers, except the private outreach tool.
+      { userAgent: "*", allow: "/", disallow: "/outreach/" },
       // Explicitly welcome AI / answer-engine crawlers (AEO).
       {
         userAgent: [
