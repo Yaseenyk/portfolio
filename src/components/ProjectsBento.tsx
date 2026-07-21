@@ -23,18 +23,17 @@ const SPANS = [
   "sm:col-span-2",
 ];
 
-// Subtle tint per tile so the grid reads as a composition, not flat boxes.
 const TINTS = [
   "from-cyan/[0.10]",
   "from-purple/[0.10]",
   "from-ice/[0.08]",
   "from-cyan/[0.07]",
-  "from-purple/[0.08]",
+  "from-purple/[0.09]",
 ];
 
 export default function ProjectsBento() {
   return (
-    <div className="grid grid-flow-dense grid-cols-2 gap-4 md:grid-cols-4 auto-rows-[10rem]">
+    <div className="grid grid-flow-dense grid-cols-2 gap-4 md:grid-cols-4 auto-rows-[11rem]">
       {PROJECTS.map((project, i) => {
         const span = SPANS[i % SPANS.length];
         const featured = span.includes("row-span-2");
@@ -54,23 +53,33 @@ export default function ProjectsBento() {
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.5, ease: EASE, delay: (i % 4) * 0.06 }}
             whileHover={{ y: -4 }}
-            className={`group relative flex flex-col justify-end overflow-hidden rounded-2xl border border-zinc-800/60 bg-gradient-to-br ${TINTS[i % TINTS.length]} to-zinc-950/60 p-5 transition-colors hover:border-cyan/50 ${span}`}
+            className={`group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800/60 bg-gradient-to-br ${TINTS[i % TINTS.length]} to-zinc-950/70 p-5 transition-colors hover:border-cyan/50 ${span}`}
           >
-            {/* faint grid texture */}
+            {/* grid texture + top accent hairline */}
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:22px_22px]"
+              className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(#fff_1px,transparent_1px),linear-gradient(90deg,#fff_1px,transparent_1px)] [background-size:22px_22px]"
             />
             <span
               aria-hidden
               className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-cyan/50 via-purple/30 to-transparent"
             />
+            {/* big faded index — fills the tile so it never reads empty */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-3 -top-5 font-mono text-[5.5rem] font-bold leading-none text-white/[0.04] transition-colors group-hover:text-cyan/[0.06]"
+            >
+              {String(i + 1).padStart(2, "0")}
+            </span>
 
-            <div className="relative">
-              <span className="block font-mono text-[9px] uppercase tracking-[0.18em] text-cyan/80">
-                {project.category}
-              </span>
-              <span className="mt-1.5 flex items-baseline justify-between gap-2">
+            {/* top: category */}
+            <span className="relative font-mono text-[9px] uppercase tracking-[0.18em] text-cyan/80">
+              {project.category}
+            </span>
+
+            {/* bottom: name, desc (featured), metric + tech chips */}
+            <div className="relative mt-auto pt-4">
+              <span className="flex items-baseline justify-between gap-2">
                 <span
                   className={`font-semibold tracking-tight text-zinc-50 transition-colors group-hover:text-cyan ${
                     featured ? "text-xl" : "text-sm"
@@ -85,11 +94,25 @@ export default function ProjectsBento() {
                   →
                 </span>
               </span>
+
               {featured && (
-                <span className="mt-2 hidden text-xs leading-relaxed text-zinc-400 sm:line-clamp-3">
+                <span className="mt-2 hidden text-xs leading-relaxed text-zinc-400 sm:line-clamp-2">
                   {project.description}
                 </span>
               )}
+
+              <span className="mt-3 flex flex-wrap gap-1.5">
+                {(featured ? project.metrics.slice(0, 3) : project.tech.slice(0, 2)).map(
+                  (t) => (
+                    <span
+                      key={t}
+                      className="rounded-full border border-zinc-700/70 bg-white/[0.03] px-2 py-0.5 font-mono text-[9px] text-zinc-400"
+                    >
+                      {t}
+                    </span>
+                  ),
+                )}
+              </span>
             </div>
           </motion.a>
         );
