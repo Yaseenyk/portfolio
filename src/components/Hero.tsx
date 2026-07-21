@@ -33,10 +33,10 @@ export default function Hero() {
         <motion.div variants={item} className="flex flex-wrap items-center gap-2.5">
           <span className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-4 py-1.5 text-xs font-medium text-emerald-300">
             <PulseDot color="bg-emerald-400" />
-            Open to Remote roles
+            Open to work · remote / hybrid / on-site
           </span>
           <span className="inline-flex items-center rounded-full border border-zinc-800 bg-white/[0.03] px-4 py-1.5 text-xs text-zinc-300">
-            Senior Full-Stack AI Engineer
+            Senior Full-Stack Developer · AI Systems
           </span>
         </motion.div>
 
@@ -44,25 +44,29 @@ export default function Hero() {
           variants={headline}
           className="mt-8 text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
         >
-          Architecting Scalable Systems.
+          Full-stack developer.
           <br />
-          Delivering at{" "}
-          <GradientText className="whitespace-nowrap">AI-Speed.</GradientText>
+          Now building{" "}
+          <GradientText className="whitespace-nowrap">
+            AI systems.
+          </GradientText>
         </motion.h1>
 
         <motion.p
           variants={item}
           className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400"
         >
-          Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer who builds
-          and ships autonomous AI products — from Agentic RAG pipelines and LLM
-          orchestration to the high-throughput MERN systems they run on. He turns
-          AI capabilities into production software, at AI-speed.
+          I&apos;m Yaseen Khatib. Five years of building for the web end to
+          end — React, Node.js, TypeScript, MongoDB — and the last few wiring
+          that stack into production AI: RAG pipelines, agent orchestration,
+          and five products shipped solo, from a Rust desktop app to
+          autonomous pipelines. Everything on this site actually runs. Scroll
+          down and poke it.
         </motion.p>
 
         <motion.p variants={item} className="mt-4 text-sm text-zinc-500">
-          Based in Hyderabad (IST) · Remote-first, effective across global time
-          zones.
+          Hyderabad, India (IST) · happy remote, hybrid, or in an office ·
+          effective across global time zones.
         </motion.p>
 
         <motion.div

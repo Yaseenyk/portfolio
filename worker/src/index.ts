@@ -37,7 +37,7 @@ const REFUSAL =
   "That's outside my grounded context — I only answer from Yaseen's indexed portfolio corpus, and retrieval confidence was too low to answer honestly. Try asking about his stack, products, architecture decisions, or availability.";
 
 const AVAILABILITY =
-  "Yaseen Khatib is open to Lead and Senior Full-Stack / AI Engineering roles. Remote-first from Hyderabad, India (IST), effective across global time zones. Contact: contact@streamerosai.com · linkedin.com/in/yaseen-yk · github.com/Yaseenyk. Interview brief for engineering leadership: " +
+  "Yaseen Khatib is open to Lead and Senior Full-Stack / AI Engineering roles — remote, hybrid, or on-site. Based in Hyderabad, India (IST), comfortable working from an office, effective across global time zones. Contact: contact@streamerosai.com · linkedin.com/in/yaseen-yk · github.com/Yaseenyk. Interview brief for engineering leadership: " +
   SITE +
   "/interview";
 

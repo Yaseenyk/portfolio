@@ -15,7 +15,8 @@ export function GET() {
 
 > ${PERSON.name} builds and ships autonomous AI products solo — Agentic RAG
 > pipelines, LLM orchestration, and the MERN systems they run on. Five
-> production products in twelve months; open to Lead/Senior remote roles.
+> production products in twelve months; open to Lead/Senior roles —
+> remote, hybrid, or on-site.
 > Base: ${PERSON.locality}, ${PERSON.country} (IST). Contact: ${PERSON.email}.
 
 ## Canonical pages

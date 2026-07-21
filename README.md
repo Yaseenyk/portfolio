@@ -77,7 +77,7 @@ Pages via Actions; the Worker deploys separately via `worker.yml`.
 
 ---
 
-Open to Lead/Senior Full-Stack & AI Engineering roles — remote-first,
-Hyderabad (IST). Start with the
+Open to Lead/Senior Full-Stack & AI Engineering roles — remote, hybrid, or
+on-site — based in Hyderabad (IST). Start with the
 [interview brief](https://yaseenkhatib.streamerosai.com/interview) or
 [/about](https://yaseenkhatib.streamerosai.com/about).

@@ -100,7 +100,8 @@ engineer sharing hard-won specifics, NOT like a content writer:
   invent personal war stories, clients, or specific past incidents.
 
 Field requirements (ALL fields are mandatory — never leave one empty):
-- title: a specific, punchy, keyword-rich title (<=70 chars).
+- title: a specific title a human would write (<=65 chars): plain words, at
+  most one colon, no keyword-stuffing — say the one thing the article proves.
 - description: one compelling meta-description sentence, 120-160 chars, plain text, no quotes.
 - tags: 2-4 short topic tags (e.g. AI, Backend, RAG).
 - keywords: 5-8 specific, long-tail SEO keywords/phrases a developer would actually search.

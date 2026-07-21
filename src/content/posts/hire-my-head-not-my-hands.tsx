@@ -66,7 +66,7 @@ function Body() {
         A team where the hard problems are architectural: AI systems that need
         trust boundaries, infrastructure that needs its economics fixed,
         products that need to feel instant at scale. Lead or senior
-        full-stack / AI engineering roles, remote-first from Hyderabad,
+        full-stack / AI engineering roles — remote, hybrid, or on-site — from Hyderabad,
         effective across time zones — my work is asynchronous by construction,
         as the pipelines prove.
       </p>

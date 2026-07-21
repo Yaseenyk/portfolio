@@ -26,7 +26,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Is Yaseen available for hire?",
     answer:
-      "Yes — open to Lead/Senior Full-Stack and AI Engineering roles. Remote-first from Hyderabad (IST), effective across global time zones.",
+      "Yes — open to Lead/Senior Full-Stack and AI Engineering roles: remote, hybrid, or on-site. Based in Hyderabad (IST), effective across global time zones.",
   },
   {
     question: "What production AI systems has he shipped?",

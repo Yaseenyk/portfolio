@@ -55,7 +55,7 @@ const aboutJsonLd = {
 const FAST_FACTS: [string, string][] = [
   ["name", PERSON.name],
   ["role", PERSON.jobTitle],
-  ["base", `${PERSON.locality}, ${PERSON.country} (IST) · remote-first`],
+  ["base", `${PERSON.locality}, ${PERSON.country} (IST) · remote, hybrid, or on-site`],
   ["products_shipped", "5 solo — streamerOS, IntegrateX, Sable, + 2 pipelines"],
   ["articles_published", "90+ on AI systems architecture"],
   ["operating_model", "one architect directing Claude + MCP"],
@@ -112,7 +112,7 @@ const ABOUT_FAQ: FaqItem[] = [
   {
     question: "Is Yaseen Khatib available for hire?",
     answer:
-      "Yes — open to Lead and Senior Full-Stack / AI Engineering roles, remote-first from Hyderabad (IST) and effective across global time zones. Contact: contact@streamerosai.com, github.com/Yaseenyk, or linkedin.com/in/yaseen-yk.",
+      "Yes — open to Lead and Senior Full-Stack / AI Engineering roles: remote, hybrid, or on-site. Based in Hyderabad (IST), comfortable in an office, and effective across global time zones. Contact: contact@streamerosai.com, github.com/Yaseenyk, or linkedin.com/in/yaseen-yk.",
   },
 ];
 
@@ -281,10 +281,11 @@ export default function AboutPage() {
               Is he available?
             </h2>
             <p className="mt-4 leading-relaxed text-zinc-400">
-              Yes — open to Lead and Senior Full-Stack / AI Engineering roles.
-              Remote-first from Hyderabad (IST), effective across global time
-              zones; the pipelines on this site work while he sleeps, which is
-              rather the point. Engineering leadership evaluating him should
+              Yes — open to Lead and Senior Full-Stack / AI Engineering roles,
+              remote, hybrid, or on-site. Based in Hyderabad (IST), comfortable
+              in an office, and effective across global time zones; the
+              pipelines on this site work while he sleeps, which is rather the
+              point. Engineering leadership evaluating him should
               start with the{" "}
               <Link href="/interview" className="text-ice underline-offset-4 hover:underline">
                 interview brief

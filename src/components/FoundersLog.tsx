@@ -24,8 +24,8 @@ export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
           </h2>
           <p className="mt-3 max-w-2xl text-2xl font-semibold leading-snug tracking-tight text-zinc-50 sm:text-3xl">
             Syntax is table stakes. This is the{" "}
-            <span className="text-gradient animate-gradient">vision</span> —
-            10 stories from building 5 products solo.
+            <span className="text-gradient animate-gradient">journey</span> —
+            from first dev job to five products shipped solo.
           </p>
         </div>
         <span className="font-mono text-xs text-zinc-500">

@@ -78,6 +78,7 @@ import { enterpriseMcpAggregation } from "@/content/posts/enterprise-mcp-aggrega
 import { evalDrivenPromptEngineering } from "@/content/posts/evaluation-driven-prompt-engineering-golden-datasets";
 import { autonomousAgentRoutines } from "@/content/posts/long-running-automated-agent-routines-cron-workflows";
 // Founder's Log — the vision series: product stories + operating model (see components/FoundersLog.tsx).
+import { myJourneyPost } from "@/content/posts/my-journey-web-developer-to-ai-engineer";
 import { shippedFiveProductsSolo } from "@/content/posts/shipped-5-products-solo-12-months";
 import { visionOverSyntax } from "@/content/posts/vision-over-syntax-architecture-first";
 import { oneArchitectFullSquad } from "@/content/posts/one-architect-claude-mcp-full-squad";
@@ -93,6 +94,7 @@ export { SITE_URL };
 
 /** The Founder's Log vision series, in narrative order — featured on the home page. */
 export const FOUNDERS_LOG_SLUGS = [
+  "my-journey-web-developer-to-ai-engineer",
   "shipped-5-products-solo-12-months",
   "vision-over-syntax-architecture-first",
   "one-architect-claude-mcp-full-squad",
@@ -136,6 +138,7 @@ export interface BlogPost {
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
   // Founder's Log — the vision series (newest).
+  myJourneyPost,
   shippedFiveProductsSolo,
   visionOverSyntax,
   oneArchitectFullSquad,

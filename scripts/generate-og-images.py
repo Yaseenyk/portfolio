@@ -36,6 +36,11 @@ JPEG_QUALITY = 85
 # The Founder's Log series (title + hook drive the art direction).
 POSTS = [
     {
+        "slug": "my-journey-web-developer-to-ai-engineer",
+        "title": "How I Went From My First Dev Job to Building AI Systems",
+        "hook": "Five years honestly told: an ASP.NET healthcare backend in 2021, full-stack MERN through the ChatGPT shift, nights of embeddings homework, then five AI products shipped solo. A road/journey metaphor fits.",
+    },
+    {
         "slug": "shipped-5-products-solo-12-months",
         "title": "I Shipped 5 Products in 12 Months — Solo, Unfunded, and Faster Than Most Teams Ship One",
         "hook": "One engineer, five production systems in a year: a Rust desktop cockpit, a workflow engine, a local-first AI finance agent, and two autonomous pipelines.",
