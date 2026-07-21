@@ -6,26 +6,28 @@ function Body() {
     <>
       <p>
         Node-graph editors — n8n clones, pipeline builders, anything with
-        connectors and edges — have a quiet performance problem. The thing the
-        user drags around the canvas is a rich UI object, and naive
-        implementations persist that object verbatim. Save a moderately complex
-        workflow and you are writing kilobytes of measured widths, port
-        geometry, drag state, and React internals into your database. On
-        IntegrateX, engineering a clean serialization boundary cut that payload
-        by <strong>94%</strong>.
+        connectors and edges — carry a quiet performance leak. The thing the
+        user drags around the canvas is a fat UI object, and naive systems write
+        that object straight to storage. Save a moderately complex workflow and
+        you&apos;re archiving measured widths, port geometry, drag state, even
+        framework internals. On IntegrateX that bloat surfaced as sync lag and
+        unnecessary WebSocket chatter during co-editing. I drew a hard
+        serialization boundary, stripped the render-only fields, and the payload
+        fell by <strong>94%</strong>.
       </p>
 
       <h2>Where the bytes go</h2>
       <p>
-        A single React Flow node is not your data. It is your data wrapped in
+        A single React Flow node is not your data. It&apos;s your data wrapped in
         everything the renderer needs: <code>position</code>,{" "}
         <code>measured</code> dimensions, <code>selected</code> and{" "}
         <code>dragging</code> flags, handle definitions, z-index, and whatever
-        view state your custom node component attached. Multiply that by every
-        node and edge, serialize the whole graph, and the transport payload is
-        mostly things that should never have left the browser. None of it is
-        meaningful to the backend, and all of it is dead weight on every save,
-        load, and sync.
+        view state your custom node component latched onto. Multiply that by every
+        node and edge, serialize the whole graph, and your wire payload becomes
+        mostly things that should never have left the browser. None of it matters
+        to the backend, yet you pay for it on every save, reload, and real-time
+        broadcast — plus the client pays again rehydrating it, which invites
+        render thrash under load.
       </p>
 
       <h2>The Serialization Adapter pattern</h2>
@@ -35,6 +37,12 @@ function Body() {
         the <strong>transport model</strong> (what your database and wire
         actually require). An adapter translates between them in both
         directions, and nothing crosses the boundary without passing through it.
+        In the pattern I call <strong>Trinity Architecture</strong>, this is the
+        third layer: Presentation (pure React/React Flow views), Reactive
+        State/Orchestration (Zustand, events, optimistic intent), and the Data /
+        Serialization Adapter (shape the lean records for the wire and storage).
+        Boundary rule: the UI never formats DB schemas; the adapter never pokes
+        UI state directly — it only hands records to the orchestrator.
       </p>
 
       <Terminal title="serialize.ts">
@@ -88,34 +96,40 @@ function Body() {
         anything that can be <em>derived</em> should never be{" "}
         <em>stored</em>. Measured dimensions are derived. Selection is ephemeral.
         Handle geometry is a function of the node type. Persisting them is
-        persisting a cache.
+        persisting a cache. On IntegrateX this also made upgrades safe: renderer
+        changes didn&apos;t demand data migrations because we never saved UI-only
+        state.
       </p>
 
       <h2>Zustand as the render store</h2>
       <p>
         Keep one store — Zustand is ideal here — as the single owner of the
         render model. The canvas reads and writes the rich nodes there with zero
-        ceremony. Serialization happens only at the boundary: on save, map the
-        store through <code>toRecord</code>; on load, map records through{" "}
-        <code>fromRecord</code> back into the store. The adapter is the only code
-        that knows both shapes, so the rest of the application never has to.
+        ceremony. Optimistic updates and cross-node orchestration live here too.
+        Serialization happens only at the boundary: on save, map the store
+        through <code>toRecord</code>; on load, map records through{" "}
+        <code>fromRecord</code> back into the store. In my Trinity split, the UI
+        renders from state and dispatches intent; the orchestrator holds the
+        runtime truth; the adapter shapes bytes for the wire. The adapter is the
+        only code that knows both shapes, so the rest of the application never
+        has to.
       </p>
 
       <h2>The 94%, decomposed</h2>
       <p>
-        The reduction is not a trick; it is the sum of removing what was never
-        needed. Drop the measured geometry, the per-node interaction flags, the
-        duplicated handle definitions, and the framework metadata, round the
-        coordinates to integers, and a node that serialized to roughly a
-        kilobyte collapses to a few dozen bytes. Across a graph of a hundred
-        nodes the difference is the entire performance profile of save, load,
-        and real-time sync.
+        The reduction isn&apos;t a trick; it&apos;s subtraction of baggage. Drop the
+        measured geometry, the per-node interaction flags, the duplicated handle
+        definitions, and the framework metadata; round coordinates to integers.
+        A node that used to serialize to roughly a kilobyte collapses to a few
+        dozen bytes. Across a graph of a hundred nodes, that flips the profile
+        of save, load, and real-time sync from spiky to cheap — fewer bytes on
+        the socket, less state to reconcile, less render churn on rehydrate.
       </p>
 
       <blockquote>
-        Most payload-size problems are not compression problems. They are
-        boundary problems — you are shipping the cache because nobody drew the
-        line between the view and the record.
+        Most payload-size issues aren&apos;t compression problems. They&apos;re boundary
+        problems — you&apos;re shipping the cache because nobody drew the line between
+        the view and the record.
       </blockquote>
 
       <p>

@@ -79,36 +79,27 @@ function Body() {
   return (
     <>
       <p>
-        React Flow is the canvas everyone reaches for to <em>draw</em> a workflow.
-        Far fewer people use it for what it is quietly perfect at: being the{" "}
-        <strong>control plane for a running agent system</strong>. The same graph
-        that a non-engineer drags around to describe &quot;when a ticket comes in,
-        search the docs, then either answer or escalate&quot; can be the literal
-        definition the runtime executes. The diagram stops being documentation and
-        becomes the program.
+        React Flow is the canvas we all reach for to <em>sketch</em> a workflow. Where it really earns its keep is as the{" "}
+        <strong>control plane for a running agent system</strong>. On IntegrateX, the same graph a PM drags to say &quot;when a ticket comes in,
+        search the docs, then either answer or escalate&quot; is the exact spec the runtime executes — no shadow YAML, no parallel DSL. The moment
+        you wire it this way, the diagram stops being decoration and becomes the program.
       </p>
 
       <h2>Nodes are capabilities, edges are contracts</h2>
       <p>
-        The reframing is small but total. A node is no longer a shape — it is a
-        capability: a trigger, an agent, a tool, an output. An edge is no longer a
-        line — it is a typed contract that the output of one capability is a valid
-        input to the next. React Flow already gives you the two primitives this
-        needs: custom node components and typed handles (ports). You are not
-        bending the library; you are using the part of it most demos ignore.
+        Treat the canvas like a system, not clip art. A node is a capability: trigger, agent, tool, output. An edge is a typed contract that says
+        one capability&apos;s output is valid input to the next. React Flow already gives you the primitives you need: custom node components and
+        typed handles (ports). You&apos;re not fighting the library; you&apos;re finally using the part most demos skip.
       </p>
 
       <Diagram />
 
       <h2>Typed ports are the whole trick</h2>
       <p>
-        The difference between a pretty canvas and a real orchestration tool is
-        whether the connections mean anything. Give each handle a type — a
-        document stream, a tool result, a terminal response — and reject
-        connections that violate it at draw time. Now the canvas itself prevents
-        an entire class of invalid graphs before anything runs. The user cannot
-        wire a string output into a node that expects a tool call, because the
-        port simply will not accept the edge.
+        The gap between a pretty drawing and a real orchestrator is whether connections carry meaning. Put a type on each handle — document stream,
+        tool result, terminal &quot;done&quot; — and reject bad edges <em>while</em> the user is drawing. Entire categories of runtime bugs disappear,
+        and your on-call future self stops diffing logs to learn someone piped a string into a tool port. If the port doesn&apos;t accept the edge,
+        it can&apos;t ship broken.
       </p>
 
       <Terminal title="ports.ts">
@@ -125,28 +116,24 @@ function Body() {
 
       <h2>Separate the render graph from the run graph</h2>
       <p>
-        Keep one rule and this stays clean: the React Flow state is the{" "}
-        <em>render</em> model — positions, selection, the visual edges. The
-        runtime consumes a <em>derived</em> graph — capabilities and their typed
-        wiring, stripped of all view state. The canvas owns how it looks; the
-        executor owns what it does. Compiling one into the other is its own
-        topic — toposort, cycle detection, scheduling — covered in the companion
-        post.
+        Keep one invariant or you&apos;ll drown in state-synchronization lag: React Flow state is the <em>render</em> model — positions, selection,
+        pan/zoom, visual edges. The executor consumes a <em>derived</em> run graph — capabilities and typed wiring, no UI fluff. I package this as the
+        pattern I call <strong>Trinity Architecture</strong>: (1) Presentation — the canvas renders and dispatches events; (2) Reactive State / Orchestration —
+        a client store owns the source of truth and optimistic updates; (3) Data / Serialization Adapter — a boundary that compiles rich in-memory state
+        into lean wire payloads. On IntegrateX, that Serialization Adapter stripped React Flow metadata before persistence and cut payload size 94%, which
+        killed a whole class of sync stalls and payload bloat. Boundary rule: the UI never formats DB schemas; the adapter never pokes UI state directly —
+        only through the orchestrator.
       </p>
 
       <h2>Why managers care</h2>
       <p>
-        An agent system defined as a visual graph is one a product manager can
-        read, a support lead can adjust, and an engineer can debug by watching the
-        active path light up. The orchestration stops living in a thousand lines
-        of imperative glue and starts living in an artifact the whole team can
-        point at. That legibility is worth more than any individual clever prompt.
+        A visual, typed graph is readable to a PM, tweakable by support, and debuggable by engineers watching the active path light up in real time.
+        You stop spelunking imperative glue and start pointing at a living artifact. Keep the overlay cheap and state isolated, and you avoid render
+        thrash while the system streams results; hard-won habit from streamerOS, where 60fps mattered. The payoff here is clarity the whole team can ship against.
       </p>
 
       <blockquote>
-        The best agent architecture is the one a non-author can read. A typed node
-        graph turns &quot;trust me, the orchestration works&quot; into something you
-        can point at.
+        The best agent architecture is the one a non-author can read. A typed node graph turns &quot;trust me, the orchestration works&quot; into something you can point at.
       </blockquote>
 
       <p>

@@ -5,23 +5,28 @@ function Body() {
   return (
     <>
       <p>
-        Streaming AI responses changed the shape of frontend state. A traditional
-        app updates state in discrete, deliberate events — a click, a fetch, a
-        form submit. An AI interface updates it dozens of times a second as tokens
-        arrive, mid-stream, cancellable, and interleaved with optimistic UI. That
-        pattern punishes ceremony. The question of Zustand versus Redux is really
-        a question of how much boilerplate you can afford between a token arriving
-        and the screen reflecting it.
+        Streaming AI responses rewired how I treat frontend state. Classic apps
+        move in discrete, audited steps — click, fetch, submit. A token stream
+        lands dozens of times a second, cancellable mid-flight, interleaved with
+        optimistic UI, and any friction shows up as jitter. Ceremony turns into
+        latency. The real question behind Zustand versus Redux is how many hops
+        you can afford between a byte hitting the socket and pixels changing.
+        On projects like streamerOS and IntegrateX, that budget is measured in
+        milliseconds. I default to the pattern I call Trinity Architecture:
+        Presentation renders; a Reactive State/Orchestration layer absorbs events
+        and applies optimistic updates; a Data/Serialization Adapter shapes what
+        goes over the wire. If the path is longer than that, you feel it.
       </p>
 
       <h2>What streaming does to your state</h2>
       <p>
         A streamed completion is a firehose of partial state: append a token,
-        re-render, repeat, until a stop event — or a cancel, or an error
+        re-render, maybe rewrite or cancel, then repeat until a stop — or an error
         mid-flight. Multiply that by a node-graph UI where each node holds its own
-        local interaction state and you have high-frequency, highly-localized
-        updates. The architecture that wins is the one where a single update is
-        cheap to express and cheap to run.
+        local interaction state and you now have high-frequency, highly-localized
+        updates under 60-fps pressure. If every token wakes half the tree, you get
+        render thrash and backpressure. The architecture that wins makes a single
+        tiny update cheap to express and cheap to run.
       </p>
 
       <h2>Redux Toolkit — when the ceremony pays off</h2>
@@ -29,18 +34,19 @@ function Body() {
         Redux did not become wrong; it became specific. When you need a single
         auditable state tree, time-travel debugging, strict action provenance, or
         a large team that benefits from rigid convention, Redux Toolkit&apos;s
-        structure is an asset. The slice pattern tamed most of the old
-        boilerplate. But every update still flows through an action and a reducer
-        — deliberate by design, which is exactly what you do not want in a 60-Hz
-        token loop.
+        structure is an asset. The slice pattern killed most of the old
+        boilerplate. But every change still moves through action creation and a
+        reducer — deliberate by design. Those extra hops are exactly what you do
+        not want in a 60-Hz token loop.
       </p>
 
       <h2>Zustand — localized, fast, boilerplate-free</h2>
       <p>
-        Zustand collapses the update to a function call against a store. No
-        actions, no reducers, no providers — a hook and a setter. For streaming
-        and for per-component local state, that directness is the whole point:
-        the path from event to render is as short as the language allows.
+        Zustand collapses an update to a function call on a store. No actions, no
+        reducers, no providers — a hook and a setter. For streaming and
+        per-component local state, that directness is the point: subscribe with a
+        selector, update a slice, and only the parts that care re-render. The path
+        from event to paint is as short as the language allows.
       </p>
 
       <Terminal title="store.ts">
@@ -88,7 +94,11 @@ function Body() {
         Redux Toolkit when state is global, audited, and shared across a large
         team that needs the guardrails. Most serious apps run both: Zustand for
         the fast, local, ephemeral surface; a structured store for the durable
-        global core. It is not a war; it is a layering decision.
+        global core. It is not a war; it is a layering decision. In the pattern I
+        call Trinity Architecture, Presentation renders, the orchestrator (often
+        Zustand) owns runtime truth and optimistic updates, and the
+        Data/Serialization Adapter talks to the network or storage — no layer
+        talking past its neighbor.
       </p>
 
       <h2>The edge cases that decide it</h2>
@@ -97,9 +107,9 @@ function Body() {
         second request races the first, an error arrives after partial output.
         Whatever you choose has to make cancellation, partial-state cleanup, and
         race resolution trivial to express — because in AI UIs those are not edge
-        cases, they are Tuesday. Zustand&apos;s minimal surface makes them small;
-        Redux&apos;s structure makes them explicit. Pick the failure mode you
-        would rather debug.
+        cases, they are Tuesday. Zustand&apos;s minimal surface keeps those paths
+        low-latency; Redux&apos;s structure makes the intent explicit. Pick the
+        failure mode you would rather debug.
       </p>
 
       <blockquote>
@@ -111,7 +121,10 @@ function Body() {
       <p>
         Zustand drives the node-graph state in{" "}
         <a href="/#projects">IntegrateX</a>, where high-frequency local updates
-        across a live canvas are the core workload.
+        across a live canvas are the core workload. The Serialization Adapter
+        there stripped non-essential React Flow UI metadata before persistence and
+        cut payloads 94% — a clean win made possible by the Trinity split&apos;s
+        boundaries.
       </p>
     </>
   );

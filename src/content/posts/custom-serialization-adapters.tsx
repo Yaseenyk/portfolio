@@ -5,21 +5,28 @@ function Body() {
   return (
     <>
       <p>
-        Rich UI objects make terrible database records. In IntegrateX — a
-        node-graph automation tool — the thing the user drags around the canvas
-        carries measured geometry, interaction flags, handle definitions, and
-        framework internals. Persist that verbatim and every save writes
-        kilobytes of cache. A custom Serialization Adapter pattern stripped it to
-        the domain essentials and cut payloads by 94%.
+        Rich UI objects are great for rendering and lousy as records. In
+        IntegrateX — a node-graph automation tool — the node you drag around the
+        canvas is packed with measured geometry, hover/selection flags, handle
+        maps, and framework internals. Persist that verbatim and every save ships
+        kilobytes of cached view state, sync gets chatty, and real-time edits run
+        into backpressure. I put a Serialization Adapter at the boundary, kept
+        only the domain fields, and dropped the UI scaffolding. Net: 94% smaller
+        payloads and predictable sync.
       </p>
 
       <h2>Two models, one boundary</h2>
       <p>
-        The naive design conflates two things that should never be the same: the
-        <strong> render model</strong> (what the UI library needs to draw) and
-        the <strong>transport model</strong> (what the database and wire
-        actually require). An adapter translates between them in both directions,
-        and nothing crosses the boundary without passing through it.
+        The naive approach fuses two things that must stay separate: the{" "}
+        <strong>render model</strong> (what the UI needs to draw) and the{" "}
+        <strong>transport model</strong> (what the wire and database require).
+        The adapter translates both ways, and nothing crosses without it. This is
+        the Data / Serialization Adapter in the pattern I call{" "}
+        <em>Trinity Architecture</em>: Presentation renders and dispatches only,
+        a Reactive State / Orchestration layer owns the runtime truth and
+        optimistic updates, and the Adapter shapes lean records for the wire. No
+        layer talks past its neighbor — the UI never formats DB schemas, and the
+        adapter never pokes UI state directly.
       </p>
 
       <Terminal title="adapter.ts">
@@ -39,31 +46,34 @@ export const fromRecord = (r: NodeRecord): FlowNode =>
 
       <h2>Derived, never stored</h2>
       <p>
-        The principle that powers the compression: anything that can be{" "}
-        <em>derived</em> must never be <em>stored</em>. Measured dimensions are
-        derived from layout. Selection is ephemeral. Handle geometry is a
-        function of the node type. Persisting them is persisting a cache — and
-        caches do not belong in your source of truth.
+        The lever behind the compression is simple: anything that can be{" "}
+        <em>derived</em> must not be <em>stored</em>. Dimensions come from
+        layout. Selection is ephemeral. Handle geometry is a function of node
+        type. Persisting them is persisting a cache. In IntegrateX, the
+        orchestrator (Zustand in the middle of my Trinity split) recomputes those
+        bits on load and on change, so the transport stays lean while the UI
+        stays reactive.
       </p>
 
       <h2>The 94%, decomposed</h2>
       <p>
-        The reduction is not a clever codec; it is the sum of removing what was
-        never needed. Drop the measured geometry, the per-node flags, the
-        duplicated handles, and the framework metadata, round coordinates to
-        integers, and a node that serialized to roughly a kilobyte collapses to a
-        few dozen bytes. Across a hundred-node graph, that is the entire
-        performance profile of save, load, and real-time sync.
+        This wasn&apos;t a clever codec; it was subtraction. Drop measured
+        geometry, per-node flags, duplicated handles, and framework metadata.
+        Round coordinates to integers. A node that used to serialize to roughly a
+        kilobyte collapses to a few dozen bytes. Multiply by a hundred-node
+        graph, and you reclaim the budget for save, load, and real-time sync —
+        fewer bytes on the wire, fewer renders, less state-synchronization lag.
       </p>
 
       <blockquote>
-        Most payload-size problems are not compression problems — they are
-        boundary problems. You are shipping the cache because nobody drew the line
-        between the view and the record.
+        Most payload-size problems aren&apos;t compression problems — they&apos;re
+        boundary problems. You&apos;re shipping the cache because nobody enforced
+        the line between the view and the record.
       </blockquote>
 
       <p>
-        For the state-management side of the same project, see{" "}
+        For the state-management side of the same project — optimistic updates,
+        sync ordering, and throttled broadcasts — see{" "}
         <a href="/blog/94-percent-payload-reduction-react-flow">
           Compressing the Wire
         </a>
