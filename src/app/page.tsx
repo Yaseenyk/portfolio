@@ -93,7 +93,7 @@ export default function Home() {
       <Navbar />
 
       <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-24">
-        <main className="pt-20">
+        <main className="pt-16 sm:pt-20">
           <Hero />
 
           {/* Recruiter-first: the vision series headlines read in the first scroll. */}
@@ -101,7 +101,7 @@ export default function Home() {
 
           <Products />
 
-          <section id="rag-concierge" className="py-16">
+          <section id="rag-concierge" className="py-10 sm:py-16">
             <h2 className="text-2xl font-semibold text-zinc-100">
               RAG Terminal Concierge
             </h2>

@@ -6,7 +6,7 @@ export default function Testimonials() {
   if (TESTIMONIALS.length === 0) return null;
 
   return (
-    <section id="testimonials" className="scroll-mt-24 py-24">
+    <section id="testimonials" className="scroll-mt-24 py-14 sm:py-24">
       <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
         ~/signal-from-others
       </h2>

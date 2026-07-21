@@ -113,7 +113,7 @@ export default function WorkflowCanvas() {
   useEffect(() => setMounted(true), []);
 
   const frame =
-    "h-[70vh] min-h-[460px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-ink";
+    "h-[340px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-ink sm:h-[60vh] sm:min-h-[460px]";
 
   if (!mounted) {
     return (

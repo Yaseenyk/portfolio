@@ -65,7 +65,7 @@ export interface LogEntry {
 export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
   const ENTRIES = entries;
   return (
-    <section id="founders-log" className="scroll-mt-24 py-16">
+    <section id="founders-log" className="scroll-mt-24 py-10 sm:py-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">

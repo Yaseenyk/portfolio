@@ -33,7 +33,7 @@ const TINTS = [
 
 export default function ProjectsBento() {
   return (
-    <div className="grid grid-flow-dense grid-cols-2 gap-4 md:grid-cols-4 auto-rows-[11rem]">
+    <div className="grid grid-flow-dense grid-cols-2 gap-4 md:grid-cols-4 auto-rows-[9.5rem] sm:auto-rows-[11rem]">
       {PROJECTS.map((project, i) => {
         const span = SPANS[i % SPANS.length];
         const featured = span.includes("row-span-2");

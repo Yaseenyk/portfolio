@@ -45,7 +45,7 @@ export default function SandboxPage() {
       <Navbar />
 
       <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-24">
-        <main className="pt-28">
+        <main className="pt-24 sm:pt-28">
           <div className="flex items-center gap-3">
             <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
               ~/sandbox
@@ -81,11 +81,11 @@ export default function SandboxPage() {
 
           {/* The hold-to-engage pipeline mini-game (moved here from the
               homepage — it belongs with the other interactive exhibits) */}
-          <div className="mt-24">
+          <div className="mt-14 sm:mt-24">
             <ArchitecturePipeline />
           </div>
 
-          <section className="mt-24" aria-labelledby="lab-heading">
+          <section className="mt-14 sm:mt-24" aria-labelledby="lab-heading">
             <div className="flex items-center gap-3">
               <h2
                 id="lab-heading"
@@ -110,7 +110,7 @@ export default function SandboxPage() {
             </div>
           </section>
 
-          <section className="mt-24" aria-labelledby="obs-heading">
+          <section className="mt-14 sm:mt-24" aria-labelledby="obs-heading">
             <div className="flex items-center gap-3">
               <h2
                 id="obs-heading"
@@ -134,7 +134,7 @@ export default function SandboxPage() {
             </div>
           </section>
 
-          <section className="mt-24" aria-labelledby="guard-heading">
+          <section className="mt-14 sm:mt-24" aria-labelledby="guard-heading">
             <div className="flex items-center gap-3">
               <h2
                 id="guard-heading"
@@ -158,7 +158,7 @@ export default function SandboxPage() {
             </div>
           </section>
 
-          <section className="mt-24" aria-labelledby="vitals-heading">
+          <section className="mt-14 sm:mt-24" aria-labelledby="vitals-heading">
             <div className="flex items-center gap-3">
               <h2
                 id="vitals-heading"

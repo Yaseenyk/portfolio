@@ -293,7 +293,7 @@ function ProjectRow({ project }: { project: Project }) {
           className="absolute inset-0 z-10 cursor-pointer"
         />
       )}
-      <div className="grid grid-cols-1 items-center gap-12 p-8 lg:grid-cols-2 lg:p-12">
+      <div className="grid grid-cols-1 items-center gap-6 p-5 sm:gap-8 sm:p-8 lg:grid-cols-2 lg:p-12">
         {/* Left — content */}
         <div>
           <div className="flex items-center justify-between">
@@ -364,7 +364,7 @@ function ProjectRow({ project }: { project: Project }) {
         </div>
 
         {/* Right — animation */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-zinc-800 bg-ink/40">
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-zinc-800 bg-ink/40 sm:aspect-[4/3]">
           <Animation />
         </div>
       </div>

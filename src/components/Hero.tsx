@@ -27,7 +27,7 @@ const headline: Variants = {
 
 export default function Hero() {
   return (
-    <section className="grid min-h-[80vh] grid-cols-1 items-center gap-12 py-20 md:grid-cols-2 md:gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+    <section className="grid grid-cols-1 items-center gap-8 py-12 sm:gap-12 sm:py-16 md:min-h-[80vh] md:grid-cols-2 md:gap-10 md:py-20 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
       {/* Left: copy */}
       <motion.div variants={container} initial="hidden" animate="show">
         <motion.div variants={item} className="flex flex-wrap items-center gap-2.5">
@@ -101,11 +101,13 @@ export default function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Right: AI core animation */}
+      {/* Right: AI core animation — constrained on mobile so it doesn't
+          dominate the first screen */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
+        className="mx-auto w-full max-w-[260px] sm:max-w-[400px] md:max-w-none"
       >
         <NeuralCore />
       </motion.div>

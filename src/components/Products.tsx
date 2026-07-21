@@ -5,7 +5,7 @@ import { PRODUCTS } from "@/lib/products";
  *  to sell each product, one click to its /products deep-dive. */
 export default function Products() {
   return (
-    <section id="products" aria-label="Products" className="scroll-mt-24 py-16">
+    <section id="products" aria-label="Products" className="scroll-mt-24 py-10 sm:py-16">
       <div className="flex items-center justify-between gap-4">
         <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
           ~/products

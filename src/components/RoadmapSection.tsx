@@ -22,7 +22,7 @@ const TRACKS = [
  *  themselves on their own hub pages. Server component, zero bundle cost. */
 export default function RoadmapSection() {
   return (
-    <section id="roadmap" className="scroll-mt-24 py-16">
+    <section id="roadmap" className="scroll-mt-24 py-10 sm:py-16">
       <div className="rounded-2xl border border-zinc-800/60 bg-zinc-950/60 p-6 backdrop-blur-md sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
