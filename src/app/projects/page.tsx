@@ -66,11 +66,6 @@ export default function ProjectsPage() {
           </div>
 
           <Projects all />
-
-          <footer className="mt-16 border-t border-zinc-800/70 py-10 text-sm text-zinc-500">
-            © {new Date().getFullYear()} Yaseen Khatib — every card above
-            links to something real.
-          </footer>
         </main>
       </div>
     </>

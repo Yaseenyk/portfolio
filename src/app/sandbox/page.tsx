@@ -173,10 +173,6 @@ export default function SandboxPage() {
             </div>
           </section>
         </main>
-
-        <footer className="mt-20 border-t border-zinc-800/70 py-10 text-sm text-zinc-500">
-          © {new Date().getFullYear()} Yaseen Khatib — Architected with Next.js
-        </footer>
       </div>
     </>
   );

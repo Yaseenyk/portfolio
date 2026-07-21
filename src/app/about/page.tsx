@@ -324,12 +324,6 @@ export default function AboutPage() {
             </div>
           </section>
 
-          <footer className="mt-16 border-t border-zinc-800/70 py-10 text-sm text-zinc-500">
-            Machine-readable profile:{" "}
-            <a href="/ai-briefing.json" className="text-ice underline-offset-4 hover:underline">
-              /ai-briefing.json
-            </a>
-          </footer>
         </div>
       </main>
     </>

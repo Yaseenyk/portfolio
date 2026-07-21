@@ -4,6 +4,7 @@ import { SITE_URL, SITE_DESCRIPTION, VERIFICATION } from "@/lib/site";
 import { siteGraphJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import MotionProvider from "@/components/MotionProvider";
+import SiteFooter from "@/components/SiteFooter";
 import CommandPalette from "@/components/CommandPalette";
 import "./globals.css";
 
@@ -100,6 +101,7 @@ export default function RootLayout({
         <JsonLd data={siteGraphJsonLd} />
         <MotionProvider>
           {children}
+          <SiteFooter />
           <CommandPalette />
         </MotionProvider>
         {/* GoatCounter — privacy-friendly, cookieless page analytics.

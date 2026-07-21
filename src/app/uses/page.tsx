@@ -232,13 +232,6 @@ export default function UsesPage() {
           ))}
         </div>
       </main>
-
-      <footer className="mx-auto max-w-4xl border-t border-zinc-800/70 px-6 py-10 text-sm text-zinc-500">
-        <p>
-          © {new Date().getFullYear()} Yaseen Khatib — Architected with Next.js
-          &amp; Framer Motion, delivered at AI-speed.
-        </p>
-      </footer>
     </>
   );
 }

@@ -198,9 +198,6 @@ export default function InterviewPage() {
             </div>
           </section>
 
-          <footer className="mt-16 border-t border-zinc-800/70 py-10 text-sm text-zinc-500">
-            © {new Date().getFullYear()} Yaseen Khatib — Architected with Next.js
-          </footer>
         </main>
       </div>
     </>
