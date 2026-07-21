@@ -5,43 +5,22 @@ function Body() {
   return (
     <>
       <p>
-        For fifteen years, the unit of engineering throughput was the team. You
-        wanted to ship faster, you hired. More endpoints, more backend
-        engineers; more screens, more frontend engineers. That equation just
-        broke. The constraint was never the number of hands on keyboards — it
-        was the time it took to translate a clear architectural intent into
-        working code across three layers of the stack. AI has collapsed that
-        translation cost to near zero.
+        For most of my career, throughput was something you bought with headcount. More endpoints, add backend engineers; more screens, add frontend engineers. That model just snapped. The limiter was never hands on keyboards — it was the latency between clear architectural intent and working code spread across three layers. AI has crushed that translation latency to near zero.
       </p>
 
       <h2>The bottleneck was never typing</h2>
       <p>
-        Walk the timeline of a traditional MERN feature. A lead designs the data
-        model. A backend engineer writes the Mongoose schema, the controller,
-        the validation, the route. A second engineer writes the service layer.
-        A frontend engineer builds the form, the fetch hook, the optimistic
-        update, the error states. Somewhere a fourth person writes the tests.
-        Strip out the meetings and the merge conflicts and you find the
-        uncomfortable truth: roughly 80% of that work was{" "}
-        <strong>mechanical translation</strong>, not decision-making. It was a
-        known architecture being typed out, slowly, by humans who already knew
-        exactly what they wanted.
+        Walk the timeline of a standard MERN feature. A lead sketches the data model. Backend builds the Mongoose schema, controller, validation, routes. Another engineer wires the service layer. Frontend ships the form, the fetch hook, the optimistic update, the error states. Someone else writes tests. Strip the meetings and merge conflicts and you see the uncomfortable truth: roughly 80% of that work was{" "}
+        <strong>mechanical translation</strong>, not decisions. We already knew what to build; we were slowly re-encoding a known architecture into code.
       </p>
       <p>
-        That 80% is what AI now absorbs. Not the thinking — the typing,
-        scaffolding, wiring, and the thousand small consistency decisions that
-        eat a sprint alive.
+        That 80% is what AI now absorbs. Not the thinking — the scaffolding, wiring, and the thousand tiny consistency choices that quietly turn a week into a sprint.
       </p>
 
       <h2>From writing code to directing flow</h2>
       <p>
         The discipline that replaces manual coding is{" "}
-        <strong>AI Orchestration</strong>: you define the contract once — the
-        canonical shape of the data and the boundaries it must respect — and
-        direct an agent to materialize it through every layer. You stop writing
-        the database record, the endpoint, and the React hook as three separate
-        artifacts. You declare the contract, and the layers are generated to
-        satisfy it.
+        <strong>AI Orchestration</strong>: declare a single contract — the canonical data shape and its boundaries — and direct an agent to materialize it through every layer. Stop writing the database record, the endpoint, and the React hook as three separate artifacts. Declare the contract; generate the layers to satisfy it. I keep this inside the pattern I call Trinity Architecture: Presentation renders and dispatches only; Reactive State / Orchestration holds the runtime truth and coordinates events; the Data / Serialization Adapter shapes rich in-memory state into lean, durable payloads. No layer talks past its neighbor.
       </p>
 
       <Terminal title="orchestrate.ts">
@@ -83,90 +62,54 @@ function Body() {
       </Terminal>
 
       <p>
-        This is not autocomplete. Autocomplete guesses the next token inside a
-        file you are already writing. Orchestration operates a layer up: it
-        treats the contract as the specification and the codebase as the build
-        target. Your leverage is no longer how fast you type — it is how
-        precisely you can specify.
+        This is not autocomplete. Autocomplete predicts the next token in a file you&apos;re already writing. Orchestration operates a layer up: the contract is the spec and the codebase is the build target. Your leverage stops being WPM and starts being how precisely you specify.
       </p>
 
       <h3>The orchestration loop</h3>
       <p>
-        Every productive AI build runs the same loop: declare the contract,
-        generate a layer, verify it against the contract, integrate, repeat. The
-        engineer&apos;s attention sits entirely on the seams — the points where
-        one layer hands data to the next. Get the seams right and the interiors
-        are commodity. Get them wrong and no amount of generated code will save
-        you.
+        Every productive AI build runs the same loop: declare the contract, generate a layer, verify it against the contract, integrate, repeat. The engineer&apos;s attention sits entirely on the seams — where one layer hands data to the next. Get the seams right and the interiors are commodity. Miss a seam and you get schema drift, broken optimistic updates, cache churn, and render thrash no amount of generated code can hide.
       </p>
 
       <h2>The only bottleneck left: data-flow comprehension</h2>
       <p>
-        There is exactly one thing AI cannot do for you, and it is the thing
-        that has always mattered most: decide how data should move through your
-        system. The shape of the records, the boundaries between services, the
-        contracts that cross them, the indexes that make the queries cheap —
-        these are architectural decisions, and they remain stubbornly,
-        permanently human. Whoever holds the clearest mental model of the
-        data&apos;s journey from{" "}
+        There is exactly one thing AI cannot do for you, and it has always mattered most: decide how data should move through your system. The shape of the records, the boundaries between services, the contracts that cross them, the indexes that make the queries cheap — these are architectural decisions, and they remain stubbornly, permanently human. Whoever holds the clearest mental model of the data&apos;s journey from{" "}
         <span className="font-mono text-ice">
           Database → Backend → Frontend
         </span>{" "}
-        is now the entire critical path.
+        is now the entire critical path. On IntegrateX — a React Flow workflow canvas with real-time node execution and Zustand state — the hard problems were all flow and serialization. A Serialization Adapter stripped canvas-only UI metadata before persistence and cut payload sizes 94%, which in turn fixed state-sync lag during bursts. The adapter never touched UI state; it only spoke through the orchestrator. That boundary discipline is what kept real-time stable.
       </p>
 
       <blockquote>
-        The era of bloated engineering teams is over. An AI-specialized
-        architect can execute the work of a 10-person squad — because the work
-        that remains is comprehension, and comprehension does not parallelize
-        across a team without enormous coordination cost.
+        The era of bloated engineering teams is over. An AI-specialized architect can execute the output of a 10-person squad because the work that remains is comprehension, and comprehension does not parallelize without heavy coordination cost.
       </blockquote>
 
       <h2>What the 10x architect actually does</h2>
       <ul>
         <li>
-          <strong>Owns the data contract</strong> — one authoritative schema
-          that every layer is generated to satisfy, eliminating the drift that
-          normally accrues between DB, API, and UI.
+          <strong>Owns the data contract</strong> — one authoritative schema that every layer is generated to satisfy, eliminating drift between DB, API, and UI, and enforcing my Trinity split so the UI never formats DB shapes and the adapter never reaches into state.
         </li>
         <li>
-          <strong>Designs the boundaries</strong> — what is a service, what is a
-          module, where validation lives, and which seams are allowed to change.
+          <strong>Designs the boundaries</strong> — service and module cuts, where validation lives, which seams are stable versus allowed to change, and how events move across them.
         </li>
         <li>
-          <strong>Reviews AI output adversarially</strong> — not reading for
-          style, but probing for the failure modes a model will not surface on
-          its own: security, edge cases, and silent correctness bugs.
+          <strong>Reviews AI output adversarially</strong> — not for style, but for the failure modes models won&apos;t surface: auth and tenancy, idempotency, pagination limits, streaming and backpressure, edge-case correctness and silent data loss.
         </li>
         <li>
-          <strong>Treats prompts as architecture specs</strong> — versioned,
-          precise, and scoped, because an ambiguous prompt is just an ambiguous
-          requirement with a faster turnaround.
+          <strong>Treats prompts as architecture specs</strong> — versioned, precise, and scoped; an ambiguous prompt is just an ambiguous requirement with faster failure.
         </li>
       </ul>
 
       <h2>The economic reality</h2>
       <p>
-        A ten-person squad does not deliver ten units of work. It delivers maybe
-        five, after you pay the tax: standups, handoffs, context-reconstruction,
-        merge conflicts, and the inevitable mismatch between the schema one
-        person imagined and the one another implemented. A single architect
-        directing AI pays none of that tax. There are no handoffs because there
-        is one context. There is no schema drift because there is one contract.
-        The output is not incrementally faster — it is structurally different.
+        A ten-person squad does not deliver ten units of work. It delivers maybe five after the tax: standups, handoffs, context rebuilds, merge conflicts, and the mismatch between the schema one person imagined and the one another implemented. A single architect directing AI pays none of that tax. There are no handoffs because there is one context. There is no schema drift because there is one contract. The output isn&apos;t incrementally faster — it&apos;s structurally different.
       </p>
       <p>
-        This is why the staffing question for greenfield product work is
-        changing from <em>how many engineers</em> to{" "}
-        <em>how clear is the architecture</em>. Velocity now scales with
-        architectural clarity, not headcount — and that is a far cheaper thing
-        to buy.
+        This is why the staffing question for greenfield product work is changing from <em>how many engineers</em> to{" "}
+        <em>how clear is the architecture</em>. Velocity now scales with architectural clarity, not headcount — and that is far cheaper to buy.
       </p>
       <p>
         If you want to see what this looks like shipped, the{" "}
-        <a href="/#projects">project breakdowns</a> walk through production
-        systems — agentic RAG pipelines, real-time admin portals, a Rust desktop
-        cockpit — each built and taken to production this way.
+        <a href="/#projects">project breakdowns</a> walk through production systems — agentic RAG pipelines, real-time admin portals, a Rust desktop cockpit — each built and taken to production this way.
       </p>
     </>
   );

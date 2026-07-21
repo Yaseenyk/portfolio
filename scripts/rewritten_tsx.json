@@ -27,6 +27,14 @@
   "json-structured-outputs-type-safe-zod": true,
   "latency-first-ai-serverless-hono": true,
   "llm-observability-opentelemetry-tracing": true,
+  "payload-compression-serialization-patterns": true,
   "react-flow-agent-orchestration-canvas": true,
-  "state-management-ai-era-zustand-vs-redux": true
+  "real-time-telemetry-websockets-react": true,
+  "redux-toolkit-architectures": true,
+  "role-based-access-control-patterns": true,
+  "state-management-ai-era-zustand-vs-redux": true,
+  "the-10x-reality": true,
+  "type-safe-llms-typescript-express": true,
+  "typescript-migration-playbook": true,
+  "websocket-telemetry-at-scale": true
 }

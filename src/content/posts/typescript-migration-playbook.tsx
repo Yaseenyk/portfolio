@@ -5,21 +5,12 @@ function Body() {
   return (
     <>
       <p>
-        The instinct when migrating a large JavaScript codebase to TypeScript is
-        to stop the world and rewrite. That instinct kills migrations. The
-        successful playbook is incremental: ship types alongside features, tighten
-        strictness in stages, and never let the codebase be un-runnable for more
-        than a commit. Done this way, a sprawling legacy app becomes type-safe
-        without a single feature freeze.
+        Say &quot;we&apos;re moving to TypeScript&quot; and someone suggests a freeze and a big‑bang rewrite. That&apos;s how migrations die. On IntegrateX and streamerOS, real-time flows couldn&apos;t pause — frames would drop, operators would lose trust. What worked was incremental: ship types with features, ratchet strictness in stages, and never leave main un-runnable past a single commit. Do that and even a sprawling legacy app turns type-safe without a feature freeze.
       </p>
 
       <h2>Allow JS, then advance the front</h2>
       <p>
-        Turn on <code>allowJs</code> and rename files to <code>.ts</code> one
-        module at a time, starting at the leaves — shared utilities and types —
-        and working inward toward the application core. Each renamed file gets
-        types; everything still importing it keeps working. The migration front
-        advances continuously instead of arriving all at once.
+        Flip <code>allowJs</code> on and rename files to <code>.ts</code> one leaf at a time — utilities, shared types, pure functions — then move inward toward the core. Each renamed file gets types and tests; everything that imports it still runs. The typed front moves every PR instead of landing in one risky blast, which kept IntegrateX’s canvas and real-time execution online while we migrated the edges first.
       </p>
 
       <Terminal title="tsconfig.json">
@@ -37,10 +28,10 @@ function Body() {
 
       <h2>Ratchet strictness, never loosen</h2>
       <p>
-        Strictness is a ratchet: each flag you enable stays enabled. Start with{" "}
+        Treat strictness like a ratchet: once a flag is on, it never turns off. Start with{" "}
         <code>noImplicitAny</code>, fix the fallout, commit. Then{" "}
-        <code>strictNullChecks</code> — usually the highest-value flag, because it
-        catches the entire class of null/undefined bugs that plague legacy JS.
+        <code>strictNullChecks</code> — usually the highest‑value flag because it
+        catches the whole class of null/undefined landmines that plague legacy JS and React props.
         Add the rest of <code>strict</code> incrementally. Each step is a finite,
         reviewable diff rather than an unbounded rewrite.
       </p>
@@ -49,20 +40,18 @@ function Body() {
       <p>
         You will need escape hatches at the boundaries of untyped third-party code
         — that is fine, as long as <code>any</code> is contained, named, and
-        tracked, not scattered. A single typed boundary that validates and casts
-        external data keeps the untyped world from leaking into your core. The
+        tracked, not scattered. One typed boundary that validates and casts
+        external data keeps the mess from leaking inward. In the pattern I call Trinity Architecture, that boundary lives in the Data / Serialization Adapter and never mutates UI state directly — it only talks through the orchestrator. The
         goal is not zero <code>any</code> on day one; it is no <em>silent</em>{" "}
         <code>any</code> in the parts you control.
       </p>
 
       <blockquote>
-        A TypeScript migration that requires a feature freeze will be cancelled
-        the first time the business needs to ship. The only migration that
-        finishes is the one nobody has to stop for.
+        A migration that asks for a feature freeze gets killed the first time product needs to ship. The one that finishes is the one nobody has to stop for.
       </blockquote>
 
       <p>
-        Strict types matter most at the AI boundary — see{" "}
+        Type safety pays the biggest dividends at the AI boundary — see{" "}
         <a href="/blog/type-safe-llms-strict-schemas-typescript-express">
           Type-Safe LLMs
         </a>

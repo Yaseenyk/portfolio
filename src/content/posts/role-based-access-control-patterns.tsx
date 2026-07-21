@@ -6,10 +6,11 @@ function Body() {
     <>
       <p>
         Authorization bugs are the most expensive bugs, because they do not crash
-        — they quietly let the wrong person do the right thing. The only reliable
-        place to enforce access control in a Node.js API is the middleware layer,
-        before a request ever reaches business logic. Scatter permission checks
-        through controllers and you guarantee that one route, someday, forgets.
+        — they quietly let the wrong person do the right thing. After enough code
+        reviews and postmortems, I only trust the middleware layer to enforce it:
+        the request is vetted at the edge, before business logic runs. Scatter checks
+        across controllers and one refactor, one &quot;temporary&quot; route, will
+        skip the guard and ship a hole.
       </p>
 
       <h2>Authentication is not authorization</h2>
@@ -19,7 +20,10 @@ function Body() {
         first; they should also carry the claims — roles, permissions — that
         answer the second. The middleware verifies the token, trusts the signed
         claims, and decides access from them, without a database round-trip on
-        every request.
+        every request. In the pattern I call Trinity Architecture, the UI never
+        owns policy; the orchestration layer hydrates auth state; and the adapter
+        shapes tokens and payloads — strict boundaries keep permission logic at
+        the API edge where it cannot drift.
       </p>
 
       <Terminal title="rbac.ts">
@@ -44,7 +48,9 @@ router.delete("/cases/:id", requirePermission("cases:delete"), handler);`}
         <em>permissions</em> (<code>cases:delete</code>,{" "}
         <code>reports:export</code>) instead, and let roles be named sets of
         permissions defined in one place. When the policy changes, you edit the
-        role definition — not a hundred route guards.
+        role definition — not a hundred route guards. That&apos;s how we kept
+        handlers boring on IntegrateX while the policy matrix evolved without
+        churn or regressions.
       </p>
 
       <h2>Default deny</h2>
@@ -53,7 +59,9 @@ router.delete("/cases/:id", requirePermission("cases:delete"), handler);`}
         guard explicitly allows it. A new endpoint shipped without a permission
         check should fail closed, not fall through to open. That single
         invariant — nothing is public until someone says so — is what turns
-        access control from a hopeful convention into a guarantee.
+        access control from a hopeful convention into a guarantee. It kept the
+        streamerOS surface fast and safe under real-time load, and it&apos;s the
+        same habit I bring to SANKALP and every client API.
       </p>
 
       <blockquote>

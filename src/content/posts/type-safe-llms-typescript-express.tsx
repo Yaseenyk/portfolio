@@ -5,30 +5,31 @@ function Body() {
   return (
     <>
       <p>
-        An LLM is a probabilistic text generator that will, eventually, hand you
-        a malformed object, an invented field, or prose where you asked for JSON.
-        Your backend is a deterministic system that must never crash on it. The
-        entire discipline of production AI engineering lives in that gap: treat
-        every model response as untrusted input and validate it at the boundary,
-        exactly as you would a request from the open internet.
+        An LLM is a probabilistic text generator that will, on some random
+        Tuesday, hand you a malformed object, invent a field, or answer in prose
+        when you asked for JSON. Your backend is a deterministic system that
+        cannot crash because a sampler got creative. Production AI engineering
+        lives in that gap: treat model output like traffic from the open
+        internet and validate it at the boundary.
       </p>
 
       <h2>Treat the LLM as an untrusted input boundary</h2>
       <p>
-        You already validate user input before it touches your database. A model
-        response deserves the same suspicion — more, because it is plausible
-        enough to slip past a careless code path and corrupt state three layers
-        deep. The rule is simple: no LLM output enters your application logic
-        until it has passed a schema.
+        You already gate user input before it gets anywhere near storage. A
+        model deserves even more suspicion — it&apos;s plausible enough to slip
+        past a careless path and poison state three layers deep. In the pattern
+        I call Trinity Architecture, the model sits outside the Data /
+        Serialization Adapter; nothing reaches the orchestrator or UI until it
+        clears a schema at that adapter boundary.
       </p>
 
       <h2>Structured output, then validate anyway</h2>
       <p>
-        Ask the model for structured output and give it the schema — but never
-        assume it complied. Parse every response through a runtime validator
-        (zod is the standard) that doubles as your TypeScript type. If it fails,
-        you retry with the validation error fed back in, or you fail the request
-        loudly. What you never do is pass an unvalidated blob downstream.
+        Ask for structured output and show the schema — then assume it&apos;s
+        wrong. Run every response through a runtime validator (zod is the usual
+        choice) that also gives you strong TypeScript types. If it fails,
+        retry with the validation error as feedback, or fail fast. What you
+        never do is let an unvalidated blob descend into application logic.
       </p>
 
       <Terminal title="validate.ts">
@@ -88,43 +89,45 @@ function Body() {
 
       <h3>Push validation into Express middleware</h3>
       <p>
-        Do not scatter parsing through your controllers. A small middleware that
-        runs the schema, attaches the typed result to the request, and short
-        circuits on failure keeps every AI-backed route uniform: the controller
-        only ever sees data that already matched its contract. The same layer is
-        where input validation and sanitization belong, so a request is clean
-        before it reaches business logic in either direction.
+        Don&apos;t scatter parsing across controllers. Write a thin middleware
+        that runs the schema, attaches the typed result to the request, and
+        short-circuits on failure. Controllers stay boring and only see
+        contract-valid data. The same edge layer handles sanitization and size
+        limits so business logic receives clean inputs in both directions. That
+        muscle memory came from streamerOS — under backpressure and 60fps
+        targets, centralizing the heavy checks at the boundary kept everything
+        predictable.
       </p>
 
       <h2>Rate-limiting and defensive middleware</h2>
       <p>
-        AI endpoints are expensive and abusable, which makes rate-limiting a
-        correctness concern, not just a cost one. A per-identity limiter in front
-        of the model — plus payload-size caps and strict request validation —
-        is what kept the Hospital-API stable under load and cut a meaningful slice
-        of server response time by rejecting bad traffic before it ever reached
-        the work.
+        AI endpoints are expensive and abusable, so rate-limiting is
+        correctness, not just cost control. Put a per-identity limiter ahead of
+        the model, cap payload size, and keep request validation strict. That
+        combination kept the Hospital-API stable under load and shaved real
+        response time by rejecting bad traffic before it touched the hot path.
       </p>
 
       <h2>Fail loud, never silent</h2>
       <p>
-        The worst outcome is not an error — it is a malformed response that looks
-        fine and quietly writes garbage to your database. Schema validation turns
-        that silent corruption into a visible, catchable failure. A crash you can
-        see is a bug you can fix; a hallucination you persisted is an incident
-        you discover weeks later.
+        The worst case isn&apos;t an error — it&apos;s a plausible response that
+        quietly writes garbage. Schema checks flip silent corruption into a loud
+        failure with context. A visible crash is a ticket you can close; a
+        hallucination you persist is an incident you chase weeks later.
       </p>
 
       <blockquote>
-        The model is allowed to be wrong. Your backend is not allowed to believe
-        it without proof. The schema is the proof.
+        The model can be wrong. Your backend can&apos;t take it on faith. The
+        schema is the proof.
       </blockquote>
 
       <p>
         This validation discipline underpins the{" "}
         <a href="/#projects">Police RAG Agent</a> and{" "}
         <a href="/#projects">Hospital-API</a> — typed outputs, hardened
-        middleware, and zero tolerance for unvalidated model data.
+        middleware, and a strict Trinity split: presentation only renders,
+        orchestration handles retries, and the adapter validates and shapes the
+        payload. Zero tolerance for unvalidated model data.
       </p>
     </>
   );

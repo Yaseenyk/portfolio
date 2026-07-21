@@ -54,36 +54,33 @@ function Body() {
   return (
     <>
       <p>
-        We cut a React Flow agent-graph payload by 94% without losing a single node,
-        edge, or coordinate. The trick wasn&apos;t reaching for gzip — it was
-        designing a serialization format around what the data actually <em>is</em>:
-        a structure with a known schema, not a bag of prose. When you stop sending
-        generic JSON and start sending the structure, most of the bytes turn out to
-        be redundant.
+        On IntegrateX&apos;s React Flow automation canvas, we cut the agent-graph payload by 94% without losing a node,
+        edge, or coordinate. The win wasn&apos;t gzip — it was a Serialization Adapter, the bridge in the pattern I call
+        Trinity Architecture, shaped around what the data actually <em>is</em>: a known schema, not prose. Once you stop
+        shipping generic JSON and serialize the structure, the redundant bytes evaporate.
       </p>
 
       <h2>Generic JSON pays for the same keys over and over</h2>
       <p>
         A graph of 400 nodes serialized as idiomatic JSON repeats the strings{" "}
         <code>&quot;position&quot;</code>, <code>&quot;data&quot;</code>,{" "}
-        <code>&quot;type&quot;</code>, <code>&quot;sourceHandle&quot;</code> four
-        hundred times. It ships default values that never changed. It encodes
-        absolute coordinates that mostly differ from their neighbours by a few
-        pixels. Every one of those is a byte you&apos;re paying to transmit, parse,
-        and re-transmit — and none of them carry information.
+        <code>&quot;type&quot;</code>, <code>&quot;sourceHandle&quot;</code> four hundred times. It ships default values
+        that never changed. It encodes absolute coordinates that mostly differ from their neighbours by a few pixels.
+        Every one of those is a byte you&apos;re paying to transmit, parse, and re-transmit — and none of them carry
+        information. Multiply that by WebSocket hops, JSON.parse cost, diffing, and render churn, and you&apos;re burning
+        budget for zero signal.
       </p>
 
       <CompressionDiagram />
 
       <h2>Design the format around the data, not the other way around</h2>
       <p>
-        The reduction came from three schema-aware moves, each lossless. Dedupe the
-        keys: the schema is known, so field names live in one header, not on every
-        record. Drop the defaults: if a node&apos;s type is the common case, omit it
-        and reconstruct on read. Delta-encode the positions: store each coordinate
-        as an offset from the last, so a tidy layout compresses to near-nothing.
-        gzip on top of <em>that</em> is gravy; gzip on top of verbose JSON is
-        lipstick.
+        The reduction came from three schema-aware moves, each lossless. Dedupe the keys: the schema is known, so field
+        names live in one header, not on every record. Drop the defaults: if a node&apos;s type is the common case, omit it
+        and reconstruct on read. Delta-encode the positions: store each coordinate as an offset from the last, so a tidy
+        layout compresses to near-nothing. In my Trinity split, the Serialization Adapter does that work and hands the
+        orchestrator lean buffers; the UI stays declarative and dumb by design. gzip on top of <em>that</em> is gravy; gzip
+        on top of verbose JSON is lipstick.
       </p>
 
       <Terminal title="serialize.ts">
@@ -98,26 +95,25 @@ function Body() {
 
       <h2>Payload is a budget — measure it like latency</h2>
       <p>
-        The reason this is worth doing isn&apos;t bytes for their own sake. Payload
-        size is a budget that buys you faster loads, cheaper bandwidth, and smaller
-        diffs over the wire on every interaction. Teams instrument latency
-        obsessively and never look at payload — yet on a real-time canvas, the
-        payload <em>is</em> the latency. Treat it as a first-class metric and the
-        94% is just what falls out of taking it seriously.
+        The reason this is worth doing isn&apos;t bytes for their own sake. Payload size is a budget that buys you faster
+        loads, cheaper bandwidth, and smaller diffs over the wire on every interaction. On a real-time canvas with live
+        node execution, the payload <em>is</em> the latency and it drives backpressure. On IntegrateX (and on streamerOS
+        under 60fps constraints), tracking payload beside FPS and RTT kept the socket steady, reconciliation snappy, and
+        render thrash down. Treat it as a first-class metric and the 94% is just what falls out of taking it seriously.
       </p>
 
       <blockquote>
-        Compression isn&apos;t something you bolt on at the end. The biggest wins
-        come from encoding the data as what it is — structure with a schema — long
-        before gzip ever sees it.
+        Compression isn&apos;t a bolt-on. The biggest wins come from encoding the data as what it is — structure with a
+        schema — long before gzip ever sees it.
       </blockquote>
 
       <p>
         A small payload is half of feeling{" "}
-        <a href="/blog/latency-first-ai-serverless-hono">instant</a>; the other half
-        is streaming. This pattern grew out of the{" "}
-        <a href="/blog/react-flow-agent-orchestration-canvas">agent orchestration canvas</a>.
-        Continue on the <a href="/roadmap">roadmap</a>.
+        <a href="/blog/latency-first-ai-serverless-hono">instant</a>; the other half is streaming. This pattern grew out
+        of the{" "}
+        <a href="/blog/react-flow-agent-orchestration-canvas">agent orchestration canvas</a> and fits cleanly in my
+        Trinity Architecture boundary: presentation renders, orchestration decides, the adapter serializes. Continue on
+        the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
