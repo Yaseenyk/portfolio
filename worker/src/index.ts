@@ -268,42 +268,55 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     const siteDigest = companyUrl ? await fetchSiteDigest(companyUrl) : "";
 
     const system =
-      "You are Yaseen Khatib writing a short, sharp, human email applying for " +
-      "work (a job or a project) to a prospective employer or client. Write in " +
-      "first person as Yaseen. No corporate fluff, no \"I hope this email finds " +
-      "you well\", no em-dash chains, no exclamation marks, at most one question. " +
-      "Sound like a senior engineer: confident, specific, not boastful. " +
-      "Return ONLY a JSON object with two string keys: \"subject\" and \"body\".";
+      "You are Yaseen Khatib, a senior full-stack + AI engineer, writing a " +
+      "concise application email to a hiring manager or founder. Your ONE goal: " +
+      "make a busy, skeptical reader think \"I want to talk to this person.\" " +
+      "Write with quiet confidence and concrete specifics — a real senior " +
+      "engineer, not a job-seeker reciting a resume. Every sentence must earn " +
+      "its place. Return ONLY a JSON object with string keys \"subject\" and \"body\".";
 
-    const linksInstruction =
-      "End the body with a short line \"A few links:\" then these on their own " +
-      "lines, keeping the full URLs exactly (they must stay clickable):\n" + LINKS;
+    const rules =
+      "WHAT MAKES THIS EMAIL WORK:\n" +
+      "- After the greeting, the FIRST line must show you understand their " +
+      "specific product, problem, or role — never \"your focus aligns with my " +
+      "experience\" or any variant.\n" +
+      "- State achievements as PLAIN OUTCOMES a non-engineer instantly gets, not " +
+      "jargon. Bad: \"achieved a 94% serialization result\". Good: \"built a " +
+      "serialization layer that cut a workflow app's save payloads by 94%, so " +
+      "saving felt instant.\" Explain the win, don't name-drop the metric.\n" +
+      "- Pick only the 1-2 MOST relevant proofs and tell them well; do not " +
+      "list-dump everything. Real proofs to draw from: shipped 5 production " +
+      "products solo in a year; took a client's LMS (Path Saathi) from a Monday " +
+      "brief to a live platform the next day; built a React Flow workflow engine " +
+      "(IntegrateX) whose serialization layer cut payloads 94%; a local-first AI " +
+      "finance agent (Sable).\n" +
+      "- Include ONE memorable differentiator, stated with confidence: they can " +
+      "add my portfolio to Claude as an MCP connector and literally interview it " +
+      "inside their own AI — almost no candidate can offer that.\n" +
+      "- Confident, warm, human. Short: 110-160 words in the body.\n" +
+      "- BANNED phrases (never use): \"I hope this email finds you well\", " +
+      "\"aligns perfectly\", \"successfully shipped\", \"demonstrating my ability\", " +
+      "\"I'd appreciate the opportunity\", \"under tight deadlines\", \"passionate\", " +
+      "\"leverage\", \"synergy\", \"fast-paced\". No exclamation marks, no em-dash " +
+      "chains, at most one question.\n";
 
     const user =
       OUTREACH_FACTS +
       "\n\n" +
       (jd
-        ? `TARGET ROLE / JOB DESCRIPTION — tailor the whole email to this, mapping my relevant strengths to what they need:\n${jd}\n\n`
+        ? `TARGET ROLE / JOB DESCRIPTION — tailor the whole email to it, mapping my strongest relevant proof to what they actually need:\n${jd}\n\n`
         : "") +
       (company ? `Prospect company: ${company}\n` : "") +
       (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
-      "\nRequirements:\n" +
-      "- \"subject\": a professional application-style subject line a hiring " +
-      "manager would open — include the role and my name, e.g. " +
-      "\"Full-Stack + AI Engineer — Yaseen Khatib\" or, if the JD names a role, " +
-      "\"Application: <that role> — Yaseen Khatib\". NOT a vague marketing phrase.\n" +
-      "- \"body\": 110-170 words. Start with a greeting — " +
+      "\n" + rules +
+      "\nSTRUCTURE:\n" +
+      "- \"subject\": an application subject a hiring manager opens — the role + " +
+      "my name, e.g. \"Application: <role from the JD> — Yaseen Khatib\". Specific, not a marketing phrase.\n" +
+      "- \"body\": greeting on line 1 (" +
       (company ? `\"Hi ${company} team,\"` : "\"Hello,\"") +
-      " on its own line, then a blank line.\n" +
-      "- First sentence: one specific line" +
-      (siteDigest || company ? " about their company or the role" : "") +
-      ", not a template opener.\n" +
-      (jd
-        ? "- Map 1-2 of my real strengths to the role's needs, citing the single best-fit proof (1-day Path Saathi delivery, 94% IntegrateX serialization result, or 5 products shipped solo).\n"
-        : "- Cite ONE best-fit proof point (1-day Path Saathi delivery, 94% IntegrateX result, or 5 solo products).\n") +
-      "- A low-friction ask (a quick call, or reply if useful).\n" +
-      "- " + linksInstruction + "\n" +
-      "- Sign off on its own line as \"Yaseen\".";
+      "), blank line, then the email, then a confident low-friction ask, then a " +
+      "line \"A few links:\" followed by these on their own lines with full URLs " +
+      "kept intact:\n" + LINKS + "\nthen a blank line and \"Yaseen\" as the sign-off.";
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -312,7 +325,7 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: env.OUTREACH_MODEL || "gpt-4o-mini",
+        model: env.OUTREACH_MODEL || "gpt-4o",
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
