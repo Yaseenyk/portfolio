@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { getAllPosts } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
-import { getTagIndex } from "@/lib/tags";
 import { PRODUCTS } from "@/lib/products";
 
 export const dynamic = "force-static";
@@ -96,11 +95,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     ...postEntries,
-    ...[...getTagIndex().keys()].map((tag) => ({
-      url: `${SITE_URL}/blog/tag/${tag}/`,
-      lastModified: lastBlogUpdate,
-      changeFrequency: "weekly" as const,
-      priority: 0.5,
-    })),
+    // Tag archive pages are intentionally excluded — they're noindex, so
+    // listing them here would only dilute crawl budget on a young domain.
   ];
 }

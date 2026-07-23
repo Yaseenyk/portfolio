@@ -23,6 +23,9 @@ export function generateMetadata({ params }: PageProps): Metadata {
     title: `${entry.label} — Articles`,
     description,
     alternates: { canonical: url },
+    // Thin archive pages: keep them as navigation (crawlable, links followed)
+    // but out of the index so they don't drain crawl budget from real posts.
+    robots: { index: false, follow: true },
     openGraph: {
       type: "website",
       title: `${entry.label} — Articles | Yaseen Khatib`,
