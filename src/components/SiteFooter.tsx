@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PERSON, SOCIALS } from "@/lib/site";
+import PreferredSource from "@/components/PreferredSource";
 
 const COLUMNS: { heading: string; links: { href: string; label: string; external?: boolean }[] }[] = [
   {
@@ -60,6 +61,15 @@ export default function SiteFooter() {
   return (
     <footer className="relative z-10 mt-24 border-t border-zinc-800/60 bg-ink/60 backdrop-blur-md">
       <div className="mx-auto w-full max-w-[1400px] px-6 py-12 md:px-12 lg:px-24">
+        {/* Google Preferred Sources opt-in — surfaces new posts to readers
+            who choose me. */}
+        <div className="mb-10 flex flex-col items-start gap-2 border-b border-zinc-800/60 pb-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-zinc-400">
+            Want my latest posts first in Google Search?
+          </p>
+          <PreferredSource />
+        </div>
+
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {COLUMNS.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
