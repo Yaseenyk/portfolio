@@ -268,35 +268,42 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     const siteDigest = companyUrl ? await fetchSiteDigest(companyUrl) : "";
 
     const system =
-      "You are Yaseen Khatib writing a short, sharp, human cold-outreach email " +
-      "to a prospective employer or client. Write in first person as Yaseen. " +
-      "No corporate fluff, no \"I hope this email finds you well\", no em-dash " +
-      "chains, no exclamation marks, at most one question. 110-160 words in the " +
-      "body. Sound like a senior engineer, confident but not boastful.";
+      "You are Yaseen Khatib writing a short, sharp, human email applying for " +
+      "work (a job or a project) to a prospective employer or client. Write in " +
+      "first person as Yaseen. No corporate fluff, no \"I hope this email finds " +
+      "you well\", no em-dash chains, no exclamation marks, at most one question. " +
+      "Sound like a senior engineer: confident, specific, not boastful. " +
+      "Return ONLY a JSON object with two string keys: \"subject\" and \"body\".";
+
+    const linksInstruction =
+      "End the body with a short line \"A few links:\" then these on their own " +
+      "lines, keeping the full URLs exactly (they must stay clickable):\n" + LINKS;
 
     const user =
       OUTREACH_FACTS +
       "\n\n" +
       (jd
-        ? `TARGET ROLE / JOB DESCRIPTION the prospect posted — tailor the email to it, matching my relevant strengths to their needs:\n${jd}\n\n`
+        ? `TARGET ROLE / JOB DESCRIPTION — tailor the whole email to this, mapping my relevant strengths to what they need:\n${jd}\n\n`
         : "") +
       (company ? `Prospect company: ${company}\n` : "") +
       (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
-      "\nWrite the email so it:\n" +
-      "- Opens with ONE specific line" +
-      (siteDigest || company ? " about their company/role" : " (a strong, non-generic hook)") +
-      ", not a template greeting.\n" +
+      "\nRequirements:\n" +
+      "- \"subject\": a professional application-style subject line a hiring " +
+      "manager would open — include the role and my name, e.g. " +
+      "\"Full-Stack + AI Engineer — Yaseen Khatib\" or, if the JD names a role, " +
+      "\"Application: <that role> — Yaseen Khatib\". NOT a vague marketing phrase.\n" +
+      "- \"body\": 110-170 words. Start with a greeting — " +
+      (company ? `\"Hi ${company} team,\"` : "\"Hello,\"") +
+      " on its own line, then a blank line.\n" +
+      "- First sentence: one specific line" +
+      (siteDigest || company ? " about their company or the role" : "") +
+      ", not a template opener.\n" +
       (jd
-        ? "- Maps 1-2 of my real strengths directly to what the role needs. Cite the most relevant proof (e.g. the 1-day Path Saathi delivery, the 94% IntegrateX serialization result, or 5 products shipped solo).\n"
-        : "- Cites ONE best-fit proof point (1-day Path Saathi delivery, 94% IntegrateX result, or 5 solo products).\n") +
-      "- Ends with a low-friction ask (a quick call, or reply if useful).\n" +
-      "- Then, on their own lines under a short line like \"A few links:\", include EXACTLY these (keep the full URLs, they must stay clickable):\n" +
-      LINKS +
-      "\n- Sign off as \"Yaseen\".\n\n" +
-      "Return EXACTLY this format and nothing else:\n" +
-      "SUBJECT: <short, specific subject line>\n" +
-      "\n" +
-      "<the full email body including the links block and sign-off>";
+        ? "- Map 1-2 of my real strengths to the role's needs, citing the single best-fit proof (1-day Path Saathi delivery, 94% IntegrateX serialization result, or 5 products shipped solo).\n"
+        : "- Cite ONE best-fit proof point (1-day Path Saathi delivery, 94% IntegrateX result, or 5 solo products).\n") +
+      "- A low-friction ask (a quick call, or reply if useful).\n" +
+      "- " + linksInstruction + "\n" +
+      "- Sign off on its own line as \"Yaseen\".";
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -310,6 +317,7 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
           { role: "system", content: system },
           { role: "user", content: user },
         ],
+        response_format: { type: "json_object" },
         max_tokens: 700,
         temperature: 0.7,
       }),
@@ -324,10 +332,15 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     const data = (await res.json()) as {
       choices?: { message?: { content?: string } }[];
     };
-    const raw = String(data.choices?.[0]?.message?.content ?? "").trim();
-    const m = raw.match(/^\s*SUBJECT:\s*(.+?)\s*\n([\s\S]*)$/i);
-    const subject = (m ? m[1] : `Quick note${company ? ` for ${company}` : ""}`).trim();
-    const emailBody = (m ? m[2] : raw).trim();
+    let subject = `Full-Stack + AI Engineer — Yaseen Khatib`;
+    let emailBody = "";
+    try {
+      const parsed = JSON.parse(String(data.choices?.[0]?.message?.content ?? "{}"));
+      if (parsed.subject) subject = String(parsed.subject).trim();
+      emailBody = String(parsed.body ?? "").trim();
+    } catch {
+      emailBody = String(data.choices?.[0]?.message?.content ?? "").trim();
+    }
     return json(
       { subject, body: emailBody, researched: Boolean(siteDigest), tailored: Boolean(jd) },
       200,
