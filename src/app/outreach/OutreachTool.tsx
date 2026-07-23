@@ -16,6 +16,8 @@ export default function OutreachTool() {
   const [companyUrl, setCompanyUrl] = useState("");
   const [jd, setJd] = useState("");
   const [showJd, setShowJd] = useState(false);
+  const [image, setImage] = useState(""); // data URL of an uploaded job-post screenshot
+  const [imageName, setImageName] = useState("");
 
   const [subject, setSubject] = useState("");
   const [emailBody, setEmailBody] = useState("");
@@ -31,7 +33,7 @@ export default function OutreachTool() {
       const res = await fetch(`${CONCIERGE_URL}/api/outreach`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passcode, company, companyUrl, jd }),
+        body: JSON.stringify({ passcode, company, companyUrl, jd, image }),
       });
       const data = (await res.json()) as {
         subject?: string;
@@ -39,15 +41,23 @@ export default function OutreachTool() {
         error?: string;
         researched?: boolean;
         tailored?: boolean;
+        extractedEmail?: string;
+        extractedCompany?: string;
       };
       if (!res.ok) return setStatus(data.error ?? `Error ${res.status}`);
       setSubject(data.subject ?? "");
       setEmailBody(data.body ?? "");
+      // Auto-fill anything the screenshot extraction pulled out.
+      if (data.extractedEmail && !email) setEmail(data.extractedEmail);
+      if (data.extractedCompany && !company) setCompany(data.extractedCompany);
       const bits = [
+        image ? "read the screenshot" : null,
         data.tailored ? "tailored to the JD" : null,
         data.researched ? "read their website" : null,
       ].filter(Boolean);
-      setStatus(`Draft ready${bits.length ? ` (${bits.join(", ")})` : ""}. Review, then open in your mail.`);
+      setStatus(
+        `Draft ready${bits.length ? ` (${bits.join(", ")})` : ""}.${data.extractedEmail && !email ? ` Found email: ${data.extractedEmail}.` : ""} Review, then open in your mail.`,
+      );
     } catch {
       setStatus("Network error reaching the drafter.");
     } finally {
@@ -79,9 +89,10 @@ export default function OutreachTool() {
         Outreach drafter
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-        Paste the prospect&apos;s email. ChatGPT writes the whole email — subject,
-        body, and your links. Optionally add a job description and it tailors to
-        that. Then it opens in your mail, ready to review and send.
+        Upload a screenshot of the job post (or paste the JD) and ChatGPT reads
+        the company, role, JD, and contact email, then writes the whole
+        application email with your links. Then it opens in your mail, ready to
+        review and send.
       </p>
 
       <div className="mt-8 space-y-3">
@@ -115,14 +126,45 @@ export default function OutreachTool() {
           />
         </div>
 
-        {/* Optional JD tab */}
+        {/* Upload a job-post screenshot — OCRs company, role, JD, and email */}
+        <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-zinc-700 px-3 py-2.5 font-mono text-xs text-zinc-400 transition-colors hover:border-cyan/50 hover:text-cyan">
+          <span>📎</span>
+          {imageName ? `Screenshot: ${imageName}` : "Upload a job-post screenshot (it reads company, role, JD, email)"}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (!f) return;
+              setImageName(f.name);
+              const reader = new FileReader();
+              reader.onload = () => setImage(String(reader.result ?? ""));
+              reader.readAsDataURL(f);
+            }}
+          />
+        </label>
+        {image && (
+          <button
+            type="button"
+            onClick={() => {
+              setImage("");
+              setImageName("");
+            }}
+            className="font-mono text-[11px] text-zinc-600 hover:text-zinc-400"
+          >
+            × remove screenshot
+          </button>
+        )}
+
+        {/* Optional JD tab (or let the screenshot fill it) */}
         <button
           type="button"
           onClick={() => setShowJd((v) => !v)}
           className="flex items-center gap-2 font-mono text-xs text-zinc-400 transition-colors hover:text-cyan"
         >
           <span className={`inline-block transition-transform ${showJd ? "rotate-90" : ""}`}>▸</span>
-          {jd.trim() ? "Job description added" : "Add a job description (optional)"}
+          {jd.trim() ? "Job description added" : "Or paste a job description (optional)"}
         </button>
         {showJd && (
           <textarea

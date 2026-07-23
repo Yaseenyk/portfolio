@@ -249,6 +249,7 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     company?: string;
     companyUrl?: string;
     jd?: string;
+    image?: string; // data URL of an uploaded job-post screenshot
   };
   try {
     body = await request.json();
@@ -259,47 +260,98 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     return json({ error: "wrong passcode" }, 401, origin);
   }
 
-  const company = String(body.company ?? "").trim().slice(0, 120);
+  let company = String(body.company ?? "").trim().slice(0, 120);
   const companyUrl = String(body.companyUrl ?? "").trim().slice(0, 200);
-  const jd = String(body.jd ?? "").trim().slice(0, 4000);
+  let jd = String(body.jd ?? "").trim().slice(0, 4000);
+  let extractedEmail = "";
 
   try {
+    // If a screenshot was uploaded, OCR the job post: pull company, role,
+    // the full JD text, and any contact email out of it (gpt-4o vision).
+    if (typeof body.image === "string" && body.image.startsWith("data:image")) {
+      const vres = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text:
+                    "This is a screenshot of a job posting. Extract and return ONLY " +
+                    "a JSON object with keys: \"company\" (hiring company name), " +
+                    "\"role\" (job title), \"email\" (any contact/apply email if " +
+                    "present, else \"\"), and \"jd\" (the full job description text, " +
+                    "responsibilities and requirements, as plain text). Use \"\" for " +
+                    "anything not present.",
+                },
+                { type: "image_url", image_url: { url: body.image } },
+              ],
+            },
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 1200,
+        }),
+      });
+      if (vres.ok) {
+        const vdata = (await vres.json()) as {
+          choices?: { message?: { content?: string } }[];
+        };
+        try {
+          const ex = JSON.parse(String(vdata.choices?.[0]?.message?.content ?? "{}"));
+          // Typed fields win; extracted fields fill the gaps.
+          if (!jd && ex.jd) jd = String(ex.jd).slice(0, 4000);
+          if (!company && ex.company) company = String(ex.company).slice(0, 120);
+          if (ex.email) extractedEmail = String(ex.email).trim().slice(0, 120);
+        } catch {
+          /* extraction best-effort */
+        }
+      }
+    }
+
     // Read the prospect's site if a URL was given (best-effort).
     const siteDigest = companyUrl ? await fetchSiteDigest(companyUrl) : "";
 
     const system =
       "You are Yaseen Khatib, a senior full-stack + AI engineer, writing a " +
-      "concise application email to a hiring manager or founder. Your ONE goal: " +
-      "make a busy, skeptical reader think \"I want to talk to this person.\" " +
-      "Write with quiet confidence and concrete specifics — a real senior " +
-      "engineer, not a job-seeker reciting a resume. Every sentence must earn " +
-      "its place. Return ONLY a JSON object with string keys \"subject\" and \"body\".";
+      "polished, professional job-application email to a hiring manager. The " +
+      "register is formal and traditional but still concrete and confident — " +
+      "the tone of a strong professional application, not a casual note and not " +
+      "a marketing pitch. Complete, well-formed sentences. Return ONLY a JSON " +
+      "object with string keys \"subject\" and \"body\".";
 
     const rules =
-      "WHAT MAKES THIS EMAIL WORK:\n" +
-      "- After the greeting, the FIRST line must show you understand their " +
-      "specific product, problem, or role — never \"your focus aligns with my " +
-      "experience\" or any variant.\n" +
-      "- State achievements as PLAIN OUTCOMES a non-engineer instantly gets, not " +
-      "jargon. Bad: \"achieved a 94% serialization result\". Good: \"built a " +
-      "serialization layer that cut a workflow app's save payloads by 94%, so " +
-      "saving felt instant.\" Explain the win, don't name-drop the metric.\n" +
-      "- Pick only the 1-2 MOST relevant proofs and tell them well; do not " +
-      "list-dump everything. Real proofs to draw from: shipped 5 production " +
-      "products solo in a year; took a client's LMS (Path Saathi) from a Monday " +
-      "brief to a live platform the next day; built a React Flow workflow engine " +
-      "(IntegrateX) whose serialization layer cut payloads 94%; a local-first AI " +
-      "finance agent (Sable).\n" +
-      "- Include ONE memorable differentiator, stated with confidence: they can " +
-      "add my portfolio to Claude as an MCP connector and literally interview it " +
-      "inside their own AI — almost no candidate can offer that.\n" +
-      "- Confident, warm, human. Short: 110-160 words in the body.\n" +
-      "- BANNED phrases (never use): \"I hope this email finds you well\", " +
-      "\"aligns perfectly\", \"successfully shipped\", \"demonstrating my ability\", " +
-      "\"I'd appreciate the opportunity\", \"under tight deadlines\", \"passionate\", " +
-      "\"leverage\", \"synergy\", \"fast-paced\". No exclamation marks, no em-dash " +
-      "chains, at most one question.\n";
+      "REQUIREMENTS:\n" +
+      "- Formal, respectful register throughout. No slang, no exclamation marks, " +
+      "no em dashes (use commas or full stops), at most one question.\n" +
+      "- Open by stating interest in the specific role" +
+      (company ? " at the company" : "") +
+      ", then in the next sentence show genuine understanding of what they do.\n" +
+      "- State achievements as PLAIN OUTCOMES a non-technical hiring manager " +
+      "understands, not jargon. Bad: \"a 94% serialization result\". Good: " +
+      "\"built a workflow engine whose serialization layer reduced data payloads " +
+      "by 94%, making saves effectively instant.\" Explain the win.\n" +
+      "- Choose only the 1-2 MOST role-relevant proofs and present them well; do " +
+      "not list everything. Real proofs: shipped 5 production products solo in a " +
+      "year; delivered a client LMS (Path Saathi) from brief to a live platform " +
+      "in a single day; built IntegrateX, a React Flow workflow engine whose " +
+      "serialization layer cut payloads 94%; Sable, a local-first AI finance agent.\n" +
+      "- Include one distinctive, professionally-framed point: my portfolio is " +
+      "available as an MCP connector, so the team can query it directly from " +
+      "within their own AI assistant, a capability few candidates offer.\n" +
+      "- 120-170 words in the body. Confident but never boastful.\n" +
+      "- BANNED phrases: \"I hope this email finds you well\", \"aligns perfectly\", " +
+      "\"resonates deeply\", \"successfully shipped\", \"demonstrating my ability\", " +
+      "\"high-quality solutions\", \"passionate\", \"leverage\", \"synergy\", " +
+      "\"fast-paced\", \"seamless\", \"evolution\".\n";
 
+    const greeting = company ? `Dear ${company} Team,` : "Dear Hiring Manager,";
     const user =
       OUTREACH_FACTS +
       "\n\n" +
@@ -310,13 +362,13 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
       "\n" + rules +
       "\nSTRUCTURE:\n" +
-      "- \"subject\": an application subject a hiring manager opens — the role + " +
-      "my name, e.g. \"Application: <role from the JD> — Yaseen Khatib\". Specific, not a marketing phrase.\n" +
-      "- \"body\": greeting on line 1 (" +
-      (company ? `\"Hi ${company} team,\"` : "\"Hello,\"") +
-      "), blank line, then the email, then a confident low-friction ask, then a " +
-      "line \"A few links:\" followed by these on their own lines with full URLs " +
-      "kept intact:\n" + LINKS + "\nthen a blank line and \"Yaseen\" as the sign-off.";
+      "- \"subject\": a formal application subject line: " +
+      "\"Application: <role from the JD, or 'Full-Stack + AI Engineer'> — Yaseen Khatib\".\n" +
+      "- \"body\": line 1 is the greeting \"" + greeting + "\", then a blank line, " +
+      "then the email, then a courteous close (e.g. \"I would welcome the chance " +
+      "to discuss how I can contribute.\"), then a line \"Links:\" followed by " +
+      "these on their own lines with full URLs kept intact:\n" + LINKS +
+      "\nthen a blank line, then \"Best regards,\" and \"Yaseen Khatib\" on the next line.";
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -355,7 +407,14 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       emailBody = String(data.choices?.[0]?.message?.content ?? "").trim();
     }
     return json(
-      { subject, body: emailBody, researched: Boolean(siteDigest), tailored: Boolean(jd) },
+      {
+        subject,
+        body: emailBody,
+        researched: Boolean(siteDigest),
+        tailored: Boolean(jd),
+        extractedEmail,
+        extractedCompany: company,
+      },
       200,
       origin,
     );
