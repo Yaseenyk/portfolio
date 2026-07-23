@@ -198,6 +198,12 @@ const OUTREACH_FACTS = `About Yaseen Khatib (the sender):
 - Unusual proof point: recruiters/clients can add his portfolio to Claude as an MCP connector and interview it from inside their own AI.
 - Open to project work and roles — remote, hybrid, or on-site (Hyderabad, IST).`;
 
+// Compensation & location — included ONLY when the posting asks or the role
+// is clearly India-based (see the rule in the prompt).
+const PREFERENCES = `- Current CTC: approximately 12 LPA
+- Expected CTC: 16 to 20 LPA
+- Preferred locations: Bangalore, Hyderabad, Mumbai, or Pune (also open to remote or hybrid)`;
+
 // Links to weave into every email (plain URLs — they auto-linkify when sent).
 const LINKS = `Portfolio: ${SITE}
 Know more about me: ${SITE}/about
@@ -345,7 +351,15 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       "- Include one distinctive, professionally-framed point: my portfolio is " +
       "available as an MCP connector, so the team can query it directly from " +
       "within their own AI assistant, a capability few candidates offer.\n" +
-      "- 120-170 words in the body. Confident but never boastful.\n" +
+      "- 120-190 words in the body. Confident but never boastful.\n" +
+      "- COMPENSATION & LOCATION: include a short, professional line with these " +
+      "ONLY if the job description asks for current CTC, expected CTC, salary, " +
+      "notice period, or preferred location, OR if the role is clearly based in " +
+      "India. Otherwise omit them entirely (never put them on a non-India or " +
+      "USD-salary role). When included, phrase naturally, e.g. \"For reference, " +
+      "my current CTC is around 12 LPA, expected 16 to 20 LPA, and I am open to " +
+      "Bangalore, Hyderabad, Mumbai, or Pune (as well as remote or hybrid).\" " +
+      "Source details:\n" + PREFERENCES + "\n" +
       "- BANNED phrases: \"I hope this email finds you well\", \"aligns perfectly\", " +
       "\"resonates deeply\", \"successfully shipped\", \"demonstrating my ability\", " +
       "\"high-quality solutions\", \"passionate\", \"leverage\", \"synergy\", " +
