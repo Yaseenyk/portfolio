@@ -23,6 +23,11 @@ export interface Env {
   /** Passcode for the private /outreach drafter. Set via:
    *  npx wrangler secret put OUTREACH_PASSCODE  (or the CF dashboard). */
   OUTREACH_PASSCODE?: string;
+  /** OpenAI (ChatGPT) key — drafts the outreach emails. Set as a secret:
+   *  npx wrangler secret put OPENAI_API_KEY  (or the CF dashboard). */
+  OPENAI_API_KEY?: string;
+  /** Optional model override (default gpt-4o-mini). */
+  OUTREACH_MODEL?: string;
 }
 
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
@@ -187,12 +192,18 @@ async function handleChat(request: Request, env: Env, origin: string | null): Pr
 // Gmail (propose/confirm boundary; never auto-sends).
 
 const OUTREACH_FACTS = `About Yaseen Khatib (the sender):
-- Senior Full-Stack Developer (React, Node.js, TypeScript, MongoDB) now building production AI systems: RAG, agents, MCP.
+- Senior Full-Stack Developer (React, Node.js, TypeScript, Python, MongoDB) now building production AI systems: RAG, agents, MCP.
 - Shipped 5 products solo in ~12 months (streamerOS, IntegrateX, Sable, plus two autonomous pipelines).
 - Speed proof: for a client LMS (Path Saathi), took a Monday MVP brief to a working platform live on dev the next day.
 - Unusual proof point: recruiters/clients can add his portfolio to Claude as an MCP connector and interview it from inside their own AI.
-- Open to project work and roles — remote, hybrid, or on-site (Hyderabad, IST).
-- Portfolio: ${SITE} · Email: contact@streamerosai.com`;
+- Open to project work and roles — remote, hybrid, or on-site (Hyderabad, IST).`;
+
+// Links to weave into every email (plain URLs — they auto-linkify when sent).
+const LINKS = `Portfolio: ${SITE}
+Know more about me: ${SITE}/about
+Products: ${SITE}/products
+Blog: ${SITE}/blog
+Interview my portfolio inside your own AI (MCP): https://yaseen-concierge.yaseenyk.workers.dev/mcp`;
 
 // Best-effort read of the prospect's website → a short plain-text digest so
 // the opener can reference what they actually do. Fails soft (many sites
@@ -230,12 +241,14 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
   if (!env.OUTREACH_PASSCODE) {
     return json({ error: "outreach drafter not configured (no passcode set)" }, 503, origin);
   }
+  if (!env.OPENAI_API_KEY) {
+    return json({ error: "OPENAI_API_KEY not set on the worker" }, 503, origin);
+  }
   let body: {
     passcode?: string;
-    name?: string;
     company?: string;
     companyUrl?: string;
-    goal?: string;
+    jd?: string;
   };
   try {
     body = await request.json();
@@ -246,59 +259,77 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     return json({ error: "wrong passcode" }, 401, origin);
   }
 
-  const name = String(body.name ?? "").trim().slice(0, 80);
   const company = String(body.company ?? "").trim().slice(0, 120);
   const companyUrl = String(body.companyUrl ?? "").trim().slice(0, 200);
-  const goal = String(body.goal ?? "").trim().slice(0, 300);
+  const jd = String(body.jd ?? "").trim().slice(0, 4000);
 
   try {
-    // 1) Ground the pitch in Yaseen's real work: retrieve the most relevant
-    //    proof from the corpus, keyed on the prospect + what he wants.
-    const query = `${company} ${goal}`.trim() || "full-stack AI engineering work";
-    let proof = "";
-    try {
-      const r = await retrieve(env, query, 3);
-      if (r.topScore >= 0.4) {
-        proof = r.chunks
-          .map((c) => `- ${c.title}: ${c.text.slice(0, 260)} (${c.url})`)
-          .join("\n");
-      }
-    } catch {
-      /* retrieval optional */
-    }
-
-    // 2) Read the prospect's site if a URL was given.
+    // Read the prospect's site if a URL was given (best-effort).
     const siteDigest = companyUrl ? await fetchSiteDigest(companyUrl) : "";
 
-    const prompt =
-      `Write a short, human cold-outreach email from Yaseen to a prospect.\n\n` +
-      OUTREACH_FACTS +
-      (proof ? `\n\nMOST RELEVANT PROOF from Yaseen's real work (cite the single best-fit one, with its link):\n${proof}` : "") +
-      `\n\nProspect: ${name || "(unknown)"}${company ? ` at ${company}` : ""}.\n` +
-      (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
-      `What Yaseen wants from them: ${goal || "to explore working together"}\n\n` +
-      `Rules:\n` +
-      `- Under 130 words. Plain, direct. No "I hope this email finds you well", no corporate fluff.\n` +
-      `- Open with ONE specific line about their company (use the website info if present), not a generic hook.\n` +
-      `- Cite ONE best-fit proof point from Yaseen's real work above, with its link. Do not list several.\n` +
-      `- Tie it to what Yaseen wants, then a low-friction ask (quick call, or "reply if useful").\n` +
-      `- Mention they can interview his portfolio inside their own AI (MCP) only if it fits naturally.\n` +
-      `- No em-dash chains, no exclamation marks, at most one question. Sign off as "Yaseen".\n` +
-      `Return EXACTLY this format:\n` +
-      `SUBJECT: <short, specific subject>\n` +
-      `<blank line>\n` +
-      `<the email body>`;
+    const system =
+      "You are Yaseen Khatib writing a short, sharp, human cold-outreach email " +
+      "to a prospective employer or client. Write in first person as Yaseen. " +
+      "No corporate fluff, no \"I hope this email finds you well\", no em-dash " +
+      "chains, no exclamation marks, at most one question. 110-160 words in the " +
+      "body. Sound like a senior engineer, confident but not boastful.";
 
-    const res = await env.AI.run(GEN_MODEL, {
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 460,
+    const user =
+      OUTREACH_FACTS +
+      "\n\n" +
+      (jd
+        ? `TARGET ROLE / JOB DESCRIPTION the prospect posted — tailor the email to it, matching my relevant strengths to their needs:\n${jd}\n\n`
+        : "") +
+      (company ? `Prospect company: ${company}\n` : "") +
+      (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
+      "\nWrite the email so it:\n" +
+      "- Opens with ONE specific line" +
+      (siteDigest || company ? " about their company/role" : " (a strong, non-generic hook)") +
+      ", not a template greeting.\n" +
+      (jd
+        ? "- Maps 1-2 of my real strengths directly to what the role needs. Cite the most relevant proof (e.g. the 1-day Path Saathi delivery, the 94% IntegrateX serialization result, or 5 products shipped solo).\n"
+        : "- Cites ONE best-fit proof point (1-day Path Saathi delivery, 94% IntegrateX result, or 5 solo products).\n") +
+      "- Ends with a low-friction ask (a quick call, or reply if useful).\n" +
+      "- Then, on their own lines under a short line like \"A few links:\", include EXACTLY these (keep the full URLs, they must stay clickable):\n" +
+      LINKS +
+      "\n- Sign off as \"Yaseen\".\n\n" +
+      "Return EXACTLY this format and nothing else:\n" +
+      "SUBJECT: <short, specific subject line>\n" +
+      "\n" +
+      "<the full email body including the links block and sign-off>";
+
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: env.OUTREACH_MODEL || "gpt-4o-mini",
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        max_tokens: 700,
+        temperature: 0.7,
+      }),
     });
-    const raw = String(res.response ?? "").trim();
+    if (!res.ok) {
+      return json(
+        { error: `openai error ${res.status}: ${(await res.text()).slice(0, 200)}` },
+        502,
+        origin,
+      );
+    }
+    const data = (await res.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
+    const raw = String(data.choices?.[0]?.message?.content ?? "").trim();
     const m = raw.match(/^\s*SUBJECT:\s*(.+?)\s*\n([\s\S]*)$/i);
-    const subject = (m ? m[1] : `Quick idea for ${company || "your team"}`).trim();
+    const subject = (m ? m[1] : `Quick note${company ? ` for ${company}` : ""}`).trim();
     const emailBody = (m ? m[2] : raw).trim();
     return json(
-      { subject, body: emailBody, researched: Boolean(siteDigest), grounded: Boolean(proof) },
+      { subject, body: emailBody, researched: Boolean(siteDigest), tailored: Boolean(jd) },
       200,
       origin,
     );
