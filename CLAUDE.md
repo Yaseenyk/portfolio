@@ -52,8 +52,11 @@ JSON-LD, and OG tags only exist post-build.
 - `worker.yml` — deploys `worker/` (Cloudflare: RAG `/api/chat` + MCP `/mcp`
   at yaseen-concierge.yaseenyk.workers.dev) and re-embeds the corpus into
   Vectorize after every Pages deploy. Corpus source: `/llms-full.txt`.
-- Sibling repo `../linkedin-bot` posts a blog URL to LinkedIn daily at
-  10:00 UTC (queue: `urls.txt`, state: `published.json`).
+- Sibling repo `../linkedin-bot` posts to LinkedIn Tue/Wed/Thu at 10:00 UTC
+  (queue: `urls.txt`, state: `published.json`). The article URL is kept OUT
+  of the post body — LinkedIn demotes off-platform links — and is posted
+  automatically as the first comment instead. Cover-image style rules there
+  are brand-locked and must stay byte-identical to the two portfolio scripts.
 
 If `git push` is rejected, a bot committed — `git stash push package-lock.json`
 (if dirty), `git pull --rebase`, push.
