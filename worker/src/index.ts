@@ -191,8 +191,17 @@ async function handleChat(request: Request, env: Env, origin: string | null): Pr
 // Yaseen's voice. Returns a draft only — the human reviews and sends from
 // Gmail (propose/confirm boundary; never auto-sends).
 
+// The ONLY technologies the drafter may ever claim. A job description must
+// never be mirrored back as experience Yaseen does not have (Java, .NET, Go…).
+// Tailoring = choosing which REAL proof to lead with, never inventing a skill.
+const STACK = `MY ACTUAL STACK — the ONLY technologies I may claim experience with:
+- Core (MERN): MongoDB, Express, React, Node.js — with TypeScript, Next.js, REST APIs.
+- Generative AI: RAG pipelines, LLM orchestration, AI agents, MCP servers, embeddings and vector search, prompt engineering, evaluation.
+- Supporting only: Python (used for my own AI and automation tooling), Tailwind CSS, Git, Cloudflare Workers, serverless deployment.
+Anything not on this list is NOT my experience.`;
+
 const OUTREACH_FACTS = `About Yaseen Khatib (the sender):
-- Senior Full-Stack Developer (React, Node.js, TypeScript, Python, MongoDB) now building production AI systems: RAG, agents, MCP.
+- Senior Full-Stack Developer (MERN: MongoDB, Express, React, Node.js, with TypeScript and Next.js) now building production AI systems: RAG, agents, MCP.
 - Shipped 5 products solo in ~12 months (streamerOS, IntegrateX, Sable, plus two autonomous pipelines).
 - Speed proof: for a client LMS (Path Saathi), took a Monday MVP brief to a working platform live on dev the next day.
 - Unusual proof point: recruiters/clients can add his portfolio to Claude as an MCP connector and interview it from inside their own AI.
@@ -329,10 +338,33 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       "polished, professional job-application email to a hiring manager. The " +
       "register is formal and traditional but still concrete and confident — " +
       "the tone of a strong professional application, not a casual note and not " +
-      "a marketing pitch. Complete, well-formed sentences. Return ONLY a JSON " +
-      "object with string keys \"subject\" and \"body\".";
+      "a marketing pitch. Complete, well-formed sentences. You are strictly " +
+      "truthful about his background: his experience is MERN (MongoDB, Express, " +
+      "React, Node.js) with TypeScript plus generative-AI systems, and you never " +
+      "claim any other technology no matter what the job description asks for. " +
+      "Return ONLY a JSON object with string keys \"subject\" and \"body\".";
 
     const rules =
+      "TRUTHFULNESS (highest priority — overrides every tailoring instruction):\n" +
+      "- I may ONLY claim experience with technologies listed in MY ACTUAL STACK. " +
+      "Never state, imply, or hint at experience, familiarity, or years with " +
+      "anything outside that list.\n" +
+      "- If the job description centres on a stack I do NOT have (for example " +
+      "Java, Spring, .NET, C#, PHP, Ruby, Go, Rust, Kotlin, Swift, native " +
+      "Android/iOS, Salesforce, SAP, or a data-engineering stack I have not " +
+      "listed), do NOT echo those technologies back as mine, do NOT say I have " +
+      "worked with or delivered in them, and do NOT imply a background in them. " +
+      "Never write sentences like \"my experience in Java\" for a stack I lack.\n" +
+      "- In that mismatch case, be honest and lead with what is real: my MERN and " +
+      "generative-AI engineering, my delivery record, and my ability to learn a " +
+      "codebase quickly. It is acceptable to state plainly that my depth is in " +
+      "JavaScript/TypeScript and AI systems. Never apologise for it, and never " +
+      "fake the gap away.\n" +
+      "- Tailoring to the JD means choosing WHICH OF MY REAL PROOFS to lead with " +
+      "and which of their genuine needs to address — never adopting their stack " +
+      "as my own, and never mirroring their keyword list back at them.\n" +
+      "- Never invent employers, projects, certifications, metrics, team sizes, " +
+      "or years of experience. Only the proofs given below are real.\n\n" +
       "REQUIREMENTS:\n" +
       "- Formal, respectful register throughout. No slang, no exclamation marks, " +
       "no em dashes (use commas or full stops), at most one question.\n" +
@@ -369,15 +401,17 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     const user =
       OUTREACH_FACTS +
       "\n\n" +
+      STACK +
+      "\n\n" +
       (jd
-        ? `TARGET ROLE / JOB DESCRIPTION — tailor the whole email to it, mapping my strongest relevant proof to what they actually need:\n${jd}\n\n`
+        ? `TARGET ROLE / JOB DESCRIPTION — tailor by selecting which of MY REAL proofs (above) best answers their needs. Do NOT treat the technologies below as things I have experience with; they are THEIR requirements, not my background:\n${jd}\n\n`
         : "") +
       (company ? `Prospect company: ${company}\n` : "") +
       (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
       "\n" + rules +
       "\nSTRUCTURE:\n" +
       "- \"subject\": a formal application subject line: " +
-      "\"Application: <role from the JD, or 'Full-Stack + AI Engineer'> — Yaseen Khatib\".\n" +
+      "\"Application: <role from the JD, or 'Full-Stack (MERN) + AI Engineer'> — Yaseen Khatib\".\n" +
       "- \"body\": line 1 is the greeting \"" + greeting + "\", then a blank line, " +
       "then the email, then a courteous close (e.g. \"I would welcome the chance " +
       "to discuss how I can contribute.\"), then a line \"Links:\" followed by " +
