@@ -1,4 +1,3 @@
-When useMemo actually helps in React 19, and how to measure before reaching for it
 Optimistic UI updates in React without letting local state drift from the server
 Building a typed event bus for cross-component orchestration in a React app
 Taming re-renders in a large React form with uncontrolled inputs and refs

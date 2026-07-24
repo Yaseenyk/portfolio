@@ -1,0 +1,250 @@
+---
+title: When useMemo actually helps in React 19, and how to measure it
+slug: when-usememo-actually-helps-in-react-19-and-how-to-measure-it
+date: '2026-07-24'
+description: 'A blunt, practical guide to useMemo in React 19: where it genuinely
+  helps, where it’s noise, and how to profile renders before you cargo‑cult memoization.'
+tags:
+- React
+- Frontend
+- Performance
+keywords:
+- useMemo React 19
+- when to use useMemo
+- React profiler useMemo
+- prevent re-renders object identity
+- measure React render performance
+- why-did-you-render React 19
+- useMemo memory retention
+- React 19 concurrent rendering useMemo
+readingMinutes: 8
+takeaways:
+- useMemo helps when you stabilize expensive derived data or prop identities that
+  gate large subtrees; it’s pointless for trivial work.
+- Measure first with React DevTools Profiler, performance marks, and why-did-you-render
+  before adding memo layers.
+- React 19 doesn’t change useMemo semantics—don’t treat it as a cache or side-effect
+  boundary, and expect extra invocations in dev Strict Mode.
+- Avoid holding large arrays/objects in useMemo without bounds; it can increase memory
+  retention and mask poor data flow.
+author:
+  name: Yaseen Khatib
+  role: MERN + AI Architect
+---
+
+## What (didn’t) change in React 19
+
+React 19 (as of 19.0.0-rc) brings Actions, asset loading, and `use` on the client, but `useMemo` semantics are the same as React 18. It’s a render-time memoization of a pure computation. It is not a cache across unmounts, not a signal to skip work outside React, and not a guarantee against recomputation in interrupted renders.
+
+In development Strict Mode, initial render paths may run twice to surface unsafe patterns. That includes the function you pass to `useMemo`. Don’t bake side effects into it.
+
+## When should I use useMemo in React 19?
+
+Use `useMemo` when you have: (1) a pure, CPU-expensive computation whose inputs rarely change (sorting, grouping, schema building), or (2) a prop identity that gates a large memoized subtree (arrays/objects passed to `React.memo` children or virtualization libraries). If you’re memoizing a 20-element `map` or a two-field object, don’t bother.
+
+Typical wins (illustrative, not your benchmarks):
+
+- Sorting/filtering 10k items on each keystroke: ~8–25 ms per render in desktop Chrome. Memoizing by `items` and `sortKey` can cut that to ~0–1 ms on unchanged keys.
+- Stabilizing a `columns` array for a `memo`-ized DataGrid avoids re-rendering thousands of cells when only a search box changes.
+
+Smells:
+
+- `{foo, bar}` objects recreated to pass into a leaf that doesn’t care about identity.
+- Memoizing a `map` over <100 items that’s cheap next to layout/paint or network latency.
+- Hiding state design issues (derivations that belong in a selector/store).
+
+## How do you measure React render cost before adding useMemo?
+
+Profile with React DevTools Profiler to see commit times and why components rendered. Add `performance.mark` around known hotspots to get millisecond timings in Chrome’s Performance panel. Finally, wire up `why-did-you-render` to spot useless re-renders from unstable prop identities. Change one thing at a time.
+
+### Baseline with React DevTools Profiler
+
+1. Install React DevTools (>= 5.x) and open the Profiler tab.
+2. Hit “Start profiling,” reproduce the interaction (typing, toggling filters), stop.
+3. Look at the flame chart for components over ~4–10 ms per commit or called very frequently.
+4. Click a hot component and check “Why did this render?” If props are `!==` but logically the same, you have an identity problem.
+
+### Add performance marks where CPU actually burns
+
+```ts
+// expensive-derivation.ts
+export function buildIndex(rows: Row[], key: keyof Row) {
+  performance.mark('buildIndex:start');
+  const map = new Map<any, Row[]>();
+  for (const r of rows) {
+    const k = r[key];
+    const arr = map.get(k);
+    if (arr) arr.push(r); else map.set(k, [r]);
+  }
+  performance.mark('buildIndex:end');
+  performance.measure('buildIndex', 'buildIndex:start', 'buildIndex:end');
+  return map;
+}
+```
+
+Open Chrome DevTools → Performance, record, and filter for “buildIndex” measures. You’ll get concrete ms per call, not vibes.
+
+### Catch identity churn with why-did-you-render
+
+```bash
+npm i -D @welldone-software/why-did-you-render
+```
+
+```ts
+// index.tsx
+import React from 'react';
+if (process.env.NODE_ENV === 'development') {
+  // @ts-ignore
+  const wdyr = require('@welldone-software/why-did-you-render');
+  wdyr(React, { trackAllPureComponents: true });
+}
+```
+
+Now memoized children will log when they re-render due to deep-equal props that changed by reference.
+
+## Example: expensive derived data (wins)
+
+You have 20k rows with filtering and sorting. Users type in a search box; unrelated toggles shouldn’t re-run the sort.
+
+```ts
+import { useMemo, useState } from 'react';
+import { buildIndex } from './expensive-derivation';
+
+function useCatalog(rows: Row[]) {
+  const [sortKey, setSortKey] = useState<keyof Row>('name');
+  const [query, setQuery] = useState('');
+
+  // Derive once per (rows, sortKey). Query filter is cheap, do it later.
+  const sorted = useMemo(() => {
+    // Pure and CPU-heavy
+    const arr = [...rows].sort((a, b) => String(a[sortKey]).localeCompare(String(b[sortKey])));
+    return arr;
+  }, [rows, sortKey]);
+
+  const filtered = useMemo(() => {
+    if (!query) return sorted;
+    const q = query.toLowerCase();
+    return sorted.filter(r => r.name.toLowerCase().includes(q));
+  }, [sorted, query]);
+
+  // Example of very heavy grouping on rows only
+  const indexByCategory = useMemo(() => buildIndex(sorted, 'category'), [sorted]);
+
+  return { filtered, indexByCategory, setSortKey, setQuery };
+}
+```
+
+Measure before/after. If the Profiler shows the parent re-renders a lot but `sorted` doesn’t change, `filtered` will recompute only when `query` does—good. If `rows` is a new array identity on every fetch even when contents are the same, fix your fetch layer or state manager; `useMemo` won’t help if the dependency changes every time.
+
+## Example: prop identity that controls a large subtree (wins)
+
+Libraries like virtualized grids often `React.memo` row/cell renderers based on shallow prop equality. If you hand them a new `columns` array every render, they’ll repaint the world.
+
+```ts
+type Column = { key: string; title: string; width: number };
+
+function ProductsGrid({ products, dense }: { products: Row[]; dense: boolean }) {
+  // BAD: new array on every render → virtualizer re-renders
+  // const columns = [
+  //   { key: 'name', title: 'Name', width: dense ? 180 : 240 },
+  //   { key: 'price', title: 'Price', width: 120 },
+  // ];
+
+  // GOOD: stable identity unless deps change
+  const columns = useMemo<Column[]>(() => [
+    { key: 'name', title: 'Name', width: dense ? 180 : 240 },
+    { key: 'price', title: 'Price', width: 120 },
+  ], [dense]);
+
+  return <VirtualGrid data={products} columns={columns} />;
+}
+```
+
+With `why-did-you-render` you’ll see the grid stop re-rendering on state unrelated to `dense`. In Profiler, commit time drops and row components disappear from the hot path when toggling UI chrome.
+
+## Example: fake optimization (loss)
+
+Developers frequently memoize trivial work and then complain nothing improved. Here’s why.
+
+```ts
+function TinyList({ items }: { items: number[] }) {
+  // Pointless: mapping 20 items is <0.1 ms; memo bookkeeping can exceed it.
+  const doubled = useMemo(() => items.map(x => x * 2), [items]);
+  return (
+    <ul>{doubled.map(x => <li key={x}>{x}</li>)}</ul>
+  );
+}
+```
+
+If `items` changes almost every render (typing, streaming updates), `useMemo` still recomputes. You paid abstraction cost for nothing. Measure: you’ll see the same commit time with or without it; sometimes marginally worse.
+
+## What about transitions, Actions, and RSC boundaries?
+
+- Transitions (React 18/19) increase concurrent work. `useMemo` still runs in render. If you start a transition that doesn’t affect a memo’s deps, it will reuse the existing value—useful for keeping big derivations out of the transition path.
+- Actions and `use` don’t change client `useMemo`. Server Components have their own cache mechanisms; `useMemo` does not persist across the server/client boundary.
+
+## When NOT to use useMemo (real failure modes)
+
+- You’re fighting your data flow. If `rows` gets replaced each fetch because you `setState([...data])` every poll, fix the source (stable references, normalized stores, selectors). `useMemo` is a band-aid.
+- Side effects inside `useMemo`. It may run multiple times in dev, and any effect belongs in `useEffect` or outside React.
+- Large object retention. If you memoize a 50 MB array (yes, it happens) and keep the component mounted, you’re pinning that memory. Memoization increases lifetime. If you only need a small projection, memoize the projection, not the blob (or don’t memoize and compute lazily per page).
+- Overfitting to micro-benchmarks. Modern browsers spend a lot of time on layout/paint. Shaving 0.2 ms in JS while triggering 16 ms of layout is misdirected effort.
+
+## How do you choose dependencies, safely?
+
+Pick the minimal stable inputs that fully determine the result. For derived arrays:
+
+- Prefer stable upstream references (state managers with referential equality guarantees, e.g., Zustand selectors with `shallow`).
+- Avoid passing freshly created objects as deps. Hoist them into their own `useMemo` or state if they’re logically inputs.
+
+```ts
+// Bad: anonymous object in deps → always changes
+const costs = useMemo(() => computeCosts(items, { tax, discount }), [items, { tax, discount }]);
+
+// Good: stabilize the options first
+const priceOpts = useMemo(() => ({ tax, discount }), [tax, discount]);
+const costs = useMemo(() => computeCosts(items, priceOpts), [items, priceOpts]);
+```
+
+If the linter nags, it’s usually right. Either add the missing dep or restructure so the function is pure with the listed deps.
+
+## A quick checklist before reaching for useMemo
+
+- Can I point to a component in Profiler spending >4–5 ms on render repeatedly? If not, skip.
+- Do I see re-renders because of `!==` props that are logically equal (via why-did-you-render)? Stabilize identity or stop passing that prop.
+- Is the work pure and CPU-heavy (O(n log n) sort on thousands of items, complex schema generation)? Memoize.
+- Will this memoize large data for a long time? Consider bounding or memoizing a projection instead.
+- Would moving the derivation to a selector/store (e.g., Reselect/Zustand) be cleaner? Often yes.
+
+## A note on selectors vs useMemo
+
+For cross-component derived state, don’t scatter `useMemo` across the tree. Centralize it:
+
+```ts
+// Reselect-style memoized selector
+import { createSelector } from '@reduxjs/toolkit';
+
+const selectRows = (s: RootState) => s.rows;
+const selectSortKey = (s: RootState) => s.sortKey;
+
+export const selectSorted = createSelector([selectRows, selectSortKey], (rows, key) => {
+  return [...rows].sort((a, b) => String(a[key]).localeCompare(String(b[key])));
+});
+```
+
+This gives you global referential stability and avoids recomputing per component. Use `useMemo` at the leaf only if you’re composing expensive UI-only transforms.
+
+## Concrete measurement recipe
+
+1. Turn on Profiler and capture the slow interaction.
+2. Identify a hot component and confirm why it renders.
+3. Drop `performance.mark` around actual heavy functions. Re-record with Chrome Performance.
+4. If identity churn is the issue, stabilize with `useMemo`/`useCallback` around the exact prop(s) the child keys on.
+5. If heavy compute is the issue, memoize the derivation with the minimal dependency set.
+6. Re-profile. If you didn’t move the needle by at least a couple milliseconds per commit or reduce commit count, revert.
+
+## Final sanity checks
+
+- `useMemo` is not a silver bullet. In React 19 it’s the same sharp knife it’s been since 16.8.
+- Favor clarity. A well-placed `useMemo` around a big sort or a `columns` config is boring and effective. Blanket memoization is busywork.
+- Keep the measurements near the code. If you can’t show a before/after profile graph or a `performance.measure` delta, you probably don’t need it.
