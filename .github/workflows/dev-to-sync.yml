@@ -1,0 +1,85 @@
+name: Cross-post new posts to DEV.to
+
+# When a brand-new Markdown post lands on main, create a DEV.to *draft* that
+# canonicalises back to the site. Drafts only — you review, then publish on DEV.to.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/content/blog/**.mdx"
+  # Manual one-off: cross-post an existing post on demand (e.g. a backfill).
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "Post to cross-post now (blank = the most recently added post)"
+        required: false
+        type: string
+
+# Never let two runs race to create the same drafts.
+concurrency:
+  group: dev-to-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          # Full history so we can diff the whole push range for *added* files.
+          fetch-depth: 0
+
+      - name: Determine posts to sync
+        id: added
+        env:
+          EVENT: ${{ github.event_name }}
+          MANUAL_FILE: ${{ github.event.inputs.file }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            if [ -n "${MANUAL_FILE:-}" ]; then
+              files="$MANUAL_FILE"                       # a specific post you named
+            else
+              # Blank input: cross-post the most recently ADDED post.
+              files="$(git log --diff-filter=A --name-only --format= \
+                -- 'src/content/blog/*.mdx' | grep -m1 . || true)"
+            fi
+          else
+            # push: a branch's first push reports an all-zero "before" SHA;
+            # diff against the empty tree so every file counts as added.
+            if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+              BEFORE_SHA="$(git hash-object -t tree /dev/null)"
+            fi
+            files="$(
+              git diff --name-only --diff-filter=A "$BEFORE_SHA" "$AFTER_SHA" \
+                -- 'src/content/blog/*.mdx' | tr '\n' ' ' | sed 's/ *$//'
+            )"
+          fi
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+          echo "Posts to sync: ${files:-<none>}"
+
+      - name: Set up Node.js
+        if: steps.added.outputs.files != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.added.outputs.files != ''
+        run: npm ci
+
+      - name: Cross-post as drafts
+        if: steps.added.outputs.files != ''
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          # Passed through the environment — NOT interpolated into the command —
+          # so the file list can never inject shell.
+          ADDED_FILES: ${{ steps.added.outputs.files }}
+        run: npx tsx scripts/sync-dev-to.ts

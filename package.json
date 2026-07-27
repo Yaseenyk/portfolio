@@ -12,7 +12,6 @@
   "dependencies": {
     "@emailjs/browser": "^3.11.0",
     "framer-motion": "^11.3.8",
-    "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
     "next": "^14.2.5",
     "react": "^18.2.0",
@@ -36,9 +35,11 @@
     "autoprefixer": "^10.4.17",
     "eslint": "^8.55.0",
     "eslint-config-next": "^14.2.5",
+    "gray-matter": "^4.0.3",
     "postcss": "^8.4.33",
     "puppeteer": "^25.1.0",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.23.1",
     "typescript": "^5.2.2"
   }
 }
