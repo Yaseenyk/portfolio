@@ -17,6 +17,9 @@ import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import ProjectCard from "@/components/campus/ProjectCard";
 import CampusFaq from "@/components/campus/CampusFaq";
+import EarlyBirdBand from "@/components/campus/EarlyBirdBand";
+import StickyActionBar from "@/components/campus/StickyActionBar";
+import TrustStrip from "@/components/campus/TrustStrip";
 
 interface Params {
   params: { degree: string };
@@ -142,7 +145,7 @@ export default function DegreePage({ params }: Params) {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
+    <div className="mx-auto max-w-6xl px-6 py-12 pb-32 md:pb-12">
       <JsonLd
         data={[
           serviceJsonLd,
@@ -179,6 +182,10 @@ export default function DegreePage({ params }: Params) {
           {copy.expectation}
         </p>
       </header>
+
+      <div className="mt-12">
+        <EarlyBirdBand />
+      </div>
 
       <section className="mt-14">
         <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
@@ -230,8 +237,14 @@ export default function DegreePage({ params }: Params) {
       </nav>
 
       <div className="mt-20">
+        <TrustStrip />
+      </div>
+
+      <div className="mt-20">
         <CampusFaq items={CAMPUS_FAQ} />
       </div>
+
+      <StickyActionBar />
     </div>
   );
 }

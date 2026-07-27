@@ -14,7 +14,10 @@ import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusFaq from "@/components/campus/CampusFaq";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
+import EarlyBirdBand from "@/components/campus/EarlyBirdBand";
+import StickyActionBar from "@/components/campus/StickyActionBar";
 import TierTable from "@/components/campus/TierTable";
+import TrustStrip from "@/components/campus/TrustStrip";
 
 interface Params {
   params: { slug: string };
@@ -74,7 +77,7 @@ export default function CampusProjectPage({ params }: Params) {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-12">
+    <div className="mx-auto max-w-5xl px-6 py-12 pb-32 md:pb-12">
       <JsonLd
         data={[
           productJsonLd,
@@ -198,7 +201,14 @@ export default function CampusProjectPage({ params }: Params) {
         <div className="mt-8">
           <TierTable tiers={tiers} />
         </div>
+        <div className="mt-10">
+          <EarlyBirdBand />
+        </div>
       </section>
+
+      <div className="mt-20">
+        <TrustStrip />
+      </div>
 
       <section className="mt-16 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
         <h2 className="text-lg font-semibold text-zinc-50">
@@ -241,6 +251,8 @@ export default function CampusProjectPage({ params }: Params) {
       <div className="mt-20">
         <CampusFaq items={CAMPUS_FAQ} />
       </div>
+
+      <StickyActionBar context={project.title} />
     </div>
   );
 }

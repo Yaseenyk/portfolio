@@ -9,6 +9,8 @@ import {
 import { breadcrumbJsonLd, personRef } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
+import StickyActionBar from "@/components/campus/StickyActionBar";
+import TrustStrip from "@/components/campus/TrustStrip";
 
 const DESCRIPTION = `Get a custom final year project built to your approved problem statement — any stack, ${formatInr(
   CUSTOM_BUILD_RANGE.min
@@ -65,7 +67,7 @@ const serviceJsonLd = {
 
 export default function CustomBuildPage() {
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
+    <div className="mx-auto max-w-4xl px-6 py-12 pb-32 md:pb-12">
       <JsonLd
         data={[
           serviceJsonLd,
@@ -123,6 +125,10 @@ export default function CustomBuildPage() {
         </div>
       </section>
 
+      <div className="mt-20">
+        <TrustStrip />
+      </div>
+
       <div className="mt-16">
         <CampusLeadForm
           heading="Describe what you want built"
@@ -131,6 +137,8 @@ export default function CustomBuildPage() {
           messagePlaceholder="What the project should do, any stack your college mandates, and your submission date…"
         />
       </div>
+
+      <StickyActionBar />
     </div>
   );
 }

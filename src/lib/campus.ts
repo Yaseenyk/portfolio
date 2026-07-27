@@ -82,6 +82,26 @@ export const PAYMENT_POLICY = {
 
 export const CUSTOM_BUILD_RANGE = { min: 10000, max: 50000 };
 
+/** WhatsApp is the conversion channel for this audience — every CTA offers it. */
+export const WHATSAPP_NUMBER = "918208335028";
+
+export function whatsappHref(message: string): string {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+/**
+ * Launch offer. This is the honest substitute for testimonials the site does
+ * not have yet: a real discount for the first students, in exchange for
+ * permission to publish what they thought. Set `seats` to 0 to retire it —
+ * the band disappears everywhere rather than going stale.
+ */
+export const EARLY_BIRD = {
+  seats: 3,
+  discountPercent: 40,
+  condition:
+    "in exchange for an honest review and permission to show your finished project here",
+};
+
 /**
  * Registered listings, newest first. Add a file under `src/content/campus/`
  * and import it above — nothing is live until it appears in this array.
@@ -217,6 +237,21 @@ export const CAMPUS_FAQ = [
   {
     question: "Can I pay in installments?",
     answer: `Yes. Payment is direct — ${PAYMENT_POLICY.method.toLowerCase()} — split into monthly installments. Sessions start after the first installment; the complete source, report, and deployment handover comes after the final one.`,
+  },
+  {
+    question: "I can buy a project online for ₹2,000. Why does this cost more?",
+    answer:
+      "Because that ₹2,000 buys a zip file. Nobody explains it to you, the same file has been sold to hundreds of students, and it collapses the moment your examiner asks why you chose that database. What you are paying for here is a project built for you, capped per college, and the sessions that make you able to answer for it. If a zip file is all you need, buy the zip file.",
+  },
+  {
+    question: "How do I know you will not disappear after I take money?",
+    answer:
+      "Payment is split across months, so you are never paying for work you have not seen — you watch the code in sessions from the first one. If I fail to deliver what the project page promised, your remaining installments are cancelled and the last one is returned. I also have a name attached to this: the same site carries my portfolio, my published work, and my public repositories. That is not something I would burn for one project.",
+  },
+  {
+    question: "What if my guide rejects the project or asks for changes?",
+    answer:
+      "Changes your guide asks for during review are made at no extra cost — that is part of the build, not a new scope. If your guide rejects the topic outright before work begins, you can switch to a different project or stop with nothing further owed.",
   },
   {
     question: "Will another student at my college submit the same project?",

@@ -4,7 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import type { CampusTier, Degree } from "@/lib/campus";
-import { formatInr } from "@/lib/campus";
+import { formatInr, whatsappHref } from "@/lib/campus";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -35,7 +35,6 @@ const EMAILJS_TEMPLATE = "template_dyb1k4x";
 const EMAILJS_PUBLIC_KEY = "mB56akvK2qStLNadU";
 
 const CONTACT_EMAIL = "contact@streamerosai.com";
-const WHATSAPP_NUMBER = "918208335028";
 
 const DEGREES: Degree[] = ["BCA", "MCA", "B.Tech", "B.Sc IT", "M.Tech", "Diploma"];
 const YEARS = ["Final year", "Pre-final year", "Other"];
@@ -53,6 +52,8 @@ interface Props {
   intro: string;
   messageLabel: string;
   messagePlaceholder: string;
+  /** Departments enquire as staff, not students — swap course/year for a role. */
+  collegeSide?: boolean;
 }
 
 export default function CampusLeadForm({
@@ -62,6 +63,7 @@ export default function CampusLeadForm({
   intro,
   messageLabel,
   messagePlaceholder,
+  collegeSide = false,
 }: Props) {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [status, setStatus] = useState<Status>("idle");
@@ -88,11 +90,17 @@ export default function CampusLeadForm({
       // campus-specific fields are folded into the message body rather than
       // added as template variables that would silently vanish.
       const body = [
-        projectTitle ? `Project: ${projectTitle}` : "Project: CUSTOM BUILD",
+        collegeSide
+          ? "*** COLLEGE / DEPARTMENT ENQUIRY ***"
+          : projectTitle
+            ? `Project: ${projectTitle}`
+            : "Project: CUSTOM BUILD",
         form.tier && `Tier: ${form.tier}`,
         `Phone: ${form.phone}`,
-        `College: ${form.college}`,
-        `Course: ${form.degree}${form.year ? ` · ${form.year}` : ""}`,
+        `${collegeSide ? "Institution" : "College"}: ${form.college}`,
+        collegeSide
+          ? `Role: ${form.degree}`
+          : `Course: ${form.degree}${form.year ? ` · ${form.year}` : ""}`,
         "",
         form.message,
       ]
@@ -125,11 +133,13 @@ export default function CampusLeadForm({
   };
 
   const isSending = status === "sending";
-  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    projectTitle
-      ? `Hi Yaseen, I'm interested in the "${projectTitle}" final year project.`
-      : "Hi Yaseen, I want a custom final year project built."
-  )}`;
+  const whatsappLink = whatsappHref(
+    collegeSide
+      ? "Hi Yaseen, I'm from a college department and want to talk about final year project mentoring for our batch."
+      : projectTitle
+        ? `Hi Yaseen, I'm interested in the "${projectTitle}" final year project.`
+        : "Hi Yaseen, I want a custom final year project built.",
+  );
 
   return (
     <section
@@ -167,28 +177,40 @@ export default function CampusLeadForm({
             disabled={isSending}
           />
           <Field
-            label="College"
+            label={collegeSide ? "Institution" : "College"}
             name="college"
             value={form.college}
             onChange={handleChange}
             disabled={isSending}
           />
-          <Select
-            label="Course"
-            name="degree"
-            value={form.degree}
-            onChange={handleChange}
-            disabled={isSending}
-            options={DEGREES}
-          />
-          <Select
-            label="Year"
-            name="year"
-            value={form.year}
-            onChange={handleChange}
-            disabled={isSending}
-            options={YEARS}
-          />
+          {collegeSide ? (
+            <Field
+              label="Your role"
+              name="degree"
+              value={form.degree}
+              onChange={handleChange}
+              disabled={isSending}
+            />
+          ) : (
+            <>
+              <Select
+                label="Course"
+                name="degree"
+                value={form.degree}
+                onChange={handleChange}
+                disabled={isSending}
+                options={DEGREES}
+              />
+              <Select
+                label="Year"
+                name="year"
+                value={form.year}
+                onChange={handleChange}
+                disabled={isSending}
+                options={YEARS}
+              />
+            </>
+          )}
           {tiers && (
             <div className="sm:col-span-2">
               <Select
@@ -235,10 +257,10 @@ export default function CampusLeadForm({
           </motion.button>
 
           <a
-            href={whatsappHref}
+            href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-lg border border-white/10 px-6 py-3 text-sm text-zinc-300 transition-colors duration-200 hover:border-cyan/60 hover:text-zinc-50"
+            className="rounded-lg bg-[#25D366] px-6 py-3 text-sm font-semibold text-[#04220F] transition-transform duration-200 hover:scale-[1.03]"
           >
             Or message on WhatsApp
           </a>
