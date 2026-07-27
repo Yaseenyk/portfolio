@@ -11,6 +11,50 @@ export const meta: GuideMeta = {
   publishedAt: "2026-07-27",
   readingMinutes: 10,
   ogImage: "/social/report-format-wide.jpg",
+  howTo: {
+    steps: [
+      {
+        name: "Front matter",
+        text: "Title page in your college's format, a signed certificate, declaration, acknowledgement, a 200 to 300 word abstract written last, and the contents, figure and table lists.",
+      },
+      {
+        name: "Chapter 1 — Introduction",
+        text: "State the problem concretely, why it matters and who it affects, numbered objectives you can be held to, and the scope with an explicit out-of-scope list.",
+      },
+      {
+        name: "Chapter 2 — Literature survey",
+        text: "Name the systems that already exist, say specifically what each does badly, and show how your project addresses that gap in a comparison table.",
+      },
+      {
+        name: "Chapter 3 — System analysis",
+        text: "Cover feasibility, numbered functional and non-functional requirements, hardware and software needs, and the use case diagram with descriptions.",
+      },
+      {
+        name: "Chapter 4 — System design",
+        text: "The highest-mark chapter: architecture, ER and data flow diagrams, a class or sequence diagram, the full database schema and interface design, each with a two-sentence justification.",
+      },
+      {
+        name: "Chapter 5 — Implementation",
+        text: "Explain the technologies and why each was chosen, describe the build module by module, give key algorithms in pseudocode, and add selected snippets and screenshots.",
+      },
+      {
+        name: "Chapter 6 — Testing",
+        text: "Set out the testing strategy, a test case table of input, expected and actual output, evidence of validation being triggered, and known bugs and limitations.",
+      },
+      {
+        name: "Chapter 7 — Results and discussion",
+        text: "Report what the system achieves against each objective, any performance or ML metrics, and an honest discussion of the limitations.",
+      },
+      {
+        name: "Chapter 8 — Conclusion and future scope",
+        text: "Keep it short: what was built, what was learned, and three or four concrete extensions rather than vague statements of enhancement.",
+      },
+      {
+        name: "Back matter",
+        text: "References in your department's citation style, and appendices holding the full schema, extended code and any questionnaires.",
+      },
+    ],
+  },
   faq: [
     {
       question: "How many pages should a final year project report be?",

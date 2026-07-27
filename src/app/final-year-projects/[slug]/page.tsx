@@ -4,13 +4,20 @@ import { notFound } from "next/navigation";
 import {
   CAMPUS_FAQ,
   CAMPUS_PROJECTS,
+  DEGREE_SLUGS,
   PAYMENT_POLICY,
   SESSION_POLICY,
   campusUrl,
   getCampusProject,
   getTiers,
 } from "@/lib/campus";
-import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
+import type { CampusProject } from "@/lib/campus";
+import {
+  breadcrumbJsonLd,
+  courseJsonLd,
+  faqPageJsonLd,
+  personRef,
+} from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusFaq from "@/components/campus/CampusFaq";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
@@ -51,6 +58,25 @@ export default function CampusProjectPage({ params }: Params) {
   if (!project) notFound();
 
   const tiers = getTiers(project);
+  const mentored = tiers.find((t) => t.id === "mentored")!;
+
+  // Related projects for internal linking: prefer ones sharing a degree, fall
+  // back to the same domain, then anything — excluding this project. Cap at 3.
+  const relatedProjects: CampusProject[] = (() => {
+    const others = CAMPUS_PROJECTS.filter((p) => p.slug !== project.slug);
+    const score = (p: CampusProject) =>
+      (p.degrees.some((d) => project.degrees.includes(d)) ? 2 : 0) +
+      (p.domain === project.domain ? 1 : 0);
+    return [...others].sort((a, b) => score(b) - score(a)).slice(0, 3);
+  })();
+
+  const courseSchema = courseJsonLd({
+    name: `${project.title} — Mentored`,
+    description: `Mentored final year project: ${project.title} built for you end to end, then walked through line by line across ${project.sessionCount} live sessions with viva prep and a mock viva. ${project.summary}`,
+    url: campusUrl(project.slug),
+    sessionCount: project.sessionCount,
+    price: mentored.price,
+  });
 
   const productJsonLd = {
     "@context": "https://schema.org",
@@ -81,6 +107,7 @@ export default function CampusProjectPage({ params }: Params) {
       <JsonLd
         data={[
           productJsonLd,
+          courseSchema,
           faqPageJsonLd(CAMPUS_FAQ),
           breadcrumbJsonLd([
             { name: "Final Year Projects", path: "/final-year-projects" },
@@ -107,7 +134,26 @@ export default function CampusProjectPage({ params }: Params) {
         <p className="mt-5 max-w-2xl leading-relaxed text-zinc-400">{project.summary}</p>
 
         <dl className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-4">
-          <Meta label="Suits" value={project.degrees.join(" · ")} />
+          <div>
+            <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+              Suits
+            </dt>
+            <dd className="mt-1.5 flex flex-wrap gap-x-1.5 text-sm text-zinc-200">
+              {project.degrees.map((d, i) => (
+                <span key={d}>
+                  <Link
+                    href={`/final-year-projects/for/${DEGREE_SLUGS[d]}`}
+                    className="underline-offset-4 hover:text-cyan hover:underline"
+                  >
+                    {d}
+                  </Link>
+                  {i < project.degrees.length - 1 && (
+                    <span className="text-zinc-600"> ·</span>
+                  )}
+                </span>
+              ))}
+            </dd>
+          </div>
           <Meta label="Level" value={project.difficulty} />
           <Meta label="Live sessions" value={`${project.sessionCount}`} />
           <Meta
@@ -247,6 +293,34 @@ export default function CampusProjectPage({ params }: Params) {
           messagePlaceholder="Submission date, any stack your department requires, and what you want varied…"
         />
       </div>
+
+      {relatedProjects.length > 0 && (
+        <nav aria-label="Related projects" className="mt-20">
+          <h2 className="text-xl font-semibold tracking-tight text-zinc-50">
+            Other projects like this
+          </h2>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+            {relatedProjects.map((p) => (
+              <li key={p.slug}>
+                <Link
+                  href={`/final-year-projects/${p.slug}`}
+                  className="group flex h-full flex-col rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-colors duration-200 hover:border-cyan/40"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
+                    {p.category}
+                  </span>
+                  <span className="mt-2 text-sm font-medium text-zinc-100">
+                    {p.title}
+                  </span>
+                  <span className="mt-1.5 text-xs leading-relaxed text-zinc-500">
+                    {p.tagline}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
 
       <div className="mt-20">
         <CampusFaq items={CAMPUS_FAQ} />

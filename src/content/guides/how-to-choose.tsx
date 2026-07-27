@@ -11,6 +11,35 @@ export const meta: GuideMeta = {
   publishedAt: "2026-07-27",
   readingMinutes: 8,
   ogImage: "/social/how-to-choose-wide.jpg",
+  howTo: {
+    totalTime: "PT1H",
+    steps: [
+      {
+        name: "Count the weeks you actually have",
+        text: "Subtract a four-week buffer, your exam weeks, placement drives and festival breaks from your submission date to find the weeks you can really build in.",
+      },
+      {
+        name: "Decide what you want on the other side",
+        text: "Pick one goal — marks, a job, or higher study — and let it choose the project, because trying to serve all three serves none of them well.",
+      },
+      {
+        name: "Find out what your batch is doing",
+        text: "Ask around before committing so you do not submit a fourth variation of the same system, which turns the panel hostile through no fault of yours.",
+      },
+      {
+        name: "Ask what question the project will attract",
+        text: "Work out the one question a panel will inevitably ask, and choose a project whose question interests you rather than frightens you.",
+      },
+      {
+        name: "Take three options to your guide, not one",
+        text: "Bring three topics with two-line descriptions and honest difficulty notes so your guide advises rather than simply approves or rejects.",
+      },
+      {
+        name: "Write the scope down before you build",
+        text: "Put what it will and will not do, the technologies, and a week-by-week plan on one page, and get your guide to agree to it.",
+      },
+    ],
+  },
   faq: [
     {
       question: "When should I finalise my final year project topic?",

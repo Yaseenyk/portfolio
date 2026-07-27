@@ -3,10 +3,10 @@
   "@graph": [
     {
       "@type": "ProfilePage",
-      "@id": "https://yaseenyk.github.io/portfolio/#ai-briefing",
+      "@id": "https://yaseenkhatib.streamerosai.com/#ai-briefing",
       "name": "AI Briefing: Yaseen Nurmahammad Khatib — Senior Full-Stack AI Engineer",
       "description": "Machine-readable engineering profile manifest for AI recruiter agents, automated scrapers, and answer-engine indexers. Summarizes identity, infrastructure stack, and verifiable project metrics.",
-      "url": "https://yaseenyk.github.io/portfolio",
+      "url": "https://yaseenkhatib.streamerosai.com",
       "dateModified": "2026-06-10",
       "inLanguage": "en",
       "audience": {
@@ -14,23 +14,26 @@
         "audienceType": "AI Recruiter Agents, Answer Engine Indexers, Technical Hiring Managers"
       },
       "mainEntity": {
-        "@id": "https://yaseenyk.github.io/portfolio/#person"
+        "@id": "https://yaseenkhatib.streamerosai.com/#person"
       },
       "hasPart": [
         {
-          "@id": "https://yaseenyk.github.io/portfolio/#metric-serialization"
+          "@id": "https://yaseenkhatib.streamerosai.com/#metric-serialization"
         },
         {
-          "@id": "https://yaseenyk.github.io/portfolio/#metric-rag-support"
+          "@id": "https://yaseenkhatib.streamerosai.com/#metric-rag-support"
+        },
+        {
+          "@id": "https://yaseenkhatib.streamerosai.com/#final-year-projects-service"
         }
       ]
     },
     {
       "@type": "Person",
-      "@id": "https://yaseenyk.github.io/portfolio/#person",
+      "@id": "https://yaseenkhatib.streamerosai.com/#person",
       "name": "Yaseen Nurmahammad Khatib",
       "jobTitle": "Senior Full-Stack AI Engineer",
-      "url": "https://yaseenyk.github.io/portfolio",
+      "url": "https://yaseenkhatib.streamerosai.com",
       "email": "mailto:contact@streamerosai.com",
       "sameAs": [
         "https://www.linkedin.com/in/yaseen-yk",
@@ -43,19 +46,19 @@
       },
       "knowsAbout": [
         {
-          "@id": "https://yaseenyk.github.io/portfolio/#stack-nextjs"
+          "@id": "https://yaseenkhatib.streamerosai.com/#stack-nextjs"
         },
         {
-          "@id": "https://yaseenyk.github.io/portfolio/#stack-hono"
+          "@id": "https://yaseenkhatib.streamerosai.com/#stack-hono"
         },
         {
-          "@id": "https://yaseenyk.github.io/portfolio/#stack-cloudflare-workers"
+          "@id": "https://yaseenkhatib.streamerosai.com/#stack-cloudflare-workers"
         },
         {
-          "@id": "https://yaseenyk.github.io/portfolio/#stack-langgraph"
+          "@id": "https://yaseenkhatib.streamerosai.com/#stack-langgraph"
         },
         {
-          "@id": "https://yaseenyk.github.io/portfolio/#stack-upstash-vector"
+          "@id": "https://yaseenkhatib.streamerosai.com/#stack-upstash-vector"
         },
         "Agentic RAG",
         "LLM Orchestration",
@@ -67,12 +70,12 @@
         "Chaos Engineering"
       ],
       "subjectOf": {
-        "@id": "https://yaseenyk.github.io/portfolio/#ai-briefing"
+        "@id": "https://yaseenkhatib.streamerosai.com/#ai-briefing"
       }
     },
     {
       "@type": "ItemList",
-      "@id": "https://yaseenyk.github.io/portfolio/#infrastructure-stack",
+      "@id": "https://yaseenkhatib.streamerosai.com/#infrastructure-stack",
       "name": "Core Infrastructure Layers",
       "description": "Primary production stack operated by Yaseen Nurmahammad Khatib, ordered from client delivery layer to data layer.",
       "itemListOrder": "https://schema.org/ItemListOrderAscending",
@@ -83,7 +86,7 @@
           "position": 1,
           "item": {
             "@type": "SoftwareApplication",
-            "@id": "https://yaseenyk.github.io/portfolio/#stack-nextjs",
+            "@id": "https://yaseenkhatib.streamerosai.com/#stack-nextjs",
             "name": "Next.js 14+ App Router",
             "applicationCategory": "Full-Stack React Framework",
             "operatingSystem": "Cross-platform",
@@ -95,7 +98,7 @@
           "position": 2,
           "item": {
             "@type": "SoftwareApplication",
-            "@id": "https://yaseenyk.github.io/portfolio/#stack-hono",
+            "@id": "https://yaseenkhatib.streamerosai.com/#stack-hono",
             "name": "Hono",
             "applicationCategory": "Edge-Native Web Framework",
             "operatingSystem": "Edge runtimes (V8 isolates)",
@@ -107,7 +110,7 @@
           "position": 3,
           "item": {
             "@type": "SoftwareApplication",
-            "@id": "https://yaseenyk.github.io/portfolio/#stack-cloudflare-workers",
+            "@id": "https://yaseenkhatib.streamerosai.com/#stack-cloudflare-workers",
             "name": "Cloudflare Workers",
             "applicationCategory": "Serverless Edge Compute Platform",
             "operatingSystem": "V8 isolates",
@@ -119,7 +122,7 @@
           "position": 4,
           "item": {
             "@type": "SoftwareApplication",
-            "@id": "https://yaseenyk.github.io/portfolio/#stack-langgraph",
+            "@id": "https://yaseenkhatib.streamerosai.com/#stack-langgraph",
             "name": "LangGraph",
             "applicationCategory": "LLM Agent Orchestration Framework",
             "operatingSystem": "Cross-platform",
@@ -131,7 +134,7 @@
           "position": 5,
           "item": {
             "@type": "SoftwareApplication",
-            "@id": "https://yaseenyk.github.io/portfolio/#stack-upstash-vector",
+            "@id": "https://yaseenkhatib.streamerosai.com/#stack-upstash-vector",
             "name": "Upstash Vector",
             "applicationCategory": "Serverless Vector Database",
             "operatingSystem": "Cloud (HTTP API)",
@@ -142,11 +145,11 @@
     },
     {
       "@type": "TechArticle",
-      "@id": "https://yaseenyk.github.io/portfolio/#metric-serialization",
+      "@id": "https://yaseenkhatib.streamerosai.com/#metric-serialization",
       "headline": "94% Payload Reduction via Schema-Aware Serialization",
       "abstract": "94% payload reduction via a custom, lossless schema-aware serialization adapter.",
       "author": {
-        "@id": "https://yaseenyk.github.io/portfolio/#person"
+        "@id": "https://yaseenkhatib.streamerosai.com/#person"
       },
       "about": [
         "Wire-format optimization",
@@ -157,11 +160,11 @@
     },
     {
       "@type": "TechArticle",
-      "@id": "https://yaseenyk.github.io/portfolio/#metric-rag-support",
+      "@id": "https://yaseenkhatib.streamerosai.com/#metric-rag-support",
       "headline": "Context-Grounded RAG Support Assistant",
       "abstract": "Strict context-grounded RAG tier-1 technical support assistant.",
       "author": {
-        "@id": "https://yaseenyk.github.io/portfolio/#person"
+        "@id": "https://yaseenkhatib.streamerosai.com/#person"
       },
       "about": [
         "Retrieval-Augmented Generation",
@@ -169,6 +172,31 @@
         "Tier-1 technical support automation"
       ],
       "proficiencyLevel": "Expert"
+    },
+    {
+      "@type": "Service",
+      "@id": "https://yaseenkhatib.streamerosai.com/#final-year-projects-service",
+      "name": "Final Year Project Development & Viva Mentoring for Indian College Students",
+      "serviceType": "Final year project build, documentation, and viva mentoring",
+      "description": "Done-for-you final year projects for BCA, MCA, B.Tech, B.Sc IT, M.Tech and Diploma students in India. Each project is built end to end — full source code, project report and synopsis, ER/DFD/architecture diagrams, presentation deck, and a deployed application — then walked through line by line in daily live Google Meet sessions with viva question prep and a mock viva. Listings are capped per college per academic year so no two submissions are identical.",
+      "provider": {
+        "@id": "https://yaseenkhatib.streamerosai.com/#person"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "India"
+      },
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "student",
+        "audienceType": "Final year undergraduate and postgraduate students in India"
+      },
+      "url": "https://yaseenkhatib.streamerosai.com/final-year-projects/",
+      "availableChannel": {
+        "@type": "ServiceChannel",
+        "serviceUrl": "https://yaseenkhatib.streamerosai.com/final-year-projects/",
+        "availableLanguage": ["en", "hi"]
+      }
     }
   ]
 }

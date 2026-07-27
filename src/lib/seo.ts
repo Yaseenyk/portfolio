@@ -79,6 +79,84 @@ export interface FaqItem {
   answer: string;
 }
 
+export interface HowToStep {
+  /** Short step heading — must match a visible step/section heading. */
+  name: string;
+  /** One-line description of the step, matching the on-page instruction. */
+  text: string;
+}
+
+/**
+ * HowTo schema. Use ONLY for genuinely step-by-step guides: the steps MUST
+ * correspond to the ordered sections a reader sees on the page (Google's
+ * matching-content rule, and the site's honest-content thesis). Feed the same
+ * steps the page renders so the two can never drift.
+ */
+export function howToJsonLd(opts: {
+  name: string;
+  description: string;
+  url: string;
+  /** ISO 8601 duration, e.g. "PT1H". Omit if unknown. */
+  totalTime?: string;
+  steps: HowToStep[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    ...(opts.totalTime ? { totalTime: opts.totalTime } : {}),
+    step: opts.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+    })),
+  };
+}
+
+/**
+ * Course schema for a mentored final-year-project listing. Honest here because
+ * the Mentored tier is a real taught course: N live sessions, a line-by-line
+ * code walkthrough, and viva prep. `provider`/`instructor` reference the
+ * sitewide Person by @id (resolved from the layout graph on the same page).
+ */
+export function courseJsonLd(opts: {
+  name: string;
+  description: string;
+  url: string;
+  /** Live 1-hour sessions in the Mentored tier — drives courseWorkload. */
+  sessionCount: number;
+  /** Mentored-tier price. */
+  price: number;
+  currency?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    provider: personRef,
+    inLanguage: "en",
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: "online",
+      courseWorkload: `PT${opts.sessionCount}H`,
+      instructor: personRef,
+      offers: {
+        "@type": "Offer",
+        category: "Mentored",
+        price: opts.price,
+        priceCurrency: opts.currency ?? "INR",
+        availability: "https://schema.org/InStock",
+        url: `${opts.url}#enquire`,
+      },
+    },
+  };
+}
+
 /**
  * FAQPage schema. Feed it the SAME array the page renders — markup matching
  * visible content is a Google rich-results requirement, and deriving both

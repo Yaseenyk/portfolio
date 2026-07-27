@@ -3,7 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SITE_URL, PERSON } from "@/lib/site";
 import { GUIDES, getGuide, guideUrl } from "@/lib/guides";
-import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
+import {
+  CAMPUS_PROJECTS,
+  DEGREE_SLUGS,
+  campusUrl,
+  projectsForDegree,
+} from "@/lib/campus";
+import type { CampusProject } from "@/lib/campus";
+import {
+  breadcrumbJsonLd,
+  faqPageJsonLd,
+  howToJsonLd,
+  personRef,
+} from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
 import StickyActionBar from "@/components/campus/StickyActionBar";
@@ -50,6 +62,19 @@ export default function GuidePage({ params }: Params) {
   const { meta, Body } = guide;
   const others = GUIDES.filter((g) => g.meta.slug !== meta.slug).slice(0, 3);
 
+  // Internal linking: send guide readers into the catalog. A guide tagged with
+  // degrees surfaces the projects that fit them; an untagged guide (applies to
+  // everyone) falls back to the newest listings. Dedupe, cap at three.
+  const relatedProjects: CampusProject[] = (() => {
+    const pool = meta.degrees?.length
+      ? meta.degrees.flatMap((d) => projectsForDegree(d))
+      : CAMPUS_PROJECTS;
+    const seen = new Set<string>();
+    return pool
+      .filter((p) => (seen.has(p.slug) ? false : (seen.add(p.slug), true)))
+      .slice(0, 3);
+  })();
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -73,6 +98,19 @@ export default function GuidePage({ params }: Params) {
       <JsonLd
         data={[
           articleJsonLd,
+          ...(meta.howTo
+            ? [
+                howToJsonLd({
+                  name: meta.h1,
+                  description: meta.description,
+                  url: guideUrl(meta.slug),
+                  ...(meta.howTo.totalTime
+                    ? { totalTime: meta.howTo.totalTime }
+                    : {}),
+                  steps: meta.howTo.steps,
+                }),
+              ]
+            : []),
           ...(meta.faq ? [faqPageJsonLd(meta.faq)] : []),
           breadcrumbJsonLd([
             { name: "Final Year Projects", path: "/final-year-projects" },
@@ -161,6 +199,57 @@ export default function GuidePage({ params }: Params) {
               </li>
             ))}
           </ul>
+        </nav>
+      )}
+
+      {relatedProjects.length > 0 && (
+        <nav aria-label="Projects you can submit" className="mt-20">
+          <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
+            Projects you can submit
+          </h2>
+          <ul className="mt-5 space-y-3">
+            {relatedProjects.map((p) => (
+              <li key={p.slug}>
+                <Link
+                  href={`/final-year-projects/${p.slug}`}
+                  className="group flex items-baseline justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-colors duration-200 hover:border-cyan/40"
+                >
+                  <span className="text-sm text-zinc-200">{p.title}</span>
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+                    {p.degrees.join(" · ")}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {meta.degrees?.length ? (
+            <p className="mt-5 text-sm text-zinc-500">
+              Or see everything shortlisted for{" "}
+              {meta.degrees.map((d, i) => (
+                <span key={d}>
+                  {i > 0 && (i === meta.degrees!.length - 1 ? " and " : ", ")}
+                  <Link
+                    href={`/final-year-projects/for/${DEGREE_SLUGS[d]}`}
+                    className="text-cyan underline-offset-4 hover:underline"
+                  >
+                    {d}
+                  </Link>
+                </span>
+              ))}
+              .
+            </p>
+          ) : (
+            <p className="mt-5 text-sm text-zinc-500">
+              Or browse the{" "}
+              <Link
+                href="/final-year-projects"
+                className="text-cyan underline-offset-4 hover:underline"
+              >
+                full project catalog
+              </Link>
+              .
+            </p>
+          )}
         </nav>
       )}
 
