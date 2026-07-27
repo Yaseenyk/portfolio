@@ -122,6 +122,12 @@ export interface BlogPost {
   takeaways: string[];
   /** Absolute or root-relative OG/Twitter image (optional). */
   ogImage?: string;
+  /**
+   * Set on thin, purely-informational posts that will never convert — keeps
+   * them out of the index so they stop diluting the site's topical focus (the
+   * intent-mismatch that got the site flagged). Still followed for link equity.
+   */
+  noindex?: boolean;
   /** The article body (JSX). */
   Body: ComponentType;
 }

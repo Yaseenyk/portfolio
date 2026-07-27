@@ -39,6 +39,7 @@ interface ResolvedPost {
   tags: string[];
   takeaways: string[];
   ogImage?: string;
+  noindex?: boolean;
   body: ReactNode;
 }
 
@@ -131,6 +132,9 @@ export async function generateMetadata({
     keywords: post.keywords,
     authors: [{ name: post.author.name }],
     alternates: { canonical: url },
+    ...(post.noindex
+      ? { robots: { index: false, follow: true } }
+      : {}),
     openGraph: {
       type: "article",
       url,
@@ -391,18 +395,31 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
       </aside>
 
-      {/* Footer CTA */}
+      {/* Footer CTA — hiring intent: every technical reader who lands here
+          should leave knowing the author is available and how to reach him. */}
       <div className="mt-16 overflow-hidden rounded-2xl border border-cyan/30 bg-gradient-to-br from-cyan/10 to-purple/10 p-8 text-center backdrop-blur-md sm:p-10">
         <h2 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
-          Looking to architect a similar system?
+          Need an engineer who can build this?
         </h2>
-        <p className="mt-3 text-zinc-400">Let&apos;s ship it at AI-speed.</p>
-        <Link
-          href="/#contact"
-          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-cyan px-6 py-3 text-sm font-semibold text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_-2px_rgba(34,211,238,0.7)]"
-        >
-          Start a conversation →
-        </Link>
+        <p className="mx-auto mt-3 max-w-xl text-zinc-400">
+          I&apos;m Yaseen Khatib — a Senior Full-Stack AI Engineer (MERN +
+          TypeScript) who ships production AI systems solo. Open to senior and
+          lead roles, remote or on-site.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/#contact"
+            className="inline-flex items-center gap-2 rounded-lg bg-cyan px-6 py-3 text-sm font-semibold text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_-2px_rgba(34,211,238,0.7)]"
+          >
+            Get in touch →
+          </Link>
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-200 transition-colors duration-300 hover:border-ice/60 hover:text-ice"
+          >
+            See what I&apos;ve shipped
+          </Link>
+        </div>
       </div>
     </article>
   );

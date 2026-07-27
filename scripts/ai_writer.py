@@ -48,7 +48,7 @@ try:
 except ImportError:
     pass
 
-AUTHOR = {"name": "Yaseen Khatib", "role": "MERN + AI Architect"}
+AUTHOR = {"name": "Yaseen Khatib", "role": "Senior Full-Stack AI Engineer"}
 
 
 def slugify(text: str) -> str:
@@ -78,7 +78,22 @@ def remove_topic(topic: str) -> None:
 
 
 def build_prompt(topic: str) -> str:
-    return f"""You are a principal MERN + AI engineer writing for a senior developer audience.
+    return f"""You are Yaseen Khatib, a Senior Full-Stack AI Engineer (MERN + TypeScript),
+writing a field-notes post for YOUR OWN portfolio blog. The audience is
+recruiters, engineering managers, and senior developers evaluating whether you
+can build the thing. So this is not an encyclopedia entry that happens to sit on
+a portfolio — it is a practitioner's writeup that proves hireable judgment while
+teaching something real.
+
+POSITIONING — the de-indexing lesson: generic explainer posts ("What is X",
+"A guide to Y") pull informational searchers who bounce, which got this site
+flagged as irrelevant. Every post must instead signal "an engineer who has
+actually built this is talking". Concretely:
+- Frame the topic through the lens of BUILDING production systems, not defining
+  a concept. Lead with the engineering decision, the tradeoff, or the failure
+  mode you design around — not a textbook definition.
+- The reader should finish thinking "I want this person on my team", not "nice
+  reference, now back to the docs".
 
 Write a highly technical, opinionated, practical article on this topic:
 "{topic}"
@@ -126,13 +141,30 @@ never force them, and never present the coined term as an industry standard:
   taken from brief to live in a day).
 
 Field requirements (ALL fields are mandatory — never leave one empty):
-- title: a specific title a human would write (<=65 chars): plain words, at
-  most one colon, no keyword-stuffing — say the one thing the article proves.
-- description: one compelling meta-description sentence, 120-160 chars, plain text, no quotes.
+- title: a practitioner's title, not an encyclopedia entry (<=65 chars, plain
+  words, at most one colon, no keyword-stuffing). It must read as a working
+  engineer's writeup — an angle, a decision, a hard-won lesson, or a
+  "how I do X in production" — NOT a neutral definition. Avoid bare
+  "What is X" / "A guide to X" / "Understanding X" / "Introduction to X"
+  framings; those are the informational-intent titles that got this site
+  de-indexed. Prefer angles like "Why I ...", "How I ... in production",
+  "... the way it actually breaks", "The ... tradeoff nobody mentions".
+- description: one meta-description sentence, 120-160 chars, plain text, no
+  quotes. Write it as the author (a Senior Full-Stack AI Engineer) — a
+  practitioner's take that carries the search phrase but clearly frames the
+  piece as built-from-experience, not a definition.
 - tags: 2-4 short topic tags (e.g. AI, Backend, RAG).
 - keywords: 5-8 specific, long-tail SEO keywords/phrases a developer would actually search.
 - takeaways: 3-4 direct, declarative TL;DR sentences.
 - body_markdown: the full article in GitHub-Flavored Markdown. Requirements:
+  - OPENING: the first paragraph must frame the topic through building/operating
+    a real system — the decision, constraint, or failure mode you engineer
+    around — NOT a definition of the concept. No "X is a technique that...".
+  - CLOSING: end with a short paragraph that connects the topic back to the kind
+    of production work the author ships (applied full-stack AI systems) and
+    leaves a subtle "this is the judgment I bring to a team" signal. Do NOT
+    invent metrics, clients, or incidents; stay honest and qualitative unless
+    referencing the documented projects/patterns below.
   - Do NOT include an H1 (#) heading; the title is rendered separately. Use ## and ### headings.
   - SEO/AEO: phrase at least TWO of the ## headings as the exact question a developer
     would type into a search engine (e.g. "## How do you X without Y?"), and open each
