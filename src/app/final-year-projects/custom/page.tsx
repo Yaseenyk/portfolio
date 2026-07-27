@@ -81,13 +81,18 @@ export default function CustomBuildPage() {
           ~/final-year-projects/custom
         </span>
         <h1 className="mt-5 text-4xl font-semibold tracking-tight text-zinc-50 sm:text-5xl">
-          Built to your problem statement
+          Tell me what you want. I build it.
         </h1>
         <p className="mt-5 text-lg leading-relaxed text-zinc-400">
-          Your guide approved a topic that is not in the catalog. Send it here. It
-          gets built to spec, with the same {SESSION_POLICY.cadence.toLowerCase()}{" "}
-          sessions after {SESSION_POLICY.startsAfter} and the same installment
-          structure — {PAYMENT_POLICY.method.toLowerCase()}, no gateway, no
+          A topic your guide approved, an idea you have been carrying around, or a
+          stack your department insists on — describe it and it gets built end to
+          end. Code, database, report, diagrams, deck, deployment. You write none of
+          it.
+        </p>
+        <p className="mt-4 leading-relaxed text-zinc-400">
+          Then the same {SESSION_POLICY.cadence.toLowerCase()} sessions after{" "}
+          {SESSION_POLICY.startsAfter} to teach you every part of it, and the same
+          installments — {PAYMENT_POLICY.method.toLowerCase()}, no gateway, no
           subscription.
         </p>
       </header>
@@ -120,10 +125,10 @@ export default function CustomBuildPage() {
 
       <div className="mt-16">
         <CampusLeadForm
-          heading="Send the brief"
-          intro="Paste the problem statement exactly as your guide gave it, plus your submission deadline. You get a scope, a price, and an installment split back — usually within a day."
-          messageLabel="Problem statement + deadline"
-          messagePlaceholder="Paste the approved problem statement, any stack your college mandates, and your submission date…"
+          heading="Describe what you want built"
+          intro="The approved problem statement, or your own idea in your own words — rough is fine, I will shape the scope. Add your submission deadline. You get a scope, a price, and an installment split back, usually within a day."
+          messageLabel="What you want built + your deadline"
+          messagePlaceholder="What the project should do, any stack your college mandates, and your submission date…"
         />
       </div>
     </div>

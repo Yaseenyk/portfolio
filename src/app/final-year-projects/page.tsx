@@ -21,7 +21,7 @@ import CampusIndex from "@/components/campus/CampusIndex";
 import CampusFaq from "@/components/campus/CampusFaq";
 
 const DESCRIPTION =
-  "Final year projects for BCA, MCA and B.Tech students — full source code, project report, and daily live Google Meet sessions where the code is explained line by line so you can defend it in your viva. Direct payment in monthly installments.";
+  "Final year projects for BCA, MCA and B.Tech students, built for you end to end — code, report, diagrams and deployment — or your own idea built from scratch. Daily live Google Meet sessions explain the code line by line so you can defend it in your viva. Direct payment in monthly installments.";
 
 export const metadata: Metadata = {
   title: "Final Year Projects — Built, Explained, Defended",
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
 const STEPS = [
   {
     n: "01",
-    title: "Pick a project",
-    body: "Browse the catalog or send a brief for something custom. Every listing shows the exact stack, modules, and what ships with it.",
+    title: "Pick one, or name your own",
+    body: "Browse the catalog, or send the idea your guide approved and it gets built from scratch. Any stack, any domain — the listing is a starting point, not a limit.",
   },
   {
     n: "02",
@@ -49,8 +49,8 @@ const STEPS = [
   },
   {
     n: "03",
-    title: "Learn it live, every day",
-    body: `${SESSION_POLICY.cadence} sessions on ${SESSION_POLICY.platform} after ${SESSION_POLICY.startsAfter}, walking the code module by module — plus mock viva before submission.`,
+    title: "Sit and learn it",
+    body: `${SESSION_POLICY.cadence} sessions on ${SESSION_POLICY.platform} after ${SESSION_POLICY.startsAfter}, walking the code module by module. Nothing to build, nothing to figure out alone — turn up and understand what you are submitting. Ends in a mock viva.`,
   },
   {
     n: "04",
@@ -112,14 +112,19 @@ export default function FinalYearProjectsPage() {
           ~/final-year-projects
         </span>
         <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-zinc-50 sm:text-5xl">
-          Final year projects you can actually defend
+          I build it. You learn it. You defend it.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-zinc-400">
-          A working project is half the marks. The other half is the viva. Every
-          project here ships with source, report, and{" "}
-          {SESSION_POLICY.cadence.toLowerCase()} live sessions after{" "}
-          {SESSION_POLICY.startsAfter} where I walk you through the code I wrote —
-          line by line — until you can explain it without me.
+          Pick a project below or tell me the one you want — either way I build the
+          whole thing. Code, database, report, diagrams, deck, deployment. You do
+          not write a line of it.
+        </p>
+        <p className="mt-4 max-w-2xl leading-relaxed text-zinc-400">
+          Then, {SESSION_POLICY.cadence.toLowerCase()} after{" "}
+          {SESSION_POLICY.startsAfter}, we sit on a call and I walk you through the
+          code I wrote — line by line — until you can explain it without me. A
+          working project is half the marks. The viva is the other half, and that is
+          what the sessions are for.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-4">
@@ -190,13 +195,14 @@ export default function FinalYearProjectsPage() {
 
       <section className="mt-24 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-10">
         <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
-          Nothing here fits your subject?
+          Want something that is not on this page?
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">
-          Send the problem statement your guide approved and it gets built to spec —
-          same sessions, same installments. Custom builds are quoted between{" "}
-          {formatInr(CUSTOM_BUILD_RANGE.min)} and {formatInr(CUSTOM_BUILD_RANGE.max)}{" "}
-          depending on scope.
+          Then describe it and it gets built. The problem statement your guide
+          approved, an idea you saw somewhere, a stack your department insists on —
+          any of it. Same sessions, same installments, still nothing for you to
+          build. Custom work is quoted between {formatInr(CUSTOM_BUILD_RANGE.min)}{" "}
+          and {formatInr(CUSTOM_BUILD_RANGE.max)} depending on scope.
         </p>
         <Link
           href="/final-year-projects/custom"

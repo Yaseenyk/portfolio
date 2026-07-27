@@ -215,12 +215,14 @@ export default function CampusProjectPage({ params }: Params) {
           </li>
           <li className="text-sm leading-relaxed text-zinc-400">
             <span className="text-zinc-200">
-              The point is that you can explain it.
+              You build nothing. You just have to be able to explain it.
             </span>{" "}
-            {SESSION_POLICY.cadence} {SESSION_POLICY.durationMinutes}-minute sessions
-            on {SESSION_POLICY.platform} after {SESSION_POLICY.startsAfter}, walking
-            the code you are submitting, ending in a mock viva. You are buying the
-            build and the understanding — the marks are still yours to earn.
+            The project is delivered finished — code, report, diagrams, deployed.
+            Then {SESSION_POLICY.cadence.toLowerCase()}{" "}
+            {SESSION_POLICY.durationMinutes}-minute sessions on{" "}
+            {SESSION_POLICY.platform} after {SESSION_POLICY.startsAfter}, walking the
+            code you are submitting, ending in a mock viva. Turn up and you will know
+            it well enough to answer anything the panel asks.
           </li>
         </ul>
       </section>

@@ -30,6 +30,7 @@ const CLAUSES: Clause[] = [
   {
     heading: "What you receive",
     paragraphs: [
+      "The project is built for you. You are not asked to write code, fix bugs, or finish anything off — it is delivered working.",
       "Every tier includes the complete source code of the project, a setup guide, and seed data where the project needs it. The Academic tier adds the project report, the presentation deck, and the ER, DFD, and architecture diagrams. The Mentored tier adds live sessions, viva preparation, and one module varied specifically for you.",
       "What each tier includes is listed on the project page itself, and that listing is the agreement. If something is not written there, it is not included — ask before paying rather than after.",
     ],
@@ -74,8 +75,8 @@ const CLAUSES: Clause[] = [
   {
     heading: "What this is, and what it is not",
     paragraphs: [
-      "This is a source licence plus mentorship. You are buying working code and the understanding to defend it. The sessions exist so that you can explain every line you submit, and they end in a mock viva for exactly that reason.",
-      "It is your responsibility to comply with your college's rules on external assistance, and to disclose it where your institution requires disclosure. The marks are yours to earn — I do not sit your viva, write your exam, or contact your college on your behalf.",
+      "This is a build service plus mentorship. The project is developed for you end to end — you are not expected to write any of it. What you are also buying is the understanding to defend it, which is why the sessions walk the code line by line and end in a mock viva.",
+      "It is your responsibility to comply with your college's rules on external assistance, and to disclose it where your institution requires disclosure. I do not sit your viva, write your exam, or contact your college on your behalf.",
     ],
   },
   {

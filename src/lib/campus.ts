@@ -197,6 +197,15 @@ export function allDomains(): string[] {
 
 export const CAMPUS_FAQ = [
   {
+    question: "Do I have to build any of it myself?",
+    answer:
+      "No. The project is built, documented, and deployed for you — code, report, deck, diagrams, and the running application. Your only job is to turn up to the sessions and learn what you are submitting.",
+  },
+  {
+    question: "Can I get my own idea built instead of picking from the list?",
+    answer: `Yes. Send whatever your guide approved — or an idea you want built from scratch — through the custom build form. Any stack, any domain. Custom projects are quoted between ${formatInr(CUSTOM_BUILD_RANGE.min)} and ${formatInr(CUSTOM_BUILD_RANGE.max)} depending on scope, and run on the same sessions and installments.`,
+  },
+  {
     question: "Do I get the source code, or only the explanation?",
     answer:
       "You get the full source code on every tier. The Mentored tier adds live sessions where the code is walked through line by line so you can defend it in your viva.",
@@ -213,10 +222,6 @@ export const CAMPUS_FAQ = [
     question: "Will another student at my college submit the same project?",
     answer:
       "No. Each listing is capped to a limited number of students per college per academic year, and the Mentored tier varies one module — the dataset, the domain, or a feature — so two builds are never identical.",
-  },
-  {
-    question: "What if I need a project that is not in the catalog?",
-    answer: `Send a brief through the custom build form. Custom projects are quoted between ${formatInr(CUSTOM_BUILD_RANGE.min)} and ${formatInr(CUSTOM_BUILD_RANGE.max)} depending on scope, and follow the same session and installment structure.`,
   },
   {
     question: "Who actually builds and teaches this?",

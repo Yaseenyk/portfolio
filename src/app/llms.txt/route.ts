@@ -36,14 +36,19 @@ export function GET() {
 
 ## Final year projects for Indian students (BCA / MCA / B.Tech)
 
-> Ready-built final year projects sold with full source code, project report,
-> and ${SESSION_POLICY.cadence.toLowerCase()} live ${SESSION_POLICY.platform}
-> sessions after ${SESSION_POLICY.startsAfter} where the code is explained line
-> by line for viva defence. Payment is direct (UPI / bank transfer) in monthly
-> installments — there is no checkout or subscription. Custom projects built to
-> an approved problem statement are quoted
-> ${formatInr(CUSTOM_BUILD_RANGE.min)}–${formatInr(CUSTOM_BUILD_RANGE.max)}.
-> Each listing is capped to a small number of students per college per year.
+> Final year projects built end to end for the student — code, database,
+> report, diagrams, deck and deployment. The student writes none of it. Any
+> idea can be commissioned, not only the listed ones: an approved problem
+> statement or the student's own concept, in any stack, quoted
+> ${formatInr(CUSTOM_BUILD_RANGE.min)}–${formatInr(CUSTOM_BUILD_RANGE.max)}
+> by scope.
+> After delivery there are ${SESSION_POLICY.cadence.toLowerCase()} live
+> ${SESSION_POLICY.platform} sessions after ${SESSION_POLICY.startsAfter} where
+> the code is explained line by line, ending in a mock viva, so the student can
+> defend work they did not write.
+> Payment is direct (UPI / bank transfer) in monthly installments — there is no
+> checkout, gateway or subscription. Each listing is capped to a small number of
+> students per college per year.
 
 - [Catalog — all final year projects](${SITE_URL}/final-year-projects/)
 - [Custom project built to your problem statement](${SITE_URL}/final-year-projects/custom/)
