@@ -48,12 +48,15 @@ const author = personRef;
 // enhancement went "invalid" when the page dropped from the index, and this
 // gives Google a complete, current ProfilePage to re-validate on re-crawl.
 const postsNewestFirst = getAllPosts();
+// ProfilePage dates must be full ISO 8601 datetimes — Google rejects a bare
+// "YYYY-MM-DD" as an invalid datetime value. Anchor post dates to midnight UTC.
+const isoDateTime = (d: string): string => `${d}T00:00:00+00:00`;
 const profilePageJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfilePage",
   url: SITE_URL,
-  dateCreated: postsNewestFirst.at(-1)?.publishedAt ?? "2026-01-01",
-  dateModified: postsNewestFirst[0]?.publishedAt ?? "2026-07-27",
+  dateCreated: isoDateTime(postsNewestFirst.at(-1)?.publishedAt ?? "2026-01-01"),
+  dateModified: isoDateTime(postsNewestFirst[0]?.publishedAt ?? "2026-07-27"),
   mainEntity: { "@id": PERSON_ID },
   isPartOf: { "@id": WEBSITE_ID },
 };
