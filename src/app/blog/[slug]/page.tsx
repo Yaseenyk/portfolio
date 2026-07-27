@@ -122,9 +122,12 @@ export async function generateMetadata({
 
   const url = `${SITE_URL}/blog/${post.slug}/`;
   const ogImage = resolveOgImage(post.slug, post.ogImage);
+  // Every post must expose an og:image, or shared links render a broken/generic
+  // card instead of a large one. Use the post's own 1536x1024 cover when it
+  // exists; otherwise reuse the existing brand banner (no new images created).
   const images = ogImage
     ? [{ url: ogImage, width: 1536, height: 1024, alt: post.title }]
-    : undefined;
+    : [{ url: "/og-lockup.png", alt: post.title }];
 
   return {
     title: post.title,
@@ -151,7 +154,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: post.title,
       description: post.description,
-      images: ogImage ? [ogImage] : undefined,
+      images: [ogImage ?? "/og-lockup.png"],
     },
   };
 }
