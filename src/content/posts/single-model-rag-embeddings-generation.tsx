@@ -74,12 +74,12 @@ function Body() {
   return (
     <>
       <p>
-        The reflexive RAG architecture reaches for two models: a specialised
-        embedding model for retrieval and a separate, larger model for generation.
-        It is defensible — best-of-breed at each step. It is also two providers,
-        two SDKs, two sets of credentials, two failure surfaces, and a standing
-        risk that your query embeddings and your corpus embeddings drift into
-        subtly different spaces. On the streamerOS Support Agent I made the
+        When I built retrieval for the streamerOS Support Agent, the reflexive
+        architecture wanted two models: a specialised embedding model for retrieval
+        and a separate, larger model for generation. It is defensible — best-of-breed
+        at each step. It is also two providers, two SDKs, two sets of credentials,
+        two failure surfaces, and a standing risk that your query embeddings and
+        your corpus embeddings drift into subtly different spaces. I made the
         opposite call: one model — <code>gemini-flash-latest</code> — does both.
       </p>
 
@@ -145,7 +145,9 @@ function Body() {
         <a href="/blog/edge-native-rag-cloudflare-workers-hono">
           an edge-native runtime
         </a>{" "}
-        where every extra dependency has a real cost.
+        where every extra dependency has a real cost. Pricing complexity before
+        adding it, rather than after, is the judgment I bring to a team&apos;s RAG
+        stack.
       </p>
     </>
   );
@@ -153,16 +155,16 @@ function Body() {
 
 export const singleModelRag: BlogPost = {
   slug: "single-model-rag-embeddings-generation",
-  title: "One Model, Two Jobs: Single-Model RAG for Embeddings and Generation",
+  title: "Why I Run One RAG Model for Both Embeddings and Generation",
   description:
-    "The default RAG stack uses a separate embedding model and generation model. Here is the case for using one model for both — fewer moving parts, one set of credentials, and query/corpus vectors that share a latent space by construction.",
+    "On streamerOS I run one model for both RAG embeddings and generation — one less provider, and query and corpus vectors share a latent space by construction.",
   keywords: [
-    "embedding model vs generation model",
-    "RAG architecture decisions",
-    "gemini flash embeddings",
-    "simplify RAG stack",
     "single model RAG",
+    "embedding model vs generation model",
     "vector embeddings",
+    "production RAG",
+    "RAG engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-06",
   readingMinutes: 6,

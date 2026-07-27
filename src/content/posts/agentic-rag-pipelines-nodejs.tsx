@@ -5,11 +5,11 @@ function Body() {
   return (
     <>
       <p>
-        Most of what passes for &quot;RAG&quot; in 2026 is a search box with a
-        model glued on the end. Top‑k, shove into a prompt, pray the context
-        window holds. It screenshots great and falls over the first time a real
-        question spans sources or needs iteration. Agentic RAG is what survives
-        production: the model doesn&apos;t just retrieve, it{" "}
+        Every RAG pipeline I have shipped in Node.js started the way most do in
+        2026: a search box with a model glued on the end. Top‑k, shove into a
+        prompt, pray the context window holds. It screenshots great and falls over
+        the first time a real question spans sources or needs iteration. Agentic RAG
+        is what survives production: the model doesn&apos;t just retrieve, it{" "}
         <strong>decides</strong> — what to look up next, when evidence is
         sufficient, and which conclusion the record actually supports.
       </p>
@@ -157,7 +157,10 @@ function Body() {
       <p>
         See the{" "}
         <a href="/#projects">Police RAG Agent breakdown</a> for the production
-        version of this architecture.
+        version of this architecture. Building the Node.js backend that gives an
+        autonomous agent its discipline — orchestration state, tool gating, and a
+        contract every verdict must satisfy — is the work I bring to a team that
+        needs RAG it can defend.
       </p>
     </>
   );
@@ -165,17 +168,16 @@ function Body() {
 
 export const agenticRagPipelines: BlogPost = {
   slug: "architecting-agentic-rag-pipelines-nodejs",
-  title: "Architecting Agentic RAG Pipelines in Node.js",
+  title: "How I Build Agentic RAG Pipelines in Node.js That Decide",
   description:
-    "Standard RAG retrieves; Agentic RAG decides. A teardown of building autonomous Node.js pipelines where the LLM extracts grounded verdicts from legacy data via vector retrieval, prompt orchestration, and tool-driven reasoning.",
+    "Standard RAG retrieves; the agentic RAG pipelines I build in Node.js decide — the model calls retrieval as a tool in a loop and commits a typed, cited verdict.",
   keywords: [
     "agentic RAG",
     "RAG pipeline",
     "Node.js",
-    "vector retrieval",
-    "LLM orchestration",
-    "autonomous agents",
-    "AI architecture",
+    "production RAG",
+    "agentic RAG engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-05",
   readingMinutes: 9,

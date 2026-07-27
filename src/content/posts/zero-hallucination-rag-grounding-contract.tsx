@@ -86,13 +86,13 @@ function Body() {
   return (
     <>
       <p>
-        Most teams can build a RAG system that works in the demo. The hard part
-        ships later: the day it answers a question the documentation never
-        covered — confidently, fluently, and wrong. A retrieval pipeline does not
-        prevent hallucination on its own. It only changes <em>where</em> the
-        model gets its facts. Whether it stays inside those facts is a separate
-        decision, and it has to be made in the architecture, not hoped for in the
-        prompt.
+        Any RAG system works in the demo. The hard part shipped later on the
+        streamerOS support agent: the day it could answer a question the
+        documentation never covered — confidently, fluently, and wrong. A retrieval
+        pipeline does not prevent hallucination on its own. It only changes{" "}
+        <em>where</em> the model gets its facts. Whether it stays inside those facts
+        is a separate decision, and it has to be made in the architecture, not hoped
+        for in the prompt.
       </p>
       <p>
         On the streamerOS AI Support Agent I treat this as a hard contract I call{" "}
@@ -171,13 +171,15 @@ function Body() {
       </blockquote>
 
       <p>
-        The grounding contract is the spine of the streamerOS Support Agent. See
-        the full retrieval and constraint breakdown in the{" "}
+        The grounding contract is the spine of the streamerOS Support Agent, and
+        the same discipline runs the live concierge on this site. See the full
+        retrieval and constraint breakdown in the{" "}
         <a href="/#projects">project teardown</a>, or the companion piece on{" "}
         <a href="/blog/edge-native-rag-cloudflare-workers-hono">
           running the whole pipeline at the edge
         </a>
-        .
+        . Deciding in code what a model is allowed to know is the judgment I bring
+        to any team shipping RAG into production.
       </p>
     </>
   );
@@ -185,16 +187,16 @@ function Body() {
 
 export const zeroHallucinationRag: BlogPost = {
   slug: "zero-hallucination-rag-grounding-contract",
-  title: "Zero-Hallucination RAG: The Grounding Contract Pattern",
+  title: "How I Stop RAG Hallucination With a Grounding Contract",
   description:
-    "Retrieval does not stop hallucination — a grounding contract does. The three-boundary pattern (retrieval floor, prompt constraint, attribution) that forces a RAG agent to answer only from context, or refuse.",
+    "Retrieval never stopped hallucination on my streamerOS agent — a grounding contract did: a retrieval score floor, a strict prompt, and required attribution.",
   keywords: [
     "grounded RAG",
     "prevent LLM hallucination",
     "RAG system prompt",
-    "retrieval augmented generation",
-    "RAG architecture",
-    "AI support agent",
+    "production RAG",
+    "RAG engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-08",
   readingMinutes: 8,

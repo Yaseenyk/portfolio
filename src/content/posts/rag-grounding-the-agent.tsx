@@ -71,12 +71,13 @@ function Body() {
   return (
     <>
       <p>
-        An ungrounded LLM is a confident stranger: fluent, plausible, and willing
-        to invent. Retrieval-Augmented Generation turns it into an expert who cites
-        the manual. You retrieve the context relevant to the question, inject it
-        into the prompt, and contract the model to answer <em>only</em> from what it
-        was given. The model stops being the source of truth and becomes the thing
-        that phrases it.
+        The refusal branch in the streamerOS support agent is where I learned the
+        rule I now build every RAG system around: an ungrounded LLM is a confident
+        stranger &mdash; fluent, plausible, willing to invent. Retrieval-Augmented
+        Generation turns it into an expert who cites the manual. You retrieve the
+        context relevant to the question, inject it into the prompt, and contract
+        the model to answer <em>only</em> from what it was given. The model stops
+        being the source of truth and becomes the thing that phrases it.
       </p>
 
       <h2>RAG is a grounding contract, not a search box</h2>
@@ -133,7 +134,10 @@ function Body() {
         <a href="/blog/agentic-control-loops">control loop</a> around several of
         them and you have an autonomous system, defended by{" "}
         <a href="/blog/guardrail-engineering-hallucination-prevention">guardrails</a>.
-        Continue on the <a href="/roadmap">roadmap</a>.
+        This contract-first instinct &mdash; cite or refuse &mdash; is what I built
+        into the streamerOS support agent and the live concierge on this site, and
+        what I bring to a team shipping RAG it can actually trust. Continue on the{" "}
+        <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -141,16 +145,16 @@ function Body() {
 
 export const ragGroundingTheAgent: BlogPost = {
   slug: "rag-grounding-the-agent",
-  title: "RAG: Grounding the Agent (My streamerOS Approach)",
+  title: "How I Ground a RAG Agent So It Refuses Instead of Lying",
   description:
-    "An ungrounded LLM is a confident stranger. RAG turns it into an expert who cites the manual: retrieve relevant context, inject it, and contract the model to answer only from what it was given — or refuse.",
+    "The grounding contract behind my streamerOS support agent: I score-floor retrieval and bind the model to cited context, so it refuses instead of guessing.",
   keywords: [
     "RAG architecture",
-    "retrieval augmented generation",
     "grounding contract",
     "hallucination prevention",
-    "AI citations",
     "production RAG",
+    "RAG engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-04-13",
   readingMinutes: 7,

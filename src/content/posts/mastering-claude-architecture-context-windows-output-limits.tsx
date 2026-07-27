@@ -6,11 +6,11 @@ function Body() {
   return (
     <>
       <p>
-        Your agent worked perfectly in testing, then fell apart on a real
-        codebase: halfway through a long task it started forgetting decisions it
+        I have shipped agents that ran clean in testing, then fell apart on a real
+        codebase: halfway through a long task they started forgetting decisions
         made twenty messages earlier, truncating files mid-function, and
-        contradicting its own plan. Nothing in your code changed. What changed is
-        that you ran out of a budget you were never tracking — the context window.
+        contradicting their own plan. Nothing in the code changed. What changed is
+        that they ran out of a budget I was not tracking — the context window.
         Before you tune a single prompt, you have to understand the model as what
         it actually is: a fixed-size attention budget, and a separate, smaller
         budget for everything it&apos;s allowed to say back.
@@ -253,7 +253,11 @@ function Body() {
       </Diagram>
       <p>
         Internalize that bar and most &quot;the model got dumber&quot; mysteries
-        dissolve into budget math. The next lesson builds directly on it:{" "}
+        dissolve into budget math. This is the discipline behind the context-budget
+        guard I run in production — measure before you spend, reserve headroom, fail
+        loud — and the judgment I bring to a team: a context window is RAM you
+        manage, not a bucket you fill until it overflows. The next lesson builds
+        directly on it:{" "}
         <a href="/blog/xml-tag-structural-prompting-deterministic-shell">
           XML-tag structural prompting
         </a>{" "}
@@ -268,18 +272,16 @@ function Body() {
 export const masteringClaudeArchitecture: BlogPost = {
   slug: "mastering-claude-architecture-context-windows-output-limits",
   title:
-    "Claude Architecture: Context Windows, Output Limits & Token Physics",
+    "Budgeting the Claude Context Window Before It Truncates You",
   description:
-    "Claude's context window is one fixed token budget shared by your prompt, tools, thinking, and reply. How context windows and output caps really work — and how to budget them.",
+    "The Claude context window is one token budget shared by prompt, tools, thinking, and reply. I count tokens and guard it in code so a reply never truncates.",
   keywords: [
     "Claude context window",
+    "Claude context window size",
     "Claude output limit",
-    "token physics",
-    "Claude Opus 4.8",
-    "max_tokens",
-    "extended thinking budget",
     "context window management",
-    "Anthropic SDK",
+    "production LLM systems",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-10",
   readingMinutes: 9,

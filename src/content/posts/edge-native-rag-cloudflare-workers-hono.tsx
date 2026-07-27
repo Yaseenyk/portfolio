@@ -86,13 +86,14 @@ function Body() {
   return (
     <>
       <p>
-        I have watched the default RAG tutorial — a fat Node server parked in one
-        region, nursing a pool and waiting — turn into latency tax and idle burn.
-        For a global support assistant that model is backwards: users are
-        everywhere, the origin is in one place, and most of the time it sits warm
-        doing nothing. streamerOS taught me not to spend a hop on hot paths; the
-        Support Agent follows that rule. The whole pipeline runs at the edge on
-        Cloudflare Workers, fronted by Hono.
+        The RAG support agent inside streamerOS, my Rust and Tauri desktop
+        cockpit, runs its whole pipeline on Cloudflare Workers behind Hono — the
+        shape I landed on after watching the default RAG tutorial, a fat Node
+        server parked in one region nursing a pool and waiting, turn into latency
+        tax and idle burn. For a global support assistant that model is backwards:
+        users are everywhere, the origin is in one place, and most of the time it
+        sits warm doing nothing. streamerOS taught me not to spend a hop on hot
+        paths; the Support Agent follows that rule.
       </p>
 
       <h2>What &quot;edge-native&quot; actually buys you</h2>
@@ -169,7 +170,10 @@ function Body() {
           streaming from the edge
         </a>{" "}
         delivers first tokens sooner, which keeps the UI smooth and avoids render
-        thrash under real-time constraints.
+        thrash under real-time constraints. This is the shape the streamerOS
+        support agent ships in today, and it reflects the call I bring to a team:
+        on a global path the right default is stateless and edge-resident, not a
+        warm origin you keep paying to leave idle.
       </p>
     </>
   );
@@ -177,16 +181,16 @@ function Body() {
 
 export const edgeNativeRag: BlogPost = {
   slug: "edge-native-rag-cloudflare-workers-hono",
-  title: "Edge-Native RAG: Running a Retrieval Pipeline on Cloudflare Workers + Hono",
+  title: "Why I Run RAG at the Edge on Cloudflare Workers + Hono",
   description:
-    "The standard RAG tutorial assumes a fat Node origin. Here is how to run the entire retrieval pipeline at the edge — router, vector query, and model call — on Cloudflare Workers with Hono, scaling to zero between requests.",
+    "The support agent I built for streamerOS runs its whole RAG pipeline at the edge on Cloudflare Workers and Hono, scaling to zero between requests.",
   keywords: [
     "RAG on Cloudflare Workers",
     "Hono RAG",
     "serverless RAG",
-    "edge AI",
-    "Upstash Vector",
-    "Cloudflare Workers AI",
+    "edge RAG engineer",
+    "production LLM systems",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-07",
   readingMinutes: 7,

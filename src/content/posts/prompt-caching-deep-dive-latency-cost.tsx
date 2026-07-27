@@ -6,12 +6,13 @@ function Body() {
   return (
     <>
       <p>
-        Your RAG endpoint sends the same 8,000-token system prompt — instructions,
-        tool schemas, a fat style guide — on every single request, then appends a
-        20-token user question. You are re-paying full input price to re-read an
-        identical preamble thousands of times a day. The model doesn&apos;t need
-        to re-read what hasn&apos;t changed. Prompt caching makes it stop, and the
-        savings on a high-volume path are not marginal — they&apos;re structural.
+        Running an autonomous content pipeline, I watched the same 8,000-token
+        system prompt — instructions, tool schemas, a fat style guide — ride on
+        every single request while the actual user question was 20 tokens,
+        re-paying full input price to re-read an identical preamble thousands of
+        times a day. The model doesn&apos;t need to re-read what hasn&apos;t
+        changed. Prompt caching makes it stop, and the savings on a high-volume
+        path are not marginal — they&apos;re structural.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -135,8 +136,11 @@ export async function answer(question: string) {
         </svg>
       </Diagram>
       <p>
-        Caching makes single-agent calls cheap; the next module scales out to
-        many agents at once —{" "}
+        Caching makes single-agent calls cheap, which is exactly the cost lever I
+        reach for first when I run FinOps on a production LLM path — the cheapest
+        token is the one you never recompute, and knowing which tokens those are is
+        the judgment I bring to a team. The next module scales out to many agents
+        at once —{" "}
         <a href="/blog/constitutional-ai-safety-system-prompts-guardrails">
           but first, safety: constitutional AI &amp; guardrails
         </a>
@@ -149,18 +153,16 @@ export async function answer(question: string) {
 
 export const promptCachingDeepDive: BlogPost = {
   slug: "prompt-caching-deep-dive-latency-cost",
-  title: "Prompt Caching Deep Dive: Cutting Latency & Cost",
+  title: "Prompt Caching: the Ordering Discipline That Cuts the Bill",
   description:
-    "Re-sending an 8K static preamble every request re-pays full price for unchanged tokens. Prompt caching bills the prefix at ~10% on every hit — if you keep it stable and first.",
+    "I treat prompt caching as FinOps: order the static prefix first, keep it byte-stable, and stop re-paying to re-read an 8K preamble on every request.",
   keywords: [
     "prompt caching",
-    "Claude cache_control",
     "prefix caching",
     "LLM cost optimization",
-    "cache breakpoints",
-    "Anthropic caching",
-    "time to first token",
-    "ephemeral cache",
+    "LLM FinOps",
+    "LLM engineer for hire",
+    "production LLM systems",
   ],
   publishedAt: "2026-06-02",
   readingMinutes: 9,

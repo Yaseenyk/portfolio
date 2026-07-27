@@ -56,13 +56,14 @@ function Body() {
   return (
     <>
       <p>
-        LLM observability means every agent request ships a structured trace — one
-        span per step, tagged with tokens, cost, latency, model, and outcome — so
-        &quot;why is this slow or wrong?&quot; turns from folklore into facts. A
-        multi‑step agent that only logs is a black box; wire it with OpenTelemetry
-        and you get a waterfall you can scan and point at the span that blew the
-        budget. In the pattern I call Trinity Architecture, tracing lives in the
-        orchestration layer, not the UI or the model client.
+        The live RAG concierge on this site ships a structured trace with every
+        request — one span per step, tagged with tokens, cost, latency, model, and
+        outcome — because the first time an agent felt slow I had only scattered
+        logs and no way to prove which step did it. A multi‑step agent that only
+        logs is a black box; wire it with OpenTelemetry and you get a waterfall you
+        can scan and point at the span that blew the budget. In the pattern I call
+        Trinity Architecture, tracing lives in the orchestration layer, not the UI
+        or the model client.
       </p>
 
       <h2>Logs tell you it happened; spans tell you the shape</h2>
@@ -130,8 +131,12 @@ function Body() {
         Tracing is what makes the{" "}
         <a href="/blog/latency-first-ai-serverless-hono">latency-first</a> target
         measurable and{" "}
-        <a href="/blog/agentic-control-loops">autonomous loops</a> auditable. Continue
-        on the <a href="/roadmap">roadmap</a>.
+        <a href="/blog/agentic-control-loops">autonomous loops</a> auditable — it is
+        why the concierge on this page can show live execution traces instead of
+        asking you to trust it. The judgment I bring to a team is that: an agent you
+        cannot see is an agent you cannot operate, so the trace is part of the
+        design, not an afterthought. Continue on the{" "}
+        <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -139,16 +144,16 @@ function Body() {
 
 export const llmObservability: BlogPost = {
   slug: "llm-observability-opentelemetry-tracing",
-  title: "LLM Observability: Tracing Agents with OpenTelemetry",
+  title: "When Logs Lie: Tracing LLM Agents with OpenTelemetry",
   description:
-    "A multi-step agent that only logs is a black box. LLM observability emits a span per step — tagged with tokens, cost, and latency via the OpenTelemetry GenAI conventions — so a slow or expensive request becomes a trace you can read, not guess at.",
+    "The live RAG concierge on this site ships a span per step — tokens, cost, latency in OpenTelemetry — which is how I trace LLM agents, not guess from logs.",
   keywords: [
     "LLM observability",
     "OpenTelemetry GenAI",
     "agent tracing",
-    "cost per trace",
-    "AI monitoring",
-    "distributed tracing LLM",
+    "LLM tracing",
+    "LLM observability engineer",
+    "production LLM systems",
   ],
   publishedAt: "2026-06-03",
   readingMinutes: 7,
