@@ -18,6 +18,10 @@ import { meta as mcaMeta, Body as McaBody } from "@/content/guides/mca-topics";
 import { meta as bcaMeta, Body as BcaBody } from "@/content/guides/bca-topics";
 import { meta as btechMeta, Body as BtechBody } from "@/content/guides/btech-topics";
 import { meta as reportMeta, Body as ReportBody } from "@/content/guides/report-format";
+import { meta as synopsisMeta, Body as SynopsisBody } from "@/content/guides/final-year-project-synopsis-format";
+import { meta as pptMeta, Body as PptBody } from "@/content/guides/final-year-project-presentation-ppt";
+import { meta as deployMeta, Body as DeployBody } from "@/content/guides/how-to-deploy-your-final-year-project-free";
+import { meta as compareMeta, Body as CompareBody } from "@/content/guides/bca-vs-mca-vs-btech-final-year-projects";
 
 export interface GuideMeta {
   slug: string;
@@ -53,6 +57,10 @@ export interface Guide {
 /** Newest / highest-intent first — this is the order the index renders. */
 export const GUIDES: Guide[] = [
   { meta: vivaMeta, Body: VivaBody },
+  { meta: synopsisMeta, Body: SynopsisBody },
+  { meta: pptMeta, Body: PptBody },
+  { meta: deployMeta, Body: DeployBody },
+  { meta: compareMeta, Body: CompareBody },
   { meta: mcaMeta, Body: McaBody },
   { meta: bcaMeta, Body: BcaBody },
   { meta: btechMeta, Body: BtechBody },
