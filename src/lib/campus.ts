@@ -57,6 +57,13 @@ export interface CampusProject {
   /** How many students at one college may buy this in one academic year. */
   seatsPerCollege: number;
   demoUrl?: string;
+  /**
+   * Share/rich-result image (site-relative), e.g. "/social/ai-college.jpg".
+   * Omit to fall back to the brand-locked FYP portal image — see
+   * campusImageUrl(). Generate bespoke per-project images with
+   * scripts/campus_social.py when you want them.
+   */
+  ogImage?: string;
   publishedAt: string;
 }
 
@@ -188,6 +195,16 @@ export function projectsForDegree(degree: Degree): CampusProject[] {
 
 export function campusUrl(slug: string): string {
   return `${SITE_URL}/final-year-projects/${slug}/`;
+}
+
+/**
+ * Absolute rich-result / share image for a project. Falls back to the
+ * brand-locked FYP portal image so the Product schema always has a valid
+ * `image` (Google Merchant-listing requirement) and every project page ships
+ * a real OG card.
+ */
+export function campusImageUrl(project: CampusProject): string {
+  return `${SITE_URL}${project.ogImage ?? "/social/portal-wide.jpg"}`;
 }
 
 export function formatInr(amount: number): string {

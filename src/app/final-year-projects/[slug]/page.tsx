@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PERSON } from "@/lib/site";
 import {
   CAMPUS_FAQ,
   CAMPUS_PROJECTS,
   DEGREE_SLUGS,
   PAYMENT_POLICY,
   SESSION_POLICY,
+  campusImageUrl,
   campusUrl,
   getCampusProject,
   getTiers,
@@ -39,6 +41,7 @@ export function generateMetadata({ params }: Params): Metadata {
   if (!project) return {};
 
   const url = campusUrl(project.slug);
+  const image = campusImageUrl(project);
   return {
     title: `${project.title} — Final Year Project`,
     description: project.summary,
@@ -49,6 +52,13 @@ export function generateMetadata({ params }: Params): Metadata {
       description: project.summary,
       url,
       siteName: "Yaseen Khatib",
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} | Final Year Project`,
+      description: project.summary,
+      images: [image],
     },
   };
 }
@@ -76,7 +86,10 @@ export default function CampusProjectPage({ params }: Params) {
     url: campusUrl(project.slug),
     sessionCount: project.sessionCount,
     price: mentored.price,
+    image: campusImageUrl(project),
   });
+
+  const image = campusImageUrl(project);
 
   const productJsonLd = {
     "@context": "https://schema.org",
@@ -85,7 +98,10 @@ export default function CampusProjectPage({ params }: Params) {
     description: project.summary,
     category: project.domain,
     url: campusUrl(project.slug),
-    brand: personRef,
+    // Google Merchant-listing requires an image and a Brand/Organization-typed
+    // brand (a Person @id is rejected as an invalid object type for `brand`).
+    image: [image],
+    brand: { "@type": "Brand", name: PERSON.name },
     offers: tiers.map((tier) => ({
       "@type": "Offer",
       name: `${project.title} — ${tier.name}`,

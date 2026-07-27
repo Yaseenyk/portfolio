@@ -131,6 +131,8 @@ export function courseJsonLd(opts: {
   /** Mentored-tier price. */
   price: number;
   currency?: string;
+  /** Absolute image URL — recommended for the Course rich result. */
+  image?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -140,6 +142,7 @@ export function courseJsonLd(opts: {
     url: opts.url,
     provider: personRef,
     inLanguage: "en",
+    ...(opts.image ? { image: [opts.image] } : {}),
     hasCourseInstance: {
       "@type": "CourseInstance",
       courseMode: "online",
