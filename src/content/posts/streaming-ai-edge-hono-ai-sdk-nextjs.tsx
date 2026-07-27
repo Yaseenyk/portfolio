@@ -69,13 +69,13 @@ function Body() {
   return (
     <>
       <p>
-        A support answer that arrives all at once, after a three-second pause,
-        feels broken even when it is correct. The same answer streamed word by
-        word feels instant. Perceived latency is the product, and streaming is how
-        you win it. The tricky part is that most tutorials show you half the wire —
-        the React hook, or the backend handler — and leave you to guess how the two
-        actually connect. This is the whole path: model to Hono to Next.js, end to
-        end.
+        Building the streamerOS support agent, I learned that a support answer
+        arriving all at once, after a three-second pause, feels broken even when it
+        is correct. The same answer streamed word by word feels instant. Perceived
+        latency is the product, and streaming is how you win it. The tricky part is
+        that most tutorials show you half the wire — the React hook, or the backend
+        handler — and leave you to guess how the two actually connect. This is the
+        whole path: model to Hono to Next.js, end to end.
       </p>
 
       <h2>Server-Sent Events, not WebSockets</h2>
@@ -161,6 +161,9 @@ function Body() {
           grounded answers
         </a>{" "}
         — the stream is fast, but it is still constrained to the retrieved context.
+        This is the delivery layer running behind the streamerOS support agent
+        today, and the instinct I bring to a team is optimising the latency users
+        actually feel, not the number on a dashboard.
       </p>
     </>
   );
@@ -168,16 +171,16 @@ function Body() {
 
 export const streamingAiEdge: BlogPost = {
   slug: "streaming-ai-edge-hono-ai-sdk-nextjs",
-  title: "Streaming AI From the Edge: SSE Token Streaming with Hono, @ai-sdk and Next.js",
+  title: "How I Stream LLM Tokens From the Edge With Hono + Next.js",
   description:
-    "Perceived latency is the product. The complete streaming path for a RAG agent — model to Hono SSE on a Cloudflare Worker to a Next.js App Router client — so answers paint as they form, with first token under a second.",
+    "For the streamerOS support agent I wired the whole streaming path — model to Hono SSE on a Cloudflare Worker to a Next.js client, first token under a second.",
   keywords: [
     "stream LLM Hono",
-    "server-sent events AI",
     "ai-sdk useChat",
-    "Next.js App Router streaming",
     "edge streaming",
-    "LLM streaming React",
+    "edge AI engineer",
+    "production LLM streaming",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-29",
   readingMinutes: 7,

@@ -5,11 +5,12 @@ function Body() {
   return (
     <>
       <p>
-        A MongoDB aggregation pipeline is a program, and like any program it can
-        be written to run in milliseconds or to crawl. The same logical result —
-        a multi-collection rollup — can vary by orders of magnitude depending on
-        stage order and index usage. On a clinical workflow API, tightening these
-        pipelines was a large part of a 30% query-efficiency gain.
+        On a clinical workflow API, an aggregation pipeline that had always felt
+        instant started to crawl — same query, same result, just more data
+        flowing through it before anything got filtered out. That is the whole
+        game with MongoDB aggregation: identical logical output can vary by orders
+        of magnitude depending on stage order and index usage, and tightening
+        these pipelines is where the real speedup lives — no bigger instance required.
       </p>
 
       <h2>Filter early, filter on indexes</h2>
@@ -48,7 +49,7 @@ const rows = await Visits.aggregate([
         Guesswork has no place here. Run the pipeline through{" "}
         <code>explain(&quot;executionStats&quot;)</code> and read what actually
         happened: which stages used an index, how many documents each examined
-        versus returned, and where the time went. The 30% gain came from reading
+        versus returned, and where the time went. The speedup came from reading
         those numbers and reordering stages — not from intuition about what
         &quot;should&quot; be fast.
       </p>
@@ -66,7 +67,9 @@ const rows = await Visits.aggregate([
         <a href="/blog/vector-embeddings-in-production">
           Vector Embeddings in Production
         </a>
-        .
+        . Pipelines like these are the unglamorous backend work behind the five
+        products I shipped solo this year — the judgment I bring is knowing the
+        fastest query is usually a reordering problem, not a bigger box.
       </p>
     </>
   );
@@ -74,17 +77,18 @@ const rows = await Visits.aggregate([
 
 export const optimizingMongoAggregation: BlogPost = {
   slug: "optimizing-mongodb-aggregation",
-  title: "Optimizing MongoDB Aggregation: 30% Faster Multi-Collection Queries",
+  title: "MongoDB Aggregation Pipelines: Stage Order Is the Win",
   description:
-    "A MongoDB aggregation pipeline is a program — it can run in milliseconds or crawl. Filtering early on indexes, treating $lookup as a join, and profiling with explain for a 30% efficiency gain.",
+    "Profiling a clinical workflow API taught me MongoDB aggregation lives or dies on stage order: $match first on indexes, $lookup treated as the join it is, then read explain.",
   keywords: [
     "MongoDB aggregation",
     "query optimization",
     "$lookup",
-    "indexes",
     "explain",
     "database performance",
-    "backend",
+    "MongoDB performance engineer",
+    "MERN developer for hire",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-11",
   readingMinutes: 7,

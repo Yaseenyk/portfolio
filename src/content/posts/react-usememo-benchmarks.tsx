@@ -5,11 +5,12 @@ function Body() {
   return (
     <>
       <p>
-        <code>useMemo</code> is the most cargo-culted hook in React — wrapped
-        around everything, understood by few. Used precisely, it delivered a 1.5–2x
-        dashboard response improvement on a data-heavy admin panel. Used
-        reflexively, it makes apps slower while looking like optimization. The
-        difference is knowing exactly what it costs and what it buys.
+        The most cargo-culted hook I run into is <code>useMemo</code> — wrapped
+        around everything, understood by few. On a data-heavy admin dashboard,
+        using it precisely made the interactions noticeably snappier; reached
+        for reflexively elsewhere, it quietly makes apps slower while looking like
+        optimization. The difference is knowing exactly what it costs and what it
+        buys.
       </p>
 
       <h2>What it actually does</h2>
@@ -46,7 +47,7 @@ const rollup = useMemo(
       <p>
         The only honest way to apply it is with the Profiler open. Find the
         components that actually re-render expensively, memoize those, and verify
-        the flame graph got shorter. The 2x win on that dashboard came from
+        the flame graph got shorter. The win on that dashboard came from
         memoizing a handful of heavy selectors — not from blanketing the tree.
         Optimization you did not measure is just superstition with a hook.
       </p>
@@ -62,7 +63,9 @@ const rollup = useMemo(
         <a href="/blog/state-management-ai-era-zustand-vs-redux">
           State Management in the AI Era
         </a>
-        .
+        . I lean on this measure-first instinct across the five products I shipped
+        solo this year — the judgment I bring is refusing to call anything an
+        optimization until the flame graph agrees.
       </p>
     </>
   );
@@ -70,17 +73,18 @@ const rollup = useMemo(
 
 export const reactUseMemoBenchmarks: BlogPost = {
   slug: "react-usememo-benchmarks",
-  title: "React useMemo Benchmarks: When Memoization Actually Wins",
+  title: "React useMemo: Measured Wins, Not Cargo-Cult Habit",
   description:
-    "useMemo is the most cargo-culted hook in React. What it costs, the two cases that justify it, and how measured memoization delivered a 1.5–2x dashboard response improvement.",
+    "In React reviews, useMemo is the hook I see cargo-culted most: what it truly costs, the two cases that justify it, and why I open the Profiler before memoizing.",
   keywords: [
     "useMemo",
     "React performance",
     "memoization",
-    "rendering",
     "profiler",
-    "optimization",
-    "frontend",
+    "rendering",
+    "React performance engineer",
+    "React developer for hire",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-07",
   readingMinutes: 6,
@@ -90,7 +94,7 @@ export const reactUseMemoBenchmarks: BlogPost = {
     "useMemo caches a value between renders at the cost of a dependency comparison and a memory slot — it is not free.",
     "It only wins on genuinely expensive computations or for preserving referential identity.",
     "On cheap computations the overhead exceeds the work, making the app slower while looking optimized.",
-    "Measure with the Profiler first; the 2x dashboard win came from memoizing a few heavy selectors, not the whole tree.",
+    "Measure with the Profiler first; the dashboard win came from memoizing a few heavy selectors, not the whole tree.",
   ],
   Body,
 };

@@ -54,10 +54,11 @@ function Body() {
   return (
     <>
       <p>
-        On IntegrateX&apos;s React Flow automation canvas, we cut the agent-graph payload by 94% without losing a node,
-        edge, or coordinate. The win wasn&apos;t gzip — it was a Serialization Adapter, the bridge in the pattern I call
-        Trinity Architecture, shaped around what the data actually <em>is</em>: a known schema, not prose. Once you stop
-        shipping generic JSON and serialize the structure, the redundant bytes evaporate.
+        On IntegrateX&apos;s React Flow automation canvas, the agent-graph payload was quietly becoming the bottleneck —
+        so I cut it by 94% without losing a node, edge, or coordinate. The win wasn&apos;t gzip — it was a Serialization
+        Adapter, the bridge in the pattern I call Trinity Architecture, shaped around what the data actually <em>is</em>:
+        a known schema, not prose. Once you stop shipping generic JSON and serialize the structure, the redundant bytes
+        evaporate.
       </p>
 
       <h2>Generic JSON pays for the same keys over and over</h2>
@@ -112,8 +113,9 @@ function Body() {
         <a href="/blog/latency-first-ai-serverless-hono">instant</a>; the other half is streaming. This pattern grew out
         of the{" "}
         <a href="/blog/react-flow-agent-orchestration-canvas">agent orchestration canvas</a> and fits cleanly in my
-        Trinity Architecture boundary: presentation renders, orchestration decides, the adapter serializes. Continue on
-        the <a href="/roadmap">roadmap</a>.
+        Trinity Architecture boundary: presentation renders, orchestration decides, the adapter serializes — one of the
+        load-bearing ideas behind the five products I shipped solo this year, and the judgment I bring is designing the
+        wire format before reaching for a compression library. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -121,16 +123,18 @@ function Body() {
 
 export const payloadCompression: BlogPost = {
   slug: "payload-compression-serialization-patterns",
-  title: "94% Compression: Custom Serialization Patterns for Structured Data",
+  title: "Cutting a Payload 94% With Custom Serialization Patterns",
   description:
-    "We cut a React Flow agent-graph payload by 94% without losing a node. The trick wasn't gzip — it was designing a serialization format around what the data is: structure with a known schema, not prose.",
+    "I cut a React Flow agent-graph payload 94% without losing a node — not with gzip, but by shaping a custom serialization format around the data: schema, not prose.",
   keywords: [
     "custom serialization",
     "payload compression",
     "columnar encoding",
     "delta encoding",
     "React Flow performance",
-    "wire format design",
+    "serialization engineer",
+    "MERN developer for hire",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-25",
   readingMinutes: 6,

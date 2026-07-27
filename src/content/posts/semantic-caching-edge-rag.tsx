@@ -76,13 +76,13 @@ function Body() {
   return (
     <>
       <p>
-        Support traffic is gloriously repetitive. &quot;How do I connect my
-        OBS?&quot;, &quot;how do I link OBS&quot;, &quot;OBS setup help&quot; — three
-        phrasings of one question, and a naive RAG pipeline runs the full retrieve-
-        and-generate gauntlet for every single one. Each is a model call you paid
-        for and a second of latency the user waited through, to produce an answer
-        you have already produced a hundred times. Semantic caching fixes this by
-        recognising the question, not the string.
+        Running the streamerOS support agent taught me that support traffic is
+        gloriously repetitive. &quot;How do I connect my OBS?&quot;, &quot;how do I
+        link OBS&quot;, &quot;OBS setup help&quot; — three phrasings of one question,
+        and a naive RAG pipeline runs the full retrieve-and-generate gauntlet for
+        every single one. Each is a model call I paid for and a second of latency the
+        user waited through, to produce an answer already produced a hundred times.
+        Semantic caching fixes this by recognising the question, not the string.
       </p>
 
       <h2>Why a normal cache misses</h2>
@@ -157,7 +157,10 @@ function Body() {
         <a href="/blog/zero-hallucination-rag-grounding-contract">
           the grounding contract
         </a>{" "}
-        — a cache hit is only valid if the original answer was grounded.
+        — a cache hit is only valid if the original answer was grounded. It is the
+        kind of trade-off I weigh on every system I ship: the cheapest, safest win is
+        usually the work you can avoid doing at all, and knowing where that line sits
+        is most of the job.
       </p>
     </>
   );
@@ -165,16 +168,16 @@ function Body() {
 
 export const semanticCachingEdge: BlogPost = {
   slug: "semantic-caching-edge-rag",
-  title: "Semantic Caching at the Edge: Cutting RAG Cost and Latency Before You Call the LLM",
+  title: "Semantic Caching That Actually Hits: Matching Meaning at the Edge",
   description:
-    "Support traffic is repetitive, but a string-keyed cache never hits. A semantic cache matches on meaning using the query embedding you already compute — skipping retrieval and generation entirely for questions you have already answered.",
+    "The streamerOS support agent kept re-answering the same question phrased ten ways, so I built a semantic cache that matches meaning, not the string.",
   keywords: [
     "semantic cache",
     "LLM caching",
-    "reduce LLM cost",
     "vector cache",
-    "RAG latency optimization",
-    "AI cost optimization",
+    "semantic caching engineer",
+    "production RAG caching",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-02",
   readingMinutes: 7,

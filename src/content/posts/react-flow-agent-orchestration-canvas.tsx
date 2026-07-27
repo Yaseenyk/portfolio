@@ -79,8 +79,8 @@ function Body() {
   return (
     <>
       <p>
-        React Flow is the canvas we all reach for to <em>sketch</em> a workflow. Where it really earns its keep is as the{" "}
-        <strong>control plane for a running agent system</strong>. On IntegrateX, the same graph a PM drags to say &quot;when a ticket comes in,
+        On IntegrateX I stopped treating the React Flow canvas as a place to <em>sketch</em> workflows and started running the agents directly off it — as the{" "}
+        <strong>control plane for a running agent system</strong>. The same graph a PM drags to say &quot;when a ticket comes in,
         search the docs, then either answer or escalate&quot; is the exact spec the runtime executes — no shadow YAML, no parallel DSL. The moment
         you wire it this way, the diagram stops being decoration and becomes the program.
       </p>
@@ -144,7 +144,10 @@ function Body() {
         <a href="/blog/router-agent-multi-agent-orchestration">
           routing between specialised agents
         </a>
-        .
+        . Shipping IntegrateX solo taught me that the architecture a whole team can
+        read and change is worth more than the clever one only its author can — the
+        judgment I bring is choosing the version that survives contact with the rest
+        of the team.
       </p>
     </>
   );
@@ -152,16 +155,16 @@ function Body() {
 
 export const reactFlowAgentCanvas: BlogPost = {
   slug: "react-flow-agent-orchestration-canvas",
-  title: "React Flow as an Agent Orchestration Canvas",
+  title: "How I Run Agents Off a React Flow Canvas, Not a Diagram",
   description:
-    "React Flow is more than a diagramming library — it is a control plane for running agent systems. How typed nodes and ports turn a visual canvas into an executable, debuggable agent orchestration layer.",
+    "On IntegrateX, the React Flow graph a PM drags is the exact spec the runtime executes — typed nodes and ports make it a debuggable agent orchestration layer.",
   keywords: [
     "React Flow agent",
-    "visual AI workflow builder",
-    "agentic workflow UI",
-    "React Flow tutorial",
     "agent orchestration",
     "node based editor",
+    "React Flow developer",
+    "production agent orchestration",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-05",
   readingMinutes: 7,

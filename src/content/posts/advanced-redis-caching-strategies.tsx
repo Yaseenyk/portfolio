@@ -5,11 +5,12 @@ function Body() {
   return (
     <>
       <p>
-        Nothing moves tail latency like a cache, and most stacks use a sliver of
-        what Redis can do. On a portal with thousands of active endpoints, the
-        change that cut API latency by 25% while holding 99.9% uptime wasn’t a
-        faster database — it was fewer trips to it. Fewer round-trips, fewer
-        serializers on the hot path, less lock contention.
+        The change that steadied a high-traffic portal wasn’t a faster
+        database — it was fewer trips to it. Once thousands of endpoints are live,
+        tail latency is dominated by round-trips, serializers on the hot path, and
+        lock contention, and nothing relieves that pressure like a cache used
+        deliberately rather than sprinkled in. Most stacks reach for Redis and
+        still use a sliver of what it can do.
       </p>
 
       <h2>The interceptor pattern</h2>
@@ -76,7 +77,10 @@ export const cached = (ttl: number) => async (req, res, next) => {
         For caching specifically in front of slow LLM calls, see{" "}
         <a href="/blog/caching-the-ai-redis-mongodb-llm-latency">Caching the AI</a>
         ; the production system is the{" "}
-        <a href="/#projects">CMZ enterprise portal</a>.
+        <a href="/#projects">CMZ enterprise portal</a>. Across the five products I
+        shipped solo this year the pattern holds — the judgment I bring to a team
+        is treating a cache as an architectural contract about staleness, not a
+        speed hack bolted on at the end.
       </p>
     </>
   );
@@ -84,17 +88,18 @@ export const cached = (ttl: number) => async (req, res, next) => {
 
 export const advancedRedisCaching: BlogPost = {
   slug: "advanced-redis-caching-strategies",
-  title: "Advanced Redis Caching Strategies: Slashing API Latency 25%",
+  title: "Redis Caching Strategies That Don't Serve Stale Data",
   description:
-    "Caching is the highest-leverage backend lever. The interceptor pattern, cache-aside vs write-through, and the TTL/stampede details that cut API latency 25% at scale.",
+    "On a busy portal I learned Redis caching strategies live or die on details: one interceptor boundary, cache-aside vs write-through, TTL jitter, stampede guards.",
   keywords: [
     "Redis caching",
     "cache-aside",
     "write-through",
-    "API latency",
-    "backend performance",
     "cache stampede",
-    "Node.js",
+    "backend performance",
+    "Redis caching engineer",
+    "MERN developer for hire",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-13",
   readingMinutes: 8,
@@ -104,7 +109,7 @@ export const advancedRedisCaching: BlogPost = {
     "Centralize caching in a read-through interceptor so controllers stay oblivious and the policy lives in one place.",
     "Pick cache-aside vs write-through per data shape — and never let a write path update the DB without the cache.",
     "Tune TTLs to real volatility, guard hot keys against stampedes, and namespace keys for surgical invalidation.",
-    "On a high-traffic portal this approach cut API latency 25% while holding 99.9% uptime.",
+    "On a high-traffic portal this approach cut API latency and shielded the origin database from read spikes.",
   ],
   Body,
 };

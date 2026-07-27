@@ -5,7 +5,7 @@ function Body() {
   return (
     <>
       <p>
-        Say &quot;we&apos;re moving to TypeScript&quot; and someone suggests a freeze and a big‑bang rewrite. That&apos;s how migrations die. On IntegrateX and streamerOS, real-time flows couldn&apos;t pause — frames would drop, operators would lose trust. What worked was incremental: ship types with features, ratchet strictness in stages, and never leave main un-runnable past a single commit. Do that and even a sprawling legacy app turns type-safe without a feature freeze.
+        On IntegrateX and streamerOS, &quot;we&apos;re moving to TypeScript&quot; could never mean a feature freeze — the real-time flows couldn&apos;t pause, or frames would drop and operators would lose trust, so a big‑bang rewrite was off the table from day one. That freeze-and-rewrite instinct is exactly how migrations die. What worked was incremental: ship types with features, ratchet strictness in stages, and never leave main un-runnable past a single commit. Do that and even a sprawling legacy app turns type-safe without a feature freeze.
       </p>
 
       <h2>Allow JS, then advance the front</h2>
@@ -55,7 +55,10 @@ function Body() {
         <a href="/blog/type-safe-llms-strict-schemas-typescript-express">
           Type-Safe LLMs
         </a>
-        .
+        . I ran this exact playbook migrating the codebases behind the five
+        products I shipped solo this year, and the judgment it takes is seeing a
+        migration as a sequencing problem, not a rewrite — you finish by never
+        asking anyone to stop.
       </p>
     </>
   );
@@ -63,17 +66,18 @@ function Body() {
 
 export const typescriptMigrationPlaybook: BlogPost = {
   slug: "typescript-migration-playbook",
-  title: "The TypeScript Migration Playbook for Legacy Codebases",
+  title: "TypeScript Migration Without a Feature Freeze",
   description:
-    "Stop-the-world rewrites kill TypeScript migrations. The incremental playbook: allowJs coexistence, ratcheting strictness one flag at a time, and quarantining any at the boundary.",
+    "My TypeScript migrations skipped the feature freeze: allowJs coexistence, strictness ratcheted one flag at a time, and any quarantined behind a single typed boundary.",
   keywords: [
     "TypeScript migration",
     "legacy code",
     "allowJs",
     "strict mode",
-    "noImplicitAny",
     "incremental adoption",
-    "JavaScript",
+    "TypeScript migration engineer",
+    "MERN developer for hire",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-08",
   readingMinutes: 7,

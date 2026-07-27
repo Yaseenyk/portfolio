@@ -73,12 +73,15 @@ function Body() {
   return (
     <>
       <p>
-        Memory is what separates an agent that knows you from a chatbot that forgets
-        you between messages. The context window is RAM, not disk — small, expensive,
-        and wiped every request — so a stateful agent can&apos;t just keep appending
-        the transcript. It tiers its memory: a working buffer for the current turn,
-        an episodic store of conversation summaries, and a semantic store of durable
-        facts — and it recalls only the slice each turn actually needs.
+        Building Sable, a local-first financial agent that has to recall a
+        user&apos;s money across sessions from on-device SQLite, is where I learned
+        that memory is what separates an agent that knows you from a chatbot that
+        forgets you between messages. The context window is RAM, not disk — small,
+        expensive, and wiped every request — so a stateful agent can&apos;t just keep
+        appending the transcript. It tiers its memory: a working buffer for the
+        current turn, an episodic store of conversation summaries, and a semantic
+        store of durable facts — and it recalls only the slice each turn actually
+        needs.
       </p>
 
       <h2>The context window is RAM, not disk</h2>
@@ -141,7 +144,10 @@ function Body() {
         <a href="/blog/vector-foundations-semantic-search">vector retrieval</a> pointed
         at the conversation instead of the docs — bounded by the same{" "}
         <a href="/blog/beyond-the-prompt-llm-mechanics">context budget</a> every prompt
-        lives under. Continue on the <a href="/roadmap">roadmap</a>.
+        lives under. This tiering is what lets Sable feel like it remembers you on a
+        phone with no server behind it, and the judgment I bring to a team is treating
+        forgetting as a feature to design, not a bug to patch. Continue on the{" "}
+        <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -149,16 +155,16 @@ function Body() {
 
 export const memoryAndStatefulAi: BlogPost = {
   slug: "memory-and-stateful-ai-architecture",
-  title: "Memory & Stateful AI: Beyond the Context Window",
+  title: "Stateful AI Memory: The Context Window Is RAM, Not Disk",
   description:
-    "The context window is RAM, not disk — small, costly, and wiped every request. Stateful agents tier their memory into a working buffer, an episodic vector store, and durable semantic facts, recalling only the slice each turn needs.",
+    "Sable remembers users across sessions, so I tier its stateful memory into a working buffer, an episodic vector store, and durable semantic facts.",
   keywords: [
     "AI memory architecture",
     "stateful agents",
     "long-term memory LLM",
-    "episodic semantic memory",
-    "conversation summarization",
-    "context window management",
+    "stateful AI engineer",
+    "production agent memory",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-06",
   readingMinutes: 7,

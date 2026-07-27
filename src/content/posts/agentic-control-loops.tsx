@@ -67,10 +67,11 @@ function Body() {
   return (
     <>
       <p>
-        A chatbot answers. An agent acts. The split isn&apos;t parameter count or a
-        cuter prompt — it&apos;s a tight control loop. Observe real state, decide the
-        next action, act through a tool, observe again, repeat. The loop carries the
-        intelligence; any single inference is just one tick.
+        Building Sable&apos;s financial agent taught me the real split between a
+        chatbot and an agent: a chatbot answers, an agent acts. It isn&apos;t
+        parameter count or a cuter prompt — it&apos;s a tight control loop. Observe
+        real state, decide the next action, act through a tool, observe again, repeat.
+        The loop carries the intelligence; any single inference is just one tick.
       </p>
 
       <h2>Agents are loops over tools, not bigger prompts</h2>
@@ -136,8 +137,11 @@ function Body() {
         them with the{" "}
         <a href="/blog/router-agent-multi-agent-orchestration">router pattern</a>,
         and run the whole thing{" "}
-        <a href="/blog/latency-first-ai-serverless-hono">at the edge</a>. Continue on
-        the <a href="/roadmap">roadmap</a>.
+        <a href="/blog/latency-first-ai-serverless-hono">at the edge</a>. Every agent
+        I shipped in Sable and IntegrateX earned its autonomy the same way — the
+        judgment I bring is designing for the runaway case first, so the system
+        degrades to a clean stop instead of a surprise invoice. Continue on the{" "}
+        <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -145,16 +149,16 @@ function Body() {
 
 export const agenticControlLoops: BlogPost = {
   slug: "agentic-control-loops",
-  title: "Agentic Control Loops: Building Autonomous Systems That Stop",
+  title: "The Agentic Control Loop I Ship: A Budget and a Stop Gate",
   description:
-    "A chatbot answers; an agent acts. The difference is a control loop — observe, decide, act, observe — with tools as the hands, a hard step budget, and a termination condition so autonomy doesn't run away.",
+    "Across Sable and IntegrateX I built agents as a tight agentic control loop — observe, decide, act — with a hard step budget and a termination gate.",
   keywords: [
     "agentic AI",
     "control loop",
     "autonomous agents",
-    "tool use",
-    "agent state management",
-    "AI orchestration",
+    "agentic AI engineer",
+    "production agent systems",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-04-27",
   readingMinutes: 7,
