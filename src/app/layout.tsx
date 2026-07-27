@@ -20,7 +20,7 @@ const firaCode = Fira_Code({
   variable: "--font-mono",
 });
 
-const TITLE_DEFAULT = "Yaseen Khatib | Full-Stack AI Engineer";
+const TITLE_DEFAULT = "Yaseen Khatib | Senior Full-Stack AI Engineer";
 const DESCRIPTION = SITE_DESCRIPTION;
 
 export const metadata: Metadata = {

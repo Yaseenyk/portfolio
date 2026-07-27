@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import fs from "node:fs";
 import path from "node:path";
@@ -15,6 +16,28 @@ import Navbar from "@/components/Navbar";
 import JsonLd from "@/components/JsonLd";
 import { SITE_URL } from "@/lib/site";
 import { PERSON_ID, WEBSITE_ID, personRef } from "@/lib/seo";
+
+// Homepage metadata is set here (not inherited from the layout default) so the
+// title/description target hiring intent — "Senior Full-Stack AI Engineer",
+// stack, seniority — rather than the generic informational phrasing that drew
+// non-converting encyclopedia traffic and got the page de-indexed.
+export const metadata: Metadata = {
+  title: {
+    absolute: "Yaseen Khatib — Senior Full-Stack AI Engineer (MERN, RAG)",
+  },
+  description:
+    "Yaseen Khatib is a Senior Full-Stack AI Engineer (MERN + TypeScript) who ships production LLM systems — RAG pipelines, agent orchestration, and real-time architectures. Five products built solo. Open to senior and lead engineering roles, remote or on-site.",
+  openGraph: {
+    title: "Yaseen Khatib — Senior Full-Stack AI Engineer",
+    description:
+      "MERN + TypeScript engineer shipping production LLM systems: RAG, agent orchestration, real-time architectures. Five products built solo. Open to senior / lead roles.",
+  },
+  twitter: {
+    title: "Yaseen Khatib — Senior Full-Stack AI Engineer",
+    description:
+      "MERN + TypeScript engineer shipping production LLM systems: RAG, agents, real-time. Five products built solo. Open to senior / lead roles.",
+  },
+};
 
 const author = personRef;
 

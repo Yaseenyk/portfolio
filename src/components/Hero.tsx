@@ -36,7 +36,7 @@ export default function Hero() {
             Open to work · remote / hybrid / on-site
           </span>
           <span className="inline-flex items-center rounded-full border border-zinc-800 bg-white/[0.03] px-4 py-1.5 text-xs text-zinc-300">
-            Senior Full-Stack Developer · AI Systems
+            Senior Full-Stack AI Engineer · MERN
           </span>
         </motion.div>
 
@@ -44,11 +44,11 @@ export default function Hero() {
           variants={headline}
           className="mt-8 text-balance text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
         >
-          Full-stack developer.
+          Senior full-stack AI engineer.
           <br />
-          Now building{" "}
+          MERN, wired into{" "}
           <GradientText className="whitespace-nowrap">
-            AI systems.
+            LLM systems.
           </GradientText>
         </motion.h1>
 
