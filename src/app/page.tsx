@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import Hero from "@/components/Hero";
 import FoundersLog from "@/components/FoundersLog";
-import { getPostBySlug, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
+import { getAllPosts, getPostBySlug, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 import TerminalAgent from "@/components/widgets/TerminalAgent";
 import Products from "@/components/Products";
 import Dashboard from "@/components/Dashboard";
@@ -42,11 +42,18 @@ export const metadata: Metadata = {
 const author = personRef;
 
 // AEO: the homepage is the Person's profile — mainEntity points at the
-// sitewide Person node by @id instead of redeclaring it.
+// sitewide Person node by @id instead of redeclaring it. dateCreated/
+// dateModified are recommended for the Profile Page rich result (Google) and
+// derive from the content corpus so freshness updates on every publish — the
+// enhancement went "invalid" when the page dropped from the index, and this
+// gives Google a complete, current ProfilePage to re-validate on re-crawl.
+const postsNewestFirst = getAllPosts();
 const profilePageJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfilePage",
   url: SITE_URL,
+  dateCreated: postsNewestFirst.at(-1)?.publishedAt ?? "2026-01-01",
+  dateModified: postsNewestFirst[0]?.publishedAt ?? "2026-07-27",
   mainEntity: { "@id": PERSON_ID },
   isPartOf: { "@id": WEBSITE_ID },
 };

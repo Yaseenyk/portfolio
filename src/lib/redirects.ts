@@ -11,6 +11,9 @@ export const BLOG_REDIRECTS: Record<string, string> = {
   "fine-tuning-vs-rag": "hybrid-rag-bm25-vector-reranking",
   "function-calling-tool-use-patterns": "tool-use-function-calling-mechanics",
   "prompt-engineering-fundamentals": "xml-tag-structural-prompting-deterministic-shell",
+  // Orphaned old slug Google still crawls (GSC 2026-07-27) — was 404ing,
+  // consolidate its equity into the prompt-mechanics post.
+  "prompt-engineering-fundamentals-backend-devs": "beyond-the-prompt-llm-mechanics",
   "streaming-llm-responses-to-react": "streaming-ai-edge-hono-ai-sdk-nextjs",
   "token-economics-cost-optimizing-llm-apps": "finops-for-ai-cost-governance",
   "evaluating-llm-outputs": "evaluation-driven-development-golden-dataset",
