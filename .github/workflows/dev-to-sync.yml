@@ -1,7 +1,8 @@
 name: Cross-post new posts to DEV.to
 
-# When a brand-new Markdown post lands on main, create a DEV.to *draft* that
-# canonicalises back to the site. Drafts only — you review, then publish on DEV.to.
+# When a Markdown post is added OR edited on main, upsert it to DEV.to
+# (published, canonicalised back to the site): update the existing article if
+# one matches its canonical_url, otherwise create it. No duplicates on edits.
 on:
   push:
     branches: [main]
@@ -52,12 +53,14 @@ jobs:
             fi
           else
             # push: a branch's first push reports an all-zero "before" SHA;
-            # diff against the empty tree so every file counts as added.
+            # diff against the empty tree so every file counts as changed.
             if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
               BEFORE_SHA="$(git hash-object -t tree /dev/null)"
             fi
+            # ACMR = added, copied, modified, renamed (NOT deleted). Modified is
+            # what makes edits upsert instead of being ignored.
             files="$(
-              git diff --name-only --diff-filter=A "$BEFORE_SHA" "$AFTER_SHA" \
+              git diff --name-only --diff-filter=ACMR "$BEFORE_SHA" "$AFTER_SHA" \
                 -- 'src/content/blog/*.mdx' | tr '\n' ' ' | sed 's/ *$//'
             )"
           fi
