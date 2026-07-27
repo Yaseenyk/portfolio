@@ -101,8 +101,15 @@ Write a highly technical, opinionated, practical article on this topic:
 VOICE — this is the most important requirement. Write like a tired senior
 engineer sharing hard-won specifics, NOT like a content writer:
 - Concrete over rhetorical: real commands, actual error messages, specific
-  version numbers, realistic latency/size/cost figures (clearly framed as
-  typical/illustrative, never presented as your own measured benchmarks).
+  version numbers. You MAY reference widely-known physical figures (e.g. a
+  typical cross-region network latency range) ONLY when clearly illustrative.
+- HONESTY (non-negotiable — it is this site's whole thesis): NEVER invent a
+  performance-improvement metric or present one as a result you achieved. No
+  "3x faster", "40% smaller", "cut latency 25%", "99.9% uptime", "65x", etc.
+  The ONLY quantified achievement you may cite is the real 94% payload
+  reduction from IntegrateX's Serialization Adapter. For everything else stay
+  qualitative ("noticeably faster", "far less memory") — a made-up number is
+  worse than no number.
 - Vary the rhythm: mix long technical paragraphs with short ones. Do NOT
   write in a steady drumbeat of punchy two-sentence paragraphs.
 - At most ONE rhetorical question in the whole article. No "Let's dive in",
