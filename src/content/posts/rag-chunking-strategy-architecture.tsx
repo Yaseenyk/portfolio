@@ -63,9 +63,10 @@ function Body() {
   return (
     <>
       <p>
-        When a RAG system gives a vague or wrong answer, the instinct is to blame
-        the model or the prompt. Most of the time the real culprit is upstream and
-        invisible: <strong>chunking</strong>. Retrieval can only return what your
+        Every time I&apos;ve chased a vague or wrong answer out of a RAG system I built
+        — the concierge grounding this site, the streamerOS support agent — the culprit
+        was almost never the model or the prompt. It was upstream and invisible:{" "}
+        <strong>chunking</strong>. Retrieval can only return what your
         chunking carved out, and if the right answer was split across two chunks —
         or buried in a chunk full of unrelated text — no amount of prompt tuning
         will recover it. Chunking is not preprocessing. It is the retrieval
@@ -156,7 +157,9 @@ function Body() {
         <a href="/blog/single-model-rag-embeddings-generation">
           single-model embeddings
         </a>{" "}
-        worth their precision. The chunk is where retrieval quality is won or lost.
+        worth their precision. The chunk is where retrieval quality is won or lost —
+        it&apos;s the first thing I audit on any RAG system I ship, and the judgment I
+        bring to a team&apos;s retrieval stack before touching a single prompt.
       </p>
     </>
   );
@@ -164,16 +167,16 @@ function Body() {
 
 export const ragChunkingArchitecture: BlogPost = {
   slug: "rag-chunking-strategy-architecture",
-  title: "Chunking Is the Whole Game: A Retrieval-Quality Chunking Architecture",
+  title: "How I Get RAG Chunking Right in Production",
   description:
-    "Most RAG quality complaints are chunking complaints in disguise. Fixed-size, recursive, and semantic chunking compared — plus why carrying the heading into each chunk lifts both recall and attribution.",
+    "Most RAG quality bugs are chunking bugs. How I handle RAG chunking in production: structural over fixed-size, semantic cuts, and headings carried into each chunk. By Yaseen Khatib.",
   keywords: [
     "RAG chunking strategy",
-    "text chunking",
     "semantic chunking",
-    "improve RAG accuracy",
-    "chunk size embeddings",
     "retrieval quality",
+    "RAG chunking engineer",
+    "production RAG systems",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-30",
   readingMinutes: 8,

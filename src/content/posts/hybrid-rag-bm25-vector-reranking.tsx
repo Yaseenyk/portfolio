@@ -70,7 +70,9 @@ function Body() {
   return (
     <>
       <p>
-        In production, one retriever is a coin flip on the user’s phrasing. I run two
+        The hybrid retrieval pipeline behind the RAG concierge on this site &mdash; and
+        the streamerOS support agent &mdash; comes down to one rule I learned in
+        production: one retriever is a coin flip on the user&apos;s phrasing. So I run two
         lanes in parallel: a sparse keyword index (BM25) and a dense vector index.
         BM25 is ruthless about exact tokens &mdash; error codes, SKUs, API field
         names. Vectors forgive wording and catch the paraphrase BM25 would never see.
@@ -152,7 +154,9 @@ function Body() {
         <a href="/blog/rag-chunking-strategy-architecture">chunking strategy</a> gives
         clean, comparable units to rank — the same pipeline that grounds the{" "}
         <a href="/blog/edge-native-rag-cloudflare-workers-hono">streamerOS support agent</a>.
-        Continue on the <a href="/roadmap">roadmap</a>.
+        This is the retrieval judgment I bring to a team &mdash; the sequencing that keeps
+        answers honest and latency inside budget, drawn from systems I&apos;ve actually
+        shipped. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -160,16 +164,16 @@ function Body() {
 
 export const hybridRag: BlogPost = {
   slug: "hybrid-rag-bm25-vector-reranking",
-  title: "Hybrid RAG: Fusing Keyword and Vector Search with Reranking",
+  title: "How I Build Production Hybrid RAG — BM25, Vectors, Reranking",
   description:
-    "Dense vectors miss exact codes; keyword search misses paraphrase. Hybrid RAG runs BM25 and vector retrieval in parallel, fuses them with Reciprocal Rank Fusion, and reranks the shortlist with a cross-encoder for production-grade precision.",
+    "How I run hybrid retrieval in production RAG: BM25 and vectors in parallel, rank fusion, and a cross-encoder on the shortlist. From real systems, by Yaseen Khatib.",
   keywords: [
     "hybrid RAG",
     "BM25 vector search",
     "reciprocal rank fusion",
-    "cross-encoder reranking",
-    "retrieval precision",
-    "production RAG architecture",
+    "hybrid RAG engineer",
+    "production RAG systems",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-02",
   readingMinutes: 7,
