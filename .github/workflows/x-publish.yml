@@ -1,0 +1,88 @@
+name: Announce new posts on X
+
+# When a brand-new Markdown post lands on main, announce it on X as a two-part
+# thread (hook tweet, then a reply carrying the link). ADDED files only — X has
+# no "update tweet", so an edit must never re-announce and duplicate the thread.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/content/blog/**.mdx"
+  # Manual one-off: announce a specific post (blank input = the most recent one).
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "Post to announce now (blank = the most recently added post)"
+        required: false
+        type: string
+
+# Never let two runs announce the same post concurrently.
+concurrency:
+  group: x-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so we can diff the push range
+
+      - name: Determine posts to announce
+        id: added
+        env:
+          EVENT: ${{ github.event_name }}
+          MANUAL_FILE: ${{ github.event.inputs.file }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            if [ -n "${MANUAL_FILE:-}" ]; then
+              files="$MANUAL_FILE"
+            else
+              files="$(git log --diff-filter=A --name-only --format= \
+                -- 'src/content/blog/*.mdx' | grep -m1 . || true)"
+            fi
+          else
+            # First push to a branch reports an all-zero "before" SHA; diff
+            # against the empty tree so every file counts as added.
+            if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+              BEFORE_SHA="$(git hash-object -t tree /dev/null)"
+            fi
+            # Added only (A) — never re-announce an edited post.
+            files="$(
+              git diff --name-only --diff-filter=A "$BEFORE_SHA" "$AFTER_SHA" \
+                -- 'src/content/blog/*.mdx' | tr '\n' ' ' | sed 's/ *$//'
+            )"
+          fi
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+          echo "Posts to announce: ${files:-<none>}"
+
+      - name: Set up Node.js
+        if: steps.added.outputs.files != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.added.outputs.files != ''
+        run: npm ci
+
+      - name: Announce on X
+        if: steps.added.outputs.files != ''
+        env:
+          # OAuth 1.0a user-context secrets — required to WRITE tweets.
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          # Passed via env (not interpolated into the command) — no shell injection.
+          ADDED_FILES: ${{ steps.added.outputs.files }}
+        run: npx tsx scripts/sync-x.ts
