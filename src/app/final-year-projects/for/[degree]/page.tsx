@@ -13,6 +13,7 @@ import {
   projectsForDegree,
   type Degree,
 } from "@/lib/campus";
+import { guidesForDegree } from "@/lib/guides";
 import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import ProjectCard from "@/components/campus/ProjectCard";
@@ -235,6 +236,27 @@ export default function DegreePage({ params }: Params) {
             ))}
         </div>
       </nav>
+
+      <section className="mt-20">
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
+          Read before you decide
+        </h2>
+        <ul className="mt-6 space-y-3">
+          {guidesForDegree(degree).map((g) => (
+            <li key={g.slug}>
+              <Link
+                href={`/final-year-projects/guides/${g.slug}`}
+                className="group flex items-baseline justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-colors duration-200 hover:border-cyan/40"
+              >
+                <span className="text-sm text-zinc-200">{g.h1}</span>
+                <span className="shrink-0 font-mono text-[10px] tabular-nums text-zinc-600">
+                  {g.readingMinutes} min
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <div className="mt-20">
         <TrustStrip />

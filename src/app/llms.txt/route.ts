@@ -6,6 +6,7 @@ import {
   SESSION_POLICY,
   formatInr,
 } from "@/lib/campus";
+import { GUIDES } from "@/lib/guides";
 
 export const dynamic = "force-static";
 
@@ -52,6 +53,11 @@ export function GET() {
 
 - [Catalog — all final year projects](${SITE_URL}/final-year-projects/)
 - [Custom project built to your problem statement](${SITE_URL}/final-year-projects/custom/)
+- [For colleges — workshops and cohort mentoring](${SITE_URL}/final-year-projects/colleges/)
+- [Terms — payment, delivery, cancellation](${SITE_URL}/final-year-projects/terms/)
+${GUIDES.map(
+  (g) => `- [${g.meta.title}](${SITE_URL}/final-year-projects/guides/${g.meta.slug}/): ${g.meta.description}`,
+).join("\n")}
 ${CAMPUS_PROJECTS.map(
   (p) =>
     `- [${p.title}](${SITE_URL}/final-year-projects/${p.slug}/): ${p.summary} Suits ${p.degrees.join(", ")}. Stack: ${p.stack.join(", ")}. From ${formatInr(p.prices.source)}.`,

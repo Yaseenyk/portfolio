@@ -73,21 +73,21 @@ const articleCount = sections.length;
 // on them is what lets an answer engine (or the concierge bot) field a student
 // question without inventing numbers.
 if (existsSync(CAMPUS)) {
-  // Listings sit one level down, the per-course landing pages two ("for/bca").
+  // Listings sit one level down; course pages and guides are nested one deeper
+  // ("for/bca", "guides/<slug>") and those sections have an index page too.
+  const NESTED = new Set(["for", "guides"]);
   const pages = [{ path: "", label: "final-year-projects" }];
   for (const dir of readdirSync(CAMPUS, { withFileTypes: true })) {
     if (!dir.isDirectory()) continue;
-    if (dir.name === "for") {
-      for (const sub of readdirSync(join(CAMPUS, "for"), { withFileTypes: true })) {
-        if (!sub.isDirectory()) continue;
-        pages.push({
-          path: join("for", sub.name),
-          label: `final-year-projects/for/${sub.name}`,
-        });
-      }
-      continue;
-    }
     pages.push({ path: dir.name, label: `final-year-projects/${dir.name}` });
+    if (!NESTED.has(dir.name)) continue;
+    for (const sub of readdirSync(join(CAMPUS, dir.name), { withFileTypes: true })) {
+      if (!sub.isDirectory()) continue;
+      pages.push({
+        path: join(dir.name, sub.name),
+        label: `final-year-projects/${dir.name}/${sub.name}`,
+      });
+    }
   }
   for (const page of pages) {
     const file = join(CAMPUS, page.path, "index.html");

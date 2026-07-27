@@ -16,6 +16,7 @@ import {
   whatsappHref,
   type Degree,
 } from "@/lib/campus";
+import { GUIDES } from "@/lib/guides";
 import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusIndex from "@/components/campus/CampusIndex";
@@ -266,6 +267,39 @@ export default function FinalYearProjectsPage() {
         >
           For colleges →
         </Link>
+      </section>
+
+      <section className="mt-24">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+            Free guides, nothing gated
+          </h2>
+          <Link
+            href="/final-year-projects/guides"
+            className="text-sm text-cyan underline-offset-4 hover:underline"
+          >
+            All {GUIDES.length} guides →
+          </Link>
+        </div>
+        <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">
+          {GUIDES.slice(0, 3).map((g) => (
+            <Link
+              key={g.meta.slug}
+              href={`/final-year-projects/guides/${g.meta.slug}`}
+              className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
+            >
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
+                {g.meta.category}
+              </span>
+              <h3 className="mt-3 text-base font-medium leading-snug text-zinc-50">
+                {g.meta.h1}
+              </h3>
+              <span className="mt-auto pt-5 font-mono text-[10px] tabular-nums text-zinc-600">
+                {g.meta.readingMinutes} min read
+              </span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <div className="mt-24">

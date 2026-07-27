@@ -4,6 +4,7 @@ import { getAllPosts } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
 import { PRODUCTS } from "@/lib/products";
 import { CAMPUS_PROJECTS, DEGREE_SLUGS } from "@/lib/campus";
+import { GUIDES } from "@/lib/guides";
 
 export const dynamic = "force-static";
 
@@ -113,6 +114,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.4,
     },
+    {
+      url: `${SITE_URL}/final-year-projects/guides/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...GUIDES.map((g) => ({
+      url: `${SITE_URL}/final-year-projects/guides/${g.meta.slug}/`,
+      lastModified: g.meta.publishedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
     ...Object.values(DEGREE_SLUGS).map((slug) => ({
       url: `${SITE_URL}/final-year-projects/for/${slug}/`,
       lastModified: lastBlogUpdate,

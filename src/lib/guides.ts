@@ -1,0 +1,65 @@
+// Guides cluster for the Final Year Projects surface. These exist to be found
+// in search: every guide targets a query students actually type, answers it
+// properly, and links inward to the catalog.
+//
+// Deliberately separate from lib/blog — the blog is engineering writing aimed
+// at a professional audience, and mixing the two would dilute both.
+//
+// Content files under src/content/guides/ import the TYPE only; a runtime
+// import would close a cycle and hit a TDZ error during the static export.
+import type { ComponentType } from "react";
+import { SITE_URL } from "@/lib/site";
+import type { Degree } from "@/lib/campus";
+import type { FaqItem } from "@/lib/seo";
+
+import { meta as vivaMeta, Body as VivaBody } from "@/content/guides/viva-questions";
+import { meta as chooseMeta, Body as ChooseBody } from "@/content/guides/how-to-choose";
+import { meta as mcaMeta, Body as McaBody } from "@/content/guides/mca-topics";
+import { meta as bcaMeta, Body as BcaBody } from "@/content/guides/bca-topics";
+import { meta as btechMeta, Body as BtechBody } from "@/content/guides/btech-topics";
+import { meta as reportMeta, Body as ReportBody } from "@/content/guides/report-format";
+
+export interface GuideMeta {
+  slug: string;
+  /** Metadata title — written for the SERP, so it carries the query. */
+  title: string;
+  /** On-page heading; may differ from the SERP title. */
+  h1: string;
+  description: string;
+  /** Mono eyebrow, e.g. "Viva prep". */
+  category: string;
+  publishedAt: string;
+  readingMinutes: number;
+  /** Drives the "read this next" links on course pages. */
+  degrees?: Degree[];
+  faq?: FaqItem[];
+}
+
+export interface Guide {
+  meta: GuideMeta;
+  Body: ComponentType;
+}
+
+/** Newest / highest-intent first — this is the order the index renders. */
+export const GUIDES: Guide[] = [
+  { meta: vivaMeta, Body: VivaBody },
+  { meta: mcaMeta, Body: McaBody },
+  { meta: bcaMeta, Body: BcaBody },
+  { meta: btechMeta, Body: BtechBody },
+  { meta: reportMeta, Body: ReportBody },
+  { meta: chooseMeta, Body: ChooseBody },
+];
+
+export function getGuide(slug: string): Guide | undefined {
+  return GUIDES.find((g) => g.meta.slug === slug);
+}
+
+export function guideUrl(slug: string): string {
+  return `${SITE_URL}/final-year-projects/guides/${slug}/`;
+}
+
+export function guidesForDegree(degree: Degree): GuideMeta[] {
+  return GUIDES.map((g) => g.meta).filter(
+    (m) => !m.degrees || m.degrees.includes(degree),
+  );
+}
