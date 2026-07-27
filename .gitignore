@@ -26,6 +26,10 @@ __pycache__/
 /out/
 next-env.d.ts
 
+# Google Search Console exports dropped into the repo for analysis (not source)
+yaseenkhatib.streamerosai.com-*/
+yaseenkhatib.streamerosai.com-*.zip
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

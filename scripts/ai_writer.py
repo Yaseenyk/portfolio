@@ -149,10 +149,17 @@ Field requirements (ALL fields are mandatory — never leave one empty):
   framings; those are the informational-intent titles that got this site
   de-indexed. Prefer angles like "Why I ...", "How I ... in production",
   "... the way it actually breaks", "The ... tradeoff nobody mentions".
+  IT MUST ALSO BE EYE-CATCHY — earn the click with a concrete tension or
+  payoff: a real failure it prevents, a decision it settles, or a specific
+  outcome. But NEVER clickbait: no hype words ("ultimate", "insane",
+  "game-changer", "you won't believe"), no promise the article can't cash.
+  The curiosity must be honest — specific and confident, not inflated.
 - description: one meta-description sentence, 120-160 chars, plain text, no
   quotes. Write it as the author (a Senior Full-Stack AI Engineer) — a
   practitioner's take that carries the search phrase but clearly frames the
-  piece as built-from-experience, not a definition.
+  piece as built-from-experience, not a definition. Lead with the single most
+  interesting specific so it reads as a compelling SERP snippet that makes a
+  hiring manager or senior dev want to click — still honest, never hype.
 - tags: 2-4 short topic tags (e.g. AI, Backend, RAG).
 - keywords: 5-8 specific, long-tail SEO keywords/phrases a developer would actually search.
 - takeaways: 3-4 direct, declarative TL;DR sentences.
