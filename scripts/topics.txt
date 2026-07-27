@@ -1,4 +1,3 @@
-Optimistic UI updates in React without letting local state drift from the server
 Building a typed event bus for cross-component orchestration in a React app
 Taming re-renders in a large React form with uncontrolled inputs and refs
 Zustand versus Redux Toolkit in 2026: choosing by state shape, not by habit

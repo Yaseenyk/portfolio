@@ -1,0 +1,319 @@
+---
+title: Optimistic React UIs that don't drift from the server
+slug: optimistic-react-uis-that-dont-drift-from-the-server
+date: '2026-07-27'
+description: 'How I ship optimistic UI in React without state drift: versioned writes,
+  idempotency keys, React Query/Zustand patterns, and the rollback math.'
+tags:
+- Frontend
+- React
+- State
+- Architecture
+keywords:
+- optimistic updates react query onMutate
+- prevent state drift optimistic ui
+- idempotency key rest react
+- websocket ack optimistic commit
+- zustand optimistic queue typescript
+- json patch versioning react
+- rollback optimistic updates example
+- react server authority version
+readingMinutes: 10
+takeaways:
+- 'Treat the server as authority: use versions/ETags and only commit optimistic changes
+  on explicit server ack.'
+- Every mutation needs a unique idempotency key and client mutation ID to dedupe retries
+  and correlate acks.
+- Rebase pending optimistic patches when out-of-order acks or rejections arrive; never
+  let the cache become the truth.
+- Prefer small, composable adapters (React Query + a tiny optimistic queue) over pushing
+  logic into components.
+author:
+  name: Yaseen Khatib
+  role: Senior Full-Stack AI Engineer
+---
+
+I don’t ship optimistic UI to make things “feel fast”; I ship it because the p95 round-trip to a different region is 120–250 ms and users will mash buttons if the UI stalls. The failure mode to design around isn’t slowness. It’s state drift: the client shows one thing while the server has another, and your next write explodes with 412 Precondition Failed or, worse, silently corrupts data.
+
+## How do you implement optimistic updates in React without state drift?
+In production I keep the server as the authority. The client holds a queue of optimistic patches tagged with a unique mutationId and idempotency key. The server validates with a version/ETag and echoes the mutationId back. On ack, I commit the server snapshot; on reject, I rollback/rebase remaining patches. Never treat the optimistic cache as canonical.
+
+That process sounds heavier than it is. You can assemble it from a few small parts: a version field (or ETag), unique mutation IDs, an idempotency key for the HTTP layer, and a state manager that can apply, rollback, and rebase patches. Components render derived state only.
+
+### Minimal React Query mutation that commits to the server’s snapshot
+Assume TanStack Query v5, React 18+, TypeScript.
+
+```ts
+// types.ts
+export type Todo = {
+  id: string;
+  title: string;
+  completed: boolean;
+  version: number; // server-assigned, monotonic per row
+};
+
+export type PatchTodo = Partial<Pick<Todo, 'title' | 'completed'>>;
+```
+
+```ts
+// api.ts
+export async function patchTodo(
+  id: string,
+  patch: PatchTodo,
+  opts: { version: number; mutationId: string; idempotencyKey: string }
+): Promise<{ todo: Todo; mutationId: string }> {
+  const res = await fetch(`/api/todos/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/merge-patch+json',
+      'If-Match': String(opts.version), // optimistic concurrency control
+      'Idempotency-Key': opts.idempotencyKey, // dedupe client retries on the server
+    },
+    body: JSON.stringify({ ...patch, clientMutationId: opts.mutationId }),
+  });
+
+  if (!res.ok) {
+    // 412 Precondition Failed when version mismatches is expected on conflicts
+    const text = await res.text();
+    throw new Error(`PATCH /todos/${id} failed: ${res.status} ${text}`);
+  }
+
+  return (await res.json()) as { todo: Todo; mutationId: string };
+}
+```
+
+```ts
+// useToggleTodo.tsx
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { patchTodo } from './api';
+import type { Todo } from './types';
+
+export function useToggleTodo() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, nextCompleted }: { id: string; nextCompleted: boolean }) => {
+      const list = qc.getQueryData<Todo[]>(['todos']);
+      const current = list?.find(t => t.id === id);
+      if (!current) throw new Error('Todo not in cache');
+      return patchTodo(id, { completed: nextCompleted }, {
+        version: current.version,
+        mutationId: crypto.randomUUID(),
+        idempotencyKey: crypto.randomUUID(),
+      });
+    },
+    onMutate: async ({ id, nextCompleted }) => {
+      await qc.cancelQueries({ queryKey: ['todos'] });
+      const prev = qc.getQueryData<Todo[]>(['todos']);
+
+      // Optimistically flip the flag but DO NOT increment version locally.
+      qc.setQueryData<Todo[]>(['todos'], (old) =>
+        (old ?? []).map(t => t.id === id ? { ...t, completed: nextCompleted } : t)
+      );
+
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      // Hard rollback on transport or 4xx/5xx
+      if (ctx?.prev) qc.setQueryData(['todos'], ctx.prev);
+    },
+    onSuccess: ({ todo }) => {
+      // Commit to the authoritative server snapshot (includes new version)
+      qc.setQueryData<Todo[]>(['todos'], (old) =>
+        (old ?? []).map(t => t.id === todo.id ? todo : t)
+      );
+    },
+    onSettled: () => {
+      // Light revalidation to catch background changes; avoid thrash.
+      qc.invalidateQueries({ queryKey: ['todos'], refetchType: 'inactive' });
+    },
+  });
+}
+```
+
+Rules being enforced:
+- Don’t fabricate versions on the client. The server sets them.
+- The optimistic cache is temporary. Always land on the server response.
+- Use an Idempotency-Key so browser retries or double-clicks don’t double-apply on the server.
+
+This pattern survives: out-of-order network responses (we match by todo.id and overwrite with the server’s snapshot), 412s (we rollback), and user spam-clicking (idempotency dedupes on the server).
+
+## How do you rollback optimistic updates when the server rejects?
+Keep a queue of pending patches with stable mutationIds. On a rejection or version conflict, drop the failed patch and recompute the derived client view by replaying the remaining patches over the last committed server state. Don’t try to surgically revert; rebase from a known good base.
+
+Here’s a compact Zustand store that does exactly that. View state is derived from committed server data plus pending patches.
+
+```ts
+// optimisticStore.ts
+import { create } from 'zustand';
+import type { Todo, PatchTodo } from './types';
+
+type PendingOp = { mutationId: string; entityId: string; patch: PatchTodo };
+
+type Store = {
+  committed: Record<string, Todo>; // last known server snapshots
+  pending: PendingOp[];            // optimistic patches, in order
+  // Derived selector: materialize current view by applying pending patches
+  getView(): Record<string, Todo>;
+  // Orchestration
+  applyOptimistic(todo: Todo, patch: PatchTodo): PendingOp;
+  commit(ack: { mutationId: string; todo: Todo }): void;
+  reject(mutationId: string): void;
+};
+
+const applyMergePatch = <T extends object>(obj: T, patch: Partial<T>): T => ({ ...obj, ...patch });
+
+export const useTodosStore = create<Store>((set, get) => ({
+  committed: {},
+  pending: [],
+
+  getView() {
+    const { committed, pending } = get();
+    const view: Record<string, Todo> = { ...committed };
+    for (const op of pending) {
+      const base = view[op.entityId] ?? get().committed[op.entityId];
+      if (!base) continue;
+      view[op.entityId] = applyMergePatch(base, op.patch);
+    }
+    return view;
+  },
+
+  applyOptimistic(todo, patch) {
+    const mutationId = crypto.randomUUID();
+    const op: PendingOp = { mutationId, entityId: todo.id, patch };
+    set(s => ({ pending: [...s.pending, op] }));
+    return op;
+  },
+
+  commit(ack) {
+    set(s => {
+      // Replace committed snapshot with authoritative server state
+      const committed = { ...s.committed, [ack.todo.id]: ack.todo };
+      // Drop the acknowledged op and keep the rest
+      const pending = s.pending.filter(p => p.mutationId !== ack.mutationId);
+      // Rebase derived view on next selector call; no in-place rewrites
+      return { committed, pending };
+    });
+  },
+
+  reject(mutationId) {
+    set(s => ({ pending: s.pending.filter(p => p.mutationId !== mutationId) }));
+  },
+}));
+```
+
+Network wiring: send the patch with both an If-Match version and the local mutationId. When a WebSocket or HTTP response arrives, call `commit` or `reject`. Derivation does the rest.
+
+```ts
+// transport.ts
+import { useTodosStore } from './optimisticStore';
+import { patchTodo } from './api';
+
+export async function sendOptimisticToggle(todo: { id: string; version: number }) {
+  const store = useTodosStore.getState();
+  const op = store.applyOptimistic({ ...todo }, { completed: !todo.completed });
+
+  const res = await patchTodo(todo.id, { completed: !todo.completed }, {
+    version: todo.version,
+    mutationId: op.mutationId,
+    idempotencyKey: crypto.randomUUID(),
+  }).catch((e) => {
+    // Transport error — drop the optimistic patch
+    store.reject(op.mutationId);
+    throw e;
+  });
+
+  // Server echo: authoritative entity + the mutationId we sent
+  useTodosStore.getState().commit(res);
+}
+
+// Optional: handle server-side broadcasts for edits from other users
+// { type: 'todo.updated', todo, version, causedByMutationId? }
+ws.addEventListener('message', (evt) => {
+  const msg = JSON.parse(evt.data);
+  if (msg.type === 'todo.updated') {
+    useTodosStore.getState().commit({ mutationId: msg.causedByMutationId ?? crypto.randomUUID(), todo: msg.todo });
+  }
+  if (msg.type === 'todo.rejected') {
+    useTodosStore.getState().reject(msg.mutationId);
+  }
+});
+```
+
+A few pragmatic points:
+- Rebasing is deterministic because we never mutate `committed`. We only replay `pending` when computing the view or after a commit/reject.
+- If an external update lands (another user changes the same entity), it just becomes the new base. Your still-pending patches reapply over it.
+- Don’t stuff the derived view inside the store. Compute it with selectors to avoid subtle bugs.
+
+## What server-side contracts make optimistic UI safe?
+You need three things: a monotonic version (or ETag) per entity, idempotency on writes, and an echo of the client mutationId in responses/broadcasts. The server should return 412 on version mismatch, dedupe by Idempotency-Key for a time window, and always send back the final canonical entity snapshot.
+
+What I typically implement:
+- Versioning: integer `version` incremented on each committed write. REST: guard with `If-Match: <version>`. GraphQL: include `expectedVersion`.
+- Idempotency: accept `Idempotency-Key` header, hash to a short-lived key (e.g., Redis 5–15 minutes). Return the same result for duplicate keys.
+- Echo: include `clientMutationId` in the response and any pub/sub broadcasts so the client can correlate and drop the matching optimistic patch.
+- Patch semantics: use JSON Merge Patch (RFC 7396) for simple partials or JSON Patch (RFC 6902) where fine-grained ops matter. Always resolve on the server, not the client.
+
+## When should you not use optimistic UI?
+- Irreversible, high-stakes actions (funds transfer, quota changes). Use a progress state and wait for commit.
+- Cross-entity invariants that must be atomically enforced (seat allocation). Show a pending state and refetch on commit.
+- Huge side effects (sending emails, kicking workflows) where a brief visual lie hurts. Acknowledge and display “queued”.
+
+For these, you can still apply speculative UI affordances (disable button, skeletons) without falsifying data.
+
+## How do you keep React components from owning this logic?
+Make components pure renderers. State orchestration sits next to your data layer, not inside JSX. A pattern I call Trinity Architecture keeps this clean:
+- Presentation: React components render from selectors of the derived view.
+- Reactive State / Orchestration: React Query and/or a tiny Zustand store hold the committed cache and optimistic queue.
+- Data / Serialization Adapter: map rich UI edits into lean wire payloads, attach version + idempotency, strip UI-only metadata.
+
+Boundary rule: components dispatch events; they don’t talk to fetch directly. That keeps the rollback/rebase math testable and reusable.
+
+## Debugging and failure modes that actually happen
+- Duplicate acks: you’ll see the same mutationId twice when a worker retries a publish. Make `commit` idempotent by filtering the op; setting `committed` twice is harmless.
+- Out-of-order acks: use mutationId matching and rebase. Don’t rely on response order.
+- Server rejects with 412: rollback and refetch the entity; consider surfacing a non-blocking toast “Update conflicted, re-applied.”
+- Cache stampede after `onSettled`: if you invalidate too aggressively, you’ll refetch during every keystroke. Invalidate inactive queries or debounce invalidation.
+- Multi-tab drift: mirror pending ops over `BroadcastChannel` and ensure idempotency keys are shared across tabs so the server dedupes.
+- Offline: cap the pending queue length and surface “Work queued” with a retry mechanism. Persist pending ops to IndexedDB if you must; never persist derived view as truth.
+
+## A small note on GraphQL clients
+If you’re on Apollo/urql/Relay, the same rules apply. Use `optimisticResponse` to update the cache, include a `clientMutationId` in the input, and on server resolve, write the authoritative entity back with the new version. Don’t hand-roll version bumps in cache write functions.
+
+## Testing the rebase math
+Write unit tests for the reducer/selectors, not components. Example with Vitest-style pseudocode:
+
+```ts
+import { describe, it, expect } from 'vitest';
+import { useTodosStore } from './optimisticStore';
+
+describe('optimistic rebase', () => {
+  it('replays remaining patches after a rejection', () => {
+    const s = useTodosStore.getState();
+    // base
+    s.commit({ mutationId: 'seed', todo: { id: '1', title: 'A', completed: false, version: 1 } });
+    const op1 = s.applyOptimistic({ id: '1', title: 'A', completed: false, version: 1 }, { completed: true });
+    const op2 = s.applyOptimistic({ id: '1', title: 'A', completed: false, version: 1 }, { title: 'Renamed' });
+
+    // server rejects op1, accepts op2 with new snapshot
+    s.reject(op1.mutationId);
+    s.commit({ mutationId: op2.mutationId, todo: { id: '1', title: 'Renamed', completed: false, version: 2 } });
+
+    const view = s.getView();
+    expect(view['1'].title).toBe('Renamed');
+    expect(view['1'].completed).toBe(false);
+    expect(view['1'].version).toBe(2);
+  });
+});
+```
+
+This is the shape of the bug you want to prevent: an earlier rejected patch shouldn’t poison later, accepted ones. The easiest way to keep it correct is always to rebase from committed state.
+
+## Costs and why it’s still worth it
+- Slightly more code: you’ll write a 50–150 line orchestrator. That’s fine. Keep it isolated and tested.
+- Marginal CPU on the client to re-derive views. Normalized entities keep it cheap.
+- Server work for idempotency windows and version checks. Usually a Redis write and a conditional update.
+
+The payoff is predictable UX with no ghost states, and you unlock concurrent edits safely.
+
+I build production UIs around these contracts because AI-backed flows (tool calls, streaming updates, collaborative graphs) are already noisy. If the view layer stays honest to the server and optimistic math is centralized, the rest scales: I can ship React, Node, and TypeScript systems that feel instant without lying, and that’s the judgment I bring to a team.
