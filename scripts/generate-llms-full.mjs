@@ -10,6 +10,7 @@ import { join } from "node:path";
 
 const OUT = join(process.cwd(), "out");
 const BLOG = join(OUT, "blog");
+const CAMPUS = join(OUT, "final-year-projects");
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
 
 function htmlToText(html) {
@@ -40,6 +41,14 @@ function extract(html) {
   return { title: htmlToText(title), desc, body: htmlToText(bodyHtml) };
 }
 
+/** Campus pages are not <article>-wrapped — take the whole <main> instead. */
+function extractMain(html) {
+  const title = (html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/) ?? [])[1] ?? "";
+  const desc = (html.match(/<meta name="description" content="([^"]*)"/) ?? [])[1] ?? "";
+  const main = (html.match(/<main[^>]*>([\s\S]*)<\/main>/) ?? [])[1] ?? "";
+  return { title: htmlToText(title), desc, body: htmlToText(main) };
+}
+
 if (!existsSync(BLOG)) {
   console.error("out/blog not found — run next build first.");
   process.exit(1);
@@ -57,11 +66,49 @@ for (const dir of readdirSync(BLOG, { withFileTypes: true })) {
   );
 }
 
-const header = `Yaseen Khatib — full article corpus (${sections.length} articles)
+const articleCount = sections.length;
+
+// Final-year-project pages: the catalog, the custom-build brief, and every
+// listing. These carry the pricing, session, and payment terms, so grounding
+// on them is what lets an answer engine (or the concierge bot) field a student
+// question without inventing numbers.
+if (existsSync(CAMPUS)) {
+  // Listings sit one level down, the per-course landing pages two ("for/bca").
+  const pages = [{ path: "", label: "final-year-projects" }];
+  for (const dir of readdirSync(CAMPUS, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+    if (dir.name === "for") {
+      for (const sub of readdirSync(join(CAMPUS, "for"), { withFileTypes: true })) {
+        if (!sub.isDirectory()) continue;
+        pages.push({
+          path: join("for", sub.name),
+          label: `final-year-projects/for/${sub.name}`,
+        });
+      }
+      continue;
+    }
+    pages.push({ path: dir.name, label: `final-year-projects/${dir.name}` });
+  }
+  for (const page of pages) {
+    const file = join(CAMPUS, page.path, "index.html");
+    if (!existsSync(file)) continue;
+    const { title, desc, body } = extractMain(readFileSync(file, "utf-8"));
+    if (!title || !body) continue;
+    sections.push(
+      `# ${title}\n\nURL: ${SITE}/${page.label}/\nSummary: ${desc}\n\n${body}`,
+    );
+  }
+}
+
+const campusCount = sections.length - articleCount;
+
+const header = `Yaseen Khatib — full corpus (${articleCount} articles, ${campusCount} final-year-project pages)
 Author canonical bio: ${SITE}/about
 Curated index: ${SITE}/llms.txt
 
 `;
 
 writeFileSync(join(OUT, "llms-full.txt"), header + sections.join("\n\n---\n\n") + "\n");
-console.log(`llms-full.txt: ${sections.length} articles written`);
+console.log(
+  `llms-full.txt: ${articleCount} articles + ${campusCount} campus pages written`,
+);

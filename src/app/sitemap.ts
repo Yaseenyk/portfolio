@@ -3,6 +3,7 @@ import { SITE_URL } from "@/lib/site";
 import { getAllPosts } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
 import { PRODUCTS } from "@/lib/products";
+import { CAMPUS_PROJECTS, DEGREE_SLUGS } from "@/lib/campus";
 
 export const dynamic = "force-static";
 
@@ -87,6 +88,36 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: lastBlogUpdate,
       changeFrequency: "monthly" as const,
       priority: 0.7,
+    })),
+    {
+      url: `${SITE_URL}/final-year-projects/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/final-year-projects/custom/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/final-year-projects/terms/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+    ...Object.values(DEGREE_SLUGS).map((slug) => ({
+      url: `${SITE_URL}/final-year-projects/for/${slug}/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
+    ...CAMPUS_PROJECTS.map((p) => ({
+      url: `${SITE_URL}/final-year-projects/${p.slug}/`,
+      lastModified: p.publishedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
     })),
     {
       url: `${SITE_URL}/interview/`,

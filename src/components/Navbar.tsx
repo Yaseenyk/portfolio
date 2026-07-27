@@ -5,13 +5,14 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import PulseDot from "./PulseDot";
 
-// Five essentials only — Products, Roadmaps, Stack, and Experience remain
+// Essentials only — Products, Roadmaps, Stack, and Experience remain
 // reachable from the homepage sections, /projects, and the footer.
 const LINKS = [
   { href: "/about", label: "About" },
   { href: "/projects", label: "Projects" },
   { href: "/blog", label: "Blog" },
   { href: "/sandbox", label: "Sandbox" },
+  { href: "/final-year-projects", label: "Students" },
   { href: "/#contact", label: "Contact" },
 ];
 

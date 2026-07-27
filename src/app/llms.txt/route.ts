@@ -1,5 +1,11 @@
 import { getAllPosts, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 import { SITE_URL, PERSON } from "@/lib/site";
+import {
+  CAMPUS_PROJECTS,
+  CUSTOM_BUILD_RANGE,
+  SESSION_POLICY,
+  formatInr,
+} from "@/lib/campus";
 
 export const dynamic = "force-static";
 
@@ -27,6 +33,24 @@ export function GET() {
 - [Infrastructure & Resiliency Lab (FinOps simulator, chaos toggle)](${SITE_URL}/sandbox/)
 - [Tooling stack](${SITE_URL}/uses/)
 - [Machine-readable profile (JSON)](${SITE_URL}/ai-briefing.json)
+
+## Final year projects for Indian students (BCA / MCA / B.Tech)
+
+> Ready-built final year projects sold with full source code, project report,
+> and ${SESSION_POLICY.cadence.toLowerCase()} live ${SESSION_POLICY.platform}
+> sessions after ${SESSION_POLICY.startsAfter} where the code is explained line
+> by line for viva defence. Payment is direct (UPI / bank transfer) in monthly
+> installments — there is no checkout or subscription. Custom projects built to
+> an approved problem statement are quoted
+> ${formatInr(CUSTOM_BUILD_RANGE.min)}–${formatInr(CUSTOM_BUILD_RANGE.max)}.
+> Each listing is capped to a small number of students per college per year.
+
+- [Catalog — all final year projects](${SITE_URL}/final-year-projects/)
+- [Custom project built to your problem statement](${SITE_URL}/final-year-projects/custom/)
+${CAMPUS_PROJECTS.map(
+  (p) =>
+    `- [${p.title}](${SITE_URL}/final-year-projects/${p.slug}/): ${p.summary} Suits ${p.degrees.join(", ")}. Stack: ${p.stack.join(", ")}. From ${formatInr(p.prices.source)}.`,
+).join("\n")}
 
 ## Founder's Log — vision series
 
