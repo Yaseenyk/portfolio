@@ -192,7 +192,10 @@ export default async function BlogPostPage({ params }: PageProps) {
             position: lesson.lesson.step,
           }
         : {}),
-      ...(ogImage ? { image: [`${SITE_URL}${ogImage}`] } : {}),
+      // Always emit an image (Article recommends one) — fall back to the brand
+      // lockup so posts without a generated cover don't throw a "missing image"
+      // warning in Search Console.
+      image: [ogImage ? `${SITE_URL}${ogImage}` : `${SITE_URL}/og-lockup.png`],
     },
     breadcrumbJsonLd([
       { name: "Blog", path: "/blog" },

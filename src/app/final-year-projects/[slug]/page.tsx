@@ -14,12 +14,7 @@ import {
   getTiers,
 } from "@/lib/campus";
 import type { CampusProject } from "@/lib/campus";
-import {
-  breadcrumbJsonLd,
-  courseJsonLd,
-  faqPageJsonLd,
-  personRef,
-} from "@/lib/seo";
+import { PERSON_ID, breadcrumbJsonLd, faqPageJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusFaq from "@/components/campus/CampusFaq";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
@@ -68,7 +63,6 @@ export default function CampusProjectPage({ params }: Params) {
   if (!project) notFound();
 
   const tiers = getTiers(project);
-  const mentored = tiers.find((t) => t.id === "mentored")!;
 
   // Related projects for internal linking: prefer ones sharing a degree, fall
   // back to the same domain, then anything — excluding this project. Cap at 3.
@@ -80,28 +74,27 @@ export default function CampusProjectPage({ params }: Params) {
     return [...others].sort((a, b) => score(b) - score(a)).slice(0, 3);
   })();
 
-  const courseSchema = courseJsonLd({
-    name: `${project.title} — Mentored`,
-    description: `Mentored final year project: ${project.title} built for you end to end, then walked through line by line across ${project.sessionCount} live sessions with viva prep and a mock viva. ${project.summary}`,
-    url: campusUrl(project.slug),
-    sessionCount: project.sessionCount,
-    price: mentored.price,
-    image: campusImageUrl(project),
-  });
-
   const image = campusImageUrl(project);
+  const provider = { "@type": "Person", "@id": PERSON_ID, name: PERSON.name };
 
-  const productJsonLd = {
+  // Modeled as a Service, not Product/Course. Those are Google rich-result
+  // types whose recommended review/aggregateRating fields we cannot fill
+  // honestly (no fabricated ratings — the site's whole thesis), so they emit
+  // permanent "missing field" warnings in Search Console. Service has no rich
+  // result to validate, so it produces ZERO GSC issues while still exposing the
+  // full offer/price data to answer engines and the sitewide FYP Service node.
+  const serviceJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "Service",
+    serviceType: "Final year project development and viva mentoring",
     name: project.title,
     description: project.summary,
     category: project.domain,
     url: campusUrl(project.slug),
-    // Google Merchant-listing requires an image and a Brand/Organization-typed
-    // brand (a Person @id is rejected as an invalid object type for `brand`).
     image: [image],
-    brand: { "@type": "Brand", name: PERSON.name },
+    provider,
+    areaServed: { "@type": "Country", name: "India" },
+    audience: { "@type": "EducationalAudience", educationalRole: "student" },
     offers: tiers.map((tier) => ({
       "@type": "Offer",
       name: `${project.title} — ${tier.name}`,
@@ -109,7 +102,7 @@ export default function CampusProjectPage({ params }: Params) {
       priceCurrency: "INR",
       availability: "https://schema.org/InStock",
       url: `${campusUrl(project.slug)}#enquire`,
-      seller: personRef,
+      seller: provider,
       eligibleQuantity: {
         "@type": "QuantitativeValue",
         maxValue: project.seatsPerCollege,
@@ -122,8 +115,7 @@ export default function CampusProjectPage({ params }: Params) {
     <div className="mx-auto max-w-5xl px-6 py-12 pb-32 md:pb-12">
       <JsonLd
         data={[
-          productJsonLd,
-          courseSchema,
+          serviceJsonLd,
           faqPageJsonLd(CAMPUS_FAQ),
           breadcrumbJsonLd([
             { name: "Final Year Projects", path: "/final-year-projects" },

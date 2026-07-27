@@ -83,6 +83,9 @@ export default function GuidePage({ params }: Params) {
     url: guideUrl(meta.slug),
     datePublished: meta.publishedAt,
     dateModified: meta.publishedAt,
+    image: [
+      meta.ogImage ? `${SITE_URL}${meta.ogImage}` : `${SITE_URL}/og-lockup.png`,
+    ],
     author: personRef,
     publisher: personRef,
     mainEntityOfPage: { "@type": "WebPage", "@id": guideUrl(meta.slug) },
