@@ -11,6 +11,12 @@ import { hospitalManagementMern } from "@/content/campus/hospital-management-mer
 import { expenseTrackerMobile } from "@/content/campus/expense-tracker-mobile";
 import { resumeScreeningMl } from "@/content/campus/resume-screening-ml";
 import { faceRecognitionAttendance } from "@/content/campus/face-recognition-attendance";
+import { ecommerceMern } from "@/content/campus/ecommerce-mern";
+import { realtimeChatMern } from "@/content/campus/realtime-chat-mern";
+import { recommendationSystemMl } from "@/content/campus/recommendation-system-ml";
+import { fakeNewsDetectionMl } from "@/content/campus/fake-news-detection-ml";
+import { plantDiseaseDetection } from "@/content/campus/plant-disease-detection";
+import { bloodBankManagement } from "@/content/campus/blood-bank-management";
 
 export type Degree = "BCA" | "MCA" | "B.Tech" | "B.Sc IT" | "M.Tech" | "Diploma";
 
@@ -114,6 +120,12 @@ export const EARLY_BIRD = {
  * and import it above — nothing is live until it appears in this array.
  */
 export const CAMPUS_PROJECTS: CampusProject[] = [
+  ecommerceMern,
+  realtimeChatMern,
+  recommendationSystemMl,
+  fakeNewsDetectionMl,
+  plantDiseaseDetection,
+  bloodBankManagement,
   aiCollegeAssistant,
   hospitalManagementMern,
   expenseTrackerMobile,
