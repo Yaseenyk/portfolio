@@ -11,6 +11,7 @@ export const meta: GuideMeta = {
   category: "Topic lists",
   publishedAt: "2026-07-27",
   readingMinutes: 9,
+  ogImage: "/social/bca-topics-wide.jpg",
   degrees: ["BCA", "B.Sc IT", "Diploma"],
   faq: [
     {

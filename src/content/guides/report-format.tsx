@@ -10,6 +10,7 @@ export const meta: GuideMeta = {
   category: "Documentation",
   publishedAt: "2026-07-27",
   readingMinutes: 10,
+  ogImage: "/social/report-format-wide.jpg",
   faq: [
     {
       question: "How many pages should a final year project report be?",

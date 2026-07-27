@@ -7,6 +7,7 @@ import {
   formatInr,
 } from "@/lib/campus";
 import { GUIDES } from "@/lib/guides";
+import { VIVA_QUESTIONS } from "@/lib/vivaQuestions";
 
 export const dynamic = "force-static";
 
@@ -55,6 +56,8 @@ export function GET() {
 - [Custom project built to your problem statement](${SITE_URL}/final-year-projects/custom/)
 - [For colleges — workshops and cohort mentoring](${SITE_URL}/final-year-projects/colleges/)
 - [Terms — payment, delivery, cancellation](${SITE_URL}/final-year-projects/terms/)
+- [Free tool: timeline planner — usable weeks before a submission date](${SITE_URL}/final-year-projects/planner/)
+- [Free tool: viva question bank — ${VIVA_QUESTIONS.length} questions, filterable, with what each one tests](${SITE_URL}/final-year-projects/question-bank/)
 ${GUIDES.map(
   (g) => `- [${g.meta.title}](${SITE_URL}/final-year-projects/guides/${g.meta.slug}/): ${g.meta.description}`,
 ).join("\n")}

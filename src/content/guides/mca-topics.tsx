@@ -11,6 +11,7 @@ export const meta: GuideMeta = {
   category: "Topic lists",
   publishedAt: "2026-07-27",
   readingMinutes: 12,
+  ogImage: "/social/mca-topics-wide.jpg",
   degrees: ["MCA", "M.Tech"],
   faq: [
     {

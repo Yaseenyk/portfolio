@@ -10,6 +10,7 @@ export const meta: GuideMeta = {
   category: "Viva prep",
   publishedAt: "2026-07-27",
   readingMinutes: 11,
+  ogImage: "/social/viva-questions-wide.jpg",
   faq: [
     {
       question: "What is asked in a final year project viva?",

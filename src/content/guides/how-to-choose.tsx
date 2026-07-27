@@ -10,6 +10,7 @@ export const meta: GuideMeta = {
   category: "Getting started",
   publishedAt: "2026-07-27",
   readingMinutes: 8,
+  ogImage: "/social/how-to-choose-wide.jpg",
   faq: [
     {
       question: "When should I finalise my final year project topic?",

@@ -22,6 +22,7 @@ export function generateMetadata({ params }: Params): Metadata {
 
   const { meta } = guide;
   const url = guideUrl(meta.slug);
+  const images = meta.ogImage ? [`${SITE_URL}${meta.ogImage}`] : undefined;
   return {
     title: meta.title,
     description: meta.description,
@@ -34,7 +35,11 @@ export function generateMetadata({ params }: Params): Metadata {
       siteName: "Yaseen Khatib",
       publishedTime: meta.publishedAt,
       authors: [PERSON.name],
+      images,
     },
+    twitter: images
+      ? { card: "summary_large_image", title: meta.title, images }
+      : undefined,
   };
 }
 

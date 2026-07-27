@@ -11,6 +11,7 @@ export const meta: GuideMeta = {
   category: "Topic lists",
   publishedAt: "2026-07-27",
   readingMinutes: 10,
+  ogImage: "/social/btech-topics-wide.jpg",
   degrees: ["B.Tech", "M.Tech"],
   faq: [
     {

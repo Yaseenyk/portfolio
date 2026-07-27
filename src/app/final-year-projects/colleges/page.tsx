@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/final-year-projects/colleges/`,
     siteName: "Yaseen Khatib",
+    images: [`${SITE_URL}/social/colleges-wide.jpg`],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "For Colleges | Final Year Project Mentoring",
+    images: [`${SITE_URL}/social/colleges-wide.jpg`],
   },
 };
 

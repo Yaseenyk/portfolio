@@ -17,6 +17,7 @@ import {
   type Degree,
 } from "@/lib/campus";
 import { GUIDES } from "@/lib/guides";
+import { VIVA_QUESTIONS } from "@/lib/vivaQuestions";
 import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusIndex from "@/components/campus/CampusIndex";
@@ -270,6 +271,50 @@ export default function FinalYearProjectsPage() {
       </section>
 
       <section className="mt-24">
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+          Two free tools
+        </h2>
+        <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
+          <Link
+            href="/final-year-projects/planner"
+            className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
+              Timeline planner
+            </span>
+            <h3 className="mt-3 text-lg font-medium text-zinc-50">
+              How many weeks do you actually have?
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              Enter your submission date and see what is left after exams and the
+              buffer you will need. Most students are surprised.
+            </p>
+            <span className="mt-auto pt-5 text-xs text-ice transition-transform duration-300 group-hover:translate-x-0.5">
+              Open the planner →
+            </span>
+          </Link>
+          <Link
+            href="/final-year-projects/question-bank"
+            className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
+              Viva question bank
+            </span>
+            <h3 className="mt-3 text-lg font-medium text-zinc-50">
+              {VIVA_QUESTIONS.length} questions your panel might ask
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              Filterable by project type, each showing what the examiner is really
+              testing. Tick them off as you prepare.
+            </p>
+            <span className="mt-auto pt-5 text-xs text-ice transition-transform duration-300 group-hover:translate-x-0.5">
+              Start drilling →
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      <section className="mt-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
             Free guides, nothing gated
