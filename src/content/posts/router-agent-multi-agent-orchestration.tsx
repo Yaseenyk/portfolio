@@ -170,6 +170,7 @@ export const routerAgentPattern: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-01",
+  updatedAt: "2026-07-28",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["Agentic AI", "Architecture", "RAG"],

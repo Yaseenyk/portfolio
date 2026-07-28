@@ -173,6 +173,7 @@ export const finopsForAi: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-04",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
   tags: ["AI", "FinOps", "Architecture"],

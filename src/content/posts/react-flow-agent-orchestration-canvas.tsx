@@ -167,6 +167,7 @@ export const reactFlowAgentCanvas: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-05",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["React Flow", "Agentic AI", "Architecture"],

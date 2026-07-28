@@ -172,6 +172,7 @@ export const evaluationDrivenDevelopment: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-05",
+  updatedAt: "2026-07-28",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
   tags: ["AI", "Testing", "Evals"],

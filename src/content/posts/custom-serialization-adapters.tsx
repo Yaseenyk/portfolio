@@ -100,6 +100,7 @@ export const customSerializationAdapters: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-15",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["Performance", "Architecture", "React Flow"],

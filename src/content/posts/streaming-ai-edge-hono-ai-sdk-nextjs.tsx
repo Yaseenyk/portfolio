@@ -183,6 +183,7 @@ export const streamingAiEdge: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-05-29",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["Serverless", "Next.js", "RAG"],

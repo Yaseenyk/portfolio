@@ -199,6 +199,7 @@ export const zeroHallucinationRag: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-08",
+  updatedAt: "2026-07-28",
   readingMinutes: 8,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["RAG", "AI Architecture", "Prompt Engineering"],

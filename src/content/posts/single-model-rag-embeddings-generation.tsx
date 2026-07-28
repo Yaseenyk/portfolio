@@ -167,6 +167,7 @@ export const singleModelRag: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-06",
+  updatedAt: "2026-07-28",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["RAG", "AI Architecture", "Embeddings"],

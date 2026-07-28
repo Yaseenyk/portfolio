@@ -183,6 +183,7 @@ export const evalDrivenPromptEngineering: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-05-28",
+  updatedAt: "2026-07-28",
   readingMinutes: 9,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["AI", "Anthropic", "Claude", "Testing"],

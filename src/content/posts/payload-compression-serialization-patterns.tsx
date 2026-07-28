@@ -137,6 +137,7 @@ export const payloadCompression: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-05-25",
+  updatedAt: "2026-07-28",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
   tags: ["Performance", "Architecture", "Frontend"],

@@ -165,6 +165,7 @@ export const promptCachingDeepDive: BlogPost = {
     "production LLM systems",
   ],
   publishedAt: "2026-06-02",
+  updatedAt: "2026-07-28",
   readingMinutes: 9,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["AI", "Anthropic", "Claude", "Cost Optimization"],

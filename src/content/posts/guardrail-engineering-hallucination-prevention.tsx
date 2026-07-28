@@ -135,6 +135,7 @@ export const guardrailEngineering: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-01",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
   tags: ["AI", "Architecture", "RAG"],

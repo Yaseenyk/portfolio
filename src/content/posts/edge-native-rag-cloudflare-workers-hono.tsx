@@ -193,6 +193,7 @@ export const edgeNativeRag: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-07",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["Serverless", "RAG", "Cloudflare"],

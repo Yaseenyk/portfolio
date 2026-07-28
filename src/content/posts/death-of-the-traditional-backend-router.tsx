@@ -144,6 +144,7 @@ export const deathOfTheBackendRouter: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-05-30",
+  updatedAt: "2026-07-28",
   readingMinutes: 8,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["Node.js", "AI Agents", "Backend"],
