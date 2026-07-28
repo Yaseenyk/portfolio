@@ -74,7 +74,9 @@ function Body() {
   return (
     <>
       <p>
-        Prompt engineering is UX for a function you don&apos;t control. It matters,
+        Every production LLM system I&apos;ve shipped — the RAG concierge on this site,
+        the streamerOS support agent — pushed me past prompt wording into the mechanics
+        underneath. Prompt engineering is UX for a function you don&apos;t control. It matters,
         but it&apos;s the surface. To architect <em>with</em> an LLM, not just chat at one,
         I focus on the mechanics I can reason about: how text becomes tokens, why the
         context window is a budget and not a memory, and why the same prompt can land
@@ -143,7 +145,9 @@ function Body() {
         renders and dispatches; the orchestration layer owns runtime truth and retries; and a
         Serialization Adapter shapes lean, token-aware payloads across the boundary. On IntegrateX,
         that adapter stripped non-essential React Flow metadata and cut payloads 94% — the same habit
-        keeps LLM context tight. Full series on the <a href="/roadmap">roadmap</a>.
+        keeps LLM context tight. Treating tokens, budgets, and sampling as constraints to design
+        around rather than magic to trust is the judgment I bring to a team. Full series on the{" "}
+        <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -151,18 +155,19 @@ function Body() {
 
 export const beyondThePrompt: BlogPost = {
   slug: "beyond-the-prompt-llm-mechanics",
-  title: "Beyond the Prompt: The LLM Mechanics Architects Actually Need",
+  title: "LLM Mechanics I Wish I'd Learned Before Prompt Engineering",
   description:
-    "Prompt engineering is UX for a function you don't control. To architect with LLMs you need the mechanics: tokens, the context window as a byte budget, and why determinism is a sampling parameter — not a model property.",
+    "The costliest bugs I've shipped came from treating the context window as memory — the LLM mechanics prompt engineering hides: tokens, byte budgets, and sampling.",
   keywords: [
     "LLM mechanics",
     "context window",
-    "tokenization",
-    "temperature sampling",
     "prompt engineering",
-    "LLM architecture",
+    "LLM engineer",
+    "production LLM systems",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-03-16",
+  updatedAt: "2026-07-28",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
   tags: ["AI", "LLM", "Architecture"],

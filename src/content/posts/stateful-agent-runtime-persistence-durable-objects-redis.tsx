@@ -6,7 +6,9 @@ function Body() {
   return (
     <>
       <p>
-        Your agent is twenty tool calls into a forty-step refactor when the worker
+        The streamerOS support agent runs on Cloudflare Workers, where a process can
+        vanish mid-run — so I design for exactly the failure that follows. Your agent is
+        twenty tool calls into a forty-step refactor when the worker
         process is recycled, the deploy rolls, or the request times out. Every
         decision, every file it touched, every dollar of tokens — gone. It starts
         over from message one, or worse, re-runs side effects it already
@@ -162,7 +164,9 @@ export class AgentDO {            // one Durable Object instance per run
         </svg>
       </Diagram>
       <p>
-        A durable single agent is ready for the messy reality of production tools.
+        A durable single agent is ready for the messy reality of production tools —
+        the discipline behind the streamerOS support agent, and the call I bring to a
+        team the first time a run has to survive a deploy.
         Next, govern many of them at once:{" "}
         <a href="/blog/enterprise-mcp-aggregation-postgres-figma-playwright">
           enterprise MCP aggregation
@@ -176,20 +180,19 @@ export class AgentDO {            // one Durable Object instance per run
 
 export const statefulAgentRuntime: BlogPost = {
   slug: "stateful-agent-runtime-persistence-durable-objects-redis",
-  title: "Stateful Agent Runtime: Durable Objects + Redis",
+  title: "How I Make Agents Survive a Crash: Durable Objects + Redis",
   description:
-    "A crash mid-run erases a stateless agent's progress. Checkpoint the agent's state machine to Durable Objects and Redis so it resumes from the last good step — exactly once.",
+    "A worker recycle twenty tool calls into a run taught me to checkpoint the agent's state machine to Durable Objects and Redis so it resumes exactly once.",
   keywords: [
     "stateful agents",
     "agent checkpointing",
     "Durable Objects",
-    "Redis agent state",
-    "idempotency",
-    "agent persistence",
-    "resumable agents",
-    "Cloudflare Durable Objects",
+    "agent runtime engineer",
+    "production agent persistence",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-30",
+  updatedAt: "2026-07-28",
   readingMinutes: 10,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["AI", "Anthropic", "Agents", "Architecture"],

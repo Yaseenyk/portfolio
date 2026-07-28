@@ -6,13 +6,13 @@ function Body() {
   return (
     <>
       <p>
-        The moment a production agent has to hit Postgres, read a Figma file, and
-        drive a Playwright browser, you wire up three MCP servers and call it a
-        day. Then reality lands: every turn drags three servers&apos; tool schemas
-        through the window, three sets of secrets leak across three configs, and a
-        teammate rebuilds the same stack with slightly different auth. Hooking up
-        MCP servers is easy; keeping payloads lean, auth sane, and behavior
-        consistent is the real job.
+        On SANKALP, the moment a production agent had to hit Postgres, read a
+        Figma file, and drive a Playwright browser, the easy move was to wire up
+        three MCP servers and call it a day. Then reality lands: every turn drags
+        three servers&apos; tool schemas through the window, three sets of secrets
+        leak across three configs, and a teammate rebuilds the same stack with
+        slightly different auth. Hooking up MCP servers is easy; keeping payloads
+        lean, auth sane, and behavior consistent is the real job.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -152,7 +152,11 @@ export async function buildGateway(role: string) {
         </svg>
       </Diagram>
       <p>
-        A governed surface only matters if the agent actually behaves. Next up:
+        A governed surface only matters if the agent actually behaves — the same
+        discipline I leaned on wiring the agent tiers in SANKALP, where one auth
+        boundary beat a sprawling mesh. Knowing when to centralize control
+        instead of letting every service improvise is the judgment I bring to a
+        team. Next up:
         {" "}
         <a href="/blog/evaluation-driven-prompt-engineering-golden-datasets">
           eval-driven prompt engineering with golden datasets
@@ -166,20 +170,21 @@ export async function buildGateway(role: string) {
 
 export const enterpriseMcpAggregation: BlogPost = {
   slug: "enterprise-mcp-aggregation-postgres-figma-playwright",
-  title: "Enterprise MCP Aggregation: Postgres, Figma & Playwright",
+  title: "Enterprise MCP: One Gateway for Postgres, Figma, Playwright",
   description:
-    "Wiring three MCP servers into an agent is easy; governing a fleet is the enterprise problem. An aggregation gateway gives one namespaced, auth-brokered, role-filtered surface.",
+    "Wiring three MCP servers is easy; secret sprawl bites later. I build an MCP aggregation gateway — one namespaced, auth-brokered, role-filtered surface.",
   keywords: [
     "MCP aggregation",
     "MCP gateway",
     "enterprise MCP",
     "Postgres MCP",
-    "Figma MCP",
-    "Playwright MCP",
     "tool namespacing",
-    "MCP auth broker",
+    "MCP integration engineer",
+    "production MCP",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-29",
+  updatedAt: "2026-07-28",
   readingMinutes: 9,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["AI", "Anthropic", "MCP", "Architecture"],

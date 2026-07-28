@@ -6,7 +6,9 @@ function Body() {
   return (
     <>
       <p>
-        Two failure modes, opposite causes. I&apos;ve watched teams turn a snappy
+        Tuning latency on streamerOS and reliability on IntegrateX taught me the same
+        lesson from opposite ends: reasoning effort is a dial, and the default settings
+        are both wrong. I&apos;ve watched teams turn a snappy
         classifier into molasses by forcing every request through a thousand-token
         &quot;thinking&quot; preamble just to answer &quot;billing.&quot; At the
         same time, their planning agent face-plants on real multi-constraint work
@@ -147,8 +149,10 @@ await ask("planning", SYS, "Sequence this 9-step migration under these 4 constra
         </svg>
       </Diagram>
       <p>
-        With reasoning effort tuned, the workflow shifts from the API to the
-        local agent. Next:{" "}
+        With reasoning effort tuned — the same per-tier discipline that keeps streamerOS
+        fast and the IntegrateX planner reliable — you get the judgment I bring to a team:
+        spend compute where it changes the answer, nowhere else. The workflow shifts from
+        the API to the local agent. Next:{" "}
         <a href="/blog/local-first-claude-code-claude-md-secure-cli">
           CLAUDE.md, system files &amp; a secure CLI
         </a>
@@ -161,20 +165,19 @@ await ask("planning", SYS, "Sequence this 9-step migration under these 4 constra
 
 export const adaptiveExtendedThinking: BlogPost = {
   slug: "adaptive-extended-thinking-latency-vs-compute",
-  title: "Adaptive Extended Thinking: Trading Latency for Compute",
+  title: "Extended Thinking: The Latency Dial Most Teams Get Wrong",
   description:
-    "Reasoning isn't free. Adaptive extended thinking lets Claude spend tokens proportional to difficulty — tune budget_tokens per task tier so hard problems get depth and easy ones stay fast.",
+    "I've watched teams choke a classifier with forced thinking and starve a planner of it. Adaptive extended thinking is the dial I tier per task with budget_tokens.",
   keywords: [
     "extended thinking",
-    "Claude reasoning",
     "budget_tokens",
     "adaptive thinking",
-    "interleaved thinking",
-    "latency vs accuracy",
-    "Claude Opus 4.8",
-    "reasoning budget",
+    "AI performance engineer",
+    "production LLM latency",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-05",
+  updatedAt: "2026-07-28",
   readingMinutes: 8,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["AI", "Anthropic", "Claude", "Performance"],

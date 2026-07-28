@@ -74,13 +74,15 @@ function Body() {
   return (
     <>
       <p>
-        MERN didn&apos;t die — it grew a nervous system. The framework choices
-        haven&apos;t changed: Mongo still stores, Express still routes, React still
-        renders. What changed is that a probabilistic core now sits in the middle
-        of your stack, and every architectural assumption you inherited from the
-        CRUD era has to be re-examined against it. Token budgets, latency targets,
-        cost ceilings, and streaming backpressure start dictating structure, not
-        the other way around.
+        Every AI feature I bolted onto a MERN app &mdash; from IntegrateX to a
+        RAG service &mdash; taught the same lesson: MERN didn&apos;t die, it grew
+        a nervous system. The framework choices haven&apos;t changed: Mongo still
+        stores, Express still routes, React still renders. What changed is that a
+        probabilistic core now sits in the middle of your stack, and every
+        architectural assumption you inherited from the CRUD era has to be
+        re-examined against it. Token budgets, latency targets, cost ceilings, and
+        streaming backpressure start dictating structure, not the other way
+        around.
       </p>
 
       <h2>Three new tiers, not a rewrite</h2>
@@ -153,11 +155,14 @@ function Body() {
       </blockquote>
 
       <p>
-        The rest of this roadmap walks each new tier in turn — starting with the{" "}
+        This is the stack behind the five products I shipped solo this past
+        year — IntegrateX among them — so the rest of this roadmap walks each new
+        tier in turn, starting with the{" "}
         <a href="/blog/beyond-the-prompt-llm-mechanics">mechanics of the model itself</a>,
         then the <a href="/blog/vector-foundations-semantic-search">vector layer</a>{" "}
-        that makes retrieval possible. See the full series on the{" "}
-        <a href="/roadmap">roadmap</a>.
+        that makes retrieval possible. Knowing which parts of a stack to leave
+        boring and which to rebuild is the judgment I bring to a team. See the
+        full series on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -165,18 +170,20 @@ function Body() {
 
 export const aiNativeDevStack: BlogPost = {
   slug: "ai-native-dev-stack-rethinking-mern",
-  title: "The AI-Native Dev Stack: Rethinking MERN for Production AI",
+  title: "MERN Didn't Die: The AI-Native Stack I Ship Now",
   description:
-    "MERN didn't die — it grew a nervous system. The AI-native stack keeps Mongo, Express, React and Node but adds three new tiers — vector memory, a model gateway, and an orchestration loop — that change every architectural assumption.",
+    "MERN didn't die; it grew a nervous system. I keep Mongo, Express, React, Node and add three AI-native tiers: vector memory, model gateway, orchestration loop.",
   keywords: [
     "AI-native stack",
     "MERN AI architecture",
     "model gateway",
-    "vector store",
-    "LLM orchestration",
     "production AI architecture",
+    "MERN developer for hire",
+    "AI-native engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-03-02",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
   tags: ["Architecture", "AI", "Backend"],

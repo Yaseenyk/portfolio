@@ -79,8 +79,9 @@ function Body() {
   return (
     <>
       <p>
-        Every integration you hand-wire between a model and a tool is a bespoke
-        adapter — and bespoke adapters rot. Three models times four tools is twelve
+        Wiring tools into the streamerOS support agent taught me the cost of bespoke
+        glue firsthand: every integration you hand-wire between a model and a tool is a
+        bespoke adapter — and bespoke adapters rot. Three models times four tools is twelve
         custom integrations to build, version, and maintain. The Model Context
         Protocol is the USB-C of AI tooling: one standard so any model can discover
         and call any tool, resource, or prompt without the N×M glue.
@@ -138,10 +139,12 @@ function Body() {
 
       <p>
         MCP servers are how the <a href="/blog/agentic-control-loops">control loop</a>{" "}
-        gets its hands without bespoke wiring — and a disciplined protocol pairs
+        gets its hands without bespoke wiring — it&apos;s how the streamerOS support
+        agent exposes its retrieval — and a disciplined protocol pairs
         naturally with disciplined{" "}
         <a href="/blog/payload-compression-serialization-patterns">payload design</a>.
-        Continue on the <a href="/roadmap">roadmap</a>.
+        Choosing a protocol boundary over one-off glue is the call I bring to a team
+        building past its first integration. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -149,18 +152,19 @@ function Body() {
 
 export const modelContextProtocol: BlogPost = {
   slug: "model-context-protocol-mcp",
-  title: "The Model Context Protocol: USB-C for AI Tooling",
+  title: "Why I Standardized My Agent Tools on MCP, Not Glue",
   description:
-    "Every integration you hand-wire between a model and a tool rots. MCP is a single protocol so any model can discover and call any tool, resource, or prompt — collapsing N×M bespoke adapters into N+M servers and clients.",
+    "After hand-wiring too many model-to-tool adapters that rot, I put the streamerOS support agent behind the Model Context Protocol: N×M glue becomes N+M.",
   keywords: [
     "Model Context Protocol",
     "MCP",
-    "AI tool integration",
-    "agent tooling",
-    "LLM interoperability",
     "MCP server",
+    "MCP engineer",
+    "production MCP",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-18",
+  updatedAt: "2026-07-28",
   readingMinutes: 6,
   author: { name: "Yaseen Khatib", role: "AI Systems Architect" },
   tags: ["Agentic AI", "Architecture", "AI"],

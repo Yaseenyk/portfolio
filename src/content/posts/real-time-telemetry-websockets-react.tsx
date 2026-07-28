@@ -5,13 +5,13 @@ function Body() {
   return (
     <>
       <p>
-        After shipping enough &quot;live&quot; dashboards, one truth stuck: a
-        polling dashboard is lying most of the time. Between ticks, operators
-        act on stale numbers; shrink the window and you DoS your own APIs with
-        empty work. For telemetry — CPU, chat velocity, scene state — stop
+        After shipping enough &quot;live&quot; dashboards &mdash; including the
+        real-time layer of the CMZ portal &mdash; one truth stuck: a polling
+        dashboard is lying most of the time. Between ticks, operators act on
+        stale numbers; shrink the window and you DoS your own APIs with empty
+        work. For telemetry — CPU, chat velocity, scene state — stop
         interrogating the server and let it speak. WebSockets push changes the
-        instant they occur. That sub-second parity across clients is what cut
-        manual data errors by 35% in production.
+        instant they occur, giving every client the same value in the same frame.
       </p>
 
       <h2>Why polling fails at scale</h2>
@@ -109,8 +109,7 @@ function Body() {
         class of &quot;acted on stale data&quot; mistakes disappears. No operator
         is reconciling conflicting numbers; no action races a 3s-old snapshot.
         The win isn&apos;t speed for its own sake — it&apos;s a single, timely
-        source of truth, which is what drove the 35% reduction we saw across
-        platforms.
+        source of truth that every operator shares, so decisions stop diverging.
       </p>
 
       <blockquote>
@@ -122,8 +121,10 @@ function Body() {
       <p>
         This is the live-data backbone of{" "}
         <a href="/#projects">streamerOS</a> and the real-time sync layer in the{" "}
-        <a href="/#projects">CMZ portal</a>, the same playbook I reach for when
-        correctness, smoothness, and cost need to coexist.
+        <a href="/#projects">CMZ portal</a> — the same playbook I reach for when
+        correctness, smoothness, and cost need to coexist. Deciding when a system
+        should push instead of being asked is the kind of judgment I bring to a
+        team.
       </p>
     </>
   );
@@ -131,19 +132,21 @@ function Body() {
 
 export const realTimeTelemetry: BlogPost = {
   slug: "real-time-telemetry-websockets-react",
-  title: "Real-Time Telemetry: WebSockets, React, and Live Data",
+  title: "Real-Time Telemetry: Why Polling Lies, and WebSockets Don't",
   description:
-    "Polling is obsolete for live dashboards. How a WebSocket push architecture delivers sub-second cross-platform sync — and cut manual data errors by 35%.",
+    "Polling dashboards lie between ticks — I learned that the hard way. Now I push telemetry over WebSockets for sub-second parity across every React client.",
   keywords: [
     "WebSockets",
     "real-time",
     "React",
-    "live dashboard",
     "telemetry",
     "Socket.IO",
-    "cross-platform sync",
+    "real-time engineer",
+    "production WebSockets",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-31",
+  updatedAt: "2026-07-28",
   readingMinutes: 8,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["WebSockets", "React", "Real-Time"],
@@ -151,7 +154,7 @@ export const realTimeTelemetry: BlogPost = {
     "Polling can't be both fresh and cheap; a push model has the server speak only when state actually changes.",
     "Broadcast events over a persistent socket and map them onto React state with a thin subscription.",
     "Coalesce high-frequency sources on the server to a renderable frame rate, and isolate live state so only affected components repaint.",
-    "Single-source-of-truth sync — every client identical in the same instant — is what eliminates stale-data errors (35% fewer).",
+    "Single-source-of-truth sync — every client identical in the same instant — is what eliminates a whole class of stale-data errors.",
   ],
   Body,
 };

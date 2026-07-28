@@ -5,12 +5,14 @@ function Body() {
   return (
     <>
       <p>
-        An LLM is a probabilistic text generator that will, on some random
-        Tuesday, hand you a malformed object, invent a field, or answer in prose
-        when you asked for JSON. Your backend is a deterministic system that
-        cannot crash because a sampler got creative. Production AI engineering
-        lives in that gap: treat model output like traffic from the open
-        internet and validate it at the boundary.
+        Building Sable &mdash; a local-first financial agent that calls
+        functions to move real money &mdash; hammered home a rule I now apply
+        everywhere: a probabilistic text generator will, on some random Tuesday,
+        hand you a malformed object, invent a field, or answer in prose when you
+        asked for JSON. Your backend is a deterministic system that cannot crash
+        because a sampler got creative. Production AI engineering lives in that
+        gap: treat model output like traffic from the open internet and validate
+        it at the boundary.
       </p>
 
       <h2>Treat the LLM as an untrusted input boundary</h2>
@@ -127,7 +129,10 @@ function Body() {
         <a href="/#projects">Hospital-API</a> — typed outputs, hardened
         middleware, and a strict Trinity split: presentation only renders,
         orchestration handles retries, and the adapter validates and shapes the
-        payload. Zero tolerance for unvalidated model data.
+        payload. Across the five products I shipped solo in the last year the
+        same rule held: zero tolerance for unvalidated model data. Deciding
+        where a system must refuse to trust itself is the judgment I bring to a
+        team.
       </p>
     </>
   );
@@ -135,19 +140,21 @@ function Body() {
 
 export const typeSafeLlms: BlogPost = {
   slug: "type-safe-llms-strict-schemas-typescript-express",
-  title: "Type-Safe LLMs: Enforcing Strict Schemas in TypeScript & Express",
+  title: "Type-Safe LLMs: The zod Boundary I Never Skip",
   description:
-    "AI hallucinates; your backend cannot crash. How to validate every LLM response through zod schemas and Express middleware so an AI-augmented MERN app stays crash-free.",
+    "A bad field slipped three layers deep before I caught it. Now every LLM response clears a zod schema at the Express boundary — the type-safe pattern I ship.",
   keywords: [
     "type-safe LLM",
     "zod",
     "structured output",
     "Express middleware",
-    "validation",
-    "rate limiting",
     "TypeScript",
+    "production LLM validation",
+    "LLM backend engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-01",
+  updatedAt: "2026-07-28",
   readingMinutes: 8,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["TypeScript", "Express", "Validation"],

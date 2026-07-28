@@ -65,13 +65,15 @@ function Body() {
   return (
     <>
       <p>
-        Edge functions are stateless by design — each request gets a fresh,
-        short-lived execution with no memory of the last one. Conversations are the
-        opposite: an agent that cannot remember what you said two messages ago is
-        not an agent, it is a search box. Reconciling those two facts is the
-        architectural puzzle that stops most developers from shipping a real
-        agent on serverless. The resolution is simple once you name it: separate
-        the compute from the memory.
+        The first time I put the streamerOS support agent on Cloudflare Workers,
+        it forgot every message the instant it replied — edge functions are
+        stateless by design, each request a fresh, short-lived execution with no
+        memory of the last one. Conversations are the opposite: an agent that
+        cannot remember what you said two messages ago is not an agent, it is a
+        search box. Reconciling those two facts is the architectural puzzle that
+        stops most developers from shipping a real agent on serverless. The
+        resolution is simple once you name it: separate the compute from the
+        memory.
       </p>
 
       <h2>The mistake: state in the function</h2>
@@ -138,7 +140,8 @@ function Body() {
       </blockquote>
 
       <p>
-        This completes the serverless agent stack alongside{" "}
+        This completes the serverless agent stack behind the streamerOS support
+        agent, alongside{" "}
         <a href="/blog/edge-native-rag-cloudflare-workers-hono">
           edge-native retrieval
         </a>{" "}
@@ -146,7 +149,9 @@ function Body() {
         <a href="/blog/streaming-ai-edge-hono-ai-sdk-nextjs">
           streamed responses
         </a>{" "}
-        — stateless where it is cheap, stateful exactly where it matters.
+        — stateless where it is cheap, stateful exactly where it matters. Knowing
+        which half of a system should remember and which should forget is the
+        kind of judgment I bring to a team.
       </p>
     </>
   );
@@ -154,18 +159,20 @@ function Body() {
 
 export const statelessAgentsEdge: BlogPost = {
   slug: "stateless-agents-edge-cloudflare-durable-objects",
-  title: "Stateless by Default: Managing Agent Memory at the Edge with Cloudflare KV and Durable Objects",
+  title: "Stateless Edge, Stateful Chat: Agent Memory on Cloudflare",
   description:
-    "Edge functions are stateless; conversations are not. The pattern for shipping stateful agents on serverless — keep the compute amnesiac and move conversation memory into an external store, choosing KV or Durable Objects by contention.",
+    "Edge functions forget between turns; chats can't. I keep compute amnesiac and move agent memory into Cloudflare KV or Durable Objects, chosen by contention.",
   keywords: [
     "Cloudflare Durable Objects",
     "serverless state",
     "agent memory",
-    "stateless architecture",
-    "edge conversation state",
     "Cloudflare KV",
+    "edge AI engineer",
+    "production serverless agents",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-28",
+  updatedAt: "2026-07-28",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["Serverless", "Agentic AI", "Cloudflare"],
