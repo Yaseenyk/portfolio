@@ -29,6 +29,8 @@ next-env.d.ts
 # Google Search Console exports dropped into the repo for analysis (not source)
 yaseenkhatib.streamerosai.com-*/
 yaseenkhatib.streamerosai.com-*.zip
+gsc data/
+blog-index.xlsx
 
 # Editor directories and files
 .vscode/*
