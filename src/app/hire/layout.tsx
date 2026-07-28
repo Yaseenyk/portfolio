@@ -1,8 +1,7 @@
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
-import HireCta from "@/components/HireCta";
 
-export default function ProductsLayout({
+export default function HireLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -11,11 +10,7 @@ export default function ProductsLayout({
     <>
       <GridBackground />
       <Navbar />
-      <main className="pt-28">
-        {children}
-        <HireCta />
-        <div className="pb-20" />
-      </main>
+      <main className="pt-28">{children}</main>
     </>
   );
 }

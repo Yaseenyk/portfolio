@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "/sandbox", label: "Sandbox" },
   { href: "/final-year-projects", label: "Students" },
+  { href: "/hire", label: "Hire" },
   { href: "/#contact", label: "Contact" },
 ];
 
