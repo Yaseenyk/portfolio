@@ -23,6 +23,8 @@ import JsonLd from "@/components/JsonLd";
 import CampusIndex from "@/components/campus/CampusIndex";
 import CampusFaq from "@/components/campus/CampusFaq";
 import EarlyBirdBand from "@/components/campus/EarlyBirdBand";
+import ReferralBand from "@/components/campus/ReferralBand";
+import SubmissionSeasonBand from "@/components/campus/SubmissionSeasonBand";
 import PriceComparison from "@/components/campus/PriceComparison";
 import ProcessTimeline from "@/components/campus/ProcessTimeline";
 import StickyActionBar from "@/components/campus/StickyActionBar";
@@ -189,7 +191,11 @@ export default function FinalYearProjectsPage() {
         </div>
       </header>
 
-      <div className="mt-16">
+      <div className="mt-10">
+        <SubmissionSeasonBand />
+      </div>
+
+      <div className="mt-8">
         <EarlyBirdBand />
       </div>
 
@@ -400,6 +406,10 @@ export default function FinalYearProjectsPage() {
           ))}
         </div>
       </section>
+
+      <div className="mt-8">
+        <ReferralBand />
+      </div>
 
       <div className="mt-24">
         <CampusFaq items={CAMPUS_FAQ} />

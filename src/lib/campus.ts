@@ -95,6 +95,14 @@ export const PAYMENT_POLICY = {
 
 export const CUSTOM_BUILD_RANGE = { min: 10000, max: 50000 };
 
+/**
+ * Referral offer. Final year projects happen in batches, so a classmate is the
+ * best channel. Honest and code-free: both parties get the discount when they
+ * book, claimed by naming each other on WhatsApp — no coupon system to fake.
+ * Set discountPercent to 0 to retire it.
+ */
+export const REFERRAL = { discountPercent: 15 };
+
 /** WhatsApp is the conversion channel for this audience — every CTA offers it. */
 export const WHATSAPP_NUMBER = "918208335028";
 
