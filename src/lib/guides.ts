@@ -22,6 +22,11 @@ import { meta as synopsisMeta, Body as SynopsisBody } from "@/content/guides/fin
 import { meta as pptMeta, Body as PptBody } from "@/content/guides/final-year-project-presentation-ppt";
 import { meta as deployMeta, Body as DeployBody } from "@/content/guides/how-to-deploy-your-final-year-project-free";
 import { meta as compareMeta, Body as CompareBody } from "@/content/guides/bca-vs-mca-vs-btech-final-year-projects";
+import { meta as aiMlMeta, Body as AiMlBody } from "@/content/guides/ai-ml-final-year-projects";
+import { meta as webDevMeta, Body as WebDevBody } from "@/content/guides/web-development-final-year-projects";
+import { meta as bscItMeta, Body as BscItBody } from "@/content/guides/bsc-it-final-year-project-topics";
+import { meta as mtechMeta, Body as MtechBody } from "@/content/guides/mtech-final-year-project-topics";
+import { meta as diplomaMeta, Body as DiplomaBody } from "@/content/guides/diploma-final-year-project-topics";
 
 export interface GuideMeta {
   slug: string;
@@ -61,9 +66,14 @@ export const GUIDES: Guide[] = [
   { meta: pptMeta, Body: PptBody },
   { meta: deployMeta, Body: DeployBody },
   { meta: compareMeta, Body: CompareBody },
+  { meta: aiMlMeta, Body: AiMlBody },
+  { meta: webDevMeta, Body: WebDevBody },
   { meta: mcaMeta, Body: McaBody },
   { meta: bcaMeta, Body: BcaBody },
   { meta: btechMeta, Body: BtechBody },
+  { meta: bscItMeta, Body: BscItBody },
+  { meta: mtechMeta, Body: MtechBody },
+  { meta: diplomaMeta, Body: DiplomaBody },
   { meta: reportMeta, Body: ReportBody },
   { meta: chooseMeta, Body: ChooseBody },
 ];
