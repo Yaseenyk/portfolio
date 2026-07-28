@@ -1,5 +1,6 @@
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
+import FloatingWhatsApp from "@/components/campus/FloatingWhatsApp";
 
 export default function CampusLayout({
   children,
@@ -11,6 +12,7 @@ export default function CampusLayout({
       <GridBackground />
       <Navbar />
       <main className="pt-28">{children}</main>
+      <FloatingWhatsApp />
     </>
   );
 }

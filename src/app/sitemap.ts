@@ -127,6 +127,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${SITE_URL}/final-year-projects/cost-estimator/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/final-year-projects/templates/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${SITE_URL}/final-year-projects/question-bank/`,
       lastModified: lastBlogUpdate,
       changeFrequency: "monthly",

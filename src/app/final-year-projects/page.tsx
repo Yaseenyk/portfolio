@@ -272,7 +272,7 @@ export default function FinalYearProjectsPage() {
 
       <section className="mt-24">
         <h2 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
-          Three free tools
+          Free tools
         </h2>
         <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">
           <Link
@@ -327,6 +327,42 @@ export default function FinalYearProjectsPage() {
             </p>
             <span className="mt-auto pt-5 text-xs text-ice transition-transform duration-300 group-hover:translate-x-0.5">
               Start drilling →
+            </span>
+          </Link>
+          <Link
+            href="/final-year-projects/cost-estimator"
+            className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
+              Cost estimator
+            </span>
+            <h3 className="mt-3 text-lg font-medium text-zinc-50">
+              What will your project cost?
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              Three taps — type, complexity, timeline — for an honest price
+              range, then lock the real quote on WhatsApp.
+            </p>
+            <span className="mt-auto pt-5 text-xs text-ice transition-transform duration-300 group-hover:translate-x-0.5">
+              Estimate the cost →
+            </span>
+          </Link>
+          <Link
+            href="/final-year-projects/templates"
+            className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
+              Free templates
+            </span>
+            <h3 className="mt-3 text-lg font-medium text-zinc-50">
+              Report &amp; synopsis templates
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              The exact chapter-by-chapter structure colleges expect, with a
+              prompt for every section. Free, no email spam.
+            </p>
+            <span className="mt-auto pt-5 text-xs text-ice transition-transform duration-300 group-hover:translate-x-0.5">
+              Get the templates →
             </span>
           </Link>
         </div>
