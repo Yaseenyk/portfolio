@@ -54,12 +54,15 @@ function Body() {
   return (
     <>
       <p>
-        Keyword search asks &quot;does this string appear?&quot; Semantic search
-        asks &quot;does this <em>mean</em> the same thing?&quot; The bridge between
-        those two questions is the embedding: a model that turns a span of text
-        into a vector, positioned so that things which mean similar things land
-        near each other. Get this layer right and &quot;reset my password&quot;
-        finds &quot;recover account access&quot; without sharing a single word.
+        When I built the live RAG concierge on my homepage, the failure mode was
+        never the embedding model — it was retrieval returning confident nonsense
+        because one chunk tried to mean five things at once. Keyword search asks
+        &quot;does this string appear?&quot; Semantic search asks &quot;does this <em>mean</em> the
+        same thing?&quot; The bridge is the embedding: a model that turns a span of
+        text into a vector, positioned so that things which mean similar things
+        land near each other. Get this layer right and &quot;reset my
+        password&quot; finds &quot;recover account access&quot; without sharing a
+        single word.
       </p>
 
       <h2>Meaning becomes geometry</h2>
@@ -116,7 +119,10 @@ function Body() {
         This vector layer is the retrieval half of{" "}
         <a href="/blog/rag-grounding-the-agent">RAG</a>, and the place where{" "}
         <a href="/blog/latency-first-ai-serverless-hono">semantic caching</a> later
-        earns its keep. Continue on the <a href="/roadmap">roadmap</a>.
+        earns its keep. It&apos;s the same layer under the concierge grounding this
+        site — and the judgment I bring to a team is knowing retrieval quality is
+        won in chunk design long before anyone argues about which model to embed
+        with. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -124,16 +130,16 @@ function Body() {
 
 export const vectorFoundations: BlogPost = {
   slug: "vector-foundations-semantic-search",
-  title: "Vector Foundations: How Semantic Search Actually Works",
+  title: "Semantic Search in Production: Chunking Beats Model Choice",
   description:
-    "Keyword search asks 'does this string appear?' Semantic search asks 'does this mean the same thing?' Embeddings turn meaning into geometry — and chunking, not model choice, usually decides retrieval quality.",
+    "Building the live RAG concierge on my homepage taught me chunking decides semantic search quality more than model choice — embeddings, cosine, and ANN indexes.",
   keywords: [
     "semantic search",
     "vector embeddings",
     "ANN HNSW IVF",
-    "cosine similarity",
-    "vector database",
-    "retrieval quality",
+    "RAG engineer",
+    "production retrieval",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-03-30",
   readingMinutes: 7,

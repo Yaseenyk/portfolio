@@ -150,7 +150,10 @@ function Body() {
         a single app, and it rides the same{" "}
         <a href="/blog/router-agent-multi-agent-orchestration">router pattern</a> that
         coordinates multi-agent work. Keep the layers tight — presentation, orchestration,
-        adapter — and the costs stay predictable. Continue on the <a href="/roadmap">roadmap</a>.
+        adapter — and the costs stay predictable. Shipping five products solo in twelve
+        months made this reflexive: the engineer who wires attribution in on day one is
+        the one who can still answer &quot;is this feature profitable?&quot; a year later.
+        Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -158,16 +161,16 @@ function Body() {
 
 export const finopsForAi: BlogPost = {
   slug: "finops-for-ai-cost-governance",
-  title: "FinOps for AI: Routing, Caching, and Cost Attribution",
+  title: "FinOps for AI: Engineering the Cost Curve, Not the Invoice",
   description:
-    "At scale, cost per request is an architectural property you design, not an invoice surprise. FinOps for AI uses three levers — a semantic cache, a difficulty-aware model router, and per-tenant attribution — to govern the token-spend curve.",
+    "I treat token spend as unit economics with an owner, not an invoice surprise. FinOps for AI: a semantic cache, a router by difficulty, per-tenant attribution.",
   keywords: [
     "FinOps for AI",
     "LLM cost optimization",
     "model routing",
-    "semantic caching",
-    "cost attribution",
-    "AI cost governance",
+    "LLM FinOps engineer",
+    "production LLM cost governance",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-04",
   readingMinutes: 7,

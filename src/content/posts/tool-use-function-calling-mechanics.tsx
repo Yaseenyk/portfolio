@@ -6,13 +6,15 @@ function Body() {
   return (
     <>
       <p>
-        Ask Claude for today&apos;s order count and a naive integration gets back
-        a confident, specific, completely invented number. The model has no
-        database — it has a probability distribution over plausible-sounding
-        answers. Tool use is how you close that gap: instead of hallucinating, the
-        model pauses and asks <em>your</em> runtime to go get the real value. Get
-        the request/result loop right and the same mechanism turns a chat model
-        into an agent that can read databases, hit APIs, and run code.
+        The streamerOS support agent went from demo to dependable the day I
+        stopped letting Claude answer questions it had no data for — ask it for
+        today&apos;s order count and a naive integration gets back a confident,
+        specific, completely invented number. The model has no database — it has a
+        probability distribution over plausible-sounding answers. Tool use is how
+        you close that gap: instead of hallucinating, the model pauses and asks{" "}
+        <em>your</em> runtime to go get the real value. Get the request/result
+        loop right and the same mechanism turns a chat model into an agent that
+        can read databases, hit APIs, and run code.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -160,6 +162,9 @@ export async function runAgent(prompt: string) {
         </svg>
       </Diagram>
       <p>
+        This loop is the backbone of the streamerOS support agent I run on
+        Cloudflare Workers, and the discipline that keeps it dependable is
+        treating the model as an untrusted planner and never a trusted executor.
         With the loop understood, the next question is how to expose tools to{" "}
         <em>many</em> agents without re-wiring each one — the{" "}
         <a href="/blog/model-context-protocol-mcp-server-foundations">
@@ -174,18 +179,18 @@ export async function runAgent(prompt: string) {
 
 export const toolUseFunctionCalling: BlogPost = {
   slug: "tool-use-function-calling-mechanics",
-  title: "Tool Use & Function Calling Mechanics in Claude",
+  title: "The Claude Tool-Use Loop Nobody Warns You About",
   description:
-    "Claude hallucinates data it should fetch. Tool use fixes it: the model requests a function, your runtime executes it, and the result flows back. The full agent loop, explained.",
+    "The streamerOS support agent taught me tool use is a turn-based negotiation, not a callback: the model plans, my runtime executes. The agent loop I ship.",
   keywords: [
     "Claude tool use",
     "function calling",
     "agent loop",
     "tool_use tool_result",
-    "stop_reason",
     "parallel tool calls",
-    "Anthropic agents",
-    "Claude function calling",
+    "production agent tooling",
+    "Claude tool use engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-07",
   readingMinutes: 9,

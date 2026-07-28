@@ -6,13 +6,14 @@ function Body() {
   return (
     <>
       <p>
-        You wired Claude to your orders database with a hand-rolled tool. Then you
-        needed the same database in your support bot, your internal CLI, and a
-        teammate&apos;s agent — so you copy-pasted the integration four times, and
-        now a schema change means four edits and three forgotten ones. Tool use
-        (Lesson 4) solved <em>how</em> the model calls a function; it said nothing
-        about how that capability is packaged, discovered, and reused. The Model
-        Context Protocol is that missing layer.
+        Building custom tooling across streamerOS and my own agents, I kept
+        hitting the same wall: I&apos;d wire Claude to an orders database with a
+        hand-rolled tool, then need that same database in a support bot, an
+        internal CLI, and a teammate&apos;s agent — so I copy-pasted the
+        integration four times, and now a schema change means four edits and three
+        forgotten ones. Tool use (Lesson 4) solved <em>how</em> the model calls a
+        function; it said nothing about how that capability is packaged,
+        discovered, and reused. The Model Context Protocol is that missing layer.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -145,6 +146,9 @@ await server.connect(new StdioServerTransport())`}
         </svg>
       </Diagram>
       <p>
+        Authoring servers this way — one contract, versioned in one place — is how
+        I keep the tooling behind streamerOS from rotting into that N×M mess, and
+        it&apos;s the instinct I bring before an integration sprawls across a team.
         With a capability layer in place, the next lever is the model&apos;s own
         reasoning effort:{" "}
         <a href="/blog/adaptive-extended-thinking-latency-vs-compute">
@@ -159,18 +163,18 @@ await server.connect(new StdioServerTransport())`}
 
 export const modelContextProtocolFoundations: BlogPost = {
   slug: "model-context-protocol-mcp-server-foundations",
-  title: "Model Context Protocol: MCP Server Foundations",
+  title: "Why I Build MCP Servers Instead of Hand-Wiring Tools",
   description:
-    "Hard-wiring integrations into every agent doesn't scale. MCP is a USB-C port for tools: author a server once, and any client discovers and calls it over one protocol.",
+    "I copy-pasted one integration into four agents before building an MCP server. The Model Context Protocol lets me author it once; every client discovers it.",
   keywords: [
     "Model Context Protocol",
     "MCP server",
     "MCP tools resources",
     "Claude MCP",
-    "Anthropic MCP",
     "stdio transport",
-    "AI integrations",
-    "MCP SDK",
+    "production MCP server",
+    "MCP server engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-06",
   readingMinutes: 9,

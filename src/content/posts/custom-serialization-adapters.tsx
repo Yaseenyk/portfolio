@@ -78,7 +78,9 @@ export const fromRecord = (r: NodeRecord): FlowNode =>
           Compressing the Wire
         </a>
         ; the system is{" "}
-        <a href="/#projects">IntegrateX</a>.
+        <a href="/#projects">IntegrateX</a>. I reach for this boundary discipline by
+        default now — the engineer who draws the line between view and record early
+        is the one whose sync layer still behaves at a hundred nodes.
       </p>
     </>
   );
@@ -86,17 +88,16 @@ export const fromRecord = (r: NodeRecord): FlowNode =>
 
 export const customSerializationAdapters: BlogPost = {
   slug: "custom-serialization-adapters",
-  title: "Custom Serialization Adapters: 94% Payload Compression",
+  title: "Serialization Adapters: How I Cut Payloads by 94%",
   description:
-    "Rich UI objects make terrible database records. The Serialization Adapter pattern that separates render model from transport record — and cut IntegrateX payloads by 94%.",
+    "Rich UI objects make terrible database records. A Serialization Adapter I built for IntegrateX split render model from transport record and cut payloads by 94%.",
   keywords: [
     "serialization",
     "React Flow",
-    "payload compression",
     "adapter pattern",
-    "state management",
-    "MERN performance",
     "IntegrateX",
+    "MERN developer for hire",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-15",
   readingMinutes: 7,

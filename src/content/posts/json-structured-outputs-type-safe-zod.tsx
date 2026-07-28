@@ -6,13 +6,13 @@ function Body() {
   return (
     <>
       <p>
-        Your pipeline expected <code>{`{ "category": "billing" }`}</code> and
-        Claude returned &quot;Sure! This looks like a billing issue, here&apos;s
-        the JSON:&quot; wrapped in a markdown fence. I&apos;ve watched teams (and
-        past-me) reach for a regex to fish the object out of the chatter; that
-        quick fix becomes the 2am pager. On IntegrateX&apos;s real-time canvas,
-        letting prose leak into structured lanes was enough to desync state and
-        back up workers. An LLM that returns prose can&apos;t drive a system. The
+        On IntegrateX&apos;s real-time canvas, the fastest way I found to desync
+        state and back up workers was letting model prose leak into a lane that
+        expected <code>{`{ "category": "billing" }`}</code> — Claude returning
+        &quot;Sure! This looks like a billing issue, here&apos;s the JSON:&quot;
+        wrapped in a markdown fence. I&apos;ve watched teams (and past-me) reach
+        for a regex to fish the object out of the chatter; that quick fix becomes
+        the 2am pager. An LLM that returns prose can&apos;t drive a system. The
         model must emit a typed object, and you validate that object at the
         boundary — before it ever touches your code.
       </p>
@@ -160,8 +160,11 @@ export async function classify(text: string): Promise<Ticket> {
         </svg>
       </Diagram>
       <p>
-        Structured output is what turns a chat model into a component. Next, the
-        full mechanics behind that <code>tool_use</code> block:{" "}
+        Structured output is what turns a chat model into a component — the same
+        boundary discipline behind IntegrateX&apos;s Serialization Adapter, where
+        validating at the edge is the difference between a canvas that holds state
+        and one that thrashes. Next, the full mechanics behind that{" "}
+        <code>tool_use</code> block:{" "}
         <a href="/blog/tool-use-function-calling-mechanics">
           tool use &amp; function calling
         </a>
@@ -174,18 +177,18 @@ export async function classify(text: string): Promise<Ticket> {
 
 export const jsonStructuredOutputs: BlogPost = {
   slug: "json-structured-outputs-type-safe-zod",
-  title: "Structured JSON Outputs from Claude with Type-Safe Zod Contracts",
+  title: "Why I Never Regex Claude's JSON: Zod at the Boundary",
   description:
-    "Parsing Claude's prose with regex breaks pipelines. Force type-safe JSON with tool use, then validate it at the boundary with a Zod contract that doubles as your type.",
+    "A regex fishing JSON out of Claude's prose became my 2am pager. I force structured JSON outputs with tool use and validate them behind a Zod contract.",
   keywords: [
     "Claude JSON output",
     "structured outputs",
     "Zod validation",
     "tool use JSON",
     "type-safe LLM",
-    "Anthropic tool_choice",
-    "schema validation",
-    "LLM data extraction",
+    "production LLM validation",
+    "structured outputs engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-08",
   readingMinutes: 8,

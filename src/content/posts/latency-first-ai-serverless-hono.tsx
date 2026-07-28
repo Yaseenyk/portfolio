@@ -124,7 +124,9 @@ function Body() {
         <a href="/blog/payload-compression-serialization-patterns">small</a>. On
         IntegrateX, a Serialization Adapter stripped non-essential React Flow UI
         metadata before persistence and cut payloads 94%, which kept edge streams
-        snappy and avoided backpressure thrash. Continue on the <a href="/roadmap">roadmap</a>.
+        snappy and avoided backpressure thrash. Latency, to me, is an operating posture
+        I carry into a team, not a late optimization pass — you design the front of the
+        curve first. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -132,16 +134,16 @@ function Body() {
 
 export const latencyFirstAi: BlogPost = {
   slug: "latency-first-ai-serverless-hono",
-  title: "Latency-First AI: Streaming from the Edge with Hono",
+  title: "Latency-First AI: Why the Edge Wins on First Token",
   description:
-    "Users forgive a wrong answer faster than a slow one. Latency-first AI streams the first token in under 300ms from the edge — Hono on Workers, parallel retrieval, and semantic caching — instead of a monolith waiting to think.",
+    "I keep AI apps feeling live because users forgive a wrong answer faster than a slow one — latency-first streaming from the edge with Hono and semantic caching.",
   keywords: [
     "edge AI",
     "Hono Cloudflare Workers",
     "streaming LLM",
-    "time to first token",
     "semantic caching",
-    "serverless AI latency",
+    "edge AI engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-11",
   readingMinutes: 6,

@@ -6,13 +6,14 @@ function Body() {
   return (
     <>
       <p>
-        You paste a user&apos;s support ticket into your prompt and the model
-        starts following instructions that were inside the ticket. Or it blends
-        your few-shot examples into the answer as if they were real data. Both
-        bugs have the same root cause: you handed Claude one undifferentiated wall
-        of text and asked it to infer which part is a command, which is reference
-        material, and which is untrusted input. Inference is non-deterministic.
-        The fix is to stop making the model guess — give it a parseable shell.
+        Running the streamerOS support agent over real user tickets, I watched
+        Claude start following instructions that were buried inside a ticket. Or
+        it blends your few-shot examples into the answer as if they were real
+        data. Both bugs have the same root cause: you handed Claude one
+        undifferentiated wall of text and asked it to infer which part is a
+        command, which is reference material, and which is untrusted input.
+        Inference is non-deterministic. The fix is to stop making the model
+        guess — give it a parseable shell.
       </p>
 
       <h2>Core Architectural Concepts &amp; Trade-offs</h2>
@@ -185,8 +186,11 @@ function Body() {
         </svg>
       </Diagram>
       <p>
-        With structure in place, the natural next step is to stop parsing tagged
-        prose at all and demand a typed object:{" "}
+        This quarantine discipline is what lets me point the streamerOS support
+        agent at untrusted input without treating every ticket as a live
+        grenade — the kind of boundary thinking I bring before a prompt ever
+        reaches production. With structure in place, the natural next step is to
+        stop parsing tagged prose at all and demand a typed object:{" "}
         <a href="/blog/json-structured-outputs-type-safe-zod">
           structured JSON outputs with Zod contracts
         </a>
@@ -199,18 +203,18 @@ function Body() {
 
 export const xmlStructuralPrompting: BlogPost = {
   slug: "xml-tag-structural-prompting-deterministic-shell",
-  title: "XML-Tag Structural Prompting: Claude's Deterministic Shell",
+  title: "How I Use XML Tags to Stop Claude Prompt Injection",
   description:
-    "Flat prompts make Claude guess which text is a command, context, or untrusted input. Use XML tags to anchor attention, quarantine injection, and make output parseable.",
+    "Flat prompts let injected instructions ride in as commands. I wrap regions in XML tags to anchor Claude's attention and quarantine untrusted input.",
   keywords: [
     "XML tags Claude",
     "structural prompting",
     "prompt injection defense",
     "Claude prompt engineering",
     "attention anchoring",
-    "prompt structure",
-    "Anthropic prompting",
-    "deterministic prompts",
+    "production prompt engineering",
+    "prompt injection defense engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-09",
   readingMinutes: 8,

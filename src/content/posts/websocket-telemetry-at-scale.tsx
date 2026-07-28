@@ -74,7 +74,9 @@ metrics.on("tick", (m) => io.to("telemetry").emit("metric", m));`}
           Real-Time Telemetry
         </a>
         ; the live systems are{" "}
-        <a href="/#projects">streamerOS and the CMZ portal</a>.
+        <a href="/#projects">streamerOS and the CMZ portal</a>. The instinct I bring to
+        a team is deciding how far each event should travel before you scale out, not
+        after the graphs freeze.
       </p>
     </>
   );
@@ -82,17 +84,16 @@ metrics.on("tick", (m) => io.to("telemetry").emit("metric", m));`}
 
 export const websocketTelemetryAtScale: BlogPost = {
   slug: "websocket-telemetry-at-scale",
-  title: "WebSocket Telemetry at Scale: Real-Time Streaming Architectures",
+  title: "WebSocket Telemetry at Scale: When One Process Isn't Enough",
   description:
-    "A single WebSocket server is a weekend project; streaming to thousands across instances is architecture. Redis pub/sub backplanes, room-scoped subscriptions, and source-side coalescing.",
+    "A single WebSocket server is a weekend project; streaming telemetry to thousands across instances broke for me on streamerOS — Redis pub/sub, rooms, coalescing.",
   keywords: [
     "WebSockets",
     "real-time",
-    "horizontal scaling",
     "Redis pub/sub",
     "Socket.IO",
-    "telemetry",
-    "backpressure",
+    "real-time systems engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-12",
   readingMinutes: 8,

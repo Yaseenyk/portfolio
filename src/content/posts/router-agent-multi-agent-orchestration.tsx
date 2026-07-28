@@ -70,12 +70,13 @@ function Body() {
   return (
     <>
       <p>
-        &quot;Just add another agent&quot; is how a tidy AI feature becomes an
-        untraceable mess. Bolt enough autonomous agents together and you get a
-        system where no one can say which agent did what, why, or whether it will
-        do the same thing tomorrow. The router-agent pattern is the antidote: a
-        single, narrow decision-maker at the front whose only job is to classify
-        the request and hand it to exactly one specialist.
+        When I structured the streamerOS support agent, &quot;just add another
+        agent&quot; was the tempting path — and the one that turns a tidy AI
+        feature into an untraceable mess. Bolt enough autonomous agents together
+        and you get a system where no one can say which agent did what, why, or
+        whether it will do the same thing tomorrow. The router-agent pattern is
+        the antidote: a single, narrow decision-maker at the front whose only job
+        is to classify the request and hand it to exactly one specialist.
       </p>
 
       <h2>The shape: hub and spoke, not a free-for-all</h2>
@@ -138,11 +139,13 @@ function Body() {
       </blockquote>
 
       <p>
-        The routing graph is a natural fit for a{" "}
+        This is the shape I reach for when a multi-agent system has to survive
+        contact with real users rather than a demo — legible topology over
+        cleverness. The routing graph is a natural fit for a{" "}
         <a href="/blog/react-flow-agent-orchestration-canvas">
           visual orchestration canvas
-        </a>
-        , and each specialist is itself a{" "}
+        </a>{" "}
+        like IntegrateX, and each specialist is itself a{" "}
         <a href="/blog/zero-hallucination-rag-grounding-contract">
           grounded RAG agent
         </a>{" "}
@@ -154,16 +157,17 @@ function Body() {
 
 export const routerAgentPattern: BlogPost = {
   slug: "router-agent-multi-agent-orchestration",
-  title: "The Router-Agent Pattern: Multi-Agent Orchestration Without the Chaos",
+  title: "Multi-Agent Orchestration: the Router-Agent Pattern I Trust",
   description:
-    "Adding agents is how multi-agent systems become untraceable. The router-agent pattern keeps a single narrow classifier at the front, dispatching each request to exactly one specialist — with a confidence-gated fallback.",
+    "Adding agents is how multi-agent orchestration turns untraceable. I keep a narrow classifier, routing each request to exactly one specialist, gated on confidence.",
   keywords: [
     "multi-agent orchestration",
     "agent routing",
     "LLM router pattern",
     "agentic architecture",
-    "AI agent design",
-    "intent classification LLM",
+    "production multi-agent systems",
+    "multi-agent orchestration engineer",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-01",
   readingMinutes: 6,
