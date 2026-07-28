@@ -38,6 +38,12 @@ export interface GuideMeta {
   /** On-page heading; may differ from the SERP title. */
   h1: string;
   description: string;
+  /**
+   * AEO answer box: a direct 1-2 sentence answer to the guide's core question,
+   * rendered at the top so answer engines (ChatGPT/Perplexity/Google) can lift
+   * it. Keep it self-contained and honest — no marketing.
+   */
+  tldr?: string;
   /** Mono eyebrow, e.g. "Viva prep". */
   category: string;
   publishedAt: string;

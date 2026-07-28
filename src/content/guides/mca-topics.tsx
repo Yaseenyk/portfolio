@@ -8,6 +8,7 @@ export const meta: GuideMeta = {
   h1: "MCA final year project topics, with the stack and the honest difficulty",
   description:
     "Twenty MCA final year project ideas grouped by domain, each with the stack it needs, how hard it really is, and the viva question it will attract. Written by an engineer who builds these systems professionally.",
+  tldr: "Good MCA final year projects are moderately sized systems you can defend in depth — a RAG document assistant, resume screening, sales forecasting, or a well-architected full-stack app — each paired with a stack you actually know. MCA vivas push into design decisions, so pick by the depth of questions a project attracts, not by the title.",
   category: "Topic lists",
   publishedAt: "2026-07-27",
   readingMinutes: 12,

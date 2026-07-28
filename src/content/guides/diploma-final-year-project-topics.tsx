@@ -8,6 +8,7 @@ export const meta: GuideMeta = {
   h1: "Diploma final year project topics you can actually finish",
   description:
     "Simple, genuinely finishable diploma final year project ideas, each with the stack it needs and the viva question it attracts. Full source code included on every tier.",
+  tldr: "The best diploma final year projects are small, genuinely finishable CRUD applications with one real rule — a library fine, a defaulter alert, an order state — on a clean database you can fully document and explain. A completed small project beats an ambitious half-built one, and full source code is included on every tier.",
   category: "Project ideas",
   publishedAt: "2026-07-27",
   readingMinutes: 8,

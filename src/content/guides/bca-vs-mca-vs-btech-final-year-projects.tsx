@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "BCA vs MCA vs B.Tech final year projects: what changes with the degree",
   description:
     "How final year project expectations differ across BCA, MCA and B.Tech, plus B.Sc IT, Diploma and M.Tech — the depth panels want, whether you need a research angle, and how to pick.",
+  tldr: "BCA and Diploma projects are judged on a complete, well-documented application you can defend; MCA and M.Tech expect a literature survey and a genuine research contribution; B.Tech sits between, with panels probing the engineering. Match the depth to what your level's examiners expect, not to the topic.",
   category: "Choosing",
   publishedAt: "2026-07-27",
   readingMinutes: 10,

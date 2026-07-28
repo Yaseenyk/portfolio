@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "How to choose a final year project without regretting it in March",
   description:
     "A practical method for picking a final year project: how to size it against the weeks you actually have, how to avoid duplicating your batch, and the questions to ask your guide before you build anything.",
+  tldr: "Choose a final year project by first counting the weeks you truly have after exams, placements and a four-week buffer, then picking the hardest idea you can finish inside them. Pick one goal — marks, a job, or higher study — take three options to your guide, and write the scope down before you build.",
   category: "Getting started",
   publishedAt: "2026-07-27",
   readingMinutes: 8,

@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "Final year project presentation and PPT, slide by slide",
   description:
     "How to build and deliver the final year project PPT for your viva: the slide-by-slide structure, how many slides, what examiners look at, demo tips, and handling questions.",
+  tldr: "A final year project PPT is about 12 to 18 slides for a 10 to 15 minute viva: title and problem, objectives, existing versus proposed, architecture and design diagrams, tech stack and modules, screenshots and a live demo, testing and results, then limitations, future scope and conclusion. One idea per slide, and never read the slide aloud.",
   category: "Presentation",
   publishedAt: "2026-07-27",
   readingMinutes: 9,

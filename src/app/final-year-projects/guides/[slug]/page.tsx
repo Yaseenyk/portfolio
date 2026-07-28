@@ -147,6 +147,16 @@ export default function GuidePage({ params }: Params) {
         </p>
       </header>
 
+      {meta.tldr && (
+        <aside className="mt-10 rounded-2xl border border-cyan/30 bg-cyan/[0.04] p-5 sm:p-6">
+          <div className="mb-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-cyan">
+            <span className="h-1.5 w-1.5 rounded-full bg-ice" />
+            Short answer
+          </div>
+          <p className="text-[15px] leading-relaxed text-zinc-200">{meta.tldr}</p>
+        </aside>
+      )}
+
       <article
         className="prose prose-invert mt-14 max-w-none
           prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-zinc-50

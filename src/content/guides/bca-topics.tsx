@@ -8,6 +8,7 @@ export const meta: GuideMeta = {
   h1: "BCA final year project topics you can actually finish",
   description:
     "Sixteen BCA project ideas with the stack each needs and an honest difficulty rating, chosen for projects that can be completed and documented in the time a BCA student actually has.",
+  tldr: "The best BCA final year projects are ones you can finish and fully document in the time you have — a hospital or library management system, a complaint tracker, an admission portal — built as a clean full-stack app with a database design that matches the code. A complete moderate project scores better than a half-built ambitious one.",
   category: "Topic lists",
   publishedAt: "2026-07-27",
   readingMinutes: 9,

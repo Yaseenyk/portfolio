@@ -8,6 +8,7 @@ export const meta: GuideMeta = {
   h1: "M.Tech final year project topics with a research angle",
   description:
     "M.Tech project ideas that carry a novelty angle a paper can be built on, each with the contribution to defend and the stack it needs. Full source code included on every tier.",
+  tldr: "A strong M.Tech project carries a defensible novelty angle — a new method, a new comparison, a new dataset, or a measurable improvement over a baseline — framed like a paper: problem, related work, method, results, limitations. Full source code, the trained model, and the evaluation scripts are included on every tier.",
   category: "Project ideas",
   publishedAt: "2026-07-27",
   readingMinutes: 11,

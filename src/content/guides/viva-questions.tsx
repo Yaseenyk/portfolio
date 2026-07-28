@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "Final year project viva questions — and how to actually answer them",
   description:
     "The questions panels really ask in a final year project viva, grouped by what they are testing, with the reasoning behind a good answer. Written by an engineer who builds these systems for a living.",
+  tldr: "A project viva is where the panel checks you actually built the project, not just described it. Expect four kinds of question: what it does, why you made each design choice, what breaks when something goes wrong, and what you would change if you rebuilt it.",
   category: "Viva prep",
   publishedAt: "2026-07-27",
   readingMinutes: 11,

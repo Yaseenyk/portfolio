@@ -8,6 +8,7 @@ export const meta: GuideMeta = {
   h1: "B.Tech CSE final year project topics that survive a review panel",
   description:
     "B.Tech final year project ideas chosen for team work and staged reviews — each with the stack, honest difficulty, how to split it across a team, and the question the panel will open with.",
+  tldr: "Strong B.Tech CSE projects survive staged review panels and split cleanly across a team — a distributed task queue, an API gateway with rate limiting, a real-time collaborative editor, a container-based CI runner. Give each member a vertical slice they can defend end to end, and pick something presentable early with visible room to grow.",
   category: "Topic lists",
   publishedAt: "2026-07-27",
   readingMinutes: 10,

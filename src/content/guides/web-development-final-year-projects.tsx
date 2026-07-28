@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "Web development final year projects that hold up in the viva",
   description:
     "Web development final year projects with source code for Indian students — the safe high-marks categories, the viva trap each hides, and the real full-stack projects we build.",
+  tldr: "The safest high-marks web development projects are complete full-stack applications with a clean database and one piece of real logic — a stock-consistent cart, a booking system that refuses double-bookings, ordered messaging. Each comes with full source code, the report, diagrams, and a working deployment.",
   category: "Project ideas",
   publishedAt: "2026-07-27",
   readingMinutes: 9,

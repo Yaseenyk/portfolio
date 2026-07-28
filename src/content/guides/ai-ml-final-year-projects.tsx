@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "AI and machine learning final year projects that survive the viva",
   description:
     "AI and machine learning final year projects with source code for Indian students — the sub-areas, the one viva question each attracts, and the real projects we build.",
+  tldr: "The strongest AI and ML final year projects are ones you can fully defend — a classifier, recommender, NLP or computer-vision system on a clean public dataset where you understand the data, the metric, and what the model gets wrong. Full source code, the report, and the training notebook come with each.",
   category: "Project ideas",
   publishedAt: "2026-07-27",
   readingMinutes: 10,

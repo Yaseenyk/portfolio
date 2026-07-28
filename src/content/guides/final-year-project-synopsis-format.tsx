@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "Final year project synopsis format, section by section",
   description:
     "How to write a final year project synopsis that gets approved: what each section needs, the standard structure, the right length, and the mistakes that get a synopsis sent back.",
+  tldr: "A synopsis is the short document you submit for approval before you build: title, problem statement, numbered objectives, scope, proposed system, tools, modules, feasibility, timeline, and references. Most colleges expect 8 to 15 pages, and because it gates approval it must be specific rather than padded.",
   category: "Documentation",
   publishedAt: "2026-07-27",
   readingMinutes: 9,

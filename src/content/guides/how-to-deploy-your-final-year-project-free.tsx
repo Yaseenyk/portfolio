@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "How to deploy your final year project for free",
   description:
     "Get your final year project live on a real URL for free — frontend on Vercel or Netlify, backend on Render, MongoDB Atlas, secrets done right, and a localhost fallback if the wifi dies.",
+  tldr: "You can deploy a final year project for free by putting the database on MongoDB Atlas, the backend on Render or Railway, and the frontend on Vercel, Netlify or GitHub Pages, wired together with environment variables and CORS. Free backends cold-start after inactivity, so open your link a few minutes before the viva and keep a localhost fallback.",
   category: "Deployment",
   publishedAt: "2026-07-27",
   readingMinutes: 10,

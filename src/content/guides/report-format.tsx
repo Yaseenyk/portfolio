@@ -7,6 +7,7 @@ export const meta: GuideMeta = {
   h1: "Final year project report format, chapter by chapter",
   description:
     "The standard structure of a final year project report for BCA, MCA and B.Tech, what belongs in each chapter, the diagrams you need, and the mistakes that cost marks at submission.",
+  tldr: "A final year project report opens with front matter, then eight chapters — introduction, literature survey, system analysis, design, implementation, testing, results, and conclusion — followed by references and appendices. System design carries the most marks, and every diagram must match the code you submit.",
   category: "Documentation",
   publishedAt: "2026-07-27",
   readingMinutes: 10,

@@ -8,6 +8,7 @@ export const meta: GuideMeta = {
   h1: "B.Sc IT final year project topics with source code",
   description:
     "Practical B.Sc IT final year project ideas across web, data and mobile, each with the stack it needs and the viva question it attracts. Full source code included on every tier.",
+  tldr: "The best B.Sc IT final year projects are complete full-stack web or data applications with a clean database and one real feature you can defend, rather than a half-built AI idea. Good directions span web, data and mobile, and full source code is included on every tier.",
   category: "Project ideas",
   publishedAt: "2026-07-27",
   readingMinutes: 9,
