@@ -9,7 +9,7 @@ export const faceRecognitionAttendance: CampusProject = {
   summary:
     "A camera-based attendance system that enrolls students from a few photos, recognises faces in a live feed, and writes attendance to a database with a timestamp. It handles the two things a demo version never does: rejecting an unknown face instead of guessing the closest match, and refusing to mark the same student twice in one session. Examiners always ask how the recognition works — the sessions make sure you can draw it on the board.",
   degrees: ["BCA", "B.Tech", "MCA", "Diploma"],
-  domain: "Computer Vision",
+  domain: "AI / Machine Learning",
   stack: ["Python", "OpenCV", "face-recognition (dlib)", "Flask", "SQLite", "NumPy"],
   features: [
     "Enroll a student from a handful of photos and build their face encoding",

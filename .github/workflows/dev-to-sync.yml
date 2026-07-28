@@ -43,6 +43,7 @@ jobs:
           AFTER_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          deleted=""
           if [ "$EVENT" = "workflow_dispatch" ]; then
             if [ -n "${MANUAL_FILE:-}" ]; then
               files="$MANUAL_FILE"                       # a specific post you named
@@ -63,26 +64,34 @@ jobs:
               git diff --name-only --diff-filter=ACMR "$BEFORE_SHA" "$AFTER_SHA" \
                 -- 'src/content/blog/*.mdx' | tr '\n' ' ' | sed 's/ *$//'
             )"
+            # Deleted posts -> unpublish their DEV.to copy.
+            deleted="$(
+              git diff --name-only --diff-filter=D "$BEFORE_SHA" "$AFTER_SHA" \
+                -- 'src/content/blog/*.mdx' | tr '\n' ' ' | sed 's/ *$//'
+            )"
           fi
           echo "files=$files" >> "$GITHUB_OUTPUT"
+          echo "deleted=$deleted" >> "$GITHUB_OUTPUT"
           echo "Posts to sync: ${files:-<none>}"
+          echo "Posts to unpublish: ${deleted:-<none>}"
 
       - name: Set up Node.js
-        if: steps.added.outputs.files != ''
+        if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
       - name: Install dependencies
-        if: steps.added.outputs.files != ''
+        if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
         run: npm ci
 
       - name: Cross-post as drafts
-        if: steps.added.outputs.files != ''
+        if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
           # Passed through the environment — NOT interpolated into the command —
           # so the file list can never inject shell.
           ADDED_FILES: ${{ steps.added.outputs.files }}
+          DELETED_FILES: ${{ steps.added.outputs.deleted }}
         run: npx tsx scripts/sync-dev-to.ts

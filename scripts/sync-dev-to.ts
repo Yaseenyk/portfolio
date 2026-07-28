@@ -157,6 +157,23 @@ async function updateArticle(
   return JSON.parse(text) as DevToArticle;
 }
 
+/**
+ * Unpublish an article — DEV.to has no DELETE endpoint, so sending only
+ * `published: false` flips it to a draft without touching the body. Used when
+ * a post is removed from the repo so it stops being live on DEV.to too.
+ */
+async function unpublishArticle(id: number, apiKey: string): Promise<void> {
+  const res = await fetch(`${DEV_TO_BASE}/articles/${id}`, {
+    method: "PUT",
+    headers: jsonHeaders(apiKey),
+    body: JSON.stringify({ article: { published: false } }),
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    throw new DevToApiError(res.status, text, `PUT /articles/${id} (unpublish)`);
+  }
+}
+
 /* ------------------------------ parsing/logic ----------------------------- */
 
 /** DEV.to tags: lowercase-alphanumeric, max 4, de-duped. */
@@ -243,6 +260,14 @@ function filesToSync(): string[] {
     .filter(Boolean);
 }
 
+/** Deleted files (via DELETED_FILES) whose DEV.to copy should be unpublished. */
+function deletedFiles(): string[] {
+  return (process.env.DELETED_FILES ?? "")
+    .split(/\s+/)
+    .map((f) => f.trim())
+    .filter(Boolean);
+}
+
 /* ---------------------------------- main ---------------------------------- */
 
 async function main(): Promise<void> {
@@ -253,7 +278,8 @@ async function main(): Promise<void> {
   }
 
   const files = filesToSync();
-  if (files.length === 0) {
+  const deleted = deletedFiles();
+  if (files.length === 0 && deleted.length === 0) {
     console.log("No changed Markdown files to sync. Nothing to do.");
     return;
   }
@@ -293,11 +319,35 @@ async function main(): Promise<void> {
     await sleep(RATE_LIMIT_PAUSE_MS);
   }
 
+  // Unpublish DEV.to copies of posts removed from the repo. The deleted file is
+  // gone, so its slug is derived from the filename (MDX slug == filename).
+  for (const file of deleted) {
+    try {
+      const slug = path.basename(file).replace(/\.mdx?$/, "");
+      const match = index.byCanonical.get(
+        canonicalKey(`${SITE_BLOG_BASE}/${slug}/`),
+      );
+      if (!match) {
+        console.log(`· ${file}: no live DEV.to article for /${slug}/ — skipping`);
+        continue;
+      }
+      await unpublishArticle(match.id, apiKey);
+      console.log(`⊘ unpublished #${match.id}: ${slug} (removed from repo)`);
+    } catch (err) {
+      console.error(`✗ ${file} (unpublish): ${(err as Error).message}`);
+      failures.push(file);
+    }
+    await sleep(RATE_LIMIT_PAUSE_MS);
+  }
+
+  const processed = files.length + deleted.length;
   if (failures.length > 0) {
-    console.error(`\n${failures.length}/${files.length} post(s) failed.`);
+    console.error(`\n${failures.length}/${processed} operation(s) failed.`);
     process.exit(1);
   }
-  console.log(`\nAll ${files.length} post(s) synced (published) to DEV.to.`);
+  console.log(
+    `\nDone: ${files.length} upserted, ${deleted.length} unpublished on DEV.to.`,
+  );
 }
 
 main().catch((err) => {

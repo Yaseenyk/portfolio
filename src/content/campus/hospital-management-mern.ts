@@ -9,7 +9,7 @@ export const hospitalManagementMern: CampusProject = {
   summary:
     "The most-attempted project in Indian colleges, built the way it should be. Separate portals for patients, doctors, and admin; JWT auth with role guards on every route; appointment booking that actually detects slot collisions instead of overwriting them; and prescriptions and billing tied to real MongoDB relations. The marks in this project are in the schema design and the auth flow, so that is where the sessions spend their time.",
   degrees: ["BCA", "MCA", "B.Tech", "B.Sc IT"],
-  domain: "Full-Stack Web",
+  domain: "Web Development",
   stack: [
     "React",
     "Node.js",
