@@ -6,7 +6,8 @@ function Body() {
   return (
     <>
       <p>
-        You know the drill you&apos;ve typed into Claude too many times: &quot;cut
+        I built my first Claude Skill after typing this same release ritual into
+        the chat one too many times: &quot;cut
         a release — bump the version, update the changelog from the commits since
         the last tag, run the build, then draft the GitHub release notes.&quot;
         Under deadline, human RAM drops a frame, a step gets skipped, and the
@@ -139,7 +140,10 @@ Follow these steps in order. Stop and ask before any push/publish.
         </svg>
       </Diagram>
       <p>
-        Skills are reusable behavior; the next lesson makes all of it cheaper to
+        The skills I keep in my own library are few and sharp on purpose — the
+        judgment that matters is restraint, not volume, because a sprawl of fuzzy
+        skills misroutes worse than no skill at all. Skills are reusable behavior;
+        the next lesson makes all of it cheaper to
         run by reusing the static context itself —{" "}
         <a href="/blog/prompt-caching-deep-dive-latency-cost">
           the prompt caching deep dive
@@ -153,18 +157,16 @@ Follow these steps in order. Stop and ask before any push/publish.
 
 export const buildingCustomSkills: BlogPost = {
   slug: "building-custom-claude-skills-task-scripts",
-  title: "Building Custom Claude Skills: Reusable Task Scripts",
+  title: "Claude Skills: Ship Fifty, Pay for One in Context",
   description:
-    "Pasting the same instructions isn't reuse. A Claude Skill is a discoverable, versioned task script that loads on demand via progressive disclosure and runs the same way every time.",
+    "Building my own Claude Skills taught me pasting instructions isn't reuse — a skill is a versioned task script, and its description is what gets it invoked.",
   keywords: [
     "Claude Skills",
     "SKILL.md",
     "progressive disclosure",
-    "custom skills",
-    "agent task scripts",
-    "Claude Code skills",
-    "skill frontmatter",
-    "reusable workflows",
+    "Claude Code skills engineer",
+    "custom Claude Skills",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-03",
   readingMinutes: 8,

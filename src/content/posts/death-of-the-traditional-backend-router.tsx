@@ -5,7 +5,8 @@ function Body() {
   return (
     <>
       <p>
-        I’ve treated the backend router as a necessary lie for years — a switch
+        After years shipping Node backends, I’d made peace with the backend
+        router as a necessary lie — a switch
         in a blazer. A request lands, you match a URL to a handler, and the real
         work hides behind a pile of conditionals. That survived because inputs
         were predictable and the path smuggled in intent. The moment the request
@@ -120,7 +121,10 @@ function Body() {
         <a href="/#projects">Police RAG Agent</a> and the node-routing core of{" "}
         <a href="/#projects">IntegrateX</a> — where a Serialization Adapter
         stripped non-essential React Flow UI metadata before persistence and cut
-        payloads 94%, keeping the capability calls fast and cheap.
+        payloads 94%, keeping the capability calls fast and cheap. The judgment
+        I bring to a team is knowing exactly where that line sits: let the model
+        own the fuzzy front door, and never once let it near auth, billing, or an
+        idempotent write.
       </p>
     </>
   );
@@ -128,17 +132,16 @@ function Body() {
 
 export const deathOfTheBackendRouter: BlogPost = {
   slug: "death-of-the-traditional-backend-router",
-  title: "The Death of the Traditional Backend Router",
+  title: "The Backend Router Became a Model: Intent-First Routing",
   description:
-    "Modern backends are evolving from rigid URL endpoints to intent-driven AI routers. How LLM dispatch replaces sprawling switch statements — and where deterministic code still wins.",
+    "Sprawling routing branches pushed me to an intent-first backend router: an LLM classifies the request, then dispatches typed tools, not endpoints.",
   keywords: [
     "AI router",
     "intent routing",
-    "Node.js",
     "agentic backend",
-    "LLM dispatch",
-    "API design",
-    "business logic",
+    "LLM backend engineer",
+    "production AI routing",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-30",
   readingMinutes: 8,

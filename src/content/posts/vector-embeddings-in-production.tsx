@@ -5,11 +5,11 @@ function Body() {
   return (
     <>
       <p>
-        Demo vector search is a single similarity query. Production vector search
-        — the kind powering the Police RAG system over dense, multi-format legal
-        archives — is a pipeline that has to be precise, filterable, and current.
-        The gap between the two is where most RAG systems quietly fail: they
-        retrieve plausible-but-wrong context and answer confidently from it.
+        Every RAG system I&apos;ve operated fails the same quiet way: it retrieves
+        plausible-but-wrong context and answers confidently from it. A demo hides
+        that behind a single similarity query; production vector search — the kind
+        powering the Police RAG system over dense, multi-format legal archives —
+        has to be precise, filterable, and current. Closing that gap is the job.
       </p>
 
       <h2>Chunking decides retrieval quality</h2>
@@ -63,7 +63,9 @@ const hits = await Cases.aggregate([
       </blockquote>
 
       <p>
-        For the fundamentals, see{" "}
+        The judgment that separates a demo from a system I&apos;d put in front of a
+        legal team is knowing retrieval quality is decided upstream — at chunking
+        and filtering — long before the ranker runs. For the fundamentals, see{" "}
         <a href="/blog/embeddings-semantic-search-mongodb">Embeddings 101</a> and{" "}
         <a href="/blog/vector-databases-for-mern-developers">
           Vector Databases for MERN Developers
@@ -77,17 +79,16 @@ const hits = await Cases.aggregate([
 
 export const vectorEmbeddingsInProduction: BlogPost = {
   slug: "vector-embeddings-in-production",
-  title: "Vector Embeddings in Production: Custom Search for RAG",
+  title: "Vector Embeddings in Production: Where RAG Quietly Fails",
   description:
-    "Demo vector search is one query; production RAG is a pipeline. Chunking strategy, metadata-filtered hybrid search, and index freshness — the architecture behind the Police RAG system.",
+    "Shipping vector embeddings in production, I learned RAG is a pipeline, not a query: chunking, metadata-filtered hybrid search, and keeping indexes from rotting.",
   keywords: [
     "vector embeddings",
     "vector search",
     "RAG",
-    "hybrid search",
-    "MongoDB Atlas",
-    "chunking",
-    "production AI",
+    "production RAG engineer",
+    "hybrid search MongoDB",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-14",
   readingMinutes: 8,

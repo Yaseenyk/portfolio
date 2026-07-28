@@ -6,8 +6,9 @@ function Body() {
   return (
     <>
       <p>
-        I patched a system prompt to calm one customer&apos;s edge case, shipped,
-        and three days later a different path started returning junk — the
+        I patched a system prompt on the streamerOS support agent to calm one
+        customer&apos;s edge case, shipped, and three days later a different path
+        started returning junk — the
         &quot;fix&quot; quietly regressed six flows nobody re-ran. Prompts are
         code with no type system and no test suite by default, so every change is
         a blind edit to production behavior. I wouldn&apos;t merge a refactor
@@ -153,7 +154,9 @@ export async function runEvals(): Promise<number> {
       </Diagram>
       <p>
         Once behavior is measurable and gated, the agent is stable enough to run
-        unattended. The series closes there:{" "}
+        unattended — the bar I hold every AI feature to across the five products I
+        shipped solo in twelve months, and the judgment I bring to a team that
+        can&apos;t afford silent regressions. The series closes there:{" "}
         <a href="/blog/long-running-automated-agent-routines-cron-workflows">
           autonomous agent routines on a cron
         </a>
@@ -166,18 +169,18 @@ export async function runEvals(): Promise<number> {
 
 export const evalDrivenPromptEngineering: BlogPost = {
   slug: "evaluation-driven-prompt-engineering-golden-datasets",
-  title: "Eval-Driven Prompt Engineering with Golden Datasets",
+  title: "Why I Won't Merge a Prompt Without a Golden Dataset",
   description:
-    "Prompts are code with no test suite by default, so every edit is a blind change to production. Build a golden dataset and an eval harness that gates every prompt change in CI.",
+    "One prompt I patched silently broke six flows, so I gate every change on a golden dataset and an eval harness in CI — eval-driven prompt engineering, in practice.",
   keywords: [
     "eval-driven development",
     "golden dataset",
     "prompt evaluation",
     "LLM as judge",
     "prompt regression testing",
-    "Claude evals",
-    "prompt engineering CI",
-    "LLM testing",
+    "prompt engineering for hire",
+    "production prompt evaluation",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-28",
   readingMinutes: 9,

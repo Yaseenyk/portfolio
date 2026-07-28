@@ -6,8 +6,8 @@ function Body() {
   return (
     <>
       <p>
-        You asked one agent to migrate a 300-file codebase from one ORM to
-        another. By file ninety the context window (Lesson 1) is saturated, it&apos;s
+        I handed a single agent a 300-file ORM migration once and watched it fall
+        apart: by file ninety the context window (Lesson 1) is saturated, it&apos;s
         forgotten the conventions it set on file ten, and the whole run is
         sequential — eight hours of wall-clock for work that&apos;s embarrassingly
         parallel. One context can&apos;t hold a migration, and one agent
@@ -153,8 +153,10 @@ export async function runMigration(files: string[]) {
         <a href="/blog/stateful-agent-runtime-persistence-durable-objects-redis">
           a stateful agent runtime with Durable Objects &amp; Redis
         </a>
-        . Or browse{" "}
-        <a href="/anthropic-roadmap">the full roadmap</a>.
+        . Orchestration discipline like this is how I shipped five products solo in
+        twelve months without the parallelism turning into corruption — the judgment
+        a team gets when speed can&apos;t come at the cost of a trustworthy result.
+        Or browse <a href="/anthropic-roadmap">the full roadmap</a>.
       </p>
     </>
   );
@@ -162,18 +164,17 @@ export async function runMigration(files: string[]) {
 
 export const multiAgentWorktrees: BlogPost = {
   slug: "multi-agent-worktrees-parallel-subagents",
-  title: "Multi-Agent Worktrees & Parallel Subagents",
+  title: "How I Parallelize Subagents Across Git Worktrees",
   description:
-    "One context can't hold a migration and one agent can't parallelize itself. An orchestrator fans work out to isolated git-worktree subagents and fans the results back in.",
+    "One context can't hold a big migration and one agent can't parallelize itself, so I fan work out to isolated git-worktree subagents and merge the branches back in.",
   keywords: [
     "multi-agent",
     "parallel subagents",
     "git worktree agents",
     "orchestrator worker",
-    "Vercel AI SDK",
-    "agent fan-out",
-    "Claude agents",
-    "parallel AI agents",
+    "multi-agent systems engineer",
+    "production agent orchestration",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-31",
   readingMinutes: 10,

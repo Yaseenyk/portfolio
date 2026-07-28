@@ -75,14 +75,14 @@ function Body() {
   return (
     <>
       <p>
-        A React Flow canvas is gorgeous and entirely inert. It is a set of nodes
-        and edges with positions. The interesting engineering question is the one
-        the demos skip: <strong>how do you actually run it?</strong> On IntegrateX,
-        the pretty graph was useless until we made it deterministic. A user-drawn
-        graph has no inherent order, can fan out and then converge, and it may
-        hide a cycle that will happily spin your workers forever. Turning that into
-        a predictable, runnable pipeline is a compilation problem with a battle‑tested
-        answer.
+        On IntegrateX, a React Flow canvas that looked finished was still entirely
+        inert — a set of nodes and edges with positions. The interesting engineering
+        question is the one the demos skip:{" "}
+        <strong>how do you actually run it?</strong> The pretty graph was useless
+        until we made it deterministic. A user-drawn graph has no inherent order,
+        can fan out and then converge, and it may hide a cycle that will happily
+        spin your workers forever. Turning that into a predictable, runnable pipeline
+        is a compilation problem with a battle‑tested answer.
       </p>
 
       <h2>From render graph to execution plan</h2>
@@ -172,7 +172,10 @@ function Body() {
         <a href="/blog/94-percent-payload-reduction-react-flow">
           serialization adapter pattern
         </a>
-        {" "}— the adapter layer in my Trinity split that made IntegrateX practical at scale.
+        {" "}— the adapter layer in my Trinity split that made IntegrateX practical at
+        scale. That seam — a visual builder compiled into a reliable runtime — is the
+        judgment a team gets in an engineer who ships the compiler, not just the
+        canvas.
       </p>
     </>
   );
@@ -180,16 +183,17 @@ function Body() {
 
 export const compilingReactFlowAgent: BlogPost = {
   slug: "compiling-react-flow-graph-agent-pipeline",
-  title: "From Diagram to Execution: Compiling a React Flow Graph into a Runnable Agent Pipeline",
+  title: "How I Compile a React Flow Graph So It Actually Runs",
   description:
-    "A React Flow canvas is inert until you compile it. How to reduce a visual node graph to a dependency map, topologically sort it into a runnable plan, detect cycles, and extract free parallelism.",
+    "On IntegrateX a React Flow canvas stayed inert until I compiled it: a dependency map, a topological sort into a runnable plan, and cycle detection before it runs.",
   keywords: [
     "React Flow execution engine",
     "topological sort DAG",
     "node graph compiler",
-    "workflow engine TypeScript",
     "agent pipeline",
-    "cycle detection",
+    "React Flow engineer",
+    "production workflow engine",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-03",
   readingMinutes: 8,

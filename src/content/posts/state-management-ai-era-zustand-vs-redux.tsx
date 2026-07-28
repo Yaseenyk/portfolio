@@ -5,7 +5,8 @@ function Body() {
   return (
     <>
       <p>
-        Streaming AI responses rewired how I treat frontend state. Classic apps
+        Wiring a live node canvas in IntegrateX is where streaming state stopped
+        being theoretical for me. Classic apps
         move in discrete, audited steps — click, fetch, submit. A token stream
         lands dozens of times a second, cancellable mid-flight, interleaved with
         optimistic UI, and any friction shows up as jitter. Ceremony turns into
@@ -124,7 +125,9 @@ function Body() {
         across a live canvas are the core workload. The Serialization Adapter
         there stripped non-essential React Flow UI metadata before persistence and
         cut payloads 94% — a clean win made possible by the Trinity split&apos;s
-        boundaries.
+        boundaries. Across the five products I shipped solo this past year, the
+        call I keep making for teams is the same: pick the state tool per surface,
+        not per religion, and let the failure modes decide.
       </p>
     </>
   );
@@ -132,17 +135,16 @@ function Body() {
 
 export const stateManagementAiEra: BlogPost = {
   slug: "state-management-ai-era-zustand-vs-redux",
-  title: "State Management in the AI Era: Zustand vs. Redux",
+  title: "Zustand vs Redux: State at 60Hz in Streaming AI",
   description:
-    "Streaming AI responses punish boilerplate. When to reach for Zustand's lightweight, localized state versus Redux Toolkit's structure — and why most serious apps run both.",
+    "After wiring streaming chat and a live node canvas, I treat Zustand vs Redux as a hops budget: where each earns its place, and why I ship both in one app.",
   keywords: [
     "Zustand",
     "Redux Toolkit",
     "state management",
-    "streaming AI",
-    "React",
-    "frontend architecture",
-    "real-time UI",
+    "React state management engineer",
+    "production state management",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-05-28",
   readingMinutes: 8,

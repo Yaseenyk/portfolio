@@ -7,7 +7,7 @@ function Body() {
       <p>
         Redux earned its boilerplate reputation honestly — and Redux Toolkit
         retired most of it. At scale, the structure RTK imposes is an asset, not
-        a tax. On SANKALP and a later enterprise build, the store stayed
+        a tax. Building the durable core of IntegrateX, the store stayed
         tractable only when I enforced the pattern I call Trinity Architecture:
         Presentation renders and dispatches only; RTK lives in the Reactive
         State / Orchestration layer as the runtime source of truth; a Data /
@@ -70,7 +70,10 @@ export const { upserted, removed } = casesSlice.actions;`}
       </blockquote>
 
       <p>
-        For the lighter-weight side of the toolbox, see{" "}
+        Every enterprise store I&apos;ve shipped ends up here: RTK for the audited
+        core, something lighter for the fast surface — the layering judgment
+        matters more than the library. For the lighter-weight side of the toolbox,
+        see{" "}
         <a href="/blog/state-management-ai-era-zustand-vs-redux">
           Zustand vs. Redux
         </a>
@@ -82,17 +85,16 @@ export const { upserted, removed } = casesSlice.actions;`}
 
 export const reduxToolkitArchitectures: BlogPost = {
   slug: "redux-toolkit-architectures",
-  title: "Redux Toolkit Architectures for Massive Enterprise State",
+  title: "Redux Toolkit at Scale: Slices That Don't Rot",
   description:
-    "RTK made Redux's boilerplate reputation obsolete. Structuring feature slices, normalizing with entity adapters, offloading server state to RTK Query — and when not to reach for it.",
+    "The rule I enforce to keep a large Redux Toolkit store tractable: feature slices, entity adapters, RTK Query for server state, and when not to reach for it.",
   keywords: [
     "Redux Toolkit",
     "RTK Query",
-    "state management",
     "createEntityAdapter",
-    "enterprise architecture",
-    "React",
-    "slices",
+    "enterprise Redux architecture",
+    "Redux engineer for hire",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-09",
   readingMinutes: 7,

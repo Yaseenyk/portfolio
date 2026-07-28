@@ -71,13 +71,13 @@ function Body() {
   return (
     <>
       <p>
-        Evaluation-Driven Development treats a golden dataset like your AI&apos;s test
-        suite. Every prompt or model tweak runs in CI against labelled cases with a
-        regression threshold. Without that harness, a prompt is code with no tests —
-        you nudge a line, it looks better on the three examples you stared at, and
-        you ship a silent regression on the other ninety-seven. The golden set turns
-        &quot;feels better&quot; into a measurable score that either clears the bar or
-        blocks the merge.
+        The golden dataset behind the streamerOS support agent is the closest thing
+        my prompts have to a test suite: every prompt or model tweak runs in CI
+        against labelled cases with a regression threshold. Without that harness, a
+        prompt is code with no tests — you nudge a line, it looks better on the three
+        examples you stared at, and you ship a silent regression on the other
+        ninety-seven. The golden set turns &quot;feels better&quot; into a measurable
+        score that either clears the bar or blocks the merge.
       </p>
 
       <h2>A prompt change is a diff without a test</h2>
@@ -146,10 +146,12 @@ function Body() {
         <a href="/blog/evaluating-llm-outputs">evaluating LLM outputs</a> and the
         safety net that lets{" "}
         <a href="/blog/guardrail-engineering-hallucination-prevention">guardrails</a>{" "}
-        evolve without silent regressions. Keep the Trinity split tight — presentation
-        renders, orchestration owns truth, and the adapter handles serialization —
-        and you get fast iteration without shipping vibes. Continue on the{" "}
-        <a href="/roadmap">roadmap</a>.
+        evolve without silent regressions. It&apos;s the discipline behind every AI
+        feature I shipped solo across five products in twelve months — the judgment a
+        team gets in an engineer who measures prompts instead of arguing about them.
+        Keep the Trinity split tight — presentation renders, orchestration owns truth,
+        and the adapter handles serialization — and you get fast iteration without
+        shipping vibes. Continue on the <a href="/roadmap">roadmap</a>.
       </p>
     </>
   );
@@ -157,16 +159,17 @@ function Body() {
 
 export const evaluationDrivenDevelopment: BlogPost = {
   slug: "evaluation-driven-development-golden-dataset",
-  title: "Evaluation-Driven Development: The Golden Dataset as a CI Gate",
+  title: "How I Gate Every Prompt Change on a Golden Dataset",
   description:
-    "A prompt is code with no tests until you have a golden dataset — a curated set of labelled cases every change runs against in CI, gated on a regression threshold. Eval-driven development turns 'feels better' into a number that blocks the merge.",
+    "A silent regression I never spot-checked taught me to gate every prompt change on a golden dataset in CI — evaluation-driven development, built from real production failures.",
   keywords: [
     "evaluation-driven development",
     "golden dataset",
-    "LLM evals CI",
-    "prompt regression testing",
-    "AI quality gate",
     "LLM-as-judge",
+    "prompt regression testing",
+    "LLM evals engineer",
+    "production LLM evals",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-05",
   readingMinutes: 6,

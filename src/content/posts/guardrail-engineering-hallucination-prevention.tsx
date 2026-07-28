@@ -56,7 +56,7 @@ function Body() {
   return (
     <>
       <p>
-        After shipping LLMs into real products, I stopped trying to erase hallucination and started boxing it in.
+        After shipping LLMs into real products — the RAG support agent in streamerOS among them — I stopped trying to erase hallucination and started boxing it in.
         The production answer to &quot;what if the model is wrong?&quot; isn&apos;t a prettier prompt — it&apos;s a sequence
         of deterministic checks wrapped around the probabilistic core. I treat the model like an untrusted dependency:
         validate what goes in, ground what it&apos;s allowed to see, verify what comes out, and fail closed the moment a check trips.
@@ -109,7 +109,10 @@ function Body() {
         Guardrails are the production payoff of{" "}
         <a href="/blog/rag-grounding-the-agent">grounding</a> and the discipline that
         makes <a href="/blog/agentic-control-loops">autonomous loops</a> safe to
-        ship without gambling on luck. The series closes with the{" "}
+        ship without gambling on luck. It&apos;s the same fail-closed instinct behind
+        the RAG concierge on this site and the streamerOS support agent — and the
+        judgment a team gets in an engineer who treats a refusal as a feature, not a
+        failure. The series closes with the{" "}
         <a href="/blog/ai-native-portfolio-landing-lead-roles">AI-native portfolio</a>{" "}
         — see the full <a href="/roadmap">roadmap</a>.
       </p>
@@ -119,16 +122,17 @@ function Body() {
 
 export const guardrailEngineering: BlogPost = {
   slug: "guardrail-engineering-hallucination-prevention",
-  title: "Guardrail Engineering: Preventing Hallucination in Production",
+  title: "Guardrail Engineering: How I Box In LLM Hallucination",
   description:
-    "You can't fine-tune away hallucination, but you can engineer around it. Guardrails are deterministic checks wrapped around a probabilistic core — input validation, grounding contracts, and output verification that fail closed.",
+    "I stopped erasing hallucination and box it in instead: guardrails, grounding contracts, and output verification that fail closed around a probabilistic model.",
   keywords: [
     "AI guardrails",
     "hallucination prevention",
     "LLM output verification",
     "prompt injection defense",
-    "grounding contract",
-    "production LLM safety",
+    "AI guardrails engineer",
+    "production LLM guardrails",
+    "Yaseen Khatib",
   ],
   publishedAt: "2026-06-01",
   readingMinutes: 7,
