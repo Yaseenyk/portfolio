@@ -27,6 +27,9 @@ import { meta as webDevMeta, Body as WebDevBody } from "@/content/guides/web-dev
 import { meta as bscItMeta, Body as BscItBody } from "@/content/guides/bsc-it-final-year-project-topics";
 import { meta as mtechMeta, Body as MtechBody } from "@/content/guides/mtech-final-year-project-topics";
 import { meta as diplomaMeta, Body as DiplomaBody } from "@/content/guides/diploma-final-year-project-topics";
+import { meta as oneMonthMeta, Body as OneMonthBody } from "@/content/guides/final-year-project-in-one-month";
+import { meta as stuckMeta, Body as StuckBody } from "@/content/guides/stuck-on-final-year-project";
+import { meta as explainVivaMeta, Body as ExplainVivaBody } from "@/content/guides/how-to-explain-your-project-in-the-viva";
 
 export interface GuideMeta {
   slug: string;
@@ -66,6 +69,9 @@ export const GUIDES: Guide[] = [
   { meta: pptMeta, Body: PptBody },
   { meta: deployMeta, Body: DeployBody },
   { meta: compareMeta, Body: CompareBody },
+  { meta: oneMonthMeta, Body: OneMonthBody },
+  { meta: stuckMeta, Body: StuckBody },
+  { meta: explainVivaMeta, Body: ExplainVivaBody },
   { meta: aiMlMeta, Body: AiMlBody },
   { meta: webDevMeta, Body: WebDevBody },
   { meta: mcaMeta, Body: McaBody },
