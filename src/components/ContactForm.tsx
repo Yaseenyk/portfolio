@@ -4,6 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import SectionLabel from "./SectionLabel";
+import { track } from "@/lib/analytics";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -58,6 +59,7 @@ export default function ContactForm() {
       );
       setStatus("sent");
       setForm(EMPTY_FORM);
+      track("contact-submit");
     } catch (err) {
       // EmailJS rejects with { status, text }; surface both so config issues
       // (bad key, origin not allowlisted, template recipient) are diagnosable.

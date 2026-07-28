@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { whatsappHref } from "@/lib/campus";
 import type { Degree, Difficulty } from "@/lib/campus";
+import { track } from "@/lib/analytics";
 
 /** Lean project shape passed from the server page (no heavy data client-side). */
 export interface QuizProject {
@@ -93,6 +94,8 @@ export default function FindMyProject({ projects }: { projects: QuizProject[] })
   const pick = (key: keyof Answers, value: string) => {
     setAnswers((prev) => ({ ...prev, [key]: value }));
     setStep((s) => s + 1);
+    // Answering the last question reveals the recommendations.
+    if (step === total - 1) track("fyp-quiz-complete");
   };
 
   const reset = () => {
@@ -187,6 +190,7 @@ export default function FindMyProject({ projects }: { projects: QuizProject[] })
                     href={waLink(p, answers)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => track("fyp-quiz-whatsapp")}
                     className="rounded-lg bg-[#25D366] px-4 py-2 text-xs font-semibold text-[#04220F] transition-transform duration-200 hover:scale-[1.03]"
                   >
                     Discuss on WhatsApp

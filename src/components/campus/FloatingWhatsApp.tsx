@@ -1,4 +1,7 @@
+"use client";
+
 import { whatsappHref } from "@/lib/campus";
+import { track } from "@/lib/analytics";
 
 /**
  * Persistent WhatsApp tap-target on every FYP page. Desktop only (md+) — the
@@ -13,6 +16,7 @@ export default function FloatingWhatsApp() {
       )}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => track("fyp-whatsapp-float")}
       aria-label="Chat about final year projects on WhatsApp"
       className="fixed bottom-6 right-6 z-40 hidden items-center gap-2 rounded-full bg-[#25D366] px-5 py-3.5 text-sm font-semibold text-[#04220F] shadow-lg shadow-black/40 transition-transform duration-200 hover:scale-105 md:flex"
     >

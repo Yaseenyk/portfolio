@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import type { CampusTier, Degree } from "@/lib/campus";
 import { formatInr, whatsappHref } from "@/lib/campus";
+import { track } from "@/lib/analytics";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -121,6 +122,7 @@ export default function CampusLeadForm({
       );
       setStatus("sent");
       setForm(EMPTY_FORM);
+      track(collegeSide ? "fyp-college-lead-submit" : "fyp-lead-submit");
     } catch (err) {
       const detail =
         err && typeof err === "object" && "text" in err
@@ -260,6 +262,7 @@ export default function CampusLeadForm({
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track("fyp-lead-whatsapp")}
             className="rounded-lg bg-[#25D366] px-6 py-3 text-sm font-semibold text-[#04220F] transition-transform duration-200 hover:scale-[1.03]"
           >
             Or message on WhatsApp

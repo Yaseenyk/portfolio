@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CUSTOM_BUILD_RANGE, formatInr, whatsappHref } from "@/lib/campus";
+import { track } from "@/lib/analytics";
 
 const TYPES = ["Web app (MERN)", "AI / ML", "Mobile app", "Something else"] as const;
 const COMPLEXITY = ["Simple", "Standard", "Advanced"] as const;
@@ -111,6 +112,7 @@ export default function QuoteEstimator() {
         href={wa}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => track("fyp-estimator-lock")}
         className="mt-6 flex items-center justify-center gap-2 rounded-lg bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-[#04220F] transition-transform duration-200 hover:scale-[1.02]"
       >
         Lock this quote on WhatsApp

@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { whatsappHref } from "@/lib/campus";
 import type { Degree } from "@/lib/campus";
+import { track } from "@/lib/analytics";
 
 const DEGREES: Degree[] = ["BCA", "MCA", "B.Tech", "B.Sc IT", "M.Tech", "Diploma"];
 
@@ -37,7 +38,10 @@ export default function TemplateGate() {
       <form
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
-          if (ready) setUnlocked(true);
+          if (ready) {
+            setUnlocked(true);
+            track("fyp-templates-unlock");
+          }
         }}
         className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8"
       >
@@ -109,6 +113,7 @@ export default function TemplateGate() {
             <a
               href={t.href}
               download
+              onClick={() => track("fyp-template-download")}
               className="group flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition-colors duration-200 hover:border-cyan/40"
             >
               <span>
@@ -134,6 +139,7 @@ export default function TemplateGate() {
           href={wa}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track("fyp-templates-whatsapp")}
           className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-5 py-3 text-sm font-semibold text-[#04220F] transition-transform duration-200 hover:scale-[1.03]"
         >
           Message me on WhatsApp

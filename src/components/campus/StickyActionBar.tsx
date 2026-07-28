@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { whatsappHref } from "@/lib/campus";
+import { track } from "@/lib/analytics";
 
 /**
  * Thumb-reachable action bar, mobile only. This audience browses on a phone
@@ -35,6 +36,7 @@ export default function StickyActionBar({ context }: { context?: string }) {
           href={whatsappHref(message)}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track("fyp-sticky-whatsapp")}
           tabIndex={shown ? 0 : -1}
           className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-[#04220F]"
         >
@@ -45,6 +47,7 @@ export default function StickyActionBar({ context }: { context?: string }) {
         </a>
         <a
           href="#enquire"
+          onClick={() => track("fyp-sticky-enquire")}
           tabIndex={shown ? 0 : -1}
           className="flex-1 rounded-xl border border-cyan/40 bg-cyan/10 px-4 py-3 text-center text-sm font-semibold text-ice"
         >
