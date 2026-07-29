@@ -1,0 +1,336 @@
+---
+title: How I orchestrate React with a typed event bus
+slug: how-i-orchestrate-react-with-a-typed-event-bus
+date: '2026-07-29'
+description: 'A production pattern I use to coordinate React components without prop
+  drilling or store-bloat: a strictly typed event bus with React-safe hooks.'
+tags:
+- React
+- TypeScript
+- Frontend Architecture
+keywords:
+- typed event bus react
+- typescript event emitter generics
+- cross component communication react
+- React StrictMode duplicate subscription
+- Next.js SSR event bus
+- event-driven React architecture
+- useEffect subscription pattern
+- orchestration layer react
+readingMinutes: 9
+takeaways:
+- Use a typed event bus to coordinate cross-component flows without lifting every
+  state concern into global stores.
+- TypeScript should drive event names and payload shapes; compile-time guarantees
+  replace runtime guesswork.
+- Guard for React StrictMode, HMR, and SSR; subscriptions must be stable and idempotent
+  with clean unmounts.
+- Don’t replace your store with a bus; use it for orchestration signals, not domain
+  state or auditability.
+author:
+  name: Yaseen Khatib
+  role: Senior Full-Stack AI Engineer
+---
+
+I keep running into the same pain in React apps: components need to coordinate side-effects across boundaries (uploads, toasts, AI stream fan-out, optimistic mutations), and pushing all of that through a global store bloats reducers and invites coupling. Context and props don’t cross far enough. What actually survives production churn is an event bus — but only if it’s strictly typed and React-safe.
+
+Below is the bus I ship on React 18.3.1 + TypeScript 5.4. It’s small, fast enough, and it fails closed at compile time. It lives in the orchestration layer (a pattern I call Trinity Architecture: views -> orchestration -> data) so components can render from state and communicate via events.
+
+## Why not just Redux/Context for everything?
+- I still use stores (Redux, Zustand, RTK Query) for domain state, caching, and derivations. They shine at persistence, devtools, and undo.
+- An event bus is for orchestration: “X happened, anyone interested?” It’s great for fan-out and cross-cutting concerns (toast, telemetry, feature toggles, analytics, workers).
+- When not to: you need time-travel, strict auditing, or persistence. Or you’re actually modeling state, not signaling. A bus is not a database.
+
+## How do you coordinate React components without prop drilling?
+Use a small, app-scoped event bus and subscribe from components via a stable hook. Dispatch from anywhere. Keep it browser-only, clean up on unmount, and guard against HMR duplicates. You get cross-tree communication without threading callbacks through five layers of props.
+
+### Define your event map (the types are the contract)
+```ts
+// events.ts
+export type AppEvents = {
+  'upload:start': { id: string; file: File };
+  'upload:progress': { id: string; loaded: number; total: number };
+  'upload:done': { id: string; url: string };
+  'toast:show': { kind: 'success' | 'error'; message: string };
+  'bus:error': { event: string; error: unknown };
+};
+```
+
+### A strongly-typed EventBus
+```ts
+// event-bus.ts
+export type Handler<P> = (payload: P) => void | Promise<void>;
+
+export class EventBus<EM extends Record<string, any>> {
+  private listeners = new Map<keyof EM, Set<Handler<any>>>();
+
+  on<K extends keyof EM>(event: K, handler: Handler<EM[K]>): () => void {
+    let set = this.listeners.get(event);
+    if (!set) {
+      set = new Set();
+      this.listeners.set(event, set);
+    }
+    set.add(handler as Handler<any>);
+    return () => this.off(event, handler);
+  }
+
+  once<K extends keyof EM>(event: K, handler: Handler<EM[K]>): () => void {
+    const wrap: Handler<EM[K]> = (p) => {
+      this.off(event, wrap);
+      return handler(p);
+    };
+    return this.on(event, wrap);
+  }
+
+  off<K extends keyof EM>(event: K, handler: Handler<EM[K]>) {
+    const set = this.listeners.get(event);
+    if (!set) return;
+    set.delete(handler as Handler<any>);
+    if (!set.size) this.listeners.delete(event);
+  }
+
+  emit<K extends keyof EM>(event: K, payload: EM[K]): void {
+    const set = this.listeners.get(event);
+    if (!set || !set.size) return;
+    // Snapshot to avoid mutations during iteration
+    const fns = Array.from(set) as Handler<EM[K]>[];
+    for (const fn of fns) {
+      try {
+        fn(payload);
+      } catch (e) {
+        // Avoid recursive loop unless the map has 'bus:error'
+        const errEvt = 'bus:error' as keyof EM;
+        if (this.listeners.has(errEvt)) {
+          this.emit(errEvt, { event: String(event), error: e } as EM[keyof EM]);
+        } else {
+          // last-resort logging
+          console.error('[bus] handler error for', String(event), e);
+        }
+      }
+    }
+  }
+
+  async emitAsync<K extends keyof EM>(event: K, payload: EM[K]): Promise<void> {
+    const set = this.listeners.get(event);
+    if (!set || !set.size) return;
+    const fns = Array.from(set) as Handler<EM[K]>[];
+    const tasks = fns.map(async (fn) => {
+      try {
+        await fn(payload);
+      } catch (e) {
+        const errEvt = 'bus:error' as keyof EM;
+        if (this.listeners.has(errEvt)) {
+          this.emit(errEvt, { event: String(event), error: e } as EM[keyof EM]);
+        } else {
+          console.error('[bus] handler error for', String(event), e);
+        }
+      }
+    });
+    await Promise.allSettled(tasks);
+  }
+}
+```
+
+### Safe singleton for the browser (HMR- and SSR-aware)
+```ts
+// app-bus.ts
+'use client'; // Next.js App Router: bus is client-only orchestration
+import { EventBus } from './event-bus';
+import type { AppEvents } from './events';
+
+// Ensure a single instance in the browser across HMR reloads
+declare global {
+  interface Window { __APP_BUS__?: EventBus<AppEvents>; }
+}
+
+export const bus: EventBus<AppEvents> =
+  (typeof window !== 'undefined' && (window.__APP_BUS__ ||= new EventBus<AppEvents>()))
+  || new EventBus<AppEvents>(); // fallback for non-browser tests
+```
+
+### React hooks: stable subscription and typed emit
+```ts
+// use-bus.ts
+import { useCallback, useEffect, useRef } from 'react';
+import { bus } from './app-bus';
+import type { AppEvents } from './events';
+
+function useStableCallback<T extends (...args: any[]) => any>(fn: T): T {
+  const ref = useRef(fn);
+  useEffect(() => { ref.current = fn; }, [fn]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useCallback(((...args: any[]) => ref.current(...args)) as T, []);
+}
+
+export function useEvent<K extends keyof AppEvents>(
+  event: K,
+  handler: (p: AppEvents[K]) => void
+) {
+  const stable = useStableCallback(handler);
+  useEffect(() => {
+    const off = bus.on(event, stable);
+    return off; // strict cleanup: avoids leaks and StrictMode dupes
+  }, [event, stable]);
+}
+
+export function useEmit<K extends keyof AppEvents>(event: K) {
+  return useCallback((payload: AppEvents[K]) => bus.emit(event, payload), [event]);
+}
+```
+
+### Usage across unrelated components
+```tsx
+// UploadButton.tsx
+'use client';
+import React from 'react';
+import { useEmit } from './use-bus';
+
+export function UploadButton() {
+  const start = useEmit('upload:start');
+  return (
+    <input
+      type="file"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const id = crypto.randomUUID();
+        start({ id, file });
+      }}
+    />
+  );
+}
+
+// UploadWorker.tsx — no UI; orchestrates side-effects
+'use client';
+import React, { useEffect } from 'react';
+import { useEvent } from './use-bus';
+import { bus } from './app-bus';
+
+async function uploadFile(id: string, file: File) {
+  // Example: chunked upload simulation with progress
+  const total = file.size || 1;
+  let loaded = 0;
+  const chunk = Math.max(64 * 1024, Math.floor(total / 20));
+  while (loaded < total) {
+    await new Promise((r) => setTimeout(r, 30));
+    loaded = Math.min(total, loaded + chunk);
+    bus.emit('upload:progress', { id, loaded, total });
+  }
+  // In real life: await fetch/PUT, then emit done
+  bus.emit('upload:done', { id, url: `/files/${id}` });
+}
+
+export function UploadWorker() {
+  useEvent('upload:start', ({ id, file }) => {
+    // Fire-and-forget; errors route to bus:error via EventBus
+    void uploadFile(id, file);
+  });
+
+  // Optional: route errors to a toast
+  useEffect(() => {
+    return bus.on('bus:error', ({ error }) => {
+      bus.emit('toast:show', { kind: 'error', message: String(error) });
+    });
+  }, []);
+
+  return null;
+}
+
+// ProgressBar.tsx
+'use client';
+import React, { useMemo, useState } from 'react';
+import { useEvent } from './use-bus';
+
+export function ProgressBar({ id }: { id: string }) {
+  const [pct, setPct] = useState(0);
+  useEvent('upload:progress', ({ id: eid, loaded, total }) => {
+    if (eid === id) setPct(Math.floor((loaded / Math.max(1, total)) * 100));
+  });
+  useEvent('upload:done', ({ id: eid }) => {
+    if (eid === id) setPct(100);
+  });
+  const color = useMemo(() => (pct === 100 ? 'green' : 'blue'), [pct]);
+  return <div style={{ width: pct + '%', height: 8, background: color }} />;
+}
+```
+
+This is the pattern: components publish signals; worker-like components subscribe and do the side-effects. No prop drilling, no central reducer bloat.
+
+## How do you type an event bus in TypeScript?
+Model events as a map of event-name to payload type. The bus API is generic over that map. Each on/emit call infers K from keyof EM and enforces the specific payload type. This way, payloads are validated at compile time and autocomplete stays precise.
+
+The `EventBus<EM>` above is the core. A couple of additions I sometimes include:
+
+- Microtask scheduling to avoid re-entrancy:
+```ts
+// Optional: queued emit that runs after current call stack
+queueMicrotask(() => bus.emit('toast:show', { kind: 'success', message: 'Saved' }));
+```
+- Wildcard debugging (untyped onAny):
+```ts
+onAny(fn: (event: keyof EM, payload: EM[keyof EM]) => void) { /* debug only */ }
+```
+Use the wildcard only for logging; don’t leak it into app logic.
+
+## How do you avoid duplicate subscriptions in React StrictMode?
+Return a proper cleanup function from useEffect and keep handlers stable. StrictMode mounts, unmounts, then re-mounts effects; idempotent subscribe/cleanup avoids duplicates. Avoid creating new handler identities every render by wrapping with a stable callback.
+
+Key points in the earlier hook code:
+- useStableCallback keeps the handler identity constant while still seeing latest props/state.
+- The effect returns the unsubscribe, so the pre-remount effect is torn down before the remount.
+- Don’t stash subscriptions in module scope inside a component file; tie them to lifecycle.
+
+## SSR, HMR, and module scope realities
+- Bus is client-only orchestration. For Next.js App Router, mark the module `'use client'`.
+- The `window.__APP_BUS__ ||= ...` pattern avoids creating a new bus on every HMR reload.
+- For unit tests or Node, the fallback `new EventBus()` works; you can inject a test bus.
+- If you need cross-tab or worker-to-UI signals, the bus is not enough — use BroadcastChannel or postMessage and bridge them into bus events.
+
+## Error handling and backpressure
+Handlers throwing shouldn’t explode unrelated listeners. The implementation wraps each callback, logs the error, and if available, emits a `bus:error`. If you have heavy async work, consider using `emitAsync` and await it in orchestrators that must know completion boundaries. For UI-level toasts and telemetry, fire-and-forget is fine.
+
+If you’re chaining events that synchronously cause more events, re-entrancy can surprise you. When you see nested renders or invariants tripping, enqueue follow-up emits via `queueMicrotask` so React state commits settle before the next wave.
+
+## Testing the bus
+You don’t need a library to test this.
+```ts
+// event-bus.test.ts with vitest or jest
+import { describe, it, expect } from 'vitest';
+import { EventBus } from './event-bus';
+
+type E = { foo: { x: number }; bar: { s: string } };
+
+describe('EventBus', () => {
+  it('subscribes, emits, and cleans up', () => {
+    const bus = new EventBus<E>();
+    const seen: number[] = [];
+    const off = bus.on('foo', (p) => seen.push(p.x));
+    bus.emit('foo', { x: 1 });
+    bus.emit('foo', { x: 2 });
+    off();
+    bus.emit('foo', { x: 3 });
+    expect(seen).toEqual([1, 2]);
+  });
+
+  it('isolates handler errors', () => {
+    const bus = new EventBus<E & { 'bus:error': { event: string; error: unknown } }>();
+    const errors: string[] = [];
+    bus.on('bus:error', ({ event }) => errors.push(event));
+    bus.on('foo', () => { throw new Error('boom'); });
+    let ok = 0;
+    bus.on('foo', () => { ok++; });
+    bus.emit('foo', { x: 42 });
+    expect(ok).toBe(1);
+    expect(errors).toEqual(['foo']);
+  });
+});
+```
+
+## Real tradeoffs I accept
+- No time-travel or inspector by default. If you need a trace, add a development-only `onAny` logger or integrate with your telemetry.
+- Debugging event order can be slippery. I keep the event map small and namespaced by feature to keep reasoning local.
+- It’s easy to overuse a bus and recreate “stringly-typed architecture.” The types prevent payload drift, but misuse is still a human problem. Treat events as contracts; keep names stable and review changes.
+- Don’t use it to mirror your domain model. Stores are better for persistent, queryable state.
+
+## Where this fits with data and AI flows
+On AI-powered UIs (tool-invocations, streaming tokens, panel updates), I let RTK Query/Zustand manage data lifecycles and cache, and I use the bus to fan out orchestration — “stream:update”, “tool:invoked”, “trace:append”. It keeps React components dumb and focused, and it avoids plumbing everything through a single god-store. If you want to see me ship applied full-stack systems, this is the judgment I bring: lean primitives, typed contracts, and small, boring abstractions that don’t fight production constraints.
