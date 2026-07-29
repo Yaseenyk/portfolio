@@ -10,9 +10,9 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { RESUME_URL } from "@/lib/site";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 interface CommandItem {
   id: string;
@@ -49,7 +49,7 @@ const ITEMS: CommandItem[] = [
         <path d="m9 15 3 3 3-3" />
       </svg>
     ),
-    run: () => window.open(`${BASE_PATH}/Resume.pdf`, "_blank", "noopener"),
+    run: () => window.open(RESUME_URL, "_blank", "noopener"),
   },
   {
     id: "lab",

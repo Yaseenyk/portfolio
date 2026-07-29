@@ -17,6 +17,18 @@ export const VERIFICATION = {
   bing: "001424A9DC931D947201E7F6E9CA9A23",
 };
 
+/**
+ * Résumé download URL. The version suffix is a cache-buster: browsers hold
+ * /Resume.pdf in disk cache and re-serve it on click regardless of what the
+ * server has, so a regenerated PDF is invisible to anyone who downloaded a
+ * previous one. Bump this every time scripts/generate-resume.js is re-run.
+ */
+const RESUME_VERSION = 2;
+
+export const RESUME_URL = `${
+  process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+}/Resume.pdf?v=${RESUME_VERSION}`;
+
 export const SOCIALS = {
   github: "https://github.com/Yaseenyk",
   linkedin: "https://www.linkedin.com/in/yaseen-yk",

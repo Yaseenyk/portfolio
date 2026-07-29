@@ -5,6 +5,7 @@ import GradientText from "./GradientText";
 import PulseDot from "./PulseDot";
 import NeuralCore from "./NeuralCore";
 import { ArrowRightIcon, DownloadIcon } from "./Icons";
+import { RESUME_URL } from "@/lib/site";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -83,7 +84,7 @@ export default function Hero() {
             <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </motion.a>
           <motion.a
-            href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/Resume.pdf`}
+            href={RESUME_URL}
             download="Yaseen-Khatib-Resume.pdf"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}

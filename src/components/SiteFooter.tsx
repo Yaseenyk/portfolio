@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PERSON, SOCIALS } from "@/lib/site";
+import { PERSON, RESUME_URL, SOCIALS } from "@/lib/site";
 import PreferredSource from "@/components/PreferredSource";
 
 const COLUMNS: { heading: string; links: { href: string; label: string; external?: boolean }[] }[] = [
@@ -28,7 +28,7 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
     heading: "For recruiters",
     links: [
       { href: "/interview", label: "Interview brief" },
-      { href: "/Resume.pdf", label: "Résumé (PDF)", external: true },
+      { href: RESUME_URL, label: "Résumé (PDF)", external: true },
       { href: "/#rag-concierge", label: "Ask the concierge" },
       { href: "/#contact", label: "Contact" },
       { href: SOCIALS.linkedin, label: "LinkedIn", external: true },

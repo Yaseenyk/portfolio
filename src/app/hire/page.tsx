@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL, PERSON } from "@/lib/site";
+import { SITE_URL, PERSON, RESUME_URL } from "@/lib/site";
 import { PERSON_ID, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import ContactForm from "@/components/ContactForm";
@@ -92,7 +92,7 @@ export default function HirePage() {
             Start a conversation
           </a>
           <a
-            href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/Resume.pdf`}
+            href={RESUME_URL}
             download="Yaseen-Khatib-Resume.pdf"
             className="rounded-lg border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-200 transition-colors duration-300 hover:border-ice/60 hover:text-ice"
           >
