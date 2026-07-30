@@ -99,8 +99,11 @@ def main() -> None:
 
     end = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
     start = end - timedelta(days=args.days)
-    window = {"start": start.isoformat(), "end": end.isoformat()}
-    print(f"window: last {args.days} days ({start.date()} → {end.date()})")
+    # GoatCounter 404s on "+00:00" offsets; it wants the trailing-Z form.
+    fmt = "%Y-%m-%dT%H:%M:%SZ"
+    window = {"start": start.strftime(fmt), "end": end.strftime(fmt)}
+    # ASCII only — Windows consoles default to cp1252.
+    print(f"window: last {args.days} days ({start.date()} -> {end.date()})")
 
     wb = Workbook()
     wb.remove(wb.active)  # drop the default empty sheet
