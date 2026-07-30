@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
+import { track } from "@/lib/analytics";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -121,6 +122,9 @@ export default function SolutionsLeadForm({
         EMAILJS_PUBLIC_KEY,
       );
       setStatus("sent");
+      // Interest is in the event name so the dashboard shows which of the four
+      // services actually converts, not just that a form was submitted.
+      track(`solutions-lead:${form.interest || "unspecified"}`);
       setForm({ ...EMPTY_FORM, interest: defaultInterest });
     } catch (err) {
       const detail =
@@ -128,6 +132,9 @@ export default function SolutionsLeadForm({
           ? `${(err as { status?: number }).status ?? ""} ${(err as { text?: string }).text ?? ""}`.trim()
           : String(err);
       console.error("EmailJS send failed:", err);
+      // A silently dropped six-figure enquiry is the worst failure on this
+      // surface — surface it in analytics so failures are visible, not guessed.
+      track("solutions-lead-failed");
       setErrorDetail(detail || null);
       setStatus("error");
     }
