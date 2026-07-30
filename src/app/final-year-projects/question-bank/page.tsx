@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/final-year-projects/question-bank/`,
     siteName: "Yaseen Khatib",
+    images: [`${SITE_URL}/og/campus/question-bank.jpg`],
   },
 };
 

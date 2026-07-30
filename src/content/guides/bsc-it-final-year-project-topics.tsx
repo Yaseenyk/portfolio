@@ -13,7 +13,7 @@ export const meta: GuideMeta = {
   publishedAt: "2026-07-27",
   readingMinutes: 9,
   degrees: ["B.Sc IT"],
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/hub.jpg",
   faq: [
     {
       question: "What is a good final year project for B.Sc IT?",

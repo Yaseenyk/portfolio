@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Project ideas",
   publishedAt: "2026-07-27",
   readingMinutes: 9,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/cat-web.jpg",
   faq: [
     {
       question: "Is a web development project good for final year?",

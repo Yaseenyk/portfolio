@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Choosing",
   publishedAt: "2026-07-27",
   readingMinutes: 10,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/hub.jpg",
   faq: [
     {
       question: "Can a BCA student submit the same project as a B.Tech student?",

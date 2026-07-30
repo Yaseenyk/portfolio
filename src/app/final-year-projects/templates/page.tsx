@@ -20,13 +20,13 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: URL,
     siteName: "Yaseen Khatib",
-    images: ["/social/portal-wide.jpg"],
+    images: ["/og/campus/templates.jpg"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Final Year Project Report & Synopsis Templates",
     description: DESCRIPTION,
-    images: ["/social/portal-wide.jpg"],
+    images: ["/og/campus/templates.jpg"],
   },
 };
 

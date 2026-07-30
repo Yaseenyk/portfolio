@@ -100,6 +100,7 @@ export function generateMetadata({ params }: Params): Metadata {
       description,
       url,
       siteName: "Yaseen Khatib",
+      images: [`${SITE_URL}/og/campus/hub.jpg`],
     },
   };
 }

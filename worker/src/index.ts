@@ -42,7 +42,10 @@ export interface Env {
  *  so the worker needs no extra type dependency. */
 interface D1Like {
   prepare(query: string): {
-    bind(...values: unknown[]): { run(): Promise<unknown> };
+    bind(...values: unknown[]): {
+      run(): Promise<unknown>;
+      all(): Promise<{ results?: unknown[] }>;
+    };
   };
 }
 
@@ -671,6 +674,54 @@ async function handleLead(
   }
 }
 
+/**
+ * POST /api/leads/list — the private inbox behind the durable store.
+ *
+ * Reuses OUTREACH_PASSCODE (one secret gates both private tools) and takes the
+ * passcode in the body, never the URL, so it stays out of access logs. Reads
+ * degrade the same way writes do: no binding means an empty inbox with an
+ * honest reason, never an error that breaks the page.
+ */
+async function handleLeadsList(
+  request: Request,
+  env: Env,
+  origin: string | null,
+): Promise<Response> {
+  if (!env.OUTREACH_PASSCODE) {
+    return json({ error: "leads inbox not configured (no passcode set)" }, 503, origin);
+  }
+  let body: { passcode?: string; source?: string; limit?: number };
+  try {
+    body = (await request.json()) as typeof body;
+  } catch {
+    return json({ error: "invalid json" }, 400, origin);
+  }
+  if ((body.passcode ?? "") !== env.OUTREACH_PASSCODE) {
+    return json({ error: "wrong passcode" }, 401, origin);
+  }
+  if (!env.DB) {
+    return json({ leads: [], stored: false, reason: "no database bound" }, 200, origin);
+  }
+
+  const limit = Math.min(Math.max(Number(body.limit) || 100, 1), 500);
+  const source = clean(body.source, 40);
+
+  try {
+    const stmt = source
+      ? env.DB.prepare(
+          `SELECT * FROM leads WHERE source = ? ORDER BY created_at DESC LIMIT ?`,
+        ).bind(source, limit)
+      : env.DB.prepare(
+          `SELECT * FROM leads ORDER BY created_at DESC LIMIT ?`,
+        ).bind(limit);
+    const { results } = await stmt.all();
+    return json({ leads: results ?? [], stored: true }, 200, origin);
+  } catch (err) {
+    console.error("leads list failed:", err);
+    return json({ error: "query failed" }, 500, origin);
+  }
+}
+
 /* --------------------------------- router -------------------------------- */
 
 export default {
@@ -690,6 +741,9 @@ export default {
     }
     if (pathname === "/api/lead" && request.method === "POST") {
       return handleLead(request, env, origin);
+    }
+    if (pathname === "/api/leads/list" && request.method === "POST") {
+      return handleLeadsList(request, env, origin);
     }
     if (pathname === "/mcp") {
       if (request.method === "POST") return handleMcp(request, env, origin);

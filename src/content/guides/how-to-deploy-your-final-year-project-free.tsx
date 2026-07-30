@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Deployment",
   publishedAt: "2026-07-27",
   readingMinutes: 10,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/cat-web.jpg",
   howTo: {
     totalTime: "PT2H",
     steps: [

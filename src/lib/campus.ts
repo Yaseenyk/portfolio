@@ -224,7 +224,17 @@ export function campusUrl(slug: string): string {
  * a real OG card.
  */
 export function campusImageUrl(project: CampusProject): string {
-  return `${SITE_URL}${project.ogImage ?? "/social/portal-wide.jpg"}`;
+  if (project.ogImage) return `${SITE_URL}${project.ogImage}`;
+  // Category cover fallback — bespoke per-project images can still override
+  // via ogImage. Covers live in public/og/campus/ (generate-campus-og.py).
+  const d = project.domain.toLowerCase();
+  const cover =
+    d.includes("machine learning") || d.includes("ai")
+      ? "cat-ai-ml"
+      : d.includes("mobile")
+        ? "cat-mobile"
+        : "cat-web";
+  return `${SITE_URL}/og/campus/${cover}.jpg`;
 }
 
 export function formatInr(amount: number): string {

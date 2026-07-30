@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/final-year-projects/guides/`,
     siteName: "Yaseen Khatib",
+    images: [`${SITE_URL}/og/campus/guides.jpg`],
   },
 };
 

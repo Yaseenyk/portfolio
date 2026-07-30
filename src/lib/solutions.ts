@@ -122,6 +122,98 @@ export const SERVICES: Service[] = [
   },
 ];
 
+export interface CaseStudy {
+  id: string;
+  /** The system's name — never a client name that isn't already public. */
+  system: string;
+  /** Which service this engagement shape proves. */
+  serviceId: ServiceId;
+  headline: string;
+  problem: string;
+  decision: string;
+  /** Honest outcome — qualitative except the one real metric (94%). */
+  outcome: string;
+  /** Everything claimed above must be openable from here. */
+  proof: { label: string; href: string }[];
+  stack: string[];
+}
+
+/**
+ * Case studies over systems already documented on this site. Same honesty
+ * contract as everywhere else: the only number quoted anywhere is the 94%
+ * payload reduction, every claim links to its write-up, and no client is
+ * named that has not already named themselves.
+ */
+export const CASE_STUDIES: CaseStudy[] = [
+  {
+    id: "integratex",
+    system: "IntegrateX",
+    serviceId: "custom-build",
+    headline: "The save button that nearly sank a product",
+    problem:
+      "A node-based workflow builder was persisting the editor's entire UI state on every save. Payloads ballooned, saves crawled, and real-time sync lagged behind the canvas the moment workflows got big enough to matter.",
+    decision:
+      "Draw a hard serialization boundary: a schema-aware adapter that maps rich React Flow objects to compact domain records, so the database stores the workflow — not the view. The client reconstructs presentation state for free.",
+    outcome:
+      "Workflow payloads shrank by 94%, round-trip lossless. Saves and loads became effectively instant, and the state-sync churn disappeared — an architecture call, not a bigger server.",
+    proof: [
+      { label: "The 94% decision, in full", href: "/blog/the-94-percent-decision-integratex" },
+      { label: "The adapter pattern itself", href: "/blog/custom-serialization-adapters" },
+    ],
+    stack: ["React Flow", "Zustand", "TypeScript", "Node.js"],
+  },
+  {
+    id: "police-rag",
+    system: "Police RAG Agent",
+    serviceId: "ai-integration",
+    headline: "Retrieval over documents where a wrong answer isn't an option",
+    problem:
+      "A question-answering system over police and legal documents — a domain where an invented citation or a confidently wrong answer is worse than no answer at all.",
+    decision:
+      "A grounding contract enforced in the pipeline, not the prompt: answers may only be assembled from retrieved passages, every answer carries its citations, and when retrieval confidence falls below threshold the system refuses instead of guessing.",
+    outcome:
+      "Answers that can always be traced back to a source document, and a refusal path you can trigger on demand. The same contract runs live in this site's concierge — ask it something outside its corpus and watch it decline.",
+    proof: [
+      { label: "The grounding contract, written up", href: "/blog/zero-hallucination-rag-grounding-contract" },
+      { label: "Test the live concierge", href: "/#rag-concierge" },
+    ],
+    stack: ["RAG", "Vector search", "LLM orchestration", "Node.js"],
+  },
+  {
+    id: "cmz-portal",
+    system: "CMZ portal",
+    serviceId: "erp",
+    headline: "A high-traffic portal that stopped lying to its operators",
+    problem:
+      "Operators on a busy enterprise portal were acting on stale numbers between polling ticks, while the polling itself hammered the database with 'nothing changed' reads at scale.",
+    decision:
+      "Flip the model: push over WebSockets so the server speaks only when state actually mutates, with caching centralised at a single read-through boundary instead of scattered through controllers.",
+    outcome:
+      "Every client sees the same value in the same frame, a whole class of acted-on-stale-data mistakes stopped happening, and the origin database was shielded from read spikes.",
+    proof: [
+      { label: "The real-time architecture", href: "/blog/real-time-telemetry-websockets-react" },
+      { label: "The caching boundary", href: "/blog/advanced-redis-caching-strategies" },
+    ],
+    stack: ["WebSockets", "Redis", "React", "Node.js"],
+  },
+  {
+    id: "hospital-api",
+    system: "Hospital-API",
+    serviceId: "architecture",
+    headline: "The query that got slow — and the fix that wasn't hardware",
+    problem:
+      "A clinical workflow API's aggregation pipeline degraded as data grew: same query, same result, vastly more work — the classic case where the instinct is to buy a bigger database.",
+    decision:
+      "Profile before spending: read explain('executionStats'), then reorder — filter first on indexed fields, join late against the already-small set, and design every stage around the smallest possible document flow.",
+    outcome:
+      "The speedup came from reordering stages against measured numbers, not from a bigger instance — exactly the kind of finding an architecture review exists to put in writing before money moves.",
+    proof: [
+      { label: "The optimization, step by step", href: "/blog/optimizing-mongodb-aggregation" },
+    ],
+    stack: ["MongoDB", "Express", "Node.js"],
+  },
+];
+
 export interface HostedTier {
   id: string;
   name: string;

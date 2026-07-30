@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Getting unstuck",
   publishedAt: "2026-07-27",
   readingMinutes: 9,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/guides.jpg",
   faq: [
     {
       question: "Why am I so stuck on my final year project?",

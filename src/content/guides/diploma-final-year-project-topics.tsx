@@ -13,7 +13,7 @@ export const meta: GuideMeta = {
   publishedAt: "2026-07-27",
   readingMinutes: 8,
   degrees: ["Diploma"],
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/hub.jpg",
   faq: [
     {
       question: "What is a simple final year project for diploma students?",

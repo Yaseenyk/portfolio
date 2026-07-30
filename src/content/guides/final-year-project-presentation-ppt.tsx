@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Presentation",
   publishedAt: "2026-07-27",
   readingMinutes: 9,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/templates.jpg",
   howTo: {
     steps: [
       {

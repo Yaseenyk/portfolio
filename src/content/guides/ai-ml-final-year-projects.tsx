@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Project ideas",
   publishedAt: "2026-07-27",
   readingMinutes: 10,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/cat-ai-ml.jpg",
   faq: [
     {
       question: "Are machine learning projects good for final year?",

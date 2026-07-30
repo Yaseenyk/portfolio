@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: URL,
     siteName: "Yaseen Khatib",
+    images: [`${SITE_URL}/og/campus/find-my-project.jpg`],
   },
 };
 

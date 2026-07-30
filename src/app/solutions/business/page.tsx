@@ -9,6 +9,7 @@ import {
 } from "@/lib/solutions";
 import { breadcrumbJsonLd, faqPageJsonLd, personRef } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
+import CaseStudies from "@/components/solutions/CaseStudies";
 import EvidenceGrid from "@/components/solutions/EvidenceGrid";
 import SolutionsLeadForm from "@/components/solutions/SolutionsLeadForm";
 
@@ -157,6 +158,10 @@ export default function BusinessPage() {
             </a>
           </article>
         ))}
+      </div>
+
+      <div className="mt-20">
+        <CaseStudies />
       </div>
 
       <section className="mt-20">

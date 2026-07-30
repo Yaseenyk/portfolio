@@ -13,7 +13,7 @@ export const meta: GuideMeta = {
   publishedAt: "2026-07-27",
   readingMinutes: 11,
   degrees: ["M.Tech"],
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/hub.jpg",
   faq: [
     {
       question: "What makes a good M.Tech final year project?",

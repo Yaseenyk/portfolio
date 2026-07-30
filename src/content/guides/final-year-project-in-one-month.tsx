@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Crunch time",
   publishedAt: "2026-07-27",
   readingMinutes: 10,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/planner.jpg",
   howTo: {
     totalTime: "P28D",
     steps: [

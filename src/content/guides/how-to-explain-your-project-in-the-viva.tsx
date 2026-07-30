@@ -11,7 +11,7 @@ export const meta: GuideMeta = {
   category: "Viva prep",
   publishedAt: "2026-07-27",
   readingMinutes: 10,
-  ogImage: "/social/portal-wide.jpg",
+  ogImage: "/og/campus/question-bank.jpg",
   faq: [
     {
       question: "How do I start explaining my project in the viva?",
