@@ -18,6 +18,7 @@ import { resolveLesson } from "@/lib/series";
 import { PERSON_ID, personRef, breadcrumbJsonLd } from "@/lib/seo";
 import { tagSlug } from "@/lib/tags";
 import JsonLd from "@/components/JsonLd";
+import ReadDepth from "@/components/ReadDepth";
 import ReadingProgress from "@/components/blog/ReadingProgress";
 import RoadmapStepper from "@/components/blog/RoadmapStepper";
 import LessonNav from "@/components/blog/LessonNav";
@@ -209,6 +210,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   return (
     <article className="mx-auto max-w-3xl px-6 py-12">
       <JsonLd data={jsonLd} />
+      <ReadDepth slug={post.slug} />
 
       {/* Reading-progress bar — roadmap lessons only */}
       {lesson && <ReadingProgress />}

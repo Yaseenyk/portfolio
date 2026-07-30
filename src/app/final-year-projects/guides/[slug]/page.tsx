@@ -17,6 +17,7 @@ import {
   personRef,
 } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
+import ReadDepth from "@/components/ReadDepth";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
 import StickyActionBar from "@/components/campus/StickyActionBar";
 
@@ -122,6 +123,8 @@ export default function GuidePage({ params }: Params) {
           ]),
         ]}
       />
+
+      <ReadDepth slug={meta.slug} />
 
       <Link
         href="/final-year-projects/guides"
