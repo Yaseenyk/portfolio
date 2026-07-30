@@ -31,6 +31,7 @@ yaseenkhatib.streamerosai.com-*/
 yaseenkhatib.streamerosai.com-*.zip
 gsc data/
 blog-index.xlsx
+analytics-report*.xlsx
 
 # Editor directories and files
 .vscode/*
