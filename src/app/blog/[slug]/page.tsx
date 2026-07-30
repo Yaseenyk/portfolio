@@ -131,7 +131,11 @@ export async function generateMetadata({
     : [{ url: "/og-lockup.png", alt: post.title }];
 
   return {
-    title: post.title,
+    // `absolute` drops the sitewide " | Yaseen Khatib" suffix. Google shows
+    // roughly 60 characters; the median post title here is already 73, so the
+    // 16-character brand suffix was pushing the headline's actual value past
+    // the cut on 89% of posts. The brand is on the SERP as the domain anyway.
+    title: { absolute: post.title },
     description: post.description,
     keywords: post.keywords,
     authors: [{ name: post.author.name }],
