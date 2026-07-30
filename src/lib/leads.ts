@@ -38,13 +38,24 @@ export async function recordLead(payload: LeadPayload): Promise<boolean> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 6000);
 
+    // First-touch channel captured by <FirstTouch /> — folded into the page
+    // field so the inbox shows both where they enquired and how they arrived.
+    let firstTouch = "";
+    try {
+      firstTouch = sessionStorage.getItem("first-touch") ?? "";
+    } catch {
+      /* storage blocked */
+    }
+
     const res = await fetch(`${CONCIERGE_URL}/api/lead`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
       body: JSON.stringify({
         ...payload,
-        page: typeof window === "undefined" ? "" : window.location.pathname,
+        page:
+          (typeof window === "undefined" ? "" : window.location.pathname) +
+          (firstTouch ? ` ← ${firstTouch}` : ""),
       }),
     });
     clearTimeout(timeout);

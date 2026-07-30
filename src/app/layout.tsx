@@ -3,6 +3,7 @@ import { Inter, Fira_Code } from "next/font/google";
 import { SITE_URL, SITE_DESCRIPTION, VERIFICATION } from "@/lib/site";
 import { siteGraphJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
+import FirstTouch from "@/components/FirstTouch";
 import MotionProvider from "@/components/MotionProvider";
 import SiteFooter from "@/components/SiteFooter";
 import CommandPalette from "@/components/CommandPalette";
@@ -99,6 +100,7 @@ export default function RootLayout({
             that every page-level schema block references instead of
             redeclaring. */}
         <JsonLd data={siteGraphJsonLd} />
+        <FirstTouch />
         <MotionProvider>
           {children}
           <SiteFooter />

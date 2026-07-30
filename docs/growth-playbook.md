@@ -7,6 +7,9 @@ Everything here is honest, value-first, and points at pages that already exist.
 - **Funnel A** — final-year students (India)
 - **Funnel B** — recruiters & clients / domain authority
 - **Measure with** — GoatCounter `evt-*` events (dashboard: yaseen.goatcounter.com)
+- **Attribution rule** — every link you share carries `?ref=<channel>` (whatsapp, instagram,
+  reddit, quora, telegram, youtube…). Messaging apps strip referrers; the tag survives.
+  It shows up in GoatCounter AND is stamped onto lead records in /leads ("← whatsapp").
 
 SEO is too slow for FYP submission season and too weak on a young domain to fix
 authority alone. These channels beat organic search on speed.
@@ -42,7 +45,7 @@ Final year project stress is real. I put together some free stuff that actually 
 • A cost estimator so you know the real price range before anyone quotes you
 • Ready report + synopsis templates (the format examiners expect)
 
-No sign-up, no spam: https://yaseenkhatib.streamerosai.com/final-year-projects/
+No sign-up, no spam: https://yaseenkhatib.streamerosai.com/final-year-projects/?ref=whatsapp
 
 If you want it built or mentored, message me from there — batch referrals get 15% off.
 ```
@@ -63,7 +66,7 @@ It's free, link in bio. Same page has a project-matcher quiz if you haven't pick
 
 [CAPTION]
 Free FYP report + synopsis templates 👇 no email needed.
-yaseenkhatib.streamerosai.com/final-year-projects/templates
+yaseenkhatib.streamerosai.com/final-year-projects/templates/?ref=instagram
 ```
 
 #### Instagram Reel / YT Short — "which project" hook
@@ -81,7 +84,7 @@ Free, no login. Link in bio.
 
 [CAPTION]
 Find your final year project in 4 questions 👇
-yaseenkhatib.streamerosai.com/final-year-projects/find-my-project
+yaseenkhatib.streamerosai.com/final-year-projects/find-my-project/?ref=instagram
 ```
 
 #### Reddit reply — to a "what project should I do" thread
@@ -97,7 +100,7 @@ Quick filter that helps —
   than a solid standard one you defend well.
 
 I maintain a free matcher quiz + a catalog for exactly this (Indian FYP context,
-BCA/MCA/B.Tech): https://yaseenkhatib.streamerosai.com/final-year-projects/find-my-project
+BCA/MCA/B.Tech): https://yaseenkhatib.streamerosai.com/final-year-projects/find-my-project/?ref=reddit
 — full disclosure, it's my site and I do offer paid builds, but the quiz, templates and
 guides are free and no-signup, so use those regardless.
 
@@ -116,7 +119,7 @@ A framework I use with students:
 3. Your goal — top marks, a job in that stack, or research.
 
 I put the whole thing into a free 4-question matcher plus report/synopsis templates and
-topic-wise guides here: https://yaseenkhatib.streamerosai.com/final-year-projects/ — it's
+topic-wise guides here: https://yaseenkhatib.streamerosai.com/final-year-projects/?ref=quora — it's
 my site and paid builds are an option, but the tools are free and need no sign-up.
 
 If you tell me your course and how many weeks you have, I'll suggest a couple of concrete
