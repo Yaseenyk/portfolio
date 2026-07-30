@@ -20,6 +20,14 @@ export interface Env {
       options: Record<string, unknown>,
     ): Promise<{ matches: { id: string; score: number; metadata?: Record<string, unknown> }[] }>;
   };
+  /**
+   * Durable record of every enquiry. OPTIONAL on purpose — the binding stays
+   * commented out in wrangler.toml until the database exists, and a missing
+   * binding must degrade to "not stored" rather than fail the deploy or take
+   * the other endpoints down with it. EmailJS stays the primary delivery path
+   * in the browser; this is the record that survives an EmailJS failure.
+   */
+  DB?: D1Like;
   /** Passcode for the private /outreach drafter. Set via:
    *  npx wrangler secret put OUTREACH_PASSCODE  (or the CF dashboard). */
   OUTREACH_PASSCODE?: string;
@@ -28,6 +36,14 @@ export interface Env {
   OPENAI_API_KEY?: string;
   /** Optional model override (default gpt-4o-mini). */
   OUTREACH_MODEL?: string;
+}
+
+/** Minimal D1 surface — hand-rolled to match the AI/VECTORIZE style above,
+ *  so the worker needs no extra type dependency. */
+interface D1Like {
+  prepare(query: string): {
+    bind(...values: unknown[]): { run(): Promise<unknown> };
+  };
 }
 
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
@@ -560,6 +576,101 @@ async function handleMcp(request: Request, env: Env, origin: string | null): Pro
   }
 }
 
+/* ---------------------------------- leads --------------------------------- */
+
+/** Field caps. Anything longer is truncated rather than rejected — losing a
+ *  long enquiry to a validation error is worse than storing a clipped one. */
+const LEAD_LIMITS: Record<string, number> = {
+  name: 120,
+  email: 200,
+  phone: 40,
+  org: 200,
+  interest: 120,
+  budget: 60,
+  context: 200,
+  message: 8000,
+  page: 300,
+};
+
+function clean(value: unknown, max: number): string {
+  if (typeof value !== "string") return "";
+  return value.trim().slice(0, max);
+}
+
+/**
+ * POST /api/lead — durable record of an enquiry.
+ *
+ * Deliberately forgiving: the browser calls this alongside EmailJS and ignores
+ * the outcome, so any error here must stay contained. It never blocks a
+ * submission and never returns anything a caller depends on.
+ */
+async function handleLead(
+  request: Request,
+  env: Env,
+  origin: string | null,
+): Promise<Response> {
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return json({ error: "invalid json" }, 400, origin);
+  }
+
+  // Honeypot: a real user never fills a hidden field. Accept silently so a bot
+  // cannot distinguish a rejection from a success.
+  if (clean(body.website, 100)) {
+    return json({ ok: true, stored: false }, 202, origin);
+  }
+
+  const name = clean(body.name, LEAD_LIMITS.name);
+  const email = clean(body.email, LEAD_LIMITS.email);
+  const message = clean(body.message, LEAD_LIMITS.message);
+
+  if (!name || !email || !message) {
+    return json({ error: "name, email and message are required" }, 400, origin);
+  }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return json({ error: "invalid email" }, 400, origin);
+  }
+
+  const source = clean(body.source, 40) || "unknown";
+
+  if (!env.DB) {
+    // Binding not configured yet. Report it honestly rather than pretending to
+    // have stored the lead — the browser ignores this, but the status is real.
+    return json({ ok: true, stored: false, reason: "no database bound" }, 200, origin);
+  }
+
+  try {
+    await env.DB.prepare(
+      `INSERT INTO leads
+         (id, created_at, source, name, email, phone, org,
+          interest, budget, context, message, page, user_agent)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+      .bind(
+        crypto.randomUUID(),
+        new Date().toISOString(),
+        source,
+        name,
+        email,
+        clean(body.phone, LEAD_LIMITS.phone),
+        clean(body.org, LEAD_LIMITS.org),
+        clean(body.interest, LEAD_LIMITS.interest),
+        clean(body.budget, LEAD_LIMITS.budget),
+        clean(body.context, LEAD_LIMITS.context),
+        message,
+        clean(body.page, LEAD_LIMITS.page),
+        clean(request.headers.get("User-Agent"), 300),
+      )
+      .run();
+    return json({ ok: true, stored: true }, 201, origin);
+  } catch (err) {
+    console.error("lead insert failed:", err);
+    return json({ ok: false, stored: false }, 500, origin);
+  }
+}
+
 /* --------------------------------- router -------------------------------- */
 
 export default {
@@ -576,6 +687,9 @@ export default {
     }
     if (pathname === "/api/outreach" && request.method === "POST") {
       return handleOutreach(request, env, origin);
+    }
+    if (pathname === "/api/lead" && request.method === "POST") {
+      return handleLead(request, env, origin);
     }
     if (pathname === "/mcp") {
       if (request.method === "POST") return handleMcp(request, env, origin);

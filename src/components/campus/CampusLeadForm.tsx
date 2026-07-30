@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import type { CampusTier, Degree } from "@/lib/campus";
 import { formatInr, whatsappHref } from "@/lib/campus";
+import { recordLead } from "@/lib/leads";
 import { track } from "@/lib/analytics";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -86,6 +87,20 @@ export default function CampusLeadForm({
     if (status === "sending") return;
 
     setStatus("sending");
+
+    // Durable record first, in parallel and unawaited — if EmailJS fails, the
+    // enquiry still exists somewhere. Never blocks or fails the submit.
+    void recordLead({
+      source: "campus",
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      org: form.college,
+      interest: form.degree,
+      context: projectTitle ?? (collegeSide ? "College enquiry" : "Custom build"),
+      message: form.message,
+    });
+
     try {
       // The shared EmailJS template only renders {name, email, message}, so the
       // campus-specific fields are folded into the message body rather than

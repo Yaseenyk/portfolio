@@ -4,6 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { track } from "@/lib/analytics";
+import { recordLead } from "@/lib/leads";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -95,6 +96,20 @@ export default function SolutionsLeadForm({
     if (status === "sending") return;
 
     setStatus("sending");
+
+    // Durable record first, in parallel and unawaited — if EmailJS fails, the
+    // enquiry still exists somewhere. Never blocks or fails the submit.
+    void recordLead({
+      source: "solutions",
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      org: form.company,
+      interest: form.interest,
+      budget: form.budget,
+      message: form.message,
+    });
+
     try {
       // The shared EmailJS template renders only {name, email, message}, so the
       // qualifying fields are folded into the body rather than added as

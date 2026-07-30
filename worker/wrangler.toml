@@ -11,5 +11,19 @@ binding = "AI"
 binding = "VECTORIZE"
 index_name = "portfolio-corpus"
 
+# Lead pipeline storage. COMMENTED OUT UNTIL THE DATABASE EXISTS — worker.yml
+# deploys on every push to worker/**, and a binding pointing at a missing
+# database fails the deploy and takes /api/chat and /mcp down with it.
+#
+# To enable:
+#   npx wrangler d1 create yaseen-leads
+#   npx wrangler d1 execute yaseen-leads --remote --file=./schema.sql
+# then paste the printed database_id below and uncomment the block.
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "yaseen-leads"
+# database_id = "PASTE_ID_FROM_D1_CREATE"
+
 [observability]
 enabled = true
