@@ -160,6 +160,8 @@ export const reactFlowAgentCanvas: BlogPost = {
     "On IntegrateX, the React Flow graph a PM drags is the exact spec the runtime executes — typed nodes and ports make it a debuggable agent orchestration layer.",
   keywords: [
     "React Flow agent",
+    "React Flow canvas",
+    "React Flow network graph",
     "agent orchestration",
     "node based editor",
     "React Flow developer",
@@ -167,7 +169,7 @@ export const reactFlowAgentCanvas: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-05",
-  updatedAt: "2026-07-28",
+  updatedAt: "2026-07-30",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["React Flow", "Agentic AI", "Architecture"],

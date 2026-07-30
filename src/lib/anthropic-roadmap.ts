@@ -27,7 +27,7 @@ export interface AnLesson {
 export const AN_META = {
   title: "The Complete Anthropic & Claude Developer Roadmap (Basics to Production)",
   tagline:
-    "A 15-part sequential masterclass from a Principal DevRel lens — from context-window physics, XML structural prompting, and type-safe tool use to MCP aggregation, durable agent runtimes, eval-driven engineering, and autonomous cron routines.",
+    "A free 15-part roadmap for taking Claude from first prompt to enterprise production — context-window physics, structural prompting, type-safe tool use, enterprise MCP aggregation, durable agent runtimes, evals, and autonomous cron routines.",
   /** Estimated total read time, kept in sync with the lessons below. */
   totalMinutes: 135,
 };

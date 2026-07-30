@@ -79,9 +79,11 @@ export const optimizingMongoAggregation: BlogPost = {
   slug: "optimizing-mongodb-aggregation",
   title: "MongoDB Aggregation Pipelines: Stage Order Is the Win",
   description:
-    "Profiling a clinical workflow API taught me MongoDB aggregation lives or dies on stage order: $match first on indexes, $lookup treated as the join it is, then read explain.",
+    "Profiling a clinical API taught me MongoDB aggregation pipeline optimization lives or dies on stage order: $match first on indexes, $lookup join performance, then explain.",
   keywords: [
     "MongoDB aggregation",
+    "MongoDB aggregation pipeline optimization",
+    "MongoDB join performance",
     "query optimization",
     "$lookup",
     "explain",
@@ -91,7 +93,7 @@ export const optimizingMongoAggregation: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-06-11",
-  updatedAt: "2026-07-28",
+  updatedAt: "2026-07-30",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
   tags: ["MongoDB", "Performance", "Backend"],

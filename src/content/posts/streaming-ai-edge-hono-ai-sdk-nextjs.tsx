@@ -176,6 +176,8 @@ export const streamingAiEdge: BlogPost = {
     "For the streamerOS support agent I wired the whole streaming path — model to Hono SSE on a Cloudflare Worker to a Next.js client, first token under a second.",
   keywords: [
     "stream LLM Hono",
+    "Hono SSE",
+    "Hono streaming response",
     "ai-sdk useChat",
     "edge streaming",
     "edge AI engineer",
@@ -183,7 +185,7 @@ export const streamingAiEdge: BlogPost = {
     "Yaseen Khatib",
   ],
   publishedAt: "2026-05-29",
-  updatedAt: "2026-07-28",
+  updatedAt: "2026-07-30",
   readingMinutes: 7,
   author: { name: "Yaseen Khatib", role: "AI Architect" },
   tags: ["Serverless", "Next.js", "RAG"],
