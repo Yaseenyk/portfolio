@@ -9,6 +9,7 @@ import PulseDot from "./PulseDot";
 // reachable from the homepage sections, /projects, and the footer.
 const LINKS = [
   { href: "/about", label: "About" },
+  { href: "/solutions", label: "Solutions" },
   { href: "/projects", label: "Projects" },
   { href: "/blog", label: "Blog" },
   { href: "/sandbox", label: "Sandbox" },

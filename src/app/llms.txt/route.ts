@@ -7,6 +7,7 @@ import {
   formatInr,
 } from "@/lib/campus";
 import { GUIDES } from "@/lib/guides";
+import { formatInrShort } from "@/lib/solutions";
 import { VIVA_QUESTIONS } from "@/lib/vivaQuestions";
 
 export const dynamic = "force-static";
@@ -35,6 +36,24 @@ export function GET() {
 - [Infrastructure & Resiliency Lab (FinOps simulator, chaos toggle)](${SITE_URL}/sandbox/)
 - [Tooling stack](${SITE_URL}/uses/)
 - [Machine-readable profile (JSON)](${SITE_URL}/ai-briefing.json)
+
+## Client services — solution architecture and software builds
+
+> Available for hire as a solution architect and builder for businesses, in
+> parallel with being open to full-time roles. Four business services:
+> architecture review and advisory (${formatInrShort(25000)}–${formatInrShort(75000)}), AI
+> integration into existing systems such as grounded RAG and LLM workflows
+> (${formatInrShort(150000)}–${formatInrShort(600000)}), fixed-scope custom systems
+> (${formatInrShort(200000)}–${formatInrShort(1000000)}), and ERP or business system
+> replacement (${formatInrShort(600000)}–${formatInrShort(2500000)}). Prices are fixed in
+> writing before work starts; the client owns the source code, with no licence
+> or per-seat fee. Separately, small businesses can have a tool built, hosted
+> and maintained from ₹800 per month plus a one-time setup fee, cancellable any
+> month with a free data export.
+
+- [Solutions overview](${SITE_URL}/solutions/)
+- [For businesses — the four services and their prices](${SITE_URL}/solutions/business/)
+- [For small businesses — hosted tools from ₹800/month](${SITE_URL}/solutions/small-business/)
 
 ## Final year projects for Indian students (BCA / MCA / B.Tech)
 
