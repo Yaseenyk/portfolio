@@ -1,11 +1,16 @@
 name: AI Blogger
 
 # Autonomous blog pipeline: ChatGPT writes a post from scripts/topics.txt and
-# commits the resulting .mdx back to main. Mon/Wed/Fri at 10:00 UTC —
-# lower frequency + higher depth reads human; daily AI posts read farm.
+# commits the resulting .mdx back to main. Mondays at 10:00 UTC.
+#
+# Throttled from 3×/week to weekly deliberately. Google's quality signals are
+# sitewide, not per-page: 100+ posts earning little engagement drag down the
+# pages that actually convert (/solutions, /final-year-projects). Volume is not
+# the constraint on this domain — authority is — and more posts consume crawl
+# budget that the commercial pages need.
 on:
   schedule:
-    - cron: "0 10 * * 1,3,5"
+    - cron: "0 10 * * 1"
   workflow_dispatch: {} # allow manual runs from the Actions tab
 
 # Needed so the workflow can push the generated post back to the repo.

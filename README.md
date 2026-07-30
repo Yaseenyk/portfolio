@@ -45,13 +45,45 @@ Interactive exhibits that prove the site's claims instead of stating them:
 ## ⚙️ The autonomous content machine
 
 - **AI Blogger** (`scripts/ai_writer.py` + Actions cron) — writes a technical
-  article Mon/Wed/Fri under a strict human-voice contract, generates a
+  article weekly under a strict human-voice contract, generates a
   brand-locked cover with gpt-image-1, commits, and deploys.
 - **Corpus loop** — every deploy regenerates `llms.txt` / `llms-full.txt` and
   re-embeds the corpus into Vectorize, so the concierge knows each new post
   the day it ships. IndexNow pings Bing on every deploy.
 - **LinkedIn pipeline** (separate repo) — publishes the queue daily with UTM
   attribution.
+
+## 💼 Working with me — [/solutions](https://yaseenkhatib.streamerosai.com/solutions)
+
+Solution architecture and builds for businesses quoted enterprise money for a
+problem that is not enterprise-sized. Prices are published rather than hidden
+behind "contact us", and the client owns the source — no licence, no per-seat
+fee.
+
+- [**Architecture review & advisory**](https://yaseenkhatib.streamerosai.com/solutions/business#architecture)
+  — an independent read on what the work should actually cost, including when
+  the answer is to buy rather than build.
+- [**AI integration**](https://yaseenkhatib.streamerosai.com/solutions/business#ai-integration)
+  — grounded RAG and LLM workflows wired into systems you already run, with
+  citations and a refusal path.
+- [**Fixed-scope custom systems**](https://yaseenkhatib.streamerosai.com/solutions/business#custom-build)
+  and [**ERP replacement**](https://yaseenkhatib.streamerosai.com/solutions/business#erp).
+- [**Small businesses**](https://yaseenkhatib.streamerosai.com/solutions/small-business)
+  — one tool, built once then hosted and maintained, from ₹800/month.
+
+## 🎓 Final year projects — [/final-year-projects](https://yaseenkhatib.streamerosai.com/final-year-projects)
+
+Projects built end to end for BCA/MCA/B.Tech students, then explained line by
+line in daily live sessions so the student can defend work in their viva. Free
+and ungated alongside it:
+
+- [**Viva question bank**](https://yaseenkhatib.streamerosai.com/final-year-projects/question-bank)
+  — 89 real questions, filterable by project type, each showing what the
+  examiner is actually testing.
+- [**Timeline planner**](https://yaseenkhatib.streamerosai.com/final-year-projects/planner)
+  — how many weeks you genuinely have after exams and a realistic buffer.
+- [**Guides**](https://yaseenkhatib.streamerosai.com/final-year-projects/guides)
+  — viva prep, report format, and topic lists with honest difficulty ratings.
 
 ## 📚 Content
 
