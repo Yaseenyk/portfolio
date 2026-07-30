@@ -13,7 +13,7 @@ export const SITE_DESCRIPTION =
  * Bing matters for AEO: its index feeds ChatGPT search.
  */
 export const VERIFICATION = {
-  google: "",
+  google: "OG5PRiRPw3I5jB5p-G7nDzf_mlxdiZzrpLaFYCZ0p1M",
   bing: "001424A9DC931D947201E7F6E9CA9A23",
 };
 
