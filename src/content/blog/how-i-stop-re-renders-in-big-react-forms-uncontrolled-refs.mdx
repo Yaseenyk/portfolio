@@ -1,0 +1,339 @@
+---
+title: 'How I stop re-renders in big React forms: uncontrolled refs'
+slug: how-i-stop-re-renders-in-big-react-forms-uncontrolled-refs
+date: '2026-08-03'
+description: 'Production tactics for large React forms: use uncontrolled inputs, refs,
+  and event delegation to kill keystroke re-renders while keeping validation sane.'
+tags:
+- Frontend
+- React
+- TypeScript
+keywords:
+- React uncontrolled inputs refs
+- prevent re-renders React forms
+- FormData TypeScript uncontrolled
+- React event delegation form change blur
+- reset uncontrolled inputs React
+- validate uncontrolled React form
+- React Hook Form uncontrolled performance
+readingMinutes: 8
+takeaways:
+- For large forms, keep inputs uncontrolled and read values via refs/FormData to avoid
+  keystroke-driven re-renders.
+- Use event delegation on the <form> for input/blur to track dirtiness and run validation
+  without cascading renders.
+- Reset/hydrate by relying on defaultValue + form.reset() or a form key; imperatively
+  set .value only when you must.
+- Don’t do this if you need live derived UI from every keystroke; controlled inputs
+  or a form library may be the better trade.
+author:
+  name: Yaseen Khatib
+  role: Senior Full-Stack AI Engineer
+---
+
+I only fight React form re-renders when they hurt users. On slower laptops and mid-range phones, a fully controlled 80-field form will stutter: every keystroke schedules React work, updates parent state, and wakes sibling components that don’t care. The fix I reach for is boring but effective: make inputs uncontrolled, use refs and delegated events, and only read values when I need them.
+
+## Why uncontrolled for large forms
+
+Controlled inputs centralize truth in React state. That’s great for live previews and masks, but it’s expensive for sheer volume. For a large data-entry form, the browser is a very good state machine: let it own input values and composition. I keep React responsible for structure, validation hints, and submit orchestration, not character-by-character state.
+
+Tradeoffs I plan around:
+- Pros: No keystroke-driven React renders, zero lag on IME/composition, trivial file inputs.
+- Cons: Harder to programmatically overwrite values; SSR/hydration requires careful defaultValue; live derived UI is trickier.
+
+## How do you prevent React re-renders while typing?
+
+Use uncontrolled inputs with defaultValue, attach a single onInput/onBlur handler on the form (event delegation), and store per-field metadata (dirty/touched/errors) in refs or an external store. Don’t set React state on keystrokes. Read current values from the DOM (FormData) only when needed (save, validate, compute derived fields).
+
+### A minimal, production-safe skeleton
+
+```tsx
+import React, {useCallback, useMemo, useRef, useState} from 'react';
+
+// Types you actually submit to your API
+type Person = {
+  firstName: string;
+  age: number | null;
+  email: string;
+  subscribe: boolean;
+};
+
+type Errors = Record<string, string | undefined>;
+
+// Domain validation that doesn’t assume React state
+function validateField(name: string, value: string): string | undefined {
+  switch (name) {
+    case 'firstName':
+      return value.trim() ? undefined : 'First name is required';
+    case 'age': {
+      if (!value) return undefined;
+      const n = Number(value);
+      if (!Number.isFinite(n)) return 'Age must be a number';
+      if (n < 0) return 'Age cannot be negative';
+      return undefined;
+    }
+    case 'email':
+      return /.+@.+\..+/.test(value) ? undefined : 'Invalid email';
+    default:
+      return undefined;
+  }
+}
+
+export function PersonForm({ initial }: { initial: Partial<Person> }) {
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  // Keep refs to focus invalid fields without caring about React value
+  const nodeByNameRef = useRef(new Map<string, HTMLElement>());
+
+  const register = useCallback((name: string) => (el: HTMLElement | null) => {
+    const map = nodeByNameRef.current;
+    if (el) map.set(name, el); else map.delete(name);
+  }, []);
+
+  // Errors live in React state so the small set of error labels can render.
+  // Inputs remain uncontrolled, so they won’t re-render on keystrokes.
+  const [errors, setErrors] = useState<Errors>({});
+
+  const onBlur = useCallback((e: React.FocusEvent<HTMLFormElement>) => {
+    const t = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    if (!t.name) return;
+    const msg = validateField(t.name, t.value);
+    setErrors(prev => (prev[t.name] === msg ? prev : { ...prev, [t.name]: msg }));
+  }, []);
+
+  const onInput = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    // Intentionally no setState here. If you need “dirty”, store it in a ref.
+  }, []);
+
+  const focusFirstError = useCallback((errs: Errors) => {
+    const firstKey = Object.keys(errs).find(k => errs[k]);
+    if (!firstKey) return;
+    const el = nodeByNameRef.current.get(firstKey);
+    if (el && 'focus' in el) (el as HTMLInputElement).focus();
+  }, []);
+
+  const parsePayload = useCallback((fd: FormData): Person => {
+    const str = (k: string) => (fd.get(k) as string) ?? '';
+    const num = (k: string) => {
+      const v = fd.get(k) as string | null;
+      if (v == null || v === '') return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+    const bool = (k: string) => fd.get(k) != null; // checkbox exists => true
+
+    return {
+      firstName: str('firstName'),
+      age: num('age'),
+      email: str('email'),
+      subscribe: bool('subscribe'),
+    };
+  }, []);
+
+  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(formRef.current!);
+
+    // Validate all at once without re-rendering inputs
+    const nextErrors: Errors = {};
+    for (const [k, v] of fd.entries()) {
+      const msg = validateField(k, String(v));
+      if (msg) nextErrors[k] = msg;
+    }
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) {
+      focusFirstError(nextErrors);
+      return;
+    }
+
+    const payload = parsePayload(fd);
+    // send payload to API
+    console.log('submit', payload);
+  }, [focusFirstError, parsePayload]);
+
+  // defaultValue hydrates inputs once; they don’t re-render on change
+  const defaults = useMemo(() => ({
+    firstName: initial.firstName ?? '',
+    age: initial.age ?? '',
+    email: initial.email ?? '',
+    subscribe: !!initial.subscribe,
+  }), [initial.firstName, initial.age, initial.email, initial.subscribe]);
+
+  return (
+    <form ref={formRef} onSubmit={onSubmit} onBlur={onBlur} onInput={onInput} noValidate>
+      <div>
+        <label htmlFor="firstName">First name</label>
+        <input
+          id="firstName"
+          name="firstName"
+          defaultValue={defaults.firstName}
+          ref={register('firstName')}
+        />
+        {errors.firstName && <span role="alert">{errors.firstName}</span>}
+      </div>
+
+      <div>
+        <label htmlFor="age">Age</label>
+        <input id="age" name="age" type="number" defaultValue={String(defaults.age ?? '')} ref={register('age')} />
+        {errors.age && <span role="alert">{errors.age}</span>}
+      </div>
+
+      <div>
+        <label htmlFor="email">Email</label>
+        <input id="email" name="email" type="email" defaultValue={defaults.email} ref={register('email')} />
+        {errors.email && <span role="alert">{errors.email}</span>}
+      </div>
+
+      <div>
+        <label>
+          <input name="subscribe" type="checkbox" defaultChecked={defaults.subscribe} ref={register('subscribe')} />
+          Subscribe to updates
+        </label>
+      </div>
+
+      <button type="submit">Save</button>
+      <button
+        type="button"
+        onClick={() => {
+          // Reset to defaultValue without rerendering each field
+          formRef.current?.reset();
+          setErrors({});
+        }}
+      >Reset</button>
+    </form>
+  );
+}
+```
+
+Notes:
+- No `value` props anywhere. Only `defaultValue`/`defaultChecked`.
+- Errors render, but inputs don’t re-render while typing.
+- We use `FormData` to read canonical values at submit. Number/boolean parsing is explicit.
+
+## How do you validate an uncontrolled form?
+
+Validate on blur and on submit. Avoid validating on every keystroke; run per-field checks on blur and full-form checks on submit. Keep errors in a small piece of React state or an external store. If you need async validation, debounce and update only the error UI, not the inputs.
+
+### Externalize metadata with useSyncExternalStore (optional but clean)
+
+If error rendering still causes too much React work, move metadata out of component state. `useSyncExternalStore` gives fine-grained subscriptions without prop-drilling.
+
+```tsx
+// simple store: errors by field name + subscribe
+class ErrorStore {
+  private errs: Record<string, string | undefined> = {};
+  private subs = new Set<() => void>();
+  getSnapshot = () => this.errs;
+  subscribe = (cb: () => void) => { this.subs.add(cb); return () => this.subs.delete(cb); };
+  set(name: string, msg: string | undefined) {
+    if (this.errs[name] === msg) return;
+    this.errs = { ...this.errs, [name]: msg };
+    this.subs.forEach(fn => fn());
+  }
+}
+
+const errorStore = new ErrorStore();
+
+function useErrors() {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return React.useSyncExternalStore(errorStore.subscribe, errorStore.getSnapshot, errorStore.getSnapshot);
+}
+
+function ErrorMsg({ name }: { name: string }) {
+  const errs = useErrors();
+  const msg = errs[name];
+  return msg ? <span role="alert">{msg}</span> : null;
+}
+
+// Then in form blur handler: errorStore.set(name, validateField(name, value));
+```
+
+With this, only the `<ErrorMsg name="..." />` near a field re-renders when its error changes. The inputs remain DOM-owned.
+
+## How do you reset or hydrate uncontrolled inputs without forcing re-renders?
+
+Use the browser: `form.reset()` returns inputs to their `defaultValue`/`defaultChecked`. To change defaults, re-render with new props and, if you must, change the form key to remount. For one-off overwrites (rare), imperatively set `el.value = 'x'` and (if needed) dispatch an `input` event.
+
+### Patterns that actually work
+
+- Instant reset to initial values:
+
+```ts
+formRef.current?.reset();
+```
+
+- Hydrate from fresh data without diffing hundreds of fields:
+
+```tsx
+// When initial changes radically, force a remount once
+const formKey = useMemo(() => JSON.stringify(initial).length, [initial]);
+return <form key={formKey} /* ... */>...</form>;
+```
+
+- Programmatic overwrite of one field (avoid unless necessary):
+
+```ts
+const el = nodeByNameRef.current.get('email') as HTMLInputElement | undefined;
+if (el) {
+  el.value = 'foo@bar.com';
+  el.dispatchEvent(new Event('input', { bubbles: true })); // if something listens to input
+}
+```
+
+## When not to do this
+
+- If your UI derives live state from every character (masked inputs, live previews, pricing calculators), controlled is simpler.
+- If you require time-travel/debugging of form state, uncontrolled fights you.
+- If hydration must mirror state exactly from the server and inputs change often post-mount, controlled avoids surprises.
+
+## Practical bugs to avoid
+
+- Hydration mismatch: on SSR, ensure `defaultValue` equals what the server rendered. If you can’t guarantee it, delay hydration or gate rendering client-side.
+- Number and date inputs: FormData returns strings. Always parse and validate—you won’t get `null` automatically.
+- Composition events (IME): Don’t validate on `onInput` for every keystroke; use `onBlur` or a debounced async check.
+- File inputs: they are inherently uncontrolled. Use `FormData` and don’t try to mirror file lists in React state.
+- Context-wide state updates: avoid putting form field values in context; it defeats the point and wakes the tree.
+
+## Do I need a library?
+
+React Hook Form (RHF) defaults to uncontrolled inputs and is battle-tested. If you need arrays of fields, field-level registration, or resolver-based validation, RHF is pragmatic:
+
+```tsx
+import { useForm } from 'react-hook-form';
+
+type Person = { firstName: string; email: string };
+
+function RHFPerson() {
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<Person>({
+    mode: 'onBlur',
+    shouldUnregister: true, // unmounting fields don't linger
+    defaultValues: { firstName: '', email: '' },
+  });
+
+  return (
+    <form onSubmit={handleSubmit((data) => console.log(data))}>
+      <input {...register('firstName', { required: 'First name is required' })} />
+      {errors.firstName && <span role="alert">{errors.firstName.message}</span>}
+      <input type="email" {...register('email', { pattern: { value: /.+@.+\..+/, message: 'Invalid email' } })} />
+      {errors.email && <span role="alert">{errors.email.message}</span>}
+      <button type="submit">Save</button>
+      <button type="button" onClick={() => reset()}>Reset</button>
+    </form>
+  );
+}
+```
+
+RHF gives you imperative `setValue`, `reset`, and strong performance by keeping values out of React state. If your form is complex or dynamic, I’ll usually start here before building custom plumbing.
+
+## Profiling the right thing
+
+- Use React DevTools Profiler and turn on “Highlight updates”. With uncontrolled, typing in one field should not flash siblings.
+- Track slow input handlers in Performance panel. If your `onBlur` or submit logic is heavy, move work into `requestIdleCallback` or a web worker. Keep the main thread free during typing.
+
+## Architecture notes
+
+In a pattern I call Trinity Architecture, the form’s inputs are presentation. The validation/errors live in a thin reactive layer (store or RHF). The data layer converts `FormData` to your typed payload. The boundary rule matters: inputs don’t talk directly to the API or the global store—events flow upward; data flows downward once.
+
+## The boring decision that keeps UIs fast
+
+Most forms don’t need React in the hot path of typing. Uncontrolled inputs with refs and delegated events let the browser do what it’s good at, while React handles structure and feedback. That’s the kind of tradeoff I make on production teams shipping full-stack and AI-backed apps: move work off the hot path, keep the mental model simple, and let users feel the speed.
