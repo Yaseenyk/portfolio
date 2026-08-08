@@ -25,7 +25,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: SITE_URL,
+      // Trailing slash matters here: `trailingSlash: true` means every other
+      // URL on this site is slash-terminated and the bare form 301s to it.
+      // Emitting the homepage without one made the sitemap disagree with the
+      // served canonical.
+      url: `${SITE_URL}/`,
       lastModified: lastBlogUpdate,
       changeFrequency: "weekly",
       priority: 1.0,
@@ -50,12 +54,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${SITE_URL}/roadmap/`,
-      lastModified: lastBlogUpdate,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/claude-code/`,
       lastModified: lastBlogUpdate,
       changeFrequency: "weekly",
       priority: 0.9,

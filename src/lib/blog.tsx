@@ -1,73 +1,25 @@
 import type { ComponentType } from "react";
 import { SITE_URL } from "@/lib/site";
-import { architectingMernAtAiSpeed } from "@/content/posts/architecting-mern-at-ai-speed";
 import { tenXReality } from "@/content/posts/the-10x-reality";
-import { agenticRagPipelines } from "@/content/posts/agentic-rag-pipelines-nodejs";
 import { payloadReductionReactFlow } from "@/content/posts/94-percent-payload-reduction-react-flow";
-import { promptingForArchitecture } from "@/content/posts/prompting-for-architecture-claude";
-import { cachingTheAi } from "@/content/posts/caching-the-ai-redis-mongodb";
-import { typeSafeLlms } from "@/content/posts/type-safe-llms-typescript-express";
 import { realTimeTelemetry } from "@/content/posts/real-time-telemetry-websockets-react";
-import { deathOfTheBackendRouter } from "@/content/posts/death-of-the-traditional-backend-router";
-import { fromWireframeToWeb } from "@/content/posts/from-wireframe-to-web-ai-speed";
-import { stateManagementAiEra } from "@/content/posts/state-management-ai-era-zustand-vs-redux";
 import { chatgptChangedEngineering } from "@/content/posts/chatgpt-changed-full-stack-engineering";
 // Advanced MERN + AI architecture series.
-import { agenticVsCopilots } from "@/content/posts/agentic-workflows-vs-copilots";
 import { customSerializationAdapters } from "@/content/posts/custom-serialization-adapters";
-import { vectorEmbeddingsInProduction } from "@/content/posts/vector-embeddings-in-production";
-import { advancedRedisCaching } from "@/content/posts/advanced-redis-caching-strategies";
 import { websocketTelemetryAtScale } from "@/content/posts/websocket-telemetry-at-scale";
 import { optimizingMongoAggregation } from "@/content/posts/optimizing-mongodb-aggregation";
-import { rbacPatterns } from "@/content/posts/role-based-access-control-patterns";
-import { reduxToolkitArchitectures } from "@/content/posts/redux-toolkit-architectures";
-import { typescriptMigrationPlaybook } from "@/content/posts/typescript-migration-playbook";
-import { reactUseMemoBenchmarks } from "@/content/posts/react-usememo-benchmarks";
 // streamerOS AI Support Agent — serverless RAG + agentic architecture series.
-import { zeroHallucinationRag } from "@/content/posts/zero-hallucination-rag-grounding-contract";
-import { edgeNativeRag } from "@/content/posts/edge-native-rag-cloudflare-workers-hono";
-import { singleModelRag } from "@/content/posts/single-model-rag-embeddings-generation";
 import { reactFlowAgentCanvas } from "@/content/posts/react-flow-agent-orchestration-canvas";
 import { compilingReactFlowAgent } from "@/content/posts/compiling-react-flow-graph-agent-pipeline";
 import { semanticCachingEdge } from "@/content/posts/semantic-caching-edge-rag";
-import { routerAgentPattern } from "@/content/posts/router-agent-multi-agent-orchestration";
-import { ragChunkingArchitecture } from "@/content/posts/rag-chunking-strategy-architecture";
-import { streamingAiEdge } from "@/content/posts/streaming-ai-edge-hono-ai-sdk-nextjs";
-import { statelessAgentsEdge } from "@/content/posts/stateless-agents-edge-cloudflare-durable-objects";
 // The AI Systems Architect Roadmap — 15-part masterclass series (see lib/roadmap.ts).
-import { aiNativeDevStack } from "@/content/posts/ai-native-dev-stack-rethinking-mern";
-import { beyondThePrompt } from "@/content/posts/beyond-the-prompt-llm-mechanics";
-import { vectorFoundations } from "@/content/posts/vector-foundations-semantic-search";
-import { ragGroundingTheAgent } from "@/content/posts/rag-grounding-the-agent";
-import { agenticControlLoops } from "@/content/posts/agentic-control-loops";
-import { latencyFirstAi } from "@/content/posts/latency-first-ai-serverless-hono";
-import { modelContextProtocol } from "@/content/posts/model-context-protocol-mcp";
 import { payloadCompression } from "@/content/posts/payload-compression-serialization-patterns";
-import { guardrailEngineering } from "@/content/posts/guardrail-engineering-hallucination-prevention";
-import { hybridRag } from "@/content/posts/hybrid-rag-bm25-vector-reranking";
 import { llmObservability } from "@/content/posts/llm-observability-opentelemetry-tracing";
-import { finopsForAi } from "@/content/posts/finops-for-ai-cost-governance";
-import { evaluationDrivenDevelopment } from "@/content/posts/evaluation-driven-development-golden-dataset";
-import { memoryAndStatefulAi } from "@/content/posts/memory-and-stateful-ai-architecture";
 import { aiNativePortfolio } from "@/content/posts/ai-native-portfolio-landing-lead-roles";
 // Mastering Claude Code: The 90% Efficiency Roadmap (see lib/claude-code-roadmap.ts).
-import { claudeCodeContextHygiene } from "@/content/posts/claude-code-context-hygiene-clear-compact";
 // The Complete Anthropic & Claude Developer Roadmap (see lib/anthropic-roadmap.ts).
 import { masteringClaudeArchitecture } from "@/content/posts/mastering-claude-architecture-context-windows-output-limits";
-import { xmlStructuralPrompting } from "@/content/posts/xml-tag-structural-prompting-deterministic-shell";
-import { jsonStructuredOutputs } from "@/content/posts/json-structured-outputs-type-safe-zod";
-import { toolUseFunctionCalling } from "@/content/posts/tool-use-function-calling-mechanics";
-import { modelContextProtocolFoundations } from "@/content/posts/model-context-protocol-mcp-server-foundations";
-import { adaptiveExtendedThinking } from "@/content/posts/adaptive-extended-thinking-latency-vs-compute";
-import { localFirstClaudeCode } from "@/content/posts/local-first-claude-code-claude-md-secure-cli";
-import { buildingCustomSkills } from "@/content/posts/building-custom-claude-skills-task-scripts";
 import { promptCachingDeepDive } from "@/content/posts/prompt-caching-deep-dive-latency-cost";
-import { constitutionalAiSafety } from "@/content/posts/constitutional-ai-safety-system-prompts-guardrails";
-import { multiAgentWorktrees } from "@/content/posts/multi-agent-worktrees-parallel-subagents";
-import { statefulAgentRuntime } from "@/content/posts/stateful-agent-runtime-persistence-durable-objects-redis";
-import { enterpriseMcpAggregation } from "@/content/posts/enterprise-mcp-aggregation-postgres-figma-playwright";
-import { evalDrivenPromptEngineering } from "@/content/posts/evaluation-driven-prompt-engineering-golden-datasets";
-import { autonomousAgentRoutines } from "@/content/posts/long-running-automated-agent-routines-cron-workflows";
 // Founder's Log — the vision series: product stories + operating model (see components/FoundersLog.tsx).
 import { myJourneyPost } from "@/content/posts/my-journey-web-developer-to-ai-engineer";
 import { shippedFiveProductsSolo } from "@/content/posts/shipped-5-products-solo-12-months";
@@ -146,74 +98,26 @@ const POSTS: BlogPost[] = [
   streamerOsRustStory,
   ninetyFourPercentDecision,
   hireMyHead,
-  // The Complete Anthropic & Claude Developer Roadmap — 15-part masterclass (newest).
+  // Claude/Anthropic — the two lessons that earned impressions; the rest of the
+  // 15-part 'masterclass' was commodity explainer content and was removed.
   masteringClaudeArchitecture,
-  xmlStructuralPrompting,
-  jsonStructuredOutputs,
-  toolUseFunctionCalling,
-  modelContextProtocolFoundations,
-  adaptiveExtendedThinking,
-  localFirstClaudeCode,
-  buildingCustomSkills,
   promptCachingDeepDive,
-  constitutionalAiSafety,
-  multiAgentWorktrees,
-  statefulAgentRuntime,
-  enterpriseMcpAggregation,
-  evalDrivenPromptEngineering,
-  autonomousAgentRoutines,
-  // Mastering Claude Code: The 90% Efficiency Roadmap.
-  claudeCodeContextHygiene,
-  // The AI Systems Architect Roadmap — 15-part masterclass series.
-  aiNativeDevStack,
-  beyondThePrompt,
-  vectorFoundations,
-  ragGroundingTheAgent,
-  agenticControlLoops,
-  latencyFirstAi,
-  modelContextProtocol,
+  // AI systems architecture — the pieces backed by first-hand measurement.
   payloadCompression,
-  guardrailEngineering,
-  hybridRag,
   llmObservability,
-  finopsForAi,
-  evaluationDrivenDevelopment,
-  memoryAndStatefulAi,
   aiNativePortfolio,
-  // streamerOS AI Support Agent — serverless RAG + agentic architecture (newest).
-  zeroHallucinationRag,
-  edgeNativeRag,
-  singleModelRag,
+  // streamerOS AI Support Agent — serverless RAG + agentic architecture.
   reactFlowAgentCanvas,
   compilingReactFlowAgent,
   semanticCachingEdge,
-  routerAgentPattern,
-  ragChunkingArchitecture,
-  streamingAiEdge,
-  statelessAgentsEdge,
-  // Advanced MERN + AI architecture series.
-  agenticVsCopilots,
+  // Advanced MERN + AI architecture.
   customSerializationAdapters,
-  vectorEmbeddingsInProduction,
-  advancedRedisCaching,
   websocketTelemetryAtScale,
   optimizingMongoAggregation,
-  rbacPatterns,
-  reduxToolkitArchitectures,
-  typescriptMigrationPlaybook,
-  reactUseMemoBenchmarks,
-  tenXReality,
-  agenticRagPipelines,
-  payloadReductionReactFlow,
-  promptingForArchitecture,
-  cachingTheAi,
-  typeSafeLlms,
   realTimeTelemetry,
-  deathOfTheBackendRouter,
-  fromWireframeToWeb,
-  stateManagementAiEra,
-  architectingMernAtAiSpeed,
-  // Foundational primer (kept: the origin-story piece).
+  tenXReality,
+  payloadReductionReactFlow,
+  // Foundational primer (the origin-story piece).
   chatgptChangedEngineering,
 ];
 

@@ -141,9 +141,9 @@ function Body() {
           compiling that canvas into a runnable pipeline
         </a>
         , and the related pattern of{" "}
-        <a href="/blog/router-agent-multi-agent-orchestration">
+        
           routing between specialised agents
-        </a>
+        
         . Shipping IntegrateX solo taught me that the architecture a whole team can
         read and change is worth more than the clever one only its author can — the
         judgment I bring is choosing the version that survives contact with the rest

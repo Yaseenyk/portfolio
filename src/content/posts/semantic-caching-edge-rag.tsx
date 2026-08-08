@@ -150,13 +150,13 @@ function Body() {
 
       <p>
         This sits in front of{" "}
-        <a href="/blog/edge-native-rag-cloudflare-workers-hono">
+        
           the edge-native pipeline
-        </a>{" "}
+        {" "}
         and respects{" "}
-        <a href="/blog/zero-hallucination-rag-grounding-contract">
+        
           the grounding contract
-        </a>{" "}
+        {" "}
         — a cache hit is only valid if the original answer was grounded. It is the
         kind of trade-off I weigh on every system I ship: the cheapest, safest win is
         usually the work you can avoid doing at all, and knowing where that line sits

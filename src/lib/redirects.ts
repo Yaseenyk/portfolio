@@ -1,20 +1,23 @@
 /**
- * Retired blog slugs → their strongest surviving equivalent. Pruned generic
- * posts redirect here (meta-refresh + rel=canonical stub written into the
- * static export by scripts/generate-redirects.mjs) so link equity consolidates
+ * Retired blog slugs → their strongest surviving equivalent. Pruned posts
+ * redirect here (meta-refresh + rel=canonical stub written into the static
+ * export by scripts/generate-redirects.mjs) so link equity consolidates
  * instead of 404-ing. Keys and values are bare slugs under /blog/.
+ *
+ * Deliberately empty as of the 2026-08 prune.
+ *
+ * This map previously held 10 entries. Every one of their *targets* was itself
+ * a commodity explainer that the prune removed, so keeping them would have
+ * pointed ten redirect stubs at ten deleted pages — strictly worse than a clean
+ * 404, because it spends crawl budget to arrive at nothing.
+ *
+ * The retired slugs are intentionally left to 404. There is no surviving post
+ * on a comparable topic to consolidate them into, and redirecting to a loosely
+ * related page (or to /blog) is a soft-404 pattern Google discounts anyway.
+ *
+ * Keep the mechanism: it is the right tool when a post is genuinely superseded
+ * by a specific successor. Add an entry only when that successor actually
+ * exists — scripts/verify-sitemap.mjs will fail the build if a stub URL ends up
+ * in the sitemap.
  */
-export const BLOG_REDIRECTS: Record<string, string> = {
-  "building-your-first-rag-system": "rag-grounding-the-agent",
-  "vector-databases-for-mern-developers": "vector-foundations-semantic-search",
-  "embeddings-semantic-search-mongodb": "vector-foundations-semantic-search",
-  "fine-tuning-vs-rag": "hybrid-rag-bm25-vector-reranking",
-  "function-calling-tool-use-patterns": "tool-use-function-calling-mechanics",
-  "prompt-engineering-fundamentals": "xml-tag-structural-prompting-deterministic-shell",
-  // Orphaned old slug Google still crawls (GSC 2026-07-27) — was 404ing,
-  // consolidate its equity into the prompt-mechanics post.
-  "prompt-engineering-fundamentals-backend-devs": "beyond-the-prompt-llm-mechanics",
-  "streaming-llm-responses-to-react": "streaming-ai-edge-hono-ai-sdk-nextjs",
-  "token-economics-cost-optimizing-llm-apps": "finops-for-ai-cost-governance",
-  "evaluating-llm-outputs": "evaluation-driven-development-golden-dataset",
-};
+export const BLOG_REDIRECTS: Record<string, string> = {};

@@ -266,12 +266,7 @@ export default function AboutPage() {
               Sable the model can propose but never touch the money; in
               streamerOS chat never leaves the user&apos;s machine; in the
               content pipelines a human curates every queue. Leverage without
-              authority. The full playbook is documented lesson by lesson in
-              the{" "}
-              <Link href="/claude-code" className="text-ice underline-offset-4 hover:underline">
-                Claude Code roadmap
-              </Link>
-              .
+              authority.
             </p>
           </section>
 

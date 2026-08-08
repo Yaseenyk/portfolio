@@ -5,6 +5,7 @@ import {
   ROADMAP_META,
   type RoadmapLesson,
 } from "@/lib/roadmap";
+import { live } from "@/lib/series";
 import RoadmapHub from "@/components/blog/RoadmapHub";
 import { personRef, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
@@ -39,7 +40,9 @@ export const metadata: Metadata = {
 
 export default function RoadmapPage() {
   // AEO/SEO: a Course with each published lesson as a syllabus item.
-  const liveLessons = ROADMAP.filter(
+  // `live()` first: a lesson whose post was pruned must not appear in the
+  // syllabus or the stepper, or the hub advertises links to deleted pages.
+  const liveLessons = live(ROADMAP).filter(
     (l: RoadmapLesson) => l.status === "published",
   );
 
@@ -69,7 +72,7 @@ export default function RoadmapPage() {
   return (
     <>
       <JsonLd data={jsonLd} />
-      <RoadmapHub meta={ROADMAP_META} lessons={ROADMAP} />
+      <RoadmapHub meta={ROADMAP_META} lessons={live(ROADMAP)} />
     </>
   );
 }

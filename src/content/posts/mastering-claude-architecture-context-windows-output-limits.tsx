@@ -258,9 +258,9 @@ function Body() {
         loud — and the judgment I bring to a team: a context window is RAM you
         manage, not a bucket you fill until it overflows. The next lesson builds
         directly on it:{" "}
-        <a href="/blog/xml-tag-structural-prompting-deterministic-shell">
+        
           XML-tag structural prompting
-        </a>{" "}
+        {" "}
         — how to organize what you put <em>inside</em> the window so the model
         parses it deterministically instead of guessing at structure. Or jump to{" "}
         <a href="/anthropic-roadmap">the full roadmap</a>.

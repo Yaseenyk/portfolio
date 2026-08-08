@@ -7,11 +7,6 @@ const TRACKS = [
     detail: "15 lessons · RAG → agents → FinOps",
   },
   {
-    href: "/claude-code",
-    label: "Claude Code Efficiency",
-    detail: "the 90% token-efficiency workflow",
-  },
-  {
     href: "/anthropic-roadmap",
     label: "Anthropic & Claude Development",
     detail: "15 lessons · tools → MCP → multi-agent",

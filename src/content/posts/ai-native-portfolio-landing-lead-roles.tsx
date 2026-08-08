@@ -129,9 +129,9 @@ function Body() {
 
       <p>
         That closes the loop: the{" "}
-        <a href="/blog/ai-native-dev-stack-rethinking-mern">stack</a>, the{" "}
-        <a href="/blog/rag-grounding-the-agent">grounding</a>, the{" "}
-        <a href="/blog/guardrail-engineering-hallucination-prevention">guardrails</a>{" "}
+        stack, the{" "}
+        grounding, the{" "}
+        guardrails{" "}
         — all of it, demonstrated by the thing you&apos;re reading. Revisit the full{" "}
         <a href="/roadmap">roadmap</a>, or{" "}
         <a href="/#contact">start a conversation</a>.

@@ -20,7 +20,6 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
       { href: "/blog", label: "Field Notes (blog)" },
       { href: "/#founders-log", label: "Founder's Log" },
       { href: "/roadmap", label: "AI Systems Roadmap" },
-      { href: "/claude-code", label: "Claude Code Roadmap" },
       { href: "/anthropic-roadmap", label: "Anthropic Roadmap" },
     ],
   },

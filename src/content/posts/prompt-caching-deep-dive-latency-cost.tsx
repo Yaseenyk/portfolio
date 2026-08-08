@@ -141,9 +141,9 @@ export async function answer(question: string) {
         token is the one you never recompute, and knowing which tokens those are is
         the judgment I bring to a team. The next module scales out to many agents
         at once —{" "}
-        <a href="/blog/constitutional-ai-safety-system-prompts-guardrails">
+        
           but first, safety: constitutional AI &amp; guardrails
-        </a>
+        
         . Or browse{" "}
         <a href="/anthropic-roadmap">the full roadmap</a>.
       </p>

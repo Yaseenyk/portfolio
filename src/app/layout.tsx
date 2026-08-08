@@ -48,7 +48,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Yaseen Khatib", url: SITE_URL }],
   creator: "Yaseen Khatib",
   alternates: {
-    canonical: SITE_URL,
+    // Slash-terminated to match `trailingSlash: true` and the sitemap entry.
+    canonical: `${SITE_URL}/`,
     // AEO: standalone machine-readable manifest for AI recruiter agents.
     types: {
       "application/ld+json": `${SITE_URL}/ai-briefing.json`,

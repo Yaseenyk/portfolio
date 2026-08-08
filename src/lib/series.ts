@@ -11,8 +11,9 @@
  */
 
 import { ROADMAP, ROADMAP_META } from "./roadmap";
-import { CC_ROADMAP, CC_META } from "./claude-code-roadmap";
 import { AN_ROADMAP, AN_META } from "./anthropic-roadmap";
+import { getAllSlugs } from "./blog";
+import { getMdxSlugs } from "./mdx";
 
 export type LessonStatus = "published" | "coming-soon";
 
@@ -40,26 +41,51 @@ export interface Series {
   lessons: RoadmapLesson[];
 }
 
-export const SERIES: Series[] = [
+/**
+ * Slugs that actually resolve to a post. Lesson lists are hand-maintained while
+ * the corpus is not, so the two drift: the 2026-08 prune removed 48 commodity
+ * explainer posts and would have left their lesson entries behind, each one a
+ * hub link to a 404. Rather than hand-trim three lesson files (and re-trim them
+ * on every future edit), drop any "published" lesson whose post is gone.
+ */
+const LIVE = new Set<string>([...getAllSlugs(), ...getMdxSlugs()]);
+
+// Generic so each series keeps its own narrower lesson type (AnLesson's
+// literal-union `module`, etc.) instead of being widened to the supertype.
+export function live<T extends RoadmapLesson>(lessons: readonly T[]): T[] {
+  return lessons.filter((l) => l.status !== "published" || LIVE.has(l.slug));
+}
+
+const publishedCount = (lessons: RoadmapLesson[]) =>
+  lessons.filter((l) => l.status === "published").length;
+
+/**
+ * A hub only earns a place if it still fronts real lessons. An index whose
+ * entries are nearly all "coming soon" promises content that does not exist —
+ * the same thin-content pattern this cleanup is undoing — so series below the
+ * threshold drop out of nav, sitemap and JSON-LD entirely. /claude-code was 12
+ * "coming soon" against 1 published even before the prune.
+ */
+const MIN_PUBLISHED_LESSONS = 2;
+
+const ALL_SERIES: Series[] = [
   {
     hubPath: "/roadmap",
     courseName: "The AI Systems Architect Roadmap",
     meta: ROADMAP_META,
-    lessons: ROADMAP,
-  },
-  {
-    hubPath: "/claude-code",
-    courseName: CC_META.title,
-    meta: CC_META,
-    lessons: CC_ROADMAP,
+    lessons: live(ROADMAP),
   },
   {
     hubPath: "/anthropic-roadmap",
     courseName: AN_META.title,
     meta: AN_META,
-    lessons: AN_ROADMAP,
+    lessons: live(AN_ROADMAP),
   },
 ];
+
+export const SERIES: Series[] = ALL_SERIES.filter(
+  (s) => publishedCount(s.lessons) >= MIN_PUBLISHED_LESSONS,
+);
 
 export interface LessonContext {
   series: Series;

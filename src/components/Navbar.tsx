@@ -103,7 +103,6 @@ const GROUPS: NavGroup[] = [
       { href: "/blog", label: "Blog", desc: "Architecture and AI systems" },
       { divider: true },
       { href: "/roadmap", label: "Roadmap" },
-      { href: "/claude-code", label: "Claude Code" },
       { href: "/anthropic-roadmap", label: "Anthropic roadmap" },
       { href: "/uses", label: "Stack" },
     ],
