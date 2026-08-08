@@ -24,10 +24,17 @@ for (const [, from, to] of pairs) {
   mkdirSync(dir, { recursive: true });
   writeFileSync(
     join(dir, "index.html"),
+    // NOTE: deliberately NO `noindex` here. `noindex` and `rel=canonical` are
+    // contradictory instructions — Google honours the noindex, drops the URL,
+    // and discards the consolidation signal, so the retired post's accumulated
+    // ranking equity is thrown away instead of being merged into its successor.
+    // (That combination is why these URLs showed up in GSC as "Page with
+    // redirect" with validation Failed.) A canonical + meta-refresh alone is
+    // the strongest soft-301 available on GitHub Pages, which cannot issue a
+    // real 301.
     `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <title>Moved</title>
 <link rel="canonical" href="${target}">
-<meta name="robots" content="noindex,follow">
 <meta http-equiv="refresh" content="0; url=${target}">
 </head><body>This post moved to <a href="${target}">${target}</a>.</body></html>\n`,
   );
