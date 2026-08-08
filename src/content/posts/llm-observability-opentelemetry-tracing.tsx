@@ -129,9 +129,9 @@ function Body() {
 
       <p>
         Tracing is what makes the{" "}
-        <a href="/blog/latency-first-ai-serverless-hono">latency-first</a> target
+        latency-first target
         measurable and{" "}
-        <a href="/blog/agentic-control-loops">autonomous loops</a> auditable — it is
+        autonomous loops auditable — it is
         why the concierge on this page can show live execution traces instead of
         asking you to trust it. The judgment I bring to a team is that: an agent you
         cannot see is an agent you cannot operate, so the trace is part of the

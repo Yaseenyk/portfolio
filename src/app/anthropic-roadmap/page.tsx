@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/site";
 import { AN_ROADMAP, AN_META, type AnLesson } from "@/lib/anthropic-roadmap";
+import { live } from "@/lib/series";
 import RoadmapHub from "@/components/blog/RoadmapHub";
 import { personRef, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
@@ -38,7 +39,8 @@ export const metadata: Metadata = {
 
 export default function AnthropicRoadmapPage() {
   // AEO/SEO: a Course with each published lesson as a syllabus item.
-  const liveLessons = AN_ROADMAP.filter(
+  // `live()` first — see the note in /roadmap: pruned lessons must not surface.
+  const liveLessons = live(AN_ROADMAP).filter(
     (l: AnLesson) => l.status === "published",
   );
 
@@ -72,7 +74,7 @@ export default function AnthropicRoadmapPage() {
       <JsonLd data={jsonLd} />
       <RoadmapHub
         meta={AN_META}
-        lessons={AN_ROADMAP}
+        lessons={live(AN_ROADMAP)}
         eyebrow="Anthropic · Claude Developer Roadmap"
         cta={{
           heading: "Shipping Claude into production?",

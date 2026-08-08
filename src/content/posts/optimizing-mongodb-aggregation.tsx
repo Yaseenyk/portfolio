@@ -64,9 +64,9 @@ const rows = await Visits.aggregate([
         The production system is the{" "}
         <a href="/#projects">Hospital-API</a>; for the vector side of querying,
         see{" "}
-        <a href="/blog/vector-embeddings-in-production">
+        
           Vector Embeddings in Production
-        </a>
+        
         . Pipelines like these are the unglamorous backend work behind the five
         products I shipped solo this year — the judgment I bring is knowing the
         fastest query is usually a reordering problem, not a bigger box.

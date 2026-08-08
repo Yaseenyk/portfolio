@@ -110,7 +110,7 @@ function Body() {
 
       <p>
         A small payload is half of feeling{" "}
-        <a href="/blog/latency-first-ai-serverless-hono">instant</a>; the other half is streaming. This pattern grew out
+        instant; the other half is streaming. This pattern grew out
         of the{" "}
         <a href="/blog/react-flow-agent-orchestration-canvas">agent orchestration canvas</a> and fits cleanly in my
         Trinity Architecture boundary: presentation renders, orchestration decides, the adapter serializes — one of the

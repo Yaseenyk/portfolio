@@ -92,9 +92,7 @@ function Body() {
 
       <p>
         I have. Every product on <a href="/products">this site</a> was built
-        under exactly this model, and the{" "}
-        <a href="/claude-code">Claude Code efficiency roadmap</a> documents the
-        playbook lesson by lesson.
+        under exactly this model.
       </p>
     </>
   );

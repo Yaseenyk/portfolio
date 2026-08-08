@@ -174,7 +174,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     outcome:
       "Answers that can always be traced back to a source document, and a refusal path you can trigger on demand. The same contract runs live in this site's concierge — ask it something outside its corpus and watch it decline.",
     proof: [
-      { label: "The grounding contract, written up", href: "/blog/zero-hallucination-rag-grounding-contract" },
       { label: "Test the live concierge", href: "/#rag-concierge" },
     ],
     stack: ["RAG", "Vector search", "LLM orchestration", "Node.js"],
@@ -192,7 +191,6 @@ export const CASE_STUDIES: CaseStudy[] = [
       "Every client sees the same value in the same frame, a whole class of acted-on-stale-data mistakes stopped happening, and the origin database was shielded from read spikes.",
     proof: [
       { label: "The real-time architecture", href: "/blog/real-time-telemetry-websockets-react" },
-      { label: "The caching boundary", href: "/blog/advanced-redis-caching-strategies" },
     ],
     stack: ["WebSockets", "Redis", "React", "Node.js"],
   },
