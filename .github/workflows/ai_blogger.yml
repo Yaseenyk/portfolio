@@ -3,15 +3,23 @@ name: AI Blogger
 # Autonomous blog pipeline: ChatGPT writes a post from scripts/topics.txt and
 # commits the resulting .mdx back to main. Mondays at 10:00 UTC.
 #
-# Throttled from 3×/week to weekly deliberately. Google's quality signals are
-# sitewide, not per-page: 100+ posts earning little engagement drag down the
-# pages that actually convert (/solutions, /final-year-projects). Volume is not
-# the constraint on this domain — authority is — and more posts consume crawl
-# budget that the commercial pages need.
+# SCHEDULE DISABLED 2026-08-08 — do not re-enable.
+#
+# Throttling this from 3×/week to weekly was the right instinct but far too
+# small a correction. The sitewide-signal reasoning below turned out to be
+# exactly what happened, and it has already cost the site its index:
+#
+#   2026-07-10   88 indexed /  86 not indexed / 178 impressions
+#   2026-07-11   25 indexed / 151 not indexed /  50 impressions
+#   2026-07-24   25 indexed / 151 not indexed /   0 impressions
+#
+# 72% of indexed pages dropped in one day. 72 URLs now sit in "Discovered –
+# currently not indexed", meaning Google saw them in the sitemap and declined
+# to spend a crawl on them at all. Publishing more cannot fix that; it is the
+# signal that caused it. Recovery requires shrinking the corpus to genuinely
+# first-hand work, not adding to it at any cadence.
 on:
-  schedule:
-    - cron: "0 10 * * 1"
-  workflow_dispatch: {} # allow manual runs from the Actions tab
+  workflow_dispatch: {} # manual only — the cron schedule is intentionally gone
 
 # Needed so the workflow can push the generated post back to the repo.
 permissions:
