@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
-import { AGREEMENT_VERSION, CLAUSES } from "@/lib/agreement";
+import { AGREEMENT_VERSION, CLAUSES, OWNER_COMMITMENTS } from "@/lib/agreement";
 import ConsentForm from "@/components/campus/ConsentForm";
 
 export const metadata: Metadata = {
@@ -71,6 +71,32 @@ export default function AgreementPage() {
           </section>
         ))}
       </div>
+
+      <section className="mt-16 rounded-2xl border border-cyan/30 bg-cyan/[0.04] p-6 sm:p-8 print:border-zinc-300 print:bg-white">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ice print:text-zinc-600">
+          The other half of this agreement
+        </span>
+        <h2 className="mt-3 text-xl font-semibold tracking-tight text-zinc-50 print:text-black">
+          What I commit to, in the same document
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-zinc-300 print:text-zinc-700">
+          You are asked to tick six things below. These eight are what binds me,
+          and they appear alongside yours in the PDF both of us receive.
+        </p>
+        <ol className="mt-6 space-y-3">
+          {OWNER_COMMITMENTS.map((commitment, i) => (
+            <li
+              key={commitment}
+              className="flex gap-3.5 text-sm leading-relaxed text-zinc-300 print:text-zinc-700"
+            >
+              <span className="font-mono text-xs text-cyan print:text-zinc-500">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {commitment}
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <div className="mt-16 print:hidden">
         <ConsentForm />

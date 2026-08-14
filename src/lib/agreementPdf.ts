@@ -5,6 +5,8 @@
  * so it is imported dynamically inside the function rather than at module
  * scope — nothing else on the site pays for it.
  */
+import { OWNER_COMMITMENTS } from "@/lib/agreement";
+
 export interface AgreementRecord {
   name: string;
   phone: string;
@@ -117,12 +119,28 @@ export async function buildAgreementPdf(
   }
   gap();
 
-  write("Consented to each of the following", { font: bold });
+  // Both sides, in one document. The provider's obligations come first
+  // deliberately: the party being asked to pay should see what they are owed
+  // before they see what is asked of them.
+  write("Yaseen Khatib commits to", { font: bold });
+  gap(0.2);
+  OWNER_COMMITMENTS.forEach((commitment, i) => {
+    write(`${i + 1}. ${commitment}`);
+    gap(0.2);
+  });
+  gap(0.6);
+
+  write(`${record.name || "The student"} consents to`, { font: bold });
   gap(0.2);
   record.clauses.forEach((clause, i) => {
     write(`${i + 1}. ${clause}`);
     gap(0.2);
   });
+  gap(0.6);
+
+  write(
+    "Either side may stop between installments. Installments already paid cover work already done and sessions already held and are not refunded; everything delivered up to that point stays with the student, and nothing further is owed.",
+  );
   gap(0.6);
 
   write(

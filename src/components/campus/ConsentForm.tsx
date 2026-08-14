@@ -3,7 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
-import { AGREEMENT_VERSION, CONSENTS } from "@/lib/agreement";
+import { AGREEMENT_VERSION, CONSENTS, OWNER_COMMITMENTS } from "@/lib/agreement";
 import { track } from "@/lib/analytics";
 import { recordLead } from "@/lib/leads";
 import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
@@ -126,7 +126,10 @@ export default function ConsentForm() {
       `Project: ${form.project}`,
       `Tier: ${form.tier}`,
       "",
-      "Clauses consented to:",
+      "Yaseen Khatib commits to:",
+      ...OWNER_COMMITMENTS.map((c, i) => `  ${i + 1}. ${c}`),
+      "",
+      "Student consented to:",
       ...CONSENTS.map((c) => `  [x] ${c.label}`),
       "",
       `User agent: ${typeof navigator === "undefined" ? "" : navigator.userAgent}`,
@@ -279,7 +282,27 @@ export default function ConsentForm() {
           ))}
         </dl>
 
-        <ul className="mt-8 space-y-2">
+        <h3 className="mt-8 text-sm font-semibold text-zinc-100 print:text-black">
+          Yaseen Khatib commits to
+        </h3>
+        <ol className="mt-3 space-y-2">
+          {OWNER_COMMITMENTS.map((c, i) => (
+            <li
+              key={c}
+              className="flex gap-3 text-sm leading-relaxed text-zinc-300 print:text-zinc-700"
+            >
+              <span className="font-mono text-xs text-cyan print:text-black">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {c}
+            </li>
+          ))}
+        </ol>
+
+        <h3 className="mt-8 text-sm font-semibold text-zinc-100 print:text-black">
+          {form.name || "The student"} consented to
+        </h3>
+        <ul className="mt-3 space-y-2">
           {CONSENTS.map((c) => (
             <li
               key={c.id}

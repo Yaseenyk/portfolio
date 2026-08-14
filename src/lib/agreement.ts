@@ -7,7 +7,25 @@
 
 /** Bump when clause text changes, so a stored consent is traceable to what was
  *  actually on screen when it was given. Never edit a clause without bumping. */
-export const AGREEMENT_VERSION = "1.0";
+export const AGREEMENT_VERSION = "1.1";
+
+/**
+ * What Yaseen is bound to. These are stated, not ticked — the student consents,
+ * the provider commits — but they carry equal weight and appear beside the
+ * student's obligations in the PDF. An agreement that lists only one side's
+ * duties is not an agreement, and reads exactly like the thing a student is
+ * right to be wary of.
+ */
+export const OWNER_COMMITMENTS = [
+  "Build the project end to end — source code, database, project report, diagrams, presentation deck and deployment. The student writes none of it.",
+  "Deliver exactly what the project page listed for the chosen tier at the time of enrolment, and say so plainly if anything cannot be delivered.",
+  "Run every session included in the tier — live, daily, after 8:00 PM IST, roughly 60 minutes each — through to the submission date.",
+  "Reschedule at no cost, and without it counting against the total, whenever I am the one who cannot attend.",
+  "Make the changes a project guide asks for during review at no extra cost. They are part of the build, not a new quotation.",
+  "Cancel all remaining installments, return the last installment paid, and leave everything already delivered with the student, if I fail to deliver what was promised.",
+  "Honour the per-college cap on this project, so the student is not competing with an identical submission from their own batch.",
+  "Use the student's name, phone number and email only to run this engagement. They are never sold, shared, or added to a marketing list.",
+] as const;
 
 export interface Clause {
   n: string;
