@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
+import { EMAILJS } from "@/lib/emailjs";
 import type { CampusTier, Degree } from "@/lib/campus";
 import { formatInr, whatsappHref } from "@/lib/campus";
 import { recordLead } from "@/lib/leads";
@@ -32,11 +33,11 @@ const EMPTY_FORM: FormState = {
   message: "",
 };
 
-const EMAILJS_SERVICE = "service_560nh3i";
-const EMAILJS_TEMPLATE = "template_dyb1k4x";
-const EMAILJS_PUBLIC_KEY = "mB56akvK2qStLNadU";
+const EMAILJS_SERVICE = EMAILJS.service;
+const EMAILJS_TEMPLATE = EMAILJS.template;
+const EMAILJS_PUBLIC_KEY = EMAILJS.publicKey;
 
-const CONTACT_EMAIL = "contact@streamerosai.com";
+const CONTACT_EMAIL = EMAILJS.contactEmail;
 
 const DEGREES: Degree[] = ["BCA", "MCA", "B.Tech", "B.Sc IT", "M.Tech", "Diploma"];
 const YEARS = ["Final year", "Pre-final year", "Other"];

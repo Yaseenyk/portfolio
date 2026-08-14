@@ -6,13 +6,9 @@ import emailjs from "@emailjs/browser";
 import { AGREEMENT_VERSION, CONSENTS } from "@/lib/agreement";
 import { track } from "@/lib/analytics";
 import { recordLead } from "@/lib/leads";
+import { EMAILJS } from "@/lib/emailjs";
 
 type Status = "idle" | "sending" | "signed" | "error";
-
-const EMAILJS_SERVICE = "service_560nh3i";
-const EMAILJS_TEMPLATE = "template_dyb1k4x";
-const EMAILJS_PUBLIC_KEY = "mB56akvK2qStLNadU";
-const CONTACT_EMAIL = "contact@streamerosai.com";
 
 interface FormState {
   name: string;
@@ -40,6 +36,7 @@ export default function ConsentForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [signedAt, setSignedAt] = useState<string>("");
+  const [copySent, setCopySent] = useState(false);
 
   const allTicked = CONSENTS.every((c) => ticked.has(c.id));
 
@@ -103,17 +100,41 @@ export default function ConsentForm() {
 
     try {
       await emailjs.send(
-        EMAILJS_SERVICE,
-        EMAILJS_TEMPLATE,
+        EMAILJS.service,
+        EMAILJS.template,
         {
           name: form.name,
           email: form.email,
           message: body,
-          to_email: CONTACT_EMAIL,
+          to_email: EMAILJS.contactEmail,
           reply_to: form.email,
         },
-        EMAILJS_PUBLIC_KEY,
+        EMAILJS.publicKey,
       );
+
+      // Second copy to the student. Best-effort and deliberately after the
+      // one that matters: an agreement only one party holds is a weak record,
+      // but failing to deliver their copy must not invalidate consent that has
+      // already been captured.
+      try {
+        await emailjs.send(
+          EMAILJS.service,
+          EMAILJS.template,
+          {
+            name: form.name,
+            email: EMAILJS.contactEmail,
+            message: `${body}\n\n---\nThis is your copy of the agreement you consented to. Keep it. Questions about any clause are welcome at ${EMAILJS.contactEmail}.`,
+            to_email: form.email,
+            reply_to: EMAILJS.contactEmail,
+          },
+          EMAILJS.publicKey,
+        );
+        setCopySent(true);
+      } catch (copyErr) {
+        console.error("Student copy failed:", copyErr);
+        track("agreement-copy-failed");
+      }
+
       setSignedAt(stamp);
       setStatus("signed");
       track("agreement-signed");
@@ -142,8 +163,9 @@ export default function ConsentForm() {
           Consent given. A copy has been sent.
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-300 print:text-zinc-700">
-          Save your own copy below. Keep it — it is the record of exactly what
-          was agreed, and it is what you point at if anything is ever unclear.
+          {copySent
+            ? `A copy has been emailed to ${form.email}. Keep it — it is the record of exactly what was agreed, and it is what you point at if anything is ever unclear.`
+            : "Save your own copy below and keep it — it is the record of exactly what was agreed. Your emailed copy did not go through, so please save the PDF."}
         </p>
 
         <dl className="mt-8 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">

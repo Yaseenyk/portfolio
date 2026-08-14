@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
+import { EMAILJS } from "@/lib/emailjs";
 import SectionLabel from "./SectionLabel";
 import { track } from "@/lib/analytics";
 
@@ -16,12 +17,12 @@ interface FormState {
 
 const EMPTY_FORM: FormState = { name: "", email: "", message: "" };
 
-const EMAILJS_SERVICE = "service_560nh3i";
-const EMAILJS_TEMPLATE = "template_dyb1k4x";
-const EMAILJS_PUBLIC_KEY = "mB56akvK2qStLNadU";
+const EMAILJS_SERVICE = EMAILJS.service;
+const EMAILJS_TEMPLATE = EMAILJS.template;
+const EMAILJS_PUBLIC_KEY = EMAILJS.publicKey;
 
 // Where enquiries are delivered + shown on the page.
-const CONTACT_EMAIL = "contact@streamerosai.com";
+const CONTACT_EMAIL = EMAILJS.contactEmail;
 const CONTACT_PHONE = "8208335028";
 
 const STATUS_MESSAGE: Record<Exclude<Status, "idle" | "sending">, string> = {
