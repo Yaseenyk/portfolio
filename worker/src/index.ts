@@ -28,6 +28,12 @@ export interface Env {
    * in the browser; this is the record that survives an EmailJS failure.
    */
   DB?: D1Like;
+  /**
+   * Signed agreement PDFs. Optional for the same reason as DB — the binding
+   * stays commented out in wrangler.toml until the bucket exists, and a
+   * missing binding must degrade rather than fail the deploy.
+   */
+  AGREEMENTS?: R2Like;
   /** Passcode for the private /outreach drafter. Set via:
    *  npx wrangler secret put OUTREACH_PASSCODE  (or the CF dashboard). */
   OUTREACH_PASSCODE?: string;
@@ -47,6 +53,16 @@ interface D1Like {
       all(): Promise<{ results?: unknown[] }>;
     };
   };
+}
+
+/** Minimal R2 surface, hand-rolled to match the style above. */
+interface R2Like {
+  put(
+    key: string,
+    value: ArrayBuffer,
+    options?: { httpMetadata?: Record<string, string> },
+  ): Promise<unknown>;
+  get(key: string): Promise<{ body: ReadableStream } | null>;
 }
 
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
@@ -722,6 +738,78 @@ async function handleLeadsList(
   }
 }
 
+/* ------------------------------ agreement pdf ----------------------------- */
+
+/** A signed agreement is a few KB. Anything larger is not one. */
+const MAX_PDF_BYTES = 2 * 1024 * 1024;
+
+/**
+ * POST /api/agreement-pdf — store a signed agreement, return its URL.
+ *
+ * The key is a UUID, so the returned URL is unguessable. That is the only
+ * thing protecting it: the PDF carries a student's name and phone number, so
+ * the link is emailed to the owner and never published.
+ */
+async function handleAgreementPut(
+  request: Request,
+  env: Env,
+  origin: string | null,
+): Promise<Response> {
+  if (!env.AGREEMENTS) {
+    return json({ ok: true, stored: false, reason: "no bucket bound" }, 200, origin);
+  }
+
+  const bytes = await request.arrayBuffer();
+  if (bytes.byteLength === 0 || bytes.byteLength > MAX_PDF_BYTES) {
+    return json({ error: "empty or oversized" }, 400, origin);
+  }
+
+  // Reject anything that is not actually a PDF — this endpoint is unauthenticated
+  // by necessity (it runs from a static page), so it must not become open storage.
+  const header = new Uint8Array(bytes.slice(0, 5));
+  const isPdf = String.fromCharCode(...header) === "%PDF-";
+  if (!isPdf) {
+    return json({ error: "not a pdf" }, 400, origin);
+  }
+
+  const key = `agreements/${crypto.randomUUID()}.pdf`;
+  try {
+    await env.AGREEMENTS.put(key, bytes, {
+      httpMetadata: { contentType: "application/pdf" },
+    });
+    return json(
+      { ok: true, stored: true, url: `${new URL(request.url).origin}/${key}` },
+      201,
+      origin,
+    );
+  } catch (err) {
+    console.error("agreement put failed:", err);
+    return json({ ok: false, stored: false }, 500, origin);
+  }
+}
+
+/** GET /agreements/<uuid>.pdf — stream a stored agreement back. */
+async function handleAgreementGet(
+  pathname: string,
+  env: Env,
+  origin: string | null,
+): Promise<Response> {
+  if (!env.AGREEMENTS) return json({ error: "not found" }, 404, origin);
+
+  const key = pathname.replace(/^\//, "");
+  const object = await env.AGREEMENTS.get(key);
+  if (!object) return json({ error: "not found" }, 404, origin);
+
+  return new Response(object.body, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": "inline",
+      // Unguessable URL, but keep it out of any shared cache.
+      "Cache-Control": "private, max-age=0, no-store",
+    },
+  });
+}
+
 /* --------------------------------- router -------------------------------- */
 
 export default {
@@ -741,6 +829,12 @@ export default {
     }
     if (pathname === "/api/lead" && request.method === "POST") {
       return handleLead(request, env, origin);
+    }
+    if (pathname === "/api/agreement-pdf" && request.method === "POST") {
+      return handleAgreementPut(request, env, origin);
+    }
+    if (pathname.startsWith("/agreements/") && request.method === "GET") {
+      return handleAgreementGet(pathname, env, origin);
     }
     if (pathname === "/api/leads/list" && request.method === "POST") {
       return handleLeadsList(request, env, origin);

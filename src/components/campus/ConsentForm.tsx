@@ -7,6 +7,43 @@ import { AGREEMENT_VERSION, CONSENTS } from "@/lib/agreement";
 import { track } from "@/lib/analytics";
 import { recordLead } from "@/lib/leads";
 import { EMAILJS } from "@/lib/emailjs";
+import {
+  agreementFilename,
+  buildAgreementPdf,
+  type AgreementRecord,
+} from "@/lib/agreementPdf";
+
+const CONCIERGE_URL = process.env.NEXT_PUBLIC_CONCIERGE_URL ?? "";
+
+/**
+ * Build the PDF and store it, returning its URL. Every failure is swallowed —
+ * a storage outage must never block consent that has already been given, and
+ * the plain-text record in the email stands on its own.
+ */
+async function storeAgreementPdf(record: AgreementRecord): Promise<string> {
+  if (!CONCIERGE_URL) return "";
+  try {
+    const bytes = await buildAgreementPdf(record);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(
+      `${CONCIERGE_URL}/api/agreement-pdf?name=${encodeURIComponent(agreementFilename(record))}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/pdf" },
+        body: bytes.slice().buffer as ArrayBuffer,
+        signal: controller.signal,
+      },
+    );
+    clearTimeout(timeout);
+    if (!res.ok) return "";
+    const data = (await res.json()) as { url?: string };
+    return data.url ?? "";
+  } catch (err) {
+    console.error("Agreement PDF storage failed:", err);
+    return "";
+  }
+}
 
 type Status = "idle" | "sending" | "signed" | "error";
 
@@ -98,6 +135,24 @@ export default function ConsentForm() {
       message: body,
     });
 
+    // Store the PDF before the emails, so the owner's copy can carry its link.
+    // Failure here is silent by design — the plain-text record stands alone.
+    const pdfUrl = await storeAgreementPdf({
+      name: form.name,
+      phone: form.phone,
+      email: form.email,
+      college: form.college,
+      project: form.project,
+      tier: form.tier,
+      version: AGREEMENT_VERSION,
+      signedAt: stamp,
+      clauses: CONSENTS.map((c) => c.label),
+    });
+
+    const ownerBody = pdfUrl
+      ? `${body}\n\nSigned PDF: ${pdfUrl}`
+      : `${body}\n\n(PDF storage unavailable — this text is the record.)`;
+
     try {
       await emailjs.send(
         EMAILJS.service,
@@ -105,7 +160,7 @@ export default function ConsentForm() {
         {
           name: form.name,
           email: form.email,
-          message: body,
+          message: ownerBody,
           to_email: EMAILJS.contactEmail,
           reply_to: form.email,
         },

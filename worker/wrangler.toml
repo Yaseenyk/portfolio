@@ -18,5 +18,17 @@ binding = "DB"
 database_name = "yaseen-leads"
 database_id = "22fc602e-3dd0-4974-8a1f-835185633208"
 
+# Signed agreement PDFs. COMMENTED OUT UNTIL THE BUCKET EXISTS — worker.yml
+# deploys on every push to worker/**, and a binding pointing at a missing
+# bucket fails the deploy and takes /api/chat and /mcp down with it.
+#
+# To enable:
+#   npx wrangler r2 bucket create yaseen-agreements
+# then uncomment. The binding name must stay "AGREEMENTS".
+#
+# [[r2_buckets]]
+# binding = "AGREEMENTS"
+# bucket_name = "yaseen-agreements"
+
 [observability]
 enabled = true
