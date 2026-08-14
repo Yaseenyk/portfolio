@@ -16,18 +16,24 @@ import {
 const CONCIERGE_URL = process.env.NEXT_PUBLIC_CONCIERGE_URL ?? "";
 
 /**
- * Build the PDF and store it, returning its URL. Every failure is swallowed —
+ * Upload the already-built PDF and return its URL. Every failure is swallowed —
  * a storage outage must never block consent that has already been given, and
  * the plain-text record in the email stands on its own.
+ *
+ * Takes bytes rather than building them, so the file the student downloads is
+ * byte-identical to the one stored and linked in both emails. Building twice
+ * would produce two subtly different documents.
  */
-async function storeAgreementPdf(record: AgreementRecord): Promise<string> {
+async function uploadAgreementPdf(
+  bytes: Uint8Array,
+  filename: string,
+): Promise<string> {
   if (!CONCIERGE_URL) return "";
   try {
-    const bytes = await buildAgreementPdf(record);
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
     const res = await fetch(
-      `${CONCIERGE_URL}/api/agreement-pdf?name=${encodeURIComponent(agreementFilename(record))}`,
+      `${CONCIERGE_URL}/api/agreement-pdf?name=${encodeURIComponent(filename)}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/pdf" },
@@ -74,6 +80,8 @@ export default function ConsentForm() {
   const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [signedAt, setSignedAt] = useState<string>("");
   const [copySent, setCopySent] = useState(false);
+  const [pdfBytes, setPdfBytes] = useState<Uint8Array | null>(null);
+  const [pdfName, setPdfName] = useState("agreement.pdf");
 
   const allTicked = CONSENTS.every((c) => ticked.has(c.id));
 
@@ -135,9 +143,11 @@ export default function ConsentForm() {
       message: body,
     });
 
-    // Store the PDF before the emails, so the owner's copy can carry its link.
-    // Failure here is silent by design — the plain-text record stands alone.
-    const pdfUrl = await storeAgreementPdf({
+    // Build the document once. The same bytes are stored, linked in both
+    // emails, and offered to the student — so there is exactly one canonical
+    // copy of the agreement rather than several that merely resemble one
+    // another.
+    const record: AgreementRecord = {
       name: form.name,
       phone: form.phone,
       email: form.email,
@@ -147,11 +157,31 @@ export default function ConsentForm() {
       version: AGREEMENT_VERSION,
       signedAt: stamp,
       clauses: CONSENTS.map((c) => c.label),
-    });
+    };
+    const filename = agreementFilename(record);
 
-    const ownerBody = pdfUrl
-      ? `${body}\n\nSigned PDF: ${pdfUrl}`
-      : `${body}\n\n(PDF storage unavailable — this text is the record.)`;
+    let bytes: Uint8Array | null = null;
+    try {
+      bytes = await buildAgreementPdf(record);
+      setPdfBytes(bytes);
+      setPdfName(filename);
+    } catch (err) {
+      console.error("Agreement PDF build failed:", err);
+    }
+
+    const pdfUrl = bytes ? await uploadAgreementPdf(bytes, filename) : "";
+
+    // Link first, not last. Buried under the clause list and the user-agent
+    // line it is genuinely easy to miss.
+    const withLink = (text: string) =>
+      pdfUrl
+        ? text.replace(
+            "*** STUDENT AGREEMENT — CONSENT GIVEN ***",
+            `*** STUDENT AGREEMENT — CONSENT GIVEN ***\nSigned PDF: ${pdfUrl}`,
+          )
+        : `${text}\n\n(PDF storage unavailable — this text is the record.)`;
+
+    const ownerBody = withLink(body);
 
     try {
       await emailjs.send(
@@ -182,7 +212,7 @@ export default function ConsentForm() {
             from_name: OWNER_NAME,
             to_name: form.name,
             email: EMAILJS.contactEmail,
-            message: `${body}\n\n---\nThis is your copy of the agreement you consented to. Keep it. Questions about any clause are welcome at ${EMAILJS.contactEmail}.`,
+            message: `${withLink(body)}\n\n---\nThis is your copy of the agreement you consented to. It is the same document Yaseen holds. Keep it — questions about any clause are welcome at ${EMAILJS.contactEmail}.`,
             to_email: form.email,
             reply_to: EMAILJS.contactEmail,
           },
@@ -261,17 +291,38 @@ export default function ConsentForm() {
           ))}
         </ul>
 
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="mt-8 rounded-xl bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-ink print:hidden"
-        >
-          Save as PDF
-        </button>
-        <p className="mt-3 text-xs text-zinc-500 print:hidden">
-          Opens your print dialog — choose &ldquo;Save as PDF&rdquo; as the
-          destination.
-        </p>
+        <div className="mt-8 flex flex-wrap items-center gap-4 print:hidden">
+          <button
+            type="button"
+            disabled={!pdfBytes}
+            onClick={() => {
+              if (!pdfBytes) return;
+              // Same bytes that were stored and linked in both emails.
+              const blob = new Blob([pdfBytes.slice().buffer as ArrayBuffer], {
+                type: "application/pdf",
+              });
+              const href = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = href;
+              a.download = pdfName;
+              a.click();
+              URL.revokeObjectURL(href);
+            }}
+            className="rounded-xl bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-ink disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Download the agreement
+          </button>
+          {pdfBytes ? (
+            <span className="text-xs text-zinc-500">
+              The same PDF has been emailed to both of us.
+            </span>
+          ) : (
+            <span className="text-xs text-zinc-500">
+              PDF unavailable — use your browser&rsquo;s print option to save
+              this page instead.
+            </span>
+          )}
+        </div>
       </section>
     );
   }
