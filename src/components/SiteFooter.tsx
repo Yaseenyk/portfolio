@@ -35,6 +35,19 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
     ],
   },
   {
+    heading: "For students",
+    links: [
+      { href: "/final-year-projects", label: "Final year projects" },
+      { href: "/final-year-projects/guides", label: "Free guides" },
+      { href: "/final-year-projects/question-bank", label: "Viva question bank" },
+      { href: "/final-year-projects/planner", label: "Timeline planner" },
+      { href: "/final-year-projects/colleges", label: "For colleges" },
+      // Onboarding document — noindex, and only sent to a student once they
+      // have committed. Listed here so the link is never lost.
+      { href: "/final-year-projects/agreement", label: "Student agreement" },
+    ],
+  },
+  {
     heading: "Machines",
     links: [
       { href: "/rss.xml", label: "RSS feed", external: true },
@@ -69,7 +82,7 @@ export default function SiteFooter() {
           <PreferredSource />
         </div>
 
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
           {COLUMNS.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
               <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
