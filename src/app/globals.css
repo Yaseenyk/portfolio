@@ -78,3 +78,36 @@
     color: #71717a;
   }
 }
+
+/* Print — used by the student agreement's "Save as PDF" button. The site
+   chrome (floating nav island, WhatsApp bubble, grid background) is noise on
+   paper, and the dark theme burns ink, so print falls back to black on white. */
+@media print {
+  nav,
+  footer,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  main {
+    padding-top: 0 !important;
+  }
+
+  /* Keep a clause and its heading on the same page. */
+  section,
+  li {
+    break-inside: avoid;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    color: #555;
+  }
+}

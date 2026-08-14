@@ -76,9 +76,12 @@ if (existsSync(CAMPUS)) {
   // Listings sit one level down; course pages and guides are nested one deeper
   // ("for/bca", "guides/<slug>") and those sections have an index page too.
   const NESTED = new Set(["for", "guides"]);
+  // Noindex onboarding documents must not enter the public corpus — the
+  // concierge answers from this file, and the agreement is not public content.
+  const PRIVATE = new Set(["agreement"]);
   const pages = [{ path: "", label: "final-year-projects" }];
   for (const dir of readdirSync(CAMPUS, { withFileTypes: true })) {
-    if (!dir.isDirectory()) continue;
+    if (!dir.isDirectory() || PRIVATE.has(dir.name)) continue;
     pages.push({ path: dir.name, label: `final-year-projects/${dir.name}` });
     if (!NESTED.has(dir.name)) continue;
     for (const sub of readdirSync(join(CAMPUS, dir.name), { withFileTypes: true })) {

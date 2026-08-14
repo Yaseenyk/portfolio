@@ -12,8 +12,9 @@
 const CONCIERGE_URL = process.env.NEXT_PUBLIC_CONCIERGE_URL ?? "";
 
 export interface LeadPayload {
-  /** Which surface the enquiry came from. */
-  source: "solutions" | "campus";
+  /** Which surface the record came from. `agreement` is an onboarding
+   *  consent, not an enquiry — it is the durable copy of a signed record. */
+  source: "solutions" | "campus" | "agreement";
   name: string;
   email: string;
   phone?: string;
