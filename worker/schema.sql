@@ -31,3 +31,19 @@ CREATE INDEX IF NOT EXISTS idx_leads_email ON leads (email);
 
 -- Splitting student from business enquiries in a single query.
 CREATE INDEX IF NOT EXISTS idx_leads_source ON leads (source, created_at DESC);
+
+-- Signed agreement PDFs, stored here rather than in R2 so the feature needs no
+-- billing setup. A signed agreement is ~8KB, ~11KB base64 encoded — far inside
+-- D1's 1MB row limit, and a few thousand of them barely dent the 10GB ceiling.
+-- If volume ever makes this the wrong call, move to R2 and keep the same URL
+-- shape (/agreements/<uuid>.pdf) so nothing else changes.
+CREATE TABLE IF NOT EXISTS agreement_pdfs (
+  id              TEXT PRIMARY KEY,   -- uuid, also the URL segment
+  created_at      TEXT NOT NULL,
+  filename        TEXT NOT NULL,
+  size_bytes      INTEGER NOT NULL,
+  content_base64  TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_agreement_pdfs_created
+  ON agreement_pdfs (created_at DESC);

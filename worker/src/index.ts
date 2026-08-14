@@ -28,12 +28,6 @@ export interface Env {
    * in the browser; this is the record that survives an EmailJS failure.
    */
   DB?: D1Like;
-  /**
-   * Signed agreement PDFs. Optional for the same reason as DB — the binding
-   * stays commented out in wrangler.toml until the bucket exists, and a
-   * missing binding must degrade rather than fail the deploy.
-   */
-  AGREEMENTS?: R2Like;
   /** Passcode for the private /outreach drafter. Set via:
    *  npx wrangler secret put OUTREACH_PASSCODE  (or the CF dashboard). */
   OUTREACH_PASSCODE?: string;
@@ -55,15 +49,6 @@ interface D1Like {
   };
 }
 
-/** Minimal R2 surface, hand-rolled to match the style above. */
-interface R2Like {
-  put(
-    key: string,
-    value: ArrayBuffer,
-    options?: { httpMetadata?: Record<string, string> },
-  ): Promise<unknown>;
-  get(key: string): Promise<{ body: ReadableStream } | null>;
-}
 
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
 const GEN_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
@@ -740,23 +725,48 @@ async function handleLeadsList(
 
 /* ------------------------------ agreement pdf ----------------------------- */
 
-/** A signed agreement is a few KB. Anything larger is not one. */
-const MAX_PDF_BYTES = 2 * 1024 * 1024;
+/**
+ * A signed agreement is a few KB. The cap is well under D1's 1MB row limit
+ * once base64 inflates it by a third.
+ */
+const MAX_PDF_BYTES = 512 * 1024;
+
+/** Chunked so a large buffer cannot blow the argument limit on apply(). */
+function toBase64(bytes: ArrayBuffer): string {
+  const view = new Uint8Array(bytes);
+  let binary = "";
+  for (let i = 0; i < view.length; i += 8192) {
+    binary += String.fromCharCode(...view.subarray(i, i + 8192));
+  }
+  return btoa(binary);
+}
+
+function fromBase64(b64: string): Uint8Array {
+  const binary = atob(b64);
+  const out = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+  return out;
+}
 
 /**
  * POST /api/agreement-pdf — store a signed agreement, return its URL.
  *
- * The key is a UUID, so the returned URL is unguessable. That is the only
- * thing protecting it: the PDF carries a student's name and phone number, so
- * the link is emailed to the owner and never published.
+ * Stored in D1 rather than R2: R2 requires enabling billing on the account,
+ * and these documents are small enough that a database row is a perfectly
+ * good home. The URL shape matches what R2 would have served, so moving later
+ * changes nothing outside this file.
+ *
+ * The id is a UUID, so the returned URL is unguessable. That is the only thing
+ * protecting it — the PDF carries a student's name and phone number, so the
+ * link is emailed to the owner and never published.
  */
 async function handleAgreementPut(
   request: Request,
   env: Env,
   origin: string | null,
 ): Promise<Response> {
-  if (!env.AGREEMENTS) {
-    return json({ ok: true, stored: false, reason: "no bucket bound" }, 200, origin);
+  if (!env.DB) {
+    return json({ ok: true, stored: false, reason: "no database bound" }, 200, origin);
   }
 
   const bytes = await request.arrayBuffer();
@@ -767,47 +777,80 @@ async function handleAgreementPut(
   // Reject anything that is not actually a PDF — this endpoint is unauthenticated
   // by necessity (it runs from a static page), so it must not become open storage.
   const header = new Uint8Array(bytes.slice(0, 5));
-  const isPdf = String.fromCharCode(...header) === "%PDF-";
-  if (!isPdf) {
+  if (String.fromCharCode(...header) !== "%PDF-") {
     return json({ error: "not a pdf" }, 400, origin);
   }
 
-  const key = `agreements/${crypto.randomUUID()}.pdf`;
+  const id = crypto.randomUUID();
+  const filename =
+    new URL(request.url).searchParams.get("name")?.slice(0, 120) || `${id}.pdf`;
+
   try {
-    await env.AGREEMENTS.put(key, bytes, {
-      httpMetadata: { contentType: "application/pdf" },
-    });
+    await env.DB.prepare(
+      `INSERT INTO agreement_pdfs (id, created_at, filename, size_bytes, content_base64)
+       VALUES (?, ?, ?, ?, ?)`,
+    )
+      .bind(
+        id,
+        new Date().toISOString(),
+        filename,
+        bytes.byteLength,
+        toBase64(bytes),
+      )
+      .run();
+
     return json(
-      { ok: true, stored: true, url: `${new URL(request.url).origin}/${key}` },
+      {
+        ok: true,
+        stored: true,
+        url: `${new URL(request.url).origin}/agreements/${id}.pdf`,
+      },
       201,
       origin,
     );
   } catch (err) {
-    console.error("agreement put failed:", err);
+    console.error("agreement store failed:", err);
     return json({ ok: false, stored: false }, 500, origin);
   }
 }
 
-/** GET /agreements/<uuid>.pdf — stream a stored agreement back. */
+/** GET /agreements/<uuid>.pdf — return a stored agreement. */
 async function handleAgreementGet(
   pathname: string,
   env: Env,
   origin: string | null,
 ): Promise<Response> {
-  if (!env.AGREEMENTS) return json({ error: "not found" }, 404, origin);
+  if (!env.DB) return json({ error: "not found" }, 404, origin);
 
-  const key = pathname.replace(/^\//, "");
-  const object = await env.AGREEMENTS.get(key);
-  if (!object) return json({ error: "not found" }, 404, origin);
+  const id = pathname.replace("/agreements/", "").replace(/\.pdf$/, "");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) {
+    return json({ error: "not found" }, 404, origin);
+  }
 
-  return new Response(object.body, {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": "inline",
-      // Unguessable URL, but keep it out of any shared cache.
-      "Cache-Control": "private, max-age=0, no-store",
-    },
-  });
+  try {
+    const res = await env.DB.prepare(
+      `SELECT filename, content_base64 FROM agreement_pdfs WHERE id = ?`,
+    )
+      .bind(id)
+      .all();
+
+    const row = res.results?.[0] as
+      | { filename?: string; content_base64?: string }
+      | undefined;
+    if (!row?.content_base64) return json({ error: "not found" }, 404, origin);
+
+    return new Response(fromBase64(row.content_base64), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="${(row.filename ?? "agreement.pdf").replace(/"/g, "")}"`,
+        // Unguessable URL, but keep it out of any shared cache.
+        "Cache-Control": "private, max-age=0, no-store",
+      },
+    });
+  } catch (err) {
+    console.error("agreement fetch failed:", err);
+    return json({ error: "not found" }, 404, origin);
+  }
 }
 
 /* --------------------------------- router -------------------------------- */
