@@ -3,7 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
-import { EMAILJS } from "@/lib/emailjs";
+import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
 import { track } from "@/lib/analytics";
 import { recordLead } from "@/lib/leads";
 
@@ -130,6 +130,8 @@ export default function SolutionsLeadForm({
         EMAILJS_TEMPLATE,
         {
           name: form.name,
+          from_name: form.name,
+          to_name: OWNER_NAME,
           email: form.email,
           message: body,
           to_email: CONTACT_EMAIL,

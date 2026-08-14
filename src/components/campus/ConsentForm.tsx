@@ -6,7 +6,7 @@ import emailjs from "@emailjs/browser";
 import { AGREEMENT_VERSION, CONSENTS } from "@/lib/agreement";
 import { track } from "@/lib/analytics";
 import { recordLead } from "@/lib/leads";
-import { EMAILJS } from "@/lib/emailjs";
+import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
 import {
   agreementFilename,
   buildAgreementPdf,
@@ -159,6 +159,8 @@ export default function ConsentForm() {
         EMAILJS.template,
         {
           name: form.name,
+          from_name: form.name,
+          to_name: OWNER_NAME,
           email: form.email,
           message: ownerBody,
           to_email: EMAILJS.contactEmail,
@@ -176,7 +178,9 @@ export default function ConsentForm() {
           EMAILJS.service,
           EMAILJS.template,
           {
-            name: form.name,
+            name: OWNER_NAME,
+            from_name: OWNER_NAME,
+            to_name: form.name,
             email: EMAILJS.contactEmail,
             message: `${body}\n\n---\nThis is your copy of the agreement you consented to. Keep it. Questions about any clause are welcome at ${EMAILJS.contactEmail}.`,
             to_email: form.email,

@@ -3,7 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
-import { EMAILJS } from "@/lib/emailjs";
+import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
 import SectionLabel from "./SectionLabel";
 import { track } from "@/lib/analytics";
 
@@ -55,7 +55,13 @@ export default function ContactForm() {
       await emailjs.send(
         EMAILJS_SERVICE,
         EMAILJS_TEMPLATE,
-        { ...form, to_email: CONTACT_EMAIL, reply_to: form.email },
+        {
+          ...form,
+          from_name: form.name,
+          to_name: OWNER_NAME,
+          to_email: CONTACT_EMAIL,
+          reply_to: form.email,
+        },
         EMAILJS_PUBLIC_KEY
       );
       setStatus("sent");

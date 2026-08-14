@@ -15,3 +15,11 @@ export const EMAILJS = {
   /** Where every form delivers. */
   contactEmail: "contact@streamerosai.com",
 } as const;
+
+/**
+ * The template greets with {{to_name}} and attributes with {{from_name}}.
+ * Forms previously sent only `name`, so both rendered empty and every email
+ * arrived as "Hello ," — send all three so the template renders whichever it
+ * references.
+ */
+export const OWNER_NAME = "Yaseen";

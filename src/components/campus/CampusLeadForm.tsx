@@ -3,7 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
-import { EMAILJS } from "@/lib/emailjs";
+import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
 import type { CampusTier, Degree } from "@/lib/campus";
 import { formatInr, whatsappHref } from "@/lib/campus";
 import { recordLead } from "@/lib/leads";
@@ -129,6 +129,8 @@ export default function CampusLeadForm({
         EMAILJS_TEMPLATE,
         {
           name: form.name,
+          from_name: form.name,
+          to_name: OWNER_NAME,
           email: form.email,
           message: body,
           to_email: CONTACT_EMAIL,
