@@ -14,6 +14,7 @@ import TVScreen from "./projects/TVScreen";
 import Untangle from "./projects/Untangle";
 import ShadowDocs from "./projects/ShadowDocs";
 import SupportAgentDocs from "./projects/SupportAgentDocs";
+import ShelfScan from "./projects/ShelfScan";
 import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
 import AiBloggerArt from "./products/art/AiBloggerArt";
 import SableArt from "./products/art/SableArt";
@@ -114,6 +115,28 @@ export const PROJECTS: Project[] = [
       {
         href: "https://github.com/Yaseenyk/sable",
         label: "Source code",
+        icon: "github",
+      },
+    ],
+  },
+  {
+    name: "ShelfSight AI",
+    href: "https://github.com/Yaseenyk/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be",
+    category: "Computer Vision · Retail Operations",
+    description:
+      "Four retail vision problems in one system for an Indian kirana shop: phantom stock, shelf layout, produce freshness and expiry dates. A manager lays out a rack once; after that a photo of it counts every facing, and staff get told which shelf to walk to. Its most useful property is what it refuses to claim — the detector localises products without naming them, so the compliance screen reports stocking rather than identity and says so on the screen, and the reference-planogram path returns 409 rather than a score it cannot support. Reads the shop's inventory system read-only; nothing is uploaded anywhere.",
+    metrics: ["4 Use Cases", "650 Tests", "Runs On-Premise"],
+    tech: ["FastAPI", "YOLOv8", "MobileNetV2", "Next.js", "Docker", "Ollama"],
+    Animation: ShelfScan,
+    links: [
+      {
+        href: "https://github.com/Yaseenyk/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be",
+        label: "Backend source",
+        icon: "github",
+      },
+      {
+        href: "https://github.com/Yaseenyk/Shelfsight-AI-real-time-planogram-and-inventory-intelligence",
+        label: "Dashboard source",
         icon: "github",
       },
     ],
