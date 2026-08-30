@@ -197,13 +197,13 @@ export function Body() {
       <p>
         Projects in several of these areas are already built, with source, report
         and daily sessions walking through the code —{" "}
-        <Link href="/final-year-projects/for/btech">see the B.Tech projects</Link>,
+        <Link href="/final-year-projects/for/btech/">see the B.Tech projects</Link>,
         or{" "}
-        <Link href="/final-year-projects/custom">
+        <Link href="/final-year-projects/custom/">
           have your team&rsquo;s problem statement built to spec
         </Link>
         . Before your final review, read{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the questions panels actually ask
         </Link>
         .

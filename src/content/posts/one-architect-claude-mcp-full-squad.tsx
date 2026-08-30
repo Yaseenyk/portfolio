@@ -91,7 +91,7 @@ function Body() {
       </blockquote>
 
       <p>
-        I have. Every product on <a href="/products">this site</a> was built
+        I have. Every product on <a href="/products/">this site</a> was built
         under exactly this model.
       </p>
     </>

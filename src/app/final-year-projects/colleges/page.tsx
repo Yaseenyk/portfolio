@@ -86,7 +86,7 @@ export default function CollegesPage() {
       />
 
       <Link
-        href="/final-year-projects"
+        href="/final-year-projects/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← Student page
@@ -158,7 +158,7 @@ export default function CollegesPage() {
           college precisely so a cohort does not end up duplicating.
         </p>
         <Link
-          href="/final-year-projects"
+          href="/final-year-projects/"
           className="mt-5 inline-block text-sm text-cyan underline-offset-4 hover:underline"
         >
           See the catalog →

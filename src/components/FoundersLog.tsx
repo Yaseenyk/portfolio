@@ -81,7 +81,7 @@ export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
           </p>
         </div>
         <Link
-          href="/blog"
+          href="/blog/"
           className="font-mono text-xs text-zinc-500 transition-colors hover:text-cyan"
         >
           All dispatches →

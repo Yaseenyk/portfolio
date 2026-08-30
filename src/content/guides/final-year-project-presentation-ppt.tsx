@@ -204,16 +204,16 @@ export function Body() {
         the synopsis already written to match the code &mdash; and each one is
         walked through with you in live sessions so the demo and the answers are
         yours, not memorised.{" "}
-        <Link href="/final-year-projects">See the projects</Link>, and prepare with{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/">See the projects</Link>, and prepare with{" "}
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the viva questions panels actually ask
         </Link>{" "}
         and the{" "}
-        <Link href="/final-year-projects/guides/final-year-project-report-format">
+        <Link href="/final-year-projects/guides/final-year-project-report-format/">
           report format that the deck should match
         </Link>
         . Need one built and rehearsed end to end? Start with a{" "}
-        <Link href="/final-year-projects/custom">custom build</Link>.
+        <Link href="/final-year-projects/custom/">custom build</Link>.
       </p>
     </>
   );

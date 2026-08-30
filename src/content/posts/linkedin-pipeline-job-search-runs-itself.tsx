@@ -52,7 +52,7 @@ function Body() {
         Profile visits, connection requests, and recruiter conversations
         arrived on the pipeline&apos;s schedule instead of my energy
         level&apos;s. The product&apos;s full architecture breakdown lives{" "}
-        <a href="/products/linkedin-pipeline">on its product page</a>.
+        <a href="/products/linkedin-pipeline/">on its product page</a>.
       </p>
 
       <h2>The transferable lesson for companies</h2>

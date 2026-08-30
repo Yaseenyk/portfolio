@@ -205,15 +205,15 @@ export function Body() {
         Every project on this site is scoped to the degree it is built for — the
         same domain shipped at BCA depth or B.Tech depth, with the report,
         diagrams and deploy done to match. Start with your degree&rsquo;s hub:{" "}
-        <Link href="/final-year-projects/for/bca">BCA</Link>,{" "}
-        <Link href="/final-year-projects/for/mca">MCA</Link> or{" "}
-        <Link href="/final-year-projects/for/btech">B.Tech</Link>. If you are still
+        <Link href="/final-year-projects/for/bca/">BCA</Link>,{" "}
+        <Link href="/final-year-projects/for/mca/">MCA</Link> or{" "}
+        <Link href="/final-year-projects/for/btech/">B.Tech</Link>. If you are still
         deciding, read{" "}
-        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project">
+        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project/">
           how to choose a project you will not regret in March
         </Link>
         , or tell us your degree and timeline on the{" "}
-        <Link href="/final-year-projects/custom">custom build</Link> page and we
+        <Link href="/final-year-projects/custom/">custom build</Link> page and we
         will scope it to your level — built, documented, deployed, and walked
         through with you in live sessions.
       </p>

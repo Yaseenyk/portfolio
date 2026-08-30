@@ -36,7 +36,7 @@ export default function CampusIndex({ projects, degrees, domains }: Props) {
         <p className="mt-2 text-sm text-zinc-500">
           Need something specific in the meantime?{" "}
           <Link
-            href="/final-year-projects/custom"
+            href="/final-year-projects/custom/"
             className="text-cyan underline-offset-4 hover:underline"
           >
             Send a custom brief
@@ -85,7 +85,7 @@ export default function CampusIndex({ projects, degrees, domains }: Props) {
         <p className="mt-10 text-center text-sm text-zinc-500">
           Nothing matches that filter.{" "}
           <Link
-            href="/final-year-projects/custom"
+            href="/final-year-projects/custom/"
             className="text-cyan underline-offset-4 hover:underline"
           >
             Ask for it to be built

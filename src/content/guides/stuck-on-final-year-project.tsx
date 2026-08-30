@@ -68,12 +68,12 @@ export function Body() {
       </ul>
       <p>
         The full method is in{" "}
-        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project">
+        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project/">
           how to choose a final year project
         </Link>
         , and the catalog is a fast way to find a shape you can commit to —
         browse{" "}
-        <Link href="/final-year-projects">the projects</Link> and pick the one
+        <Link href="/final-year-projects/">the projects</Link> and pick the one
         closest to a problem you actually care about. The goal here is not the
         perfect idea. It is a decided one, before another week is gone.
       </p>
@@ -108,21 +108,21 @@ export function Body() {
       </ul>
       <p>
         If the calendar is the real problem, the{" "}
-        <Link href="/final-year-projects/guides/final-year-project-in-one-month">
+        <Link href="/final-year-projects/guides/final-year-project-in-one-month/">
           one-month plan
         </Link>{" "}
         shows what is still achievable and in what order. And when the build
         genuinely will not come together in the time left, a project built to your
         problem statement — with the source code included so you can read and
         learn every part — is a defensible way out. That is what{" "}
-        <Link href="/final-year-projects/custom">a custom build</Link> is for. Two
+        <Link href="/final-year-projects/custom/">a custom build</Link> is for. Two
         projects with a clean, buildable core if you want to restart on solid
         ground:{" "}
-        <Link href="/final-year-projects/blood-bank-management">
+        <Link href="/final-year-projects/blood-bank-management/">
           the blood bank management system
         </Link>{" "}
         and{" "}
-        <Link href="/final-year-projects/plant-disease-detection">
+        <Link href="/final-year-projects/plant-disease-detection/">
           the plant disease detection model
         </Link>
         .
@@ -156,11 +156,11 @@ export function Body() {
       </ul>
       <p>
         Work through{" "}
-        <Link href="/final-year-projects/guides/how-to-explain-your-project-in-the-viva">
+        <Link href="/final-year-projects/guides/how-to-explain-your-project-in-the-viva/">
           how to explain your project in the viva
         </Link>{" "}
         and pressure-test yourself against{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the questions panels actually ask
         </Link>
         . If the project is not really yours to explain, the only honest fix is to
@@ -186,9 +186,9 @@ export function Body() {
         daily live sessions until you can defend it yourself — full source code on
         every tier, and seats capped per college so no two students submit the
         same thing.{" "}
-        <Link href="/final-year-projects/custom">Start a custom build</Link> from
+        <Link href="/final-year-projects/custom/">Start a custom build</Link> from
         your problem statement, or{" "}
-        <Link href="/final-year-projects">browse the catalog</Link> for a project
+        <Link href="/final-year-projects/">browse the catalog</Link> for a project
         close to where you are stuck.
       </p>
     </>

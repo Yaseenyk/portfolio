@@ -80,7 +80,7 @@ function Body() {
         three different answers from one method: find the constraint that
         actually governs the product, and spend where it lives. The full
         architecture — IPC design, chat ingestion, OBS rule engine — is broken
-        down on <a href="/products/streameros">the streamerOS product page</a>.
+        down on <a href="/products/streameros/">the streamerOS product page</a>.
       </p>
     </>
   );

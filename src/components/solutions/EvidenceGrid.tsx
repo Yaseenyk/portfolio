@@ -53,7 +53,7 @@ export default function EvidenceGrid() {
 
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
-          href="/projects"
+          href="/projects/"
           className="rounded-xl border border-white/10 px-5 py-2.5 text-sm text-zinc-300 transition-colors duration-200 hover:border-cyan/60 hover:text-zinc-50"
         >
           Client and enterprise work →

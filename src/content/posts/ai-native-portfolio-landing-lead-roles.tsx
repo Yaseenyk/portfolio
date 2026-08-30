@@ -133,7 +133,7 @@ function Body() {
         grounding, the{" "}
         guardrails{" "}
         — all of it, demonstrated by the thing you&apos;re reading. Revisit the full{" "}
-        <a href="/roadmap">roadmap</a>, or{" "}
+        <a href="/roadmap/">roadmap</a>, or{" "}
         <a href="/#contact">start a conversation</a>.
       </p>
     </>

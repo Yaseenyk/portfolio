@@ -199,8 +199,8 @@ export function Body() {
         questions you get asked — while there is still time to fix the answers.
       </p>
       <p>
-        <Link href="/final-year-projects">See the projects</Link>, or{" "}
-        <Link href="/final-year-projects/custom">
+        <Link href="/final-year-projects/">See the projects</Link>, or{" "}
+        <Link href="/final-year-projects/custom/">
           have your own idea built from scratch
         </Link>
         .

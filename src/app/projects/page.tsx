@@ -44,7 +44,7 @@ export default function ProjectsPage() {
               the autonomous pipelines that run this site. Architecture
               deep-dives live in{" "}
               <Link
-                href="/products"
+                href="/products/"
                 className="text-ice underline-offset-4 hover:underline"
               >
                 /products

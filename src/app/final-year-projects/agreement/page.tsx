@@ -18,7 +18,7 @@ export default function AgreementPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
       <Link
-        href="/final-year-projects"
+        href="/final-year-projects/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan print:hidden"
       >
         ← Final year projects
@@ -39,7 +39,7 @@ export default function AgreementPage() {
         <p className="mt-4 leading-relaxed text-zinc-400 print:text-zinc-700">
           It sits alongside the public{" "}
           <Link
-            href="/final-year-projects/terms"
+            href="/final-year-projects/terms/"
             className="text-cyan underline-offset-4 hover:underline"
           >
             terms

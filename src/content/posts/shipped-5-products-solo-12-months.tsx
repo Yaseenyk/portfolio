@@ -87,7 +87,7 @@ function Body() {
         team of one. When I say I understand systems end-to-end, the evidence
         is deployed, running, and documented across this site — every product
         has a full architecture breakdown in the{" "}
-        <a href="/products">products section</a>.
+        <a href="/products/">products section</a>.
       </p>
       <p>
         The next nine posts in this series each take one of these systems — or

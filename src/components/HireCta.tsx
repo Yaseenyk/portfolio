@@ -21,7 +21,7 @@ export default function HireCta() {
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <Link
-            href="/hire"
+            href="/hire/"
             className="inline-flex items-center gap-2 rounded-lg bg-cyan px-6 py-3 text-sm font-semibold text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_-2px_rgba(34,211,238,0.7)]"
           >
             How I work →

@@ -90,7 +90,7 @@ export function Body() {
         Get the synopsis approved this week without fail. A topic rejected in
         week two of a four-week plan is not a setback, it is the end of the plan.
         If you are unsure of the format, the{" "}
-        <Link href="/final-year-projects/guides/final-year-project-synopsis-format">
+        <Link href="/final-year-projects/guides/final-year-project-synopsis-format/">
           synopsis format guide
         </Link>{" "}
         has the structure most departments expect.
@@ -114,7 +114,7 @@ export function Body() {
         If you can already tell the build is slipping past this week — the core
         will not come together, or you are stuck on something you cannot solve —
         do not spend week three hoping it resolves. Read{" "}
-        <Link href="/final-year-projects/guides/stuck-on-final-year-project">
+        <Link href="/final-year-projects/guides/stuck-on-final-year-project/">
           the honest fix for being stuck
         </Link>{" "}
         and make the call early, while you still have three weeks of options.
@@ -133,7 +133,7 @@ export function Body() {
         Second, write the report while the decisions are still fresh. Do not save
         it for the end — a report written the night before submission always
         looks like one. Draft it chapter by chapter, and follow the{" "}
-        <Link href="/final-year-projects/guides/final-year-project-report-format">
+        <Link href="/final-year-projects/guides/final-year-project-report-format/">
           report format guide
         </Link>{" "}
         so you do not lose easy marks on structure. The single rule that matters:
@@ -154,11 +154,11 @@ export function Body() {
       <p>
         Preparing for the viva is not a week-four afterthought — it is half of
         your marks. Walk through{" "}
-        <Link href="/final-year-projects/guides/how-to-explain-your-project-in-the-viva">
+        <Link href="/final-year-projects/guides/how-to-explain-your-project-in-the-viva/">
           how to explain your project confidently
         </Link>{" "}
         and rehearse against the{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           questions panels actually ask
         </Link>
         . A project you built but cannot explain scores like a project you did not
@@ -188,15 +188,15 @@ export function Body() {
 
       <p>
         If a month is what you have, this plan uses it well —{" "}
-        <Link href="/final-year-projects">start from a project close to your idea</Link>{" "}
+        <Link href="/final-year-projects/">start from a project close to your idea</Link>{" "}
         so week one is a head start rather than a blank page. If the month is
         already gone, the honest option is a{" "}
-        <Link href="/final-year-projects/custom">build to your problem statement</Link>{" "}
+        <Link href="/final-year-projects/custom/">build to your problem statement</Link>{" "}
         with the documentation and viva prep done alongside it. Two projects that
         fit a crunch well are{" "}
-        <Link href="/final-year-projects/ecommerce-mern">the MERN e-commerce store</Link>{" "}
+        <Link href="/final-year-projects/ecommerce-mern/">the MERN e-commerce store</Link>{" "}
         and{" "}
-        <Link href="/final-year-projects/realtime-chat-mern">the real-time chat app</Link>{" "}
+        <Link href="/final-year-projects/realtime-chat-mern/">the real-time chat app</Link>{" "}
         — both have one clear core flow you can lock in week one.
       </p>
     </>

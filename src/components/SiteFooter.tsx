@@ -7,26 +7,26 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
     heading: "Explore",
     links: [
       { href: "/", label: "Home" },
-      { href: "/about", label: "About" },
-      { href: "/projects", label: "Projects" },
-      { href: "/products", label: "Products" },
-      { href: "/sandbox", label: "Sandbox / Lab" },
-      { href: "/uses", label: "Stack" },
+      { href: "/about/", label: "About" },
+      { href: "/projects/", label: "Projects" },
+      { href: "/products/", label: "Products" },
+      { href: "/sandbox/", label: "Sandbox / Lab" },
+      { href: "/uses/", label: "Stack" },
     ],
   },
   {
     heading: "Writing",
     links: [
-      { href: "/blog", label: "Field Notes (blog)" },
+      { href: "/blog/", label: "Field Notes (blog)" },
       { href: "/#founders-log", label: "Founder's Log" },
-      { href: "/roadmap", label: "AI Systems Roadmap" },
-      { href: "/anthropic-roadmap", label: "Anthropic Roadmap" },
+      { href: "/roadmap/", label: "AI Systems Roadmap" },
+      { href: "/anthropic-roadmap/", label: "Anthropic Roadmap" },
     ],
   },
   {
     heading: "For recruiters",
     links: [
-      { href: "/interview", label: "Interview brief" },
+      { href: "/interview/", label: "Interview brief" },
       { href: RESUME_URL, label: "Résumé (PDF)", external: true },
       { href: "/#rag-concierge", label: "Ask the concierge" },
       { href: "/#contact", label: "Contact" },
@@ -37,14 +37,14 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
   {
     heading: "For students",
     links: [
-      { href: "/final-year-projects", label: "Final year projects" },
-      { href: "/final-year-projects/guides", label: "Free guides" },
-      { href: "/final-year-projects/question-bank", label: "Viva question bank" },
-      { href: "/final-year-projects/planner", label: "Timeline planner" },
-      { href: "/final-year-projects/colleges", label: "For colleges" },
+      { href: "/final-year-projects/", label: "Final year projects" },
+      { href: "/final-year-projects/guides/", label: "Free guides" },
+      { href: "/final-year-projects/question-bank/", label: "Viva question bank" },
+      { href: "/final-year-projects/planner/", label: "Timeline planner" },
+      { href: "/final-year-projects/colleges/", label: "For colleges" },
       // Onboarding document — noindex, and only sent to a student once they
       // have committed. Listed here so the link is never lost.
-      { href: "/final-year-projects/agreement", label: "Student agreement" },
+      { href: "/final-year-projects/agreement/", label: "Student agreement" },
     ],
   },
   {

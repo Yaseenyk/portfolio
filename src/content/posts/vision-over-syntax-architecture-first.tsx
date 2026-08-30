@@ -83,7 +83,7 @@ function Body() {
         Node, TypeScript.&quot; Fine — so is the model. The question worth
         asking a candidate is: <em>show me a system you refused to build the
         easy way, and what that refusal bought.</em> I have{" "}
-        <a href="/products">five answers deployed</a>.
+        <a href="/products/">five answers deployed</a>.
       </p>
     </>
   );

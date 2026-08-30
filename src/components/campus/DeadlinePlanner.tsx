@@ -255,7 +255,7 @@ export default function DeadlinePlanner() {
               Send this timeline on WhatsApp
             </a>
             <Link
-              href="/final-year-projects"
+              href="/final-year-projects/"
               className="rounded-xl border border-white/10 px-6 py-3 text-sm text-zinc-300 transition-colors duration-200 hover:border-cyan/60 hover:text-zinc-50"
             >
               See projects that fit this

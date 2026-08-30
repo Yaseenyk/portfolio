@@ -263,7 +263,7 @@ function Body() {
         {" "}
         — how to organize what you put <em>inside</em> the window so the model
         parses it deterministically instead of guessing at structure. Or jump to{" "}
-        <a href="/anthropic-roadmap">the full roadmap</a>.
+        <a href="/anthropic-roadmap/">the full roadmap</a>.
       </p>
     </>
   );

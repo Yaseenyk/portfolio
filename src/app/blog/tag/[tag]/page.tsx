@@ -57,7 +57,7 @@ export default function TagPage({ params }: PageProps) {
           Home
         </Link>
         <span className="text-zinc-700">/</span>
-        <Link href="/blog" className="transition-colors hover:text-cyan">
+        <Link href="/blog/" className="transition-colors hover:text-cyan">
           Blog
         </Link>
         <span className="text-zinc-700">/</span>
@@ -102,7 +102,7 @@ export default function TagPage({ params }: PageProps) {
 
       <p className="mt-12 text-sm text-zinc-500">
         <Link
-          href="/blog"
+          href="/blog/"
           className="text-ice underline-offset-4 hover:underline"
         >
           ← All field notes

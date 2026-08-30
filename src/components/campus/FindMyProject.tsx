@@ -209,7 +209,7 @@ export default function FindMyProject({ projects }: { projects: QuizProject[] })
               Start over
             </button>
             <Link
-              href="/final-year-projects"
+              href="/final-year-projects/"
               className="text-sm text-zinc-400 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-cyan"
             >
               Or browse all projects
@@ -219,7 +219,7 @@ export default function FindMyProject({ projects }: { projects: QuizProject[] })
           <p className="mt-6 text-xs leading-relaxed text-zinc-500">
             None quite right? Any of these can be varied to your problem statement, or
             built from scratch — tell me on WhatsApp or the{" "}
-            <Link href="/final-year-projects/custom" className="text-cyan hover:underline">
+            <Link href="/final-year-projects/custom/" className="text-cyan hover:underline">
               custom build form
             </Link>
             .

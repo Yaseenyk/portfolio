@@ -125,27 +125,27 @@ export default function HirePage() {
         <p className="mt-4 max-w-3xl leading-relaxed text-zinc-400">
           This site&apos;s whole thesis is real artifacts over claims. Read the
           engineering decisions behind{" "}
-          <Link href="/products/sable" className="text-cyan underline-offset-4 hover:underline">
+          <Link href="/products/sable/" className="text-cyan underline-offset-4 hover:underline">
             Sable
           </Link>{" "}
           (a local-first AI finance agent that keeps 100% of data on-device),{" "}
-          <Link href="/products/streameros" className="text-cyan underline-offset-4 hover:underline">
+          <Link href="/products/streameros/" className="text-cyan underline-offset-4 hover:underline">
             streamerOS
           </Link>{" "}
           (a Rust desktop cockpit plus a serverless RAG support agent on the
           edge), and the{" "}
           <Link
-            href="/blog/the-94-percent-decision-integratex"
+            href="/blog/the-94-percent-decision-integratex/"
             className="text-cyan underline-offset-4 hover:underline"
           >
             94% payload cut on IntegrateX
           </Link>
           . Or browse{" "}
-          <Link href="/products" className="text-cyan underline-offset-4 hover:underline">
+          <Link href="/products/" className="text-cyan underline-offset-4 hover:underline">
             every product
           </Link>{" "}
           and{" "}
-          <Link href="/blog" className="text-cyan underline-offset-4 hover:underline">
+          <Link href="/blog/" className="text-cyan underline-offset-4 hover:underline">
             the writing
           </Link>{" "}
           behind the decisions.

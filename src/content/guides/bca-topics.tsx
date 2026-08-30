@@ -218,12 +218,12 @@ export function Body() {
       <p>
         Several of these are already built and come with the source, the report, the
         diagrams and daily sessions walking through the code —{" "}
-        <Link href="/final-year-projects/for/bca">see the BCA projects</Link>, or{" "}
-        <Link href="/final-year-projects/custom">
+        <Link href="/final-year-projects/for/bca/">see the BCA projects</Link>, or{" "}
+        <Link href="/final-year-projects/custom/">
           have something on this list built for you
         </Link>
         . Before your viva, read{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the questions panels actually ask
         </Link>
         .

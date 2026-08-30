@@ -34,7 +34,7 @@ export default function SubmissionSeasonBand() {
         four-week buffer.
       </span>
       <Link
-        href="/final-year-projects/planner"
+        href="/final-year-projects/planner/"
         className="font-medium text-amber-200 underline-offset-4 hover:underline"
       >
         Check your real deadline →

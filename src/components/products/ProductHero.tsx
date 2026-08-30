@@ -23,7 +23,7 @@ export default function ProductHero({
           Home
         </Link>
         <span className="text-zinc-700">/</span>
-        <Link href="/products" className="transition-colors hover:text-cyan">
+        <Link href="/products/" className="transition-colors hover:text-cyan">
           Products
         </Link>
         <span className="text-zinc-700">/</span>

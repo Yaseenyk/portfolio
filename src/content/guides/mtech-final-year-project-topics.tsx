@@ -163,29 +163,29 @@ export function Body() {
         metrics &mdash; plus daily sessions that walk through the method and the
         results line by line, so you defend the contribution and not just the syntax.
         Start with{" "}
-        <Link href="/final-year-projects/for/mtech">the M.Tech projects</Link>. The
+        <Link href="/final-year-projects/for/mtech/">the M.Tech projects</Link>. The
         research-angle builds above map to{" "}
-        <Link href="/final-year-projects/recommendation-system-ml">
+        <Link href="/final-year-projects/recommendation-system-ml/">
           the recommendation system
         </Link>
         ,{" "}
-        <Link href="/final-year-projects/fake-news-detection-ml">
+        <Link href="/final-year-projects/fake-news-detection-ml/">
           fake news detection
         </Link>
         ,{" "}
-        <Link href="/final-year-projects/resume-screening-ml">
+        <Link href="/final-year-projects/resume-screening-ml/">
           resume screening
         </Link>
         ,{" "}
-        <Link href="/final-year-projects/plant-disease-detection">
+        <Link href="/final-year-projects/plant-disease-detection/">
           plant disease detection
         </Link>
         , the{" "}
-        <Link href="/final-year-projects/ai-college-assistant">
+        <Link href="/final-year-projects/ai-college-assistant/">
           RAG college assistant
         </Link>{" "}
         and{" "}
-        <Link href="/final-year-projects/face-recognition-attendance">
+        <Link href="/final-year-projects/face-recognition-attendance/">
           face recognition attendance
         </Link>
         . Each is capped per college, and the Mentored tier varies a module &mdash;
@@ -193,11 +193,11 @@ export function Body() {
       </p>
       <p>
         If your guide has already approved a specific novelty,{" "}
-        <Link href="/final-year-projects/custom">
+        <Link href="/final-year-projects/custom/">
           have it built and evaluated for you
         </Link>
         . And frame the work early &mdash;{" "}
-        <Link href="/final-year-projects/guides/final-year-project-synopsis-format">
+        <Link href="/final-year-projects/guides/final-year-project-synopsis-format/">
           the synopsis format
         </Link>{" "}
         is where you state the contribution your thesis will be graded on.

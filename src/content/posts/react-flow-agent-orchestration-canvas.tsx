@@ -137,7 +137,7 @@ function Body() {
       </blockquote>
 
       <p>
-        Next: <a href="/blog/compiling-react-flow-graph-agent-pipeline">
+        Next: <a href="/blog/compiling-react-flow-graph-agent-pipeline/">
           compiling that canvas into a runnable pipeline
         </a>
         , and the related pattern of{" "}

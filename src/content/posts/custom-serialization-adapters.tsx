@@ -74,7 +74,7 @@ export const fromRecord = (r: NodeRecord): FlowNode =>
       <p>
         For the state-management side of the same project — optimistic updates,
         sync ordering, and throttled broadcasts — see{" "}
-        <a href="/blog/94-percent-payload-reduction-react-flow">
+        <a href="/blog/94-percent-payload-reduction-react-flow/">
           Compressing the Wire
         </a>
         ; the system is{" "}

@@ -11,7 +11,7 @@ export default function Products() {
           ~/products
         </h2>
         <Link
-          href="/products"
+          href="/products/"
           className="font-mono text-xs text-zinc-500 transition-colors duration-200 hover:text-cyan"
         >
           View all →

@@ -74,7 +74,7 @@ function Body() {
         client could reconstruct — and the ratio you find is usually shocking.
         The deep technical teardown, including the delta-encoding scheme,
         lives in{" "}
-        <a href="/blog/94-percent-payload-reduction-react-flow">
+        <a href="/blog/94-percent-payload-reduction-react-flow/">
           the companion engineering post
         </a>
         .

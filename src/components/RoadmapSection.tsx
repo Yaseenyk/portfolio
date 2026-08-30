@@ -2,12 +2,12 @@ import Link from "next/link";
 
 const TRACKS = [
   {
-    href: "/roadmap",
+    href: "/roadmap/",
     label: "AI Systems Architect",
     detail: "15 lessons · RAG → agents → FinOps",
   },
   {
-    href: "/anthropic-roadmap",
+    href: "/anthropic-roadmap/",
     label: "Anthropic & Claude Development",
     detail: "15 lessons · tools → MCP → multi-agent",
   },

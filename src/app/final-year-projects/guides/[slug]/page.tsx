@@ -127,7 +127,7 @@ export default function GuidePage({ params }: Params) {
       <ReadDepth slug={meta.slug} />
 
       <Link
-        href="/final-year-projects/guides"
+        href="/final-year-projects/guides/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← All guides
@@ -258,7 +258,7 @@ export default function GuidePage({ params }: Params) {
             <p className="mt-5 text-sm text-zinc-500">
               Or browse the{" "}
               <Link
-                href="/final-year-projects"
+                href="/final-year-projects/"
                 className="text-cyan underline-offset-4 hover:underline"
               >
                 full project catalog

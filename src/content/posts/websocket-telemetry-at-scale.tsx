@@ -70,7 +70,7 @@ metrics.on("tick", (m) => io.to("telemetry").emit("metric", m));`}
 
       <p>
         For the single-server fundamentals and the React consumption side, see{" "}
-        <a href="/blog/real-time-telemetry-websockets-react">
+        <a href="/blog/real-time-telemetry-websockets-react/">
           Real-Time Telemetry
         </a>
         ; the live systems are{" "}

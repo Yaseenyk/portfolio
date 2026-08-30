@@ -25,7 +25,7 @@ export default function RecentPosts({ posts }: { posts: RecentPost[] }) {
           ~/field-notes
         </h2>
         <Link
-          href="/blog"
+          href="/blog/"
           className="font-mono text-xs text-zinc-500 transition-colors duration-200 hover:text-cyan"
         >
           View all →

@@ -194,33 +194,33 @@ export function Body() {
         Several of these are already built and come with the full source code, the
         report, the diagrams and daily sessions that walk through the code line by
         line so you can defend it &mdash;{" "}
-        <Link href="/final-year-projects/for/bsc-it">
+        <Link href="/final-year-projects/for/bsc-it/">
           see the B.Sc IT projects
         </Link>
         . The e-commerce and chat builds map directly onto the web ideas above:{" "}
-        <Link href="/final-year-projects/ecommerce-mern">the MERN store</Link>,{" "}
-        <Link href="/final-year-projects/realtime-chat-mern">
+        <Link href="/final-year-projects/ecommerce-mern/">the MERN store</Link>,{" "}
+        <Link href="/final-year-projects/realtime-chat-mern/">
           the real-time chat app
         </Link>
         , the{" "}
-        <Link href="/final-year-projects/expense-tracker-mobile">
+        <Link href="/final-year-projects/expense-tracker-mobile/">
           mobile expense tracker
         </Link>{" "}
         and the{" "}
-        <Link href="/final-year-projects/blood-bank-management">
+        <Link href="/final-year-projects/blood-bank-management/">
           blood bank portal
         </Link>
         . Each listing is capped per college so no two students at the same college
         submit the same build. If your topic is on this list but not in the catalog,{" "}
-        <Link href="/final-year-projects/custom">have it built for you</Link>.
+        <Link href="/final-year-projects/custom/">have it built for you</Link>.
       </p>
       <p>
         Before you commit, read{" "}
-        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project">
+        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project/">
           how to choose a project you can actually finish
         </Link>{" "}
         and{" "}
-        <Link href="/final-year-projects/guides/final-year-project-synopsis-format">
+        <Link href="/final-year-projects/guides/final-year-project-synopsis-format/">
           the synopsis format
         </Link>{" "}
         your guide will want first.

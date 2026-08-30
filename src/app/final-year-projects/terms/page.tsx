@@ -106,7 +106,7 @@ export default function TermsPage() {
       />
 
       <Link
-        href="/final-year-projects"
+        href="/final-year-projects/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← All projects
@@ -154,7 +154,7 @@ export default function TermsPage() {
           timeline gets a written answer.
         </p>
         <Link
-          href="/final-year-projects/custom"
+          href="/final-year-projects/custom/"
           className="mt-5 inline-block rounded-lg border border-white/10 px-6 py-3 text-sm text-zinc-300 transition-colors duration-200 hover:border-cyan/60 hover:text-zinc-50"
         >
           Ask a question →

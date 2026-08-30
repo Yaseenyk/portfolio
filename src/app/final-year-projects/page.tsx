@@ -172,7 +172,7 @@ export default function FinalYearProjectsPage() {
             Ask on WhatsApp
           </a>
           <Link
-            href="/final-year-projects/custom"
+            href="/final-year-projects/custom/"
             className="rounded-xl bg-gradient-to-r from-cyan to-purple px-6 py-3.5 text-sm font-medium text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)] transition-shadow duration-300 hover:shadow-[0_0_32px_0_rgba(168,85,247,0.5)]"
           >
             Get your own idea built
@@ -184,7 +184,7 @@ export default function FinalYearProjectsPage() {
             How it works
           </a>
           <Link
-            href="/final-year-projects/terms"
+            href="/final-year-projects/terms/"
             className="rounded-xl border border-white/10 px-6 py-3.5 text-sm text-zinc-300 transition-colors duration-200 hover:border-cyan/60 hover:text-zinc-50"
           >
             Terms
@@ -250,7 +250,7 @@ export default function FinalYearProjectsPage() {
           and {formatInr(CUSTOM_BUILD_RANGE.max)} depending on scope.
         </p>
         <Link
-          href="/final-year-projects/custom"
+          href="/final-year-projects/custom/"
           className="mt-6 inline-block rounded-xl bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)] transition-shadow duration-300 hover:shadow-[0_0_32px_0_rgba(168,85,247,0.5)]"
         >
           Describe your project →
@@ -270,7 +270,7 @@ export default function FinalYearProjectsPage() {
           collide.
         </p>
         <Link
-          href="/final-year-projects/colleges"
+          href="/final-year-projects/colleges/"
           className="mt-6 inline-block rounded-xl border border-white/10 px-6 py-3 text-sm text-zinc-300 transition-colors duration-200 hover:border-cyan/60 hover:text-zinc-50"
         >
           For colleges →
@@ -283,7 +283,7 @@ export default function FinalYearProjectsPage() {
         </h2>
         <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">
           <Link
-            href="/final-year-projects/find-my-project"
+            href="/final-year-projects/find-my-project/"
             className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
@@ -301,7 +301,7 @@ export default function FinalYearProjectsPage() {
             </span>
           </Link>
           <Link
-            href="/final-year-projects/planner"
+            href="/final-year-projects/planner/"
             className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
@@ -319,7 +319,7 @@ export default function FinalYearProjectsPage() {
             </span>
           </Link>
           <Link
-            href="/final-year-projects/question-bank"
+            href="/final-year-projects/question-bank/"
             className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
@@ -337,7 +337,7 @@ export default function FinalYearProjectsPage() {
             </span>
           </Link>
           <Link
-            href="/final-year-projects/cost-estimator"
+            href="/final-year-projects/cost-estimator/"
             className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
@@ -355,7 +355,7 @@ export default function FinalYearProjectsPage() {
             </span>
           </Link>
           <Link
-            href="/final-year-projects/templates"
+            href="/final-year-projects/templates/"
             className="group flex h-full flex-col bg-ink p-6 transition-colors duration-300 hover:bg-white/[0.03]"
           >
             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
@@ -381,7 +381,7 @@ export default function FinalYearProjectsPage() {
             Free guides, nothing gated
           </h2>
           <Link
-            href="/final-year-projects/guides"
+            href="/final-year-projects/guides/"
             className="text-sm text-cyan underline-offset-4 hover:underline"
           >
             All {GUIDES.length} guides →

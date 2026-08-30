@@ -188,17 +188,17 @@ export function Body() {
 
       <p>
         If you already know what you want, it can be{" "}
-        <Link href="/final-year-projects/custom">built to your problem statement</Link>{" "}
+        <Link href="/final-year-projects/custom/">built to your problem statement</Link>{" "}
         — and if you do not, the topic lists are a reasonable place to start:{" "}
-        <Link href="/final-year-projects/guides/mca-final-year-project-topics">
+        <Link href="/final-year-projects/guides/mca-final-year-project-topics/">
           MCA
         </Link>
         ,{" "}
-        <Link href="/final-year-projects/guides/bca-final-year-project-topics">
+        <Link href="/final-year-projects/guides/bca-final-year-project-topics/">
           BCA
         </Link>
         , and{" "}
-        <Link href="/final-year-projects/guides/btech-cse-final-year-project-topics">
+        <Link href="/final-year-projects/guides/btech-cse-final-year-project-topics/">
           B.Tech
         </Link>
         .

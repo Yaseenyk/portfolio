@@ -44,3 +44,5 @@ analytics-report*.xlsx
 *.sln
 *.sw?
 tsconfig.tsbuildinfo
+# GSC coverage exports downloaded into the repo root
+https___yaseenkhatib*

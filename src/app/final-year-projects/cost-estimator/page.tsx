@@ -75,7 +75,7 @@ export default function CostEstimatorPage() {
       />
 
       <Link
-        href="/final-year-projects"
+        href="/final-year-projects/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← All projects

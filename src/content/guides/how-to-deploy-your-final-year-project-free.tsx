@@ -244,14 +244,14 @@ export function Body() {
         Every project on this site ships deployed on a real URL, with secrets done
         properly and the localhost fallback ready — because getting it live is
         exactly the step students run out of time for. See a{" "}
-        <Link href="/final-year-projects/ecommerce-mern">MERN e-commerce build</Link>{" "}
+        <Link href="/final-year-projects/ecommerce-mern/">MERN e-commerce build</Link>{" "}
         or a{" "}
-        <Link href="/final-year-projects/realtime-chat-mern">real-time chat app</Link>
+        <Link href="/final-year-projects/realtime-chat-mern/">real-time chat app</Link>
         , or if you want it done for you — built, documented, deployed, and walked
         through in live sessions — start on the{" "}
-        <Link href="/final-year-projects/custom">custom build</Link> page. Deploying
+        <Link href="/final-year-projects/custom/">custom build</Link> page. Deploying
         first? Read{" "}
-        <Link href="/final-year-projects/guides/final-year-project-report-format">
+        <Link href="/final-year-projects/guides/final-year-project-report-format/">
           the report format guide
         </Link>{" "}
         so the document matches what you shipped.

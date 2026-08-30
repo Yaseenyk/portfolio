@@ -163,11 +163,11 @@ export function Body() {
         A few of these are already built and come with the full source code, a setup
         guide, the report and diagrams, and daily sessions that walk through the code
         line by line so you can defend it in your viva &mdash;{" "}
-        <Link href="/final-year-projects/for/diploma">
+        <Link href="/final-year-projects/for/diploma/">
           see the diploma projects
         </Link>
         , including the{" "}
-        <Link href="/final-year-projects/blood-bank-management">
+        <Link href="/final-year-projects/blood-bank-management/">
           blood bank portal
         </Link>
         . Each listing is capped per college, so no two students at the same college
@@ -176,13 +176,13 @@ export function Body() {
       <p>
         If your idea is simpler than anything in the catalog &mdash; a smaller CRUD
         app, a single-feature tool &mdash;{" "}
-        <Link href="/final-year-projects/custom">have it built for you</Link> at a
+        <Link href="/final-year-projects/custom/">have it built for you</Link> at a
         scope that fits a diploma. Before you settle on a topic, read{" "}
-        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project">
+        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project/">
           how to choose a project you can actually finish
         </Link>{" "}
         and{" "}
-        <Link href="/final-year-projects/guides/final-year-project-synopsis-format">
+        <Link href="/final-year-projects/guides/final-year-project-synopsis-format/">
           the synopsis format
         </Link>{" "}
         your guide will want first.

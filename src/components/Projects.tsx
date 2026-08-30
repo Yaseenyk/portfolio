@@ -59,7 +59,7 @@ export function projectAnchor(name: string): string {
 export const PROJECTS: Project[] = [
   {
     name: "streamerOS",
-    href: "/products/streameros",
+    href: "/products/streameros/",
     category: "Flagship · Desktop Cockpit",
     description:
       "A Rust-powered desktop cockpit for streaming professionals, engineered via modular Claude orchestrations. Handles live system telemetry feeds, multi-platform chat velocity streams, and real-time automated OBS scene synchronization.",
@@ -104,7 +104,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "Sable",
-    href: "/products/sable",
+    href: "/products/sable/",
     category: "Local-First · AI Finance Agent",
     description:
       "A personal-finance agent where the AI is structurally incapable of touching the money: every record lives in on-device SQLite (no cloud backend), and the model's function calls render as Review & Confirm cards — it proposes, only a human commits. Serialized writes, offline-first, and a daily on-device briefing.",
@@ -178,7 +178,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "Automated LinkedIn Pipeline",
-    href: "/products/linkedin-pipeline",
+    href: "/products/linkedin-pipeline/",
     category: "Automation · Agent",
     description:
       "A self-hosted autonomous agent that lives entirely in a GitHub repository. On a cron schedule, a GitHub Actions runner drafts a technical post with the Gemini API, publishes it, and commits its state back to the repo — no server, no subscription.",
@@ -195,7 +195,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "Zero-Cost AI Blog Writer",
-    href: "/products/ai-blogger",
+    href: "/products/ai-blogger/",
     category: "Pipeline · Content",
     description:
       "A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles straight to this site. Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships the static export — at a steady-state cost of exactly $0.",
@@ -221,7 +221,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "IntegrateX",
-    href: "/sandbox",
+    href: "/sandbox/",
     category: "Workflow Automation",
     description:
       "An interactive workflow-automation environment featuring responsive connectors, processing layers, and directional edge bindings. Developed a custom state Serialization Adapter architecture to optimize graph serialization over the wire.",
@@ -454,7 +454,7 @@ export default function Projects({ all = false }: { all?: boolean }) {
         <p className="mt-10 text-sm text-zinc-500">
           These are the five flagships —{" "}
           <a
-            href="/projects"
+            href="/projects/"
             className="text-ice underline-offset-4 hover:underline"
           >
             all {PROJECTS.length} builds →

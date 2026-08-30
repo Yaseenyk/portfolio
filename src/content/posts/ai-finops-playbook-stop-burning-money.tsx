@@ -10,7 +10,7 @@ function Body() {
         gets sent to the most expensive frontier model in the catalog. I built
         a live, interactive cost simulator to make this failure mode visible —
         and the routing architecture that fixes it. You can run both in your
-        browser, right now, in my <a href="/sandbox">Infrastructure Lab</a>.
+        browser, right now, in my <a href="/sandbox/">Infrastructure Lab</a>.
       </p>
 
       <h2>The deficit nobody itemizes</h2>
@@ -65,7 +65,7 @@ function Body() {
       <h2>Why I built the simulator instead of writing a slide</h2>
       <p>
         Because claims are cheap and dashboards persuade. The{" "}
-        <a href="/sandbox">FinOps Cost Simulator</a> is a token-physics engine:
+        <a href="/sandbox/">FinOps Cost Simulator</a> is a token-physics engine:
         drag the traffic mix, watch the cache-hit rate, flash share, and
         frontier share reprice the month in real time. Next to it sits a{" "}
         <strong>chaos toggle</strong> that injects synthetic latency and 504s,

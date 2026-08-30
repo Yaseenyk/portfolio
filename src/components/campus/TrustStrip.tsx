@@ -21,13 +21,13 @@ const PROOF: Proof[] = [
     label: "Who builds it",
     value: PERSON.jobTitle,
     detail: `${PERSON.locality}, ${PERSON.country}. Full background, work history and CV.`,
-    href: "/about",
+    href: "/about/",
   },
   {
     label: "Shipped, not claimed",
     value: `${PRODUCTS.length} products`,
     detail: "Built solo and deployed. Architecture teardowns for each one.",
-    href: "/products",
+    href: "/products/",
   },
   {
     label: "Code in the open",

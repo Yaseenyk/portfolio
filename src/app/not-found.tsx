@@ -28,16 +28,16 @@ export default function NotFound() {
             >
               Home
             </Link>
-            <Link href="/blog" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
+            <Link href="/blog/" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
               Field notes
             </Link>
-            <Link href="/products" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
+            <Link href="/products/" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
               Products
             </Link>
-            <Link href="/sandbox" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
+            <Link href="/sandbox/" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
               Sandbox
             </Link>
-            <Link href="/about" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
+            <Link href="/about/" className="text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">
               About
             </Link>
           </div>

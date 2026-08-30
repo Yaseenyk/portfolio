@@ -125,7 +125,7 @@ export default function CampusProjectPage({ params }: Params) {
       />
 
       <Link
-        href="/final-year-projects"
+        href="/final-year-projects/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← All projects
@@ -245,7 +245,7 @@ export default function CampusProjectPage({ params }: Params) {
           {PAYMENT_POLICY.sessionsStart.toLowerCase()}; handover is{" "}
           {PAYMENT_POLICY.handover.toLowerCase()}. Full{" "}
           <Link
-            href="/final-year-projects/terms"
+            href="/final-year-projects/terms/"
             className="text-cyan underline-offset-4 hover:underline"
           >
             terms

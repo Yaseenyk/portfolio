@@ -41,7 +41,7 @@ export function Body() {
         clear, confident structure, so that most of the questions are already
         answered before they are asked. This guide is about that skill: walking
         your own project. For the question bank, see{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the viva questions panels actually ask
         </Link>{" "}
         — here we cover how to present the whole thing on your own terms.
@@ -98,7 +98,7 @@ export function Body() {
         with seven tables in front of a database with four is the single fastest
         way to turn a panel hostile. If you are not certain yours line up, fix that
         before anything else — the{" "}
-        <Link href="/final-year-projects/guides/final-year-project-report-format">
+        <Link href="/final-year-projects/guides/final-year-project-report-format/">
           report format guide
         </Link>{" "}
         covers which diagrams must agree with the code and why.
@@ -190,12 +190,12 @@ export function Body() {
         overview, the diagrams and the justifications are genuinely yours to give.
         Every tier ships with the full source code, and seats are capped per
         college so no two students defend the same submission.{" "}
-        <Link href="/final-year-projects/custom">Start a custom build</Link>, see{" "}
-        <Link href="/final-year-projects/ai-college-assistant">
+        <Link href="/final-year-projects/custom/">Start a custom build</Link>, see{" "}
+        <Link href="/final-year-projects/ai-college-assistant/">
           the AI college assistant
         </Link>{" "}
         for a project with plenty to explain, or read{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the viva questions guide
         </Link>{" "}
         next.

@@ -136,7 +136,7 @@ function Body() {
         asking you to trust it. The judgment I bring to a team is that: an agent you
         cannot see is an agent you cannot operate, so the trace is part of the
         design, not an afterthought. Continue on the{" "}
-        <a href="/roadmap">roadmap</a>.
+        <a href="/roadmap/">roadmap</a>.
       </p>
     </>
   );

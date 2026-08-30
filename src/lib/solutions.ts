@@ -157,8 +157,8 @@ export const CASE_STUDIES: CaseStudy[] = [
     outcome:
       "Workflow payloads shrank by 94%, round-trip lossless. Saves and loads became effectively instant, and the state-sync churn disappeared — an architecture call, not a bigger server.",
     proof: [
-      { label: "The 94% decision, in full", href: "/blog/the-94-percent-decision-integratex" },
-      { label: "The adapter pattern itself", href: "/blog/custom-serialization-adapters" },
+      { label: "The 94% decision, in full", href: "/blog/the-94-percent-decision-integratex/" },
+      { label: "The adapter pattern itself", href: "/blog/custom-serialization-adapters/" },
     ],
     stack: ["React Flow", "Zustand", "TypeScript", "Node.js"],
   },
@@ -190,7 +190,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     outcome:
       "Every client sees the same value in the same frame, a whole class of acted-on-stale-data mistakes stopped happening, and the origin database was shielded from read spikes.",
     proof: [
-      { label: "The real-time architecture", href: "/blog/real-time-telemetry-websockets-react" },
+      { label: "The real-time architecture", href: "/blog/real-time-telemetry-websockets-react/" },
     ],
     stack: ["WebSockets", "Redis", "React", "Node.js"],
   },
@@ -206,7 +206,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     outcome:
       "The speedup came from reordering stages against measured numbers, not from a bigger instance — exactly the kind of finding an architecture review exists to put in writing before money moves.",
     proof: [
-      { label: "The optimization, step by step", href: "/blog/optimizing-mongodb-aggregation" },
+      { label: "The optimization, step by step", href: "/blog/optimizing-mongodb-aggregation/" },
     ],
     stack: ["MongoDB", "Express", "Node.js"],
   },

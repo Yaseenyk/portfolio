@@ -71,7 +71,7 @@ function Body() {
         intents as reviewable artifacts, and reserve the commit for a human or
         a deterministic policy. I built the reference implementation into a
         product I use every day — the full breakdown is{" "}
-        <a href="/products/sable">on Sable&apos;s product page</a>.
+        <a href="/products/sable/">on Sable&apos;s product page</a>.
       </p>
     </>
   );

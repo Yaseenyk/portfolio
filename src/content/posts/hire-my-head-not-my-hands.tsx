@@ -74,9 +74,9 @@ function Body() {
         The fastest way to evaluate me is to use the site the way an engineer
         would: interrogate the{" "}
         <a href="/#rag-concierge">RAG concierge</a>, break the{" "}
-        <a href="/sandbox">chaos-engineering sandbox</a>, read a{" "}
-        <a href="/products">product teardown</a>, and check the{" "}
-        <a href="/interview">interview brief</a> built for engineering
+        <a href="/sandbox/">chaos-engineering sandbox</a>, read a{" "}
+        <a href="/products/">product teardown</a>, and check the{" "}
+        <a href="/interview/">interview brief</a> built for engineering
         leadership. Then <a href="/#contact">start the conversation</a> — the
         vision comes with references, and all of them are running in
         production.

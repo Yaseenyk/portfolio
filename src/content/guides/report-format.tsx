@@ -248,8 +248,8 @@ export function Body() {
         Every project on this site ships with the report, the synopsis, the diagrams
         and the deck already written to match the code — because a report that
         matches the code is exactly the thing students run out of time to do.{" "}
-        <Link href="/final-year-projects">See the projects</Link>, or read{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/">See the projects</Link>, or read{" "}
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the viva questions panels actually ask
         </Link>
         .

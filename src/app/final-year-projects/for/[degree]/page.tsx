@@ -164,7 +164,7 @@ export default function DegreePage({ params }: Params) {
       />
 
       <Link
-        href="/final-year-projects"
+        href="/final-year-projects/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← All projects
@@ -212,7 +212,7 @@ export default function DegreePage({ params }: Params) {
           {formatInr(CUSTOM_BUILD_RANGE.max)} depending on scope.
         </p>
         <Link
-          href="/final-year-projects/custom"
+          href="/final-year-projects/custom/"
           className="mt-6 inline-block rounded-lg bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)] transition-shadow duration-300 hover:shadow-[0_0_32px_0_rgba(168,85,247,0.5)]"
         >
           Send a brief →

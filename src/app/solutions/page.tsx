@@ -140,7 +140,7 @@ export default function SolutionsPage() {
       {/* Two audiences, one proof base — split them immediately. */}
       <section className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2">
         <Link
-          href="/solutions/business"
+          href="/solutions/business/"
           className="group flex flex-col rounded-2xl border border-white/10 bg-white/[0.02] p-8 transition-colors duration-300 hover:border-cyan/40"
         >
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
@@ -164,7 +164,7 @@ export default function SolutionsPage() {
         </Link>
 
         <Link
-          href="/solutions/small-business"
+          href="/solutions/small-business/"
           className="group flex flex-col rounded-2xl border border-white/10 bg-white/[0.02] p-8 transition-colors duration-300 hover:border-cyan/40"
         >
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">

@@ -256,11 +256,11 @@ export function Body() {
       <p>
         Several of these are already built and available with the source, the
         report, and daily sessions that walk you through the code —{" "}
-        <Link href="/final-year-projects">see the catalog</Link>. Anything on this
+        <Link href="/final-year-projects/">see the catalog</Link>. Anything on this
         list that is not there can be{" "}
-        <Link href="/final-year-projects/custom">built to your problem statement</Link>
+        <Link href="/final-year-projects/custom/">built to your problem statement</Link>
         . And before your viva, read{" "}
-        <Link href="/final-year-projects/guides/final-year-project-viva-questions">
+        <Link href="/final-year-projects/guides/final-year-project-viva-questions/">
           the questions panels actually ask
         </Link>
         .

@@ -71,7 +71,7 @@ export default function BusinessPage() {
       />
 
       <Link
-        href="/solutions"
+        href="/solutions/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← Solutions

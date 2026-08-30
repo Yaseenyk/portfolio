@@ -124,7 +124,7 @@ export function Body() {
       </p>
       <ul>
         <li>
-          <Link href="/final-year-projects/ai-college-assistant">
+          <Link href="/final-year-projects/ai-college-assistant/">
             AI College Assistant (agentic RAG)
           </Link>{" "}
           &mdash; answers from your college&rsquo;s own PDFs and cites the page it
@@ -132,7 +132,7 @@ export function Body() {
           has a one-click answer.
         </li>
         <li>
-          <Link href="/final-year-projects/recommendation-system-ml">
+          <Link href="/final-year-projects/recommendation-system-ml/">
             Recommendation System (hybrid ML)
           </Link>{" "}
           &mdash; combines collaborative and content-based filtering and has a
@@ -140,7 +140,7 @@ export function Body() {
           topic always attracts.
         </li>
         <li>
-          <Link href="/final-year-projects/fake-news-detection-ml">
+          <Link href="/final-year-projects/fake-news-detection-ml/">
             Fake News Detection (NLP)
           </Link>{" "}
           &mdash; returns a confidence score and the words that drove the
@@ -148,21 +148,21 @@ export function Body() {
           of hand-waving.
         </li>
         <li>
-          <Link href="/final-year-projects/plant-disease-detection">
+          <Link href="/final-year-projects/plant-disease-detection/">
             Plant Disease Detection (CV)
           </Link>{" "}
           &mdash; a CNN tested on real phone photos, not just a clean dataset, so
           the &ldquo;what about a bad image&rdquo; question is already handled.
         </li>
         <li>
-          <Link href="/final-year-projects/resume-screening-ml">
+          <Link href="/final-year-projects/resume-screening-ml/">
             Resume Screening &amp; Job Match
           </Link>{" "}
           &mdash; ranks resumes against a job description and shows why each one
           scored what it did, which turns an opaque model into an explainable one.
         </li>
         <li>
-          <Link href="/final-year-projects/face-recognition-attendance">
+          <Link href="/final-year-projects/face-recognition-attendance/">
             Face Recognition Attendance (CV)
           </Link>{" "}
           &mdash; the marks are in rejecting an unknown face rather than guessing
@@ -174,18 +174,18 @@ export function Body() {
 
       <p>
         If none of these fit your college&rsquo;s brief, we{" "}
-        <Link href="/final-year-projects/custom">build to a custom spec</Link>{" "}
+        <Link href="/final-year-projects/custom/">build to a custom spec</Link>{" "}
         with the same source, documentation, and viva sessions. Not sure ML is the
         right call for your degree? Read{" "}
-        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project">
+        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project/">
           how to choose a final year project
         </Link>{" "}
         first, then browse by degree:{" "}
-        <Link href="/final-year-projects/for/bca">BCA</Link>,{" "}
-        <Link href="/final-year-projects/for/mca">MCA</Link>,{" "}
-        <Link href="/final-year-projects/for/btech">B.Tech</Link>, or{" "}
-        <Link href="/final-year-projects/for/mtech">M.Tech</Link>. Or see the{" "}
-        <Link href="/final-year-projects">full catalog</Link>.
+        <Link href="/final-year-projects/for/bca/">BCA</Link>,{" "}
+        <Link href="/final-year-projects/for/mca/">MCA</Link>,{" "}
+        <Link href="/final-year-projects/for/btech/">B.Tech</Link>, or{" "}
+        <Link href="/final-year-projects/for/mtech/">M.Tech</Link>. Or see the{" "}
+        <Link href="/final-year-projects/">full catalog</Link>.
       </p>
     </>
   );

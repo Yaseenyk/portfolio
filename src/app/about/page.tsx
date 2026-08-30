@@ -66,27 +66,27 @@ const FAST_FACTS: [string, string][] = [
 const PRODUCTS_LINE: { name: string; href: string; line: string }[] = [
   {
     name: "streamerOS",
-    href: "/products/streameros",
+    href: "/products/streameros/",
     line: "a Rust + Tauri desktop cockpit for streamers — on-device chat ingestion, telemetry, and OBS automation at a fraction of Electron's memory.",
   },
   {
     name: "IntegrateX",
-    href: "/products",
+    href: "/products/",
     line: "a React Flow workflow engine whose schema-aware serialization adapter cut payloads by 94%.",
   },
   {
     name: "Sable",
-    href: "/products/sable",
+    href: "/products/sable/",
     line: "a local-first AI finance agent — all data on-device, and the model proposes while only a human commits.",
   },
   {
     name: "The Zero-Cost AI Blog Writer",
-    href: "/products/ai-blogger",
+    href: "/products/ai-blogger/",
     line: "an autonomous pipeline that drafts, commits, and deploys articles (with covers) daily for $0 of infrastructure.",
   },
   {
     name: "The LinkedIn Pipeline",
-    href: "/products/linkedin-pipeline",
+    href: "/products/linkedin-pipeline/",
     line: "an outreach machine that turns shipped work into scheduled LinkedIn content and tracks its state in Git.",
   },
 ];
@@ -242,11 +242,11 @@ export default function AboutPage() {
             </ul>
             <p className="mt-5 text-sm text-zinc-500">
               Every claim links to a full architecture teardown in{" "}
-              <Link href="/products" className="text-ice underline-offset-4 hover:underline">
+              <Link href="/products/" className="text-ice underline-offset-4 hover:underline">
                 /products
               </Link>
               , and the thinking behind the code fills{" "}
-              <Link href="/blog" className="text-ice underline-offset-4 hover:underline">
+              <Link href="/blog/" className="text-ice underline-offset-4 hover:underline">
                 the blog
               </Link>
               .
@@ -282,7 +282,7 @@ export default function AboutPage() {
               pipelines on this site work while he sleeps, which is rather the
               point. Engineering leadership evaluating him should
               start with the{" "}
-              <Link href="/interview" className="text-ice underline-offset-4 hover:underline">
+              <Link href="/interview/" className="text-ice underline-offset-4 hover:underline">
                 interview brief
               </Link>
               .

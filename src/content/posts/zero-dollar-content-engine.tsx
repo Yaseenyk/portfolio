@@ -68,7 +68,7 @@ function Body() {
         asset — content compounds into search traffic, authority, and
         inbound interest. Mine costs zero and runs on rails I built in days.
         The full teardown, including the workflow YAML and the writer script,
-        is on the <a href="/products/ai-blogger">product page</a>.
+        is on the <a href="/products/ai-blogger/">product page</a>.
       </p>
     </>
   );

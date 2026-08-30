@@ -112,10 +112,10 @@ function Body() {
         A small payload is half of feeling{" "}
         instant; the other half is streaming. This pattern grew out
         of the{" "}
-        <a href="/blog/react-flow-agent-orchestration-canvas">agent orchestration canvas</a> and fits cleanly in my
+        <a href="/blog/react-flow-agent-orchestration-canvas/">agent orchestration canvas</a> and fits cleanly in my
         Trinity Architecture boundary: presentation renders, orchestration decides, the adapter serializes — one of the
         load-bearing ideas behind the five products I shipped solo this year, and the judgment I bring is designing the
-        wire format before reaching for a compression library. Continue on the <a href="/roadmap">roadmap</a>.
+        wire format before reaching for a compression library. Continue on the <a href="/roadmap/">roadmap</a>.
       </p>
     </>
   );

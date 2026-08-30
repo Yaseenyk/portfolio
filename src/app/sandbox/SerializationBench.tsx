@@ -88,7 +88,7 @@ export default function SerializationBench() {
           The database stores what is <em>true</em>, not what is <em>drawn</em> —
           styles, dimensions, and handles are derived from the schema on load.{" "}
           <a
-            href="/blog/the-94-percent-decision-integratex"
+            href="/blog/the-94-percent-decision-integratex/"
             className="text-ice underline-offset-4 hover:underline"
           >
             The full story →

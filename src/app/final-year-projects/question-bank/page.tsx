@@ -70,7 +70,7 @@ export default function QuestionBankPage() {
       />
 
       <Link
-        href="/final-year-projects"
+        href="/final-year-projects/"
         className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-500 transition-colors hover:text-cyan"
       >
         ← All projects
@@ -150,13 +150,13 @@ export default function QuestionBankPage() {
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            href="/final-year-projects"
+            href="/final-year-projects/"
             className="rounded-xl bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)] transition-shadow duration-300 hover:shadow-[0_0_32px_0_rgba(168,85,247,0.5)]"
           >
             See the projects
           </Link>
           <Link
-            href="/final-year-projects/guides/final-year-project-viva-questions"
+            href="/final-year-projects/guides/final-year-project-viva-questions/"
             className="rounded-xl border border-white/10 px-6 py-3 text-sm text-zinc-300 transition-colors duration-200 hover:border-cyan/60 hover:text-zinc-50"
           >
             How vivas actually work

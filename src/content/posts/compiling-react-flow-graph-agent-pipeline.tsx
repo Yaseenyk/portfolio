@@ -165,11 +165,11 @@ function Body() {
 
       <p>
         This is the runtime half of{" "}
-        <a href="/blog/react-flow-agent-orchestration-canvas">
+        <a href="/blog/react-flow-agent-orchestration-canvas/">
           using React Flow as an orchestration canvas
         </a>
         . For persisting these graphs without shipping the cache, see the{" "}
-        <a href="/blog/94-percent-payload-reduction-react-flow">
+        <a href="/blog/94-percent-payload-reduction-react-flow/">
           serialization adapter pattern
         </a>
         {" "}— the adapter layer in my Trinity split that made IntegrateX practical at

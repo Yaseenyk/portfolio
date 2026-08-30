@@ -145,7 +145,7 @@ export async function answer(question: string) {
           but first, safety: constitutional AI &amp; guardrails
         
         . Or browse{" "}
-        <a href="/anthropic-roadmap">the full roadmap</a>.
+        <a href="/anthropic-roadmap/">the full roadmap</a>.
       </p>
     </>
   );

@@ -239,16 +239,16 @@ export function Body() {
         diagrams and the deck already written to match the code &mdash; because the
         synopsis is where the whole project is either scoped to finish or quietly
         set up to fail.{" "}
-        <Link href="/final-year-projects">See the projects</Link>, then read the{" "}
-        <Link href="/final-year-projects/guides/final-year-project-report-format">
+        <Link href="/final-year-projects/">See the projects</Link>, then read the{" "}
+        <Link href="/final-year-projects/guides/final-year-project-report-format/">
           report format chapter by chapter
         </Link>{" "}
         and{" "}
-        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project">
+        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project/">
           how to choose a project worth building
         </Link>
         . If the scope in your head is bigger than your semester, a{" "}
-        <Link href="/final-year-projects/custom">custom build</Link> comes scoped,
+        <Link href="/final-year-projects/custom/">custom build</Link> comes scoped,
         documented and walked through in live sessions.
       </p>
     </>

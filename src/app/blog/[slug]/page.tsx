@@ -228,7 +228,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           Home
         </Link>
         <span className="text-zinc-700">/</span>
-        <Link href="/blog" className="transition-colors hover:text-cyan">
+        <Link href="/blog/" className="transition-colors hover:text-cyan">
           Blog
         </Link>
         <span className="text-zinc-700">/</span>
@@ -398,7 +398,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             Ships autonomous AI products solo — five in the last twelve
             months.{" "}
             <Link
-              href="/about"
+              href="/about/"
               className="text-ice underline-offset-4 hover:underline"
             >
               More about Yaseen →
@@ -426,7 +426,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             Get in touch →
           </Link>
           <Link
-            href="/products"
+            href="/products/"
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-200 transition-colors duration-300 hover:border-ice/60 hover:text-ice"
           >
             See what I&apos;ve shipped

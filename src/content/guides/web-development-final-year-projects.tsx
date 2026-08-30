@@ -114,7 +114,7 @@ export function Body() {
       </p>
       <ul>
         <li>
-          <Link href="/final-year-projects/ecommerce-mern">
+          <Link href="/final-year-projects/ecommerce-mern/">
             E-Commerce Platform (MERN)
           </Link>{" "}
           &mdash; a cart that survives a refresh, real stock counts, and a working
@@ -122,7 +122,7 @@ export function Body() {
           answer rather than a shrug.
         </li>
         <li>
-          <Link href="/final-year-projects/realtime-chat-mern">
+          <Link href="/final-year-projects/realtime-chat-mern/">
             Real-Time Chat (MERN + Socket.IO)
           </Link>{" "}
           &mdash; actual websockets with online presence, typing indicators, and
@@ -130,7 +130,7 @@ export function Body() {
           question probes.
         </li>
         <li>
-          <Link href="/final-year-projects/blood-bank-management">
+          <Link href="/final-year-projects/blood-bank-management/">
             Blood Bank Management (MERN)
           </Link>{" "}
           &mdash; donor matching with real priority logic, so &ldquo;how do you
@@ -138,7 +138,7 @@ export function Body() {
           gap you apologise for.
         </li>
         <li>
-          <Link href="/final-year-projects/hospital-management-mern">
+          <Link href="/final-year-projects/hospital-management-mern/">
             Hospital Management System (MERN)
           </Link>{" "}
           &mdash; three roles and real appointment-conflict handling on a schema
@@ -152,18 +152,18 @@ export function Body() {
       <p>
         Want something outside this list built to your college&rsquo;s exact
         brief? We{" "}
-        <Link href="/final-year-projects/custom">build to a custom spec</Link>{" "}
+        <Link href="/final-year-projects/custom/">build to a custom spec</Link>{" "}
         with the same source, documentation, and viva sessions. If you are still
         deciding, read{" "}
-        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project">
+        <Link href="/final-year-projects/guides/how-to-choose-a-final-year-project/">
           how to choose a final year project
         </Link>
         , then browse by degree:{" "}
-        <Link href="/final-year-projects/for/bca">BCA</Link>,{" "}
-        <Link href="/final-year-projects/for/mca">MCA</Link>,{" "}
-        <Link href="/final-year-projects/for/btech">B.Tech</Link>, or{" "}
-        <Link href="/final-year-projects/for/mtech">M.Tech</Link>. Or see the{" "}
-        <Link href="/final-year-projects">full catalog</Link>.
+        <Link href="/final-year-projects/for/bca/">BCA</Link>,{" "}
+        <Link href="/final-year-projects/for/mca/">MCA</Link>,{" "}
+        <Link href="/final-year-projects/for/btech/">B.Tech</Link>, or{" "}
+        <Link href="/final-year-projects/for/mtech/">M.Tech</Link>. Or see the{" "}
+        <Link href="/final-year-projects/">full catalog</Link>.
       </p>
     </>
   );
