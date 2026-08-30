@@ -60,6 +60,10 @@ export default function NodeGraph() {
             key={`p-${i}`}
             r="3"
             fill="#67E8F9"
+            // `initial` is not decoration: without it the element renders at the SVG
+            // default (0,0) until Framer's first frame, which is a visible flash on
+            // every load and in any prerendered HTML.
+            initial={{ cx: a.cx, cy: a.cy, opacity: 0 }}
             animate={{ cx: [a.cx, b.cx], cy: [a.cy, b.cy], opacity: [0, 1, 1, 0] }}
             transition={{
               duration: 1.8,

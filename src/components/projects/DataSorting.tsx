@@ -47,6 +47,10 @@ export default function DataSorting() {
             key={`dot-${d.i}`}
             r="3"
             fill="#67E8F9"
+            // `initial` is not decoration: without it the element renders at the SVG
+            // default (0,0) until Framer's first frame, which is a visible flash on
+            // every load and in any prerendered HTML.
+            initial={{ cx: 16, cy: 120, opacity: 0 }}
             animate={{
               cx: [16, GATE.x, db.x],
               cy: [120, GATE.y, db.y],

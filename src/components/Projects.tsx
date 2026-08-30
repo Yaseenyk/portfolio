@@ -125,7 +125,7 @@ export const PROJECTS: Project[] = [
     href: "https://github.com/Yaseenyk/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be",
     category: "Computer Vision · Retail Operations",
     description:
-      "Four retail vision problems in one system for an Indian kirana shop: phantom stock, shelf layout, produce freshness and expiry dates. A manager lays out a rack once; after that a photo of it counts every facing, and staff get told which shelf to walk to. Its most useful property is what it refuses to claim — the detector localises products without naming them, so the compliance screen reports stocking rather than identity and says so on the screen, and the reference-planogram path returns 409 rather than a score it cannot support. Reads the shop's inventory system read-only; nothing is uploaded anywhere.",
+      "Four retail vision problems in one system for an Indian kirana shop: phantom stock, shelf layout, produce freshness and expiry dates. A manager lays out a rack once; after that a photo counts every facing and staff are told which shelf to walk to. Its most useful property is what it refuses to claim — the detector localises products without naming them, so the planogram endpoint returns 409 rather than a score it cannot support.",
     metrics: ["4 Use Cases", "650 Tests", "Runs On-Premise"],
     tech: ["FastAPI", "YOLOv8", "MobileNetV2", "Next.js", "Docker", "Ollama"],
     Animation: ShelfScan,
@@ -182,7 +182,7 @@ export const PROJECTS: Project[] = [
     href: "https://yaseenyk.github.io/SIT-FE/",
     category: "Full-Stack · Campus Platform",
     description:
-      "A department association site that arrived as one 4,019-line HTML file — with a live Firebase key in the source and every permission decided in the browser. Rebuilt as two deployables: a Next.js static export on GitHub Pages and a Spring Boot 3 / Java 25 API on Render, both reading Cloud Firestore. Firebase Auth answers who you are; the API decides what you may do, which is the half the original got backwards. Students sign up with an institute address, verify it, register for events and apply to committees; admins run it from a dashboard, and promotion to admin is the one thing signing up can never grant.",
+      "A department association site that arrived as one 4,019-line HTML file — with a live Firebase key in the source and every permission decided in the browser. Rebuilt as a Next.js static export on Pages and a Spring Boot 3 / Java 25 API on Render, both on Firestore. Firebase Auth answers who you are; the server decides what you may do, which is the half the original had backwards.",
     roi: "Browser-side permissions → server-enforced roles",
     metrics: ["4,019-line file → 2 services", "5 auth states", "29 tests"],
     tech: ["Next.js", "Java 25", "Spring Boot", "Firestore", "Firebase Auth"],
@@ -345,7 +345,7 @@ function ProjectRow({ project }: { project: Project }) {
           className="absolute inset-0 z-10 cursor-pointer"
         />
       )}
-      <div className="grid grid-cols-1 items-center gap-6 p-5 sm:gap-8 sm:p-8 lg:grid-cols-2 lg:p-12">
+      <div className="grid grid-cols-1 items-stretch gap-6 p-5 sm:gap-8 sm:p-8 lg:grid-cols-2 lg:p-12">
         {/* Left — content */}
         <div>
           <div className="flex items-center justify-between">
@@ -393,30 +393,48 @@ function ProjectRow({ project }: { project: Project }) {
             ))}
           </div>
 
+          {/*
+            The label is VISIBLE, not just an aria-label.
+
+            Cards with two repositories rendered two identical GitHub marks, so
+            "Backend source" and "Dashboard source" were indistinguishable to anyone
+            looking at them — the distinction existed only for a screen reader. Wrapping,
+            because ShelfSight and AISA carry three links between icon and text.
+          */}
           {project.links && project.links.length > 0 && (
-            <div className="relative z-20 mt-7 flex items-center gap-3">
+            <div className="relative z-20 mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
               {project.links.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${project.name} — ${link.label}`}
-                  className="text-zinc-500 transition-colors duration-200 hover:text-ice"
+                  className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500 transition-colors duration-200 hover:text-ice"
                 >
                   {link.icon === "github" ? (
-                    <GithubIcon className="h-[18px] w-[18px]" />
+                    <GithubIcon className="h-[15px] w-[15px]" />
                   ) : (
-                    <ExternalLinkIcon className="h-[18px] w-[18px]" />
+                    <ExternalLinkIcon className="h-[15px] w-[15px]" />
                   )}
+                  {link.label}
                 </a>
               ))}
             </div>
           )}
         </div>
 
-        {/* Right — animation */}
-        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-zinc-800 bg-ink/40 sm:aspect-[4/3]">
+        {/*
+          Right — animation.
+
+          Side by side, the panel takes its height from the CARD rather than dictating it.
+          A fixed 4:3 made it ~450px tall in a half-width column at full width, while the
+          shortest animations are barely 230px of content — so cards with a brief
+          description showed a large empty box with a diagram floating in the middle of it.
+          `min-h` keeps it from collapsing when the text is very short.
+
+          Stacked (below lg) it has no sibling to match, so it keeps an explicit ratio.
+        */}
+        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-zinc-800 bg-ink/40 lg:aspect-auto lg:h-full lg:min-h-[300px]">
           <Animation />
         </div>
       </div>

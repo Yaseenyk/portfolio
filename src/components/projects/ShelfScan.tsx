@@ -107,11 +107,20 @@ export default function ShelfScan() {
       ))}
 
       {/* The camera pass */}
+      {/*
+        `y` is set BOTH as an attribute and as `initial`.
+
+        Without them the rect renders at the SVG default y=0 — a 26px translucent cyan bar
+        sitting directly on the "RACK R78 / 22 COUNTED" row — until Framer's first frame.
+        It is in the prerendered HTML, so it is what the card looks like on first paint.
+      */}
       <motion.rect
         x="56"
+        y="30"
         width="208"
         height="26"
         fill="url(#shelf-sweep)"
+        initial={{ y: 30 }}
         animate={{ y: [30, 200, 200] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", times: [0, 0.6, 1] }}
       />

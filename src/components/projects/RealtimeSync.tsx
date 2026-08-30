@@ -41,6 +41,10 @@ export default function RealtimeSync() {
           key={`p-${i}`}
           r="2.6"
           fill="#67E8F9"
+          // `initial` is not decoration: without it the element renders at the SVG
+          // default (0,0) until Framer's first frame, which is a visible flash on
+          // every load and in any prerendered HTML.
+          initial={{ cx: CENTER.x, cy: CENTER.y, opacity: 0 }}
           animate={{ cx: [CENTER.x, s.x], cy: [CENTER.y, s.y], opacity: [0, 1, 0] }}
           transition={{
             duration: 1.4,
