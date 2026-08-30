@@ -7,8 +7,20 @@ import JsonLd from "@/components/JsonLd";
 import { SITE_URL } from "@/lib/site";
 import { breadcrumbJsonLd } from "@/lib/seo";
 
+/*
+ * No count in this copy, deliberately.
+ *
+ * It said "thirteen" while the array already held fourteen — a number written in prose
+ * beside the list it describes drifts the first time the list changes, and on a site whose
+ * thesis is real artifacts over claims, a stale count is the worst kind of small error.
+ * Deriving it is not an option here either: PROJECTS lives in a client module, and a
+ * server component cannot read into one. So the number lives where it is computed —
+ * `all {PROJECTS.length} builds` on the homepage — and nowhere else.
+ */
 const DESCRIPTION =
-  "Everything Yaseen Khatib has built — thirteen projects from a Rust desktop cockpit and a local-first AI finance agent to client platforms shipped in a day, enterprise portals, and autonomous pipelines. Each with its stack, metrics, and links.";
+  "Everything Yaseen Khatib has built — from a Rust desktop cockpit and a local-first AI " +
+  "finance agent to client platforms shipped in a day, campus systems, enterprise portals, " +
+  "and autonomous pipelines. Each with its stack, metrics, and links.";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -40,9 +52,9 @@ export default function ProjectsPage() {
               Everything I&apos;ve built.
             </h1>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-400">
-              All thirteen — flagships, client work, enterprise systems, and
-              the autonomous pipelines that run this site. Architecture
-              deep-dives live in{" "}
+              Flagships, client work, campus and enterprise systems, and the
+              autonomous pipelines that run this site. Architecture deep-dives
+              live in{" "}
               <Link
                 href="/products/"
                 className="text-ice underline-offset-4 hover:underline"

@@ -15,6 +15,7 @@ import Untangle from "./projects/Untangle";
 import ShadowDocs from "./projects/ShadowDocs";
 import SupportAgentDocs from "./projects/SupportAgentDocs";
 import ShelfScan from "./projects/ShelfScan";
+import RoleGate from "./projects/RoleGate";
 import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
 import AiBloggerArt from "./products/art/AiBloggerArt";
 import SableArt from "./products/art/SableArt";
@@ -173,6 +174,34 @@ export const PROJECTS: Project[] = [
         href: "https://devlms.pathsaathi.in/login",
         label: "Live (dev)",
         icon: "external",
+      },
+    ],
+  },
+  {
+    name: "AISA — Student Association Platform",
+    href: "https://yaseenyk.github.io/SIT-FE/",
+    category: "Full-Stack · Campus Platform",
+    description:
+      "A department association site that arrived as one 4,019-line HTML file — with a live Firebase key in the source and every permission decided in the browser. Rebuilt as two deployables: a Next.js static export on GitHub Pages and a Spring Boot 3 / Java 25 API on Render, both reading Cloud Firestore. Firebase Auth answers who you are; the API decides what you may do, which is the half the original got backwards. Students sign up with an institute address, verify it, register for events and apply to committees; admins run it from a dashboard, and promotion to admin is the one thing signing up can never grant.",
+    roi: "Browser-side permissions → server-enforced roles",
+    metrics: ["4,019-line file → 2 services", "5 auth states", "29 tests"],
+    tech: ["Next.js", "Java 25", "Spring Boot", "Firestore", "Firebase Auth"],
+    Animation: RoleGate,
+    links: [
+      {
+        href: "https://yaseenyk.github.io/SIT-FE/",
+        label: "Live site",
+        icon: "external",
+      },
+      {
+        href: "https://github.com/Yaseenyk/SIT-FE",
+        label: "Frontend repo",
+        icon: "github",
+      },
+      {
+        href: "https://github.com/Yaseenyk/SIT-BE",
+        label: "Backend repo",
+        icon: "github",
       },
     ],
   },
