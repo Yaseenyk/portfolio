@@ -46,3 +46,7 @@ analytics-report*.xlsx
 tsconfig.tsbuildinfo
 # GSC coverage exports downloaded into the repo root
 https___yaseenkhatib*
+
+# Google Search Console exports — local analysis only, regenerated on demand
+# and growing with every download. Not part of the site.
+gsc/

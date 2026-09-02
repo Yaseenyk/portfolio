@@ -35,12 +35,23 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
     ],
   },
   {
+    heading: "For businesses",
+    links: [
+      { href: "/solutions/", label: "Solutions overview" },
+      { href: "/solutions/business/", label: "For businesses" },
+      { href: "/solutions/small-business/", label: "For small businesses" },
+    ],
+  },
+  {
     heading: "For students",
     links: [
       { href: "/final-year-projects/", label: "Final year projects" },
       { href: "/final-year-projects/guides/", label: "Free guides" },
       { href: "/final-year-projects/question-bank/", label: "Viva question bank" },
       { href: "/final-year-projects/planner/", label: "Timeline planner" },
+      { href: "/final-year-projects/find-my-project/", label: "Find my project" },
+      { href: "/final-year-projects/cost-estimator/", label: "Cost estimator" },
+      { href: "/final-year-projects/templates/", label: "Report templates" },
       { href: "/final-year-projects/colleges/", label: "For colleges" },
       // Onboarding document — noindex, and only sent to a student once they
       // have committed. Listed here so the link is never lost.
@@ -82,7 +93,7 @@ export default function SiteFooter() {
           <PreferredSource />
         </div>
 
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
           {COLUMNS.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
               <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
