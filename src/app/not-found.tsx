@@ -1,6 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
+
+/**
+ * Without its own metadata this page inherited the root layout's
+ * `index, follow` and a canonical pointing at the homepage — so it emitted two
+ * contradictory robots tags and told Google the 404 was a duplicate of "/".
+ */
+export const metadata: Metadata = {
+  title: "Page not found",
+  robots: { index: false, follow: false },
+};
 
 /** Custom 404 — GitHub Pages serves this as 404.html for any unknown path.
  *  A dead end with exits beats a bare error for both visitors and crawlers. */

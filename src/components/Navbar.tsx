@@ -287,11 +287,17 @@ export default function Navbar() {
                   setOpen(group.label);
                 }}
               >
-                <button
-                  type="button"
+                {/* A real <a>, not a button. As a button the label carried no
+                    link equity, and the dropdown items only enter the DOM once
+                    JS opens the panel — so every group landing page was
+                    invisible to crawlers. Hover and focus still open the menu;
+                    a click now also navigates to the overview page. */}
+                <Link
+                  href={group.href}
                   aria-expanded={open === group.label}
                   aria-haspopup="true"
-                  onClick={() => setOpen(open === group.label ? null : group.label)}
+                  onFocus={() => setOpen(group.label)}
+                  onClick={() => setOpen(null)}
                   className="relative flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm"
                 >
                   {open === group.label && (
@@ -315,7 +321,7 @@ export default function Navbar() {
                   >
                     <Chevron open={open === group.label} />
                   </span>
-                </button>
+                </Link>
               </div>
             ))}
           </div>
