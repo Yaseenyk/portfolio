@@ -105,6 +105,16 @@ SURFACES = [
         "hook": "Directed building: one small bright origin node casting clean straight guide-beams that position floating flat interface panels (rectangles, bars, cards) into an assembling screen layout - a builder being directed, not typed. No people, no robots, no text.",
     },
     {
+        "name": "journey-backend",
+        "title": "Chapter 3 - Building the Backend with Claude Code",
+        "hook": "The unseen machine that thinks: small geometric shapes entering through a single gate into a corridor of orderly checkpoint frames, emerging transformed on the far side - rules applied in sequence, one door in, one door out. No people, no gears, no text.",
+    },
+    {
+        "name": "journey-database",
+        "title": "Chapter 4 - The Database with Claude Code",
+        "hook": "The memory that survives: one large calm stacked-cylinder vault with neat rows of small identical blocks stored inside visible layers, a single block being placed or retrieved by a thin beam - order, permanence, safekeeping. No people, no text.",
+    },
+    {
         "name": "cat-mobile",
         "title": "Mobile App Projects",
         "hook": "The app in hand: a minimal abstract phone silhouette with flat geometric interface shapes, screen glowing softly in palette colours only.",

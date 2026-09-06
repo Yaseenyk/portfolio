@@ -472,9 +472,12 @@ claude mcp add playwright -- npx @playwright/mcp@latest
           >
             Back to the 16-day journey
           </Link>
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
-            Chapter 03 · coming next
-          </span>
+          <Link
+            href="/final-year-projects/journey/backend/"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-ice underline decoration-cyan/30 underline-offset-4 hover:decoration-cyan"
+          >
+            Next → Chapter 03 · Backend with Claude Code
+          </Link>
         </div>
       </article>
 

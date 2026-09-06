@@ -114,6 +114,48 @@ export default function JourneyPage() {
             Read →
           </span>
         </Link>
+        <Link
+          href="/final-year-projects/journey/backend/"
+          className="group mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+              Chapter 03 · Backend, with Claude Code
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+              Building the part nobody sees
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+              Routes, validation, business rules, auth and status codes in
+              plain words — with the API contract as the spec and tests as
+              the backend&apos;s eyes.
+            </p>
+          </div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+            Read →
+          </span>
+        </Link>
+        <Link
+          href="/final-year-projects/journey/database/"
+          className="group mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+              Chapter 04 · Database, with Claude Code
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+              The memory that must never lie
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+              Tables and relationships, schema from a data-model doc,
+              migrations, indexes, injection, backups — and why production
+              data stays sacred.
+            </p>
+          </div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+            Read →
+          </span>
+        </Link>
       </section>
 
       <div className="mt-16 space-y-16">
