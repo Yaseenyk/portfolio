@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
 import { JOURNEY, JOURNEY_PHASES } from "@/lib/journey";
 import { breadcrumbJsonLd } from "@/lib/seo";
@@ -64,6 +65,35 @@ export default function JourneyPage() {
           ))}
         </div>
       </header>
+
+      {/* Foundations chapters — read like a book before (and alongside) the
+          live days. Clickable; more chapters land here as they are written. */}
+      <section className="mt-14">
+        <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-zinc-500">
+          Start here · Foundations chapters
+        </h2>
+        <Link
+          href="/final-year-projects/journey/domains/"
+          className="group mt-5 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+              Chapter 01 · Domains
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+              How software actually works, in plain words
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+              Frontend, backend, database, dev vs production, bugs and
+              hotfixes — the full map, explained like a mentor would, with
+              zero heavy words. Read this first.
+            </p>
+          </div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+            Read →
+          </span>
+        </Link>
+      </section>
 
       <div className="mt-16 space-y-16">
         {JOURNEY_PHASES.map((p) => (
