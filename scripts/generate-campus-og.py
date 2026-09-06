@@ -100,6 +100,11 @@ SURFACES = [
         "hook": "The gap between college and industry: scattered loose bricks on one side resolving into one clean, structured building of stacked geometric blocks on the other - knowing pieces vs seeing the whole system. No people.",
     },
     {
+        "name": "journey-frontend",
+        "title": "Chapter 2 - Building the Frontend with Claude Code",
+        "hook": "Directed building: one small bright origin node casting clean straight guide-beams that position floating flat interface panels (rectangles, bars, cards) into an assembling screen layout - a builder being directed, not typed. No people, no robots, no text.",
+    },
+    {
         "name": "cat-mobile",
         "title": "Mobile App Projects",
         "hook": "The app in hand: a minimal abstract phone silhouette with flat geometric interface shapes, screen glowing softly in palette colours only.",

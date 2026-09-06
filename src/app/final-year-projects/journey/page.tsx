@@ -93,6 +93,27 @@ export default function JourneyPage() {
             Read →
           </span>
         </Link>
+        <Link
+          href="/final-year-projects/journey/frontend/"
+          className="group mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+              Chapter 02 · Frontend, with Claude Code
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+              Building the frontend the way it works now
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+              Claude Code setup, CLAUDE.md, feeding docs to the AI, MCPs
+              (giving it eyes), the AI-friendly folder structure, and the
+              plan → build → verify loop you will run every day.
+            </p>
+          </div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+            Read →
+          </span>
+        </Link>
       </section>
 
       <div className="mt-16 space-y-16">

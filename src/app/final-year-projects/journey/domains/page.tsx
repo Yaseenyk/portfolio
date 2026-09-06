@@ -460,9 +460,12 @@ export default function DomainsChapterPage() {
           >
             Back to the 16-day journey
           </Link>
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
-            Chapter 02 · coming next
-          </span>
+          <Link
+            href="/final-year-projects/journey/frontend/"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-ice underline decoration-cyan/30 underline-offset-4 hover:decoration-cyan"
+          >
+            Next → Chapter 02 · Frontend with Claude Code
+          </Link>
         </div>
       </article>
 
