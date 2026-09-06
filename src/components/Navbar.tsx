@@ -88,6 +88,11 @@ const GROUPS: NavGroup[] = [
         label: "Get your idea built",
         desc: "Any stack, any domain",
       },
+      {
+        href: "/final-year-projects/journey/",
+        label: "AI engineering journey",
+        desc: "16 days · 4 hours a day, live",
+      },
       { divider: true },
       { href: "/final-year-projects/guides/", label: "Free guides" },
       { href: "/final-year-projects/question-bank/", label: "Viva question bank" },

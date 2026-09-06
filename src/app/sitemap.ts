@@ -137,6 +137,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     },
     {
+      url: `${SITE_URL}/final-year-projects/journey/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/final-year-projects/planner/`,
       lastModified: lastBlogUpdate,
       changeFrequency: "monthly",
