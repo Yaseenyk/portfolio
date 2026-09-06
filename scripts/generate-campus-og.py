@@ -95,6 +95,11 @@ SURFACES = [
         "hook": "The web app as artifact: a minimal abstract browser frame holding clean geometric layout blocks, one element actively highlighted.",
     },
     {
+        "name": "journey-domains",
+        "title": "Chapter 1 - Domains (How Software Works)",
+        "hook": "The gap between college and industry: scattered loose bricks on one side resolving into one clean, structured building of stacked geometric blocks on the other - knowing pieces vs seeing the whole system. No people.",
+    },
+    {
         "name": "cat-mobile",
         "title": "Mobile App Projects",
         "hook": "The app in hand: a minimal abstract phone silhouette with flat geometric interface shapes, screen glowing softly in palette colours only.",

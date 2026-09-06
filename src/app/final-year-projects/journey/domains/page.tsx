@@ -4,6 +4,8 @@ import { SITE_URL } from "@/lib/site";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import StickyActionBar from "@/components/campus/StickyActionBar";
+import TapJourney from "./TapJourney";
+import { PipelineDiagram, ThreeTierDiagram } from "./Diagrams";
 
 const DESCRIPTION =
   "Frontend, backend, database, dev and production, bugs and hotfixes — the map of how software actually works, explained in plain words for students who only got syntax in college.";
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: `${SITE_URL}/final-year-projects/journey/domains/`,
     siteName: "Yaseen Khatib",
-    images: [`${SITE_URL}/og/campus/guides.jpg`],
+    images: [`${SITE_URL}/og/campus/journey-domains.jpg`],
   },
 };
 
@@ -86,6 +88,18 @@ export default function DomainsChapterPage() {
           explained the moment it appears.
         </p>
       </header>
+
+      <figure className="mt-10 overflow-hidden rounded-2xl border border-white/10">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/og/campus/journey-domains.jpg"
+          alt="Scattered loose bricks on the left, an arrow, and the same bricks assembled into one structured building on the right — knowing pieces versus seeing the system."
+          className="w-full"
+        />
+        <figcaption className="border-t border-white/10 bg-white/[0.02] px-5 py-3 text-center font-mono text-[11px] text-zinc-500">
+          College gives you the bricks. This chapter is the building.
+        </figcaption>
+      </figure>
 
       <article className="mt-4">
         {/* ------------------------------------------------------------ */}
@@ -162,6 +176,7 @@ export default function DomainsChapterPage() {
           Hold onto that one line; the rest of this chapter just zooms into
           each part.
         </P>
+        <TapJourney />
 
         {/* ------------------------------------------------------------ */}
         <H2 n="03">Frontend — everything the user can see and touch</H2>
@@ -277,6 +292,7 @@ export default function DomainsChapterPage() {
           design AI systems later in this journey, we are doing exactly this —
           adding a few new boxes to the same drawing you now understand.
         </P>
+        <ThreeTierDiagram />
 
         {/* ------------------------------------------------------------ */}
         <H2 n="07">Your laptop vs the real world: dev and production</H2>
@@ -355,6 +371,7 @@ export default function DomainsChapterPage() {
           &ldquo;never break&rdquo;. They aim for &ldquo;when it breaks, we
           recover fast&rdquo;.
         </P>
+        <PipelineDiagram />
 
         {/* ------------------------------------------------------------ */}
         <H2 n="10">The domains — who does what</H2>
