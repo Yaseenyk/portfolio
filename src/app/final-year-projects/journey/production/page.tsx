@@ -247,26 +247,18 @@ export default function ProductionChapterPage() {
 
         <div className="mt-12 rounded-2xl border border-cyan/20 bg-cyan/[0.03] p-6 sm:p-8">
           <p className="text-lg font-semibold tracking-tight text-zinc-50">
-            You&rsquo;ve reached the end of the written journey.
+            You can now build the whole thing, end to end.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-            Twelve chapters, from &ldquo;what is a frontend&rdquo; to a guarded
-            production RAG agent. If you want the live version — sixteen days,
-            four hours a day, building this with guidance and getting your work
-            reviewed — the cohort is where these chapters become muscle memory.
+            That is the core journey — frontend to a guarded production RAG
+            agent. Four more chapters go deeper: making retrieval sharp,
+            measuring quality honestly, staying fast at scale, and reshaping
+            the model itself. Read on, or if you want the live version — sixteen
+            days, four hours a day, with your own work reviewed line by line —
+            the cohort is where these chapters become muscle memory.
           </p>
         </div>
       </article>
-
-      <div className="mt-10">
-        <CampusLeadForm
-          projectTitle="16-Day AI Engineering Journey"
-          heading="Join the next cohort"
-          intro="Tell me where you are — your course and how far you got through these chapters — and I'll reply with the batch schedule, the fee, and an honest read on whether this is the right next step for you."
-          messageLabel="Where are you starting from?"
-          messagePlaceholder="Your course, which chapters you've read, and what you want out of the 16 days…"
-        />
-      </div>
 
       <div className="mt-14 flex flex-wrap items-center gap-4 border-t border-white/10 pt-8">
         <Link
@@ -276,10 +268,10 @@ export default function ProductionChapterPage() {
           ← Chapter 11 · Agents
         </Link>
         <Link
-          href="/final-year-projects/journey/"
+          href="/final-year-projects/journey/advanced-rag/"
           className="rounded-lg bg-gradient-to-r from-cyan to-purple px-6 py-3 text-sm font-medium text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)] transition-shadow duration-300 hover:shadow-[0_0_32px_0_rgba(168,85,247,0.5)]"
         >
-          Back to the 16-day journey
+          Next → Chapter 13 · Advanced RAG
         </Link>
       </div>
 

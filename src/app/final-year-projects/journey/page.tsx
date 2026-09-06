@@ -250,6 +250,30 @@ export default function JourneyPage() {
             title: "Making it safe, and making it yours",
             desc: "Guardrails, PII redaction, rate limiting and cost control, the full capstone architecture, and the career roadmap from here to a job.",
           },
+          {
+            href: "/final-year-projects/journey/advanced-rag/",
+            n: "Chapter 13 · Going deeper · Advanced RAG",
+            title: "When basic RAG isn't good enough",
+            desc: "Query expansion, hybrid search, re-ranking, better chunking and metadata — each a targeted fix for a specific retrieval failure.",
+          },
+          {
+            href: "/final-year-projects/journey/evaluation/",
+            n: "Chapter 14 · Evaluation",
+            title: "Testing a thing that never answers the same way twice",
+            desc: "Golden datasets, grading retrieval vs answer quality, LLM-as-judge, and catching regressions before your users do.",
+          },
+          {
+            href: "/final-year-projects/journey/scaling/",
+            n: "Chapter 15 · Scale & real-time",
+            title: "When the model is slow and the users are many",
+            desc: "The timeout problem, streaming, async architectures and queues, WebSockets vs polling, caching, and keeping cost sane at scale.",
+          },
+          {
+            href: "/final-year-projects/journey/fine-tuning/",
+            n: "Chapter 16 · The finale",
+            title: "Fine-tuning, and where you go from here",
+            desc: "Prompt vs RAG vs fine-tuning and when to use each, how fine-tuning really works, who trains models, and the roadmap from here to a career.",
+          },
         ].map((c) => (
           <Link
             key={c.href}

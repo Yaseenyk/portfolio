@@ -155,6 +155,26 @@ SURFACES = [
         "hook": "A system made safe: a neat inner cluster of connected flat boxes wrapped by a single rounded protective outer frame, with small flat filter-gate markers sitting on the arrows entering and leaving the frame - a finished architecture guarded at its edges. Strictly flat matte shapes on near-black navy, cyan and violet only, no people, no letters, no glow.",
     },
     {
+        "name": "journey-advanced-rag",
+        "title": "Chapter 13 - Advanced RAG",
+        "hook": "Precision from breadth: on a perfectly flat uniform dark navy background, about ten small solid muted-slate rounded rectangles loosely grouped on the left, then two solid vertical violet bars standing as gates in the middle, then exactly three solid bright cyan rounded rectangles neatly stacked on the right. Everything is a solid flat fill with hard clean edges. The entire background is one single uniform dark navy tone, absolutely no glow, no light, no bloom, no blur, no gradient, no vignette, no letters.",
+    },
+    {
+        "name": "journey-evaluation",
+        "title": "Chapter 14 - Evaluating AI Systems",
+        "hook": "A scoreboard: on a perfectly flat uniform dark navy background, a vertical column of four solid muted-slate rounded rectangles down the centre, each with a short flat horizontal line to its right ending in a small solid circle; two of those circles are solid bright cyan and two are solid muted slate, reading as pass and fail. Everything is a solid flat fill with hard clean edges. The entire background is one single uniform dark navy tone, absolutely no glow, no light, no bloom, no blur, no gradient, no vignette, no letters.",
+    },
+    {
+        "name": "journey-scaling",
+        "title": "Chapter 15 - Scaling and Real-Time AI",
+        "hook": "Taming the flood: on a flat uniform near-black navy field, many small varied shapes crowding into a queue on the left, passing through one rectangular violet buffer gate in the middle, and emerging on the right as one even evenly-spaced ribbon of small cyan squares flowing to the edge. Pure flat vector, uniform matte background edge to edge, cyan and violet only, absolutely no glow, no blur, no gradient, no letters, no symbols, no people.",
+    },
+    {
+        "name": "journey-finetuning",
+        "title": "Chapter 16 - Fine-Tuning and the Road Ahead",
+        "hook": "Shaping to purpose: on a flat uniform near-black navy field, a large general faceted slate polygon on the left being narrowed by a single focused violet tool beam into a smaller sharper brighter cyan faceted crystal on the right, with a thin cyan path line continuing onward past it toward the upper-right corner. Pure flat vector, uniform matte background edge to edge, cyan and violet only, absolutely no glow, no blur, no gradient, no letters, no symbols, no people.",
+    },
+    {
         "name": "cat-mobile",
         "title": "Mobile App Projects",
         "hook": "The app in hand: a minimal abstract phone silhouette with flat geometric interface shapes, screen glowing softly in palette colours only.",

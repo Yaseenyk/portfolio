@@ -215,6 +215,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${SITE_URL}/final-year-projects/journey/advanced-rag/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/final-year-projects/journey/evaluation/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/final-year-projects/journey/scaling/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/final-year-projects/journey/fine-tuning/`,
+      lastModified: lastBlogUpdate,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${SITE_URL}/final-year-projects/planner/`,
       lastModified: lastBlogUpdate,
       changeFrequency: "monthly",
