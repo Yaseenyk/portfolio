@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
-import { JOURNEY, JOURNEY_PHASES } from "@/lib/journey";
+import { JOURNEY } from "@/lib/journey";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
@@ -219,46 +219,60 @@ export default function JourneyPage() {
             Read →
           </span>
         </Link>
-      </section>
-
-      <div className="mt-16 space-y-16">
-        {JOURNEY_PHASES.map((p) => (
-          <section key={p.phase} id={`phase-${p.phase}`} className="scroll-mt-28">
-            <div className="flex items-baseline gap-4">
-              <span className="font-mono text-sm text-purple">
-                {String(p.phase).padStart(2, "0")}
+        {[
+          {
+            href: "/final-year-projects/journey/embeddings/",
+            n: "Chapter 08 · Meaning as numbers",
+            title: "Turning meaning into numbers",
+            desc: "Embeddings, vector space without heavy maths, and cosine similarity — how a computer measures that two different sentences mean the same thing.",
+          },
+          {
+            href: "/final-year-projects/journey/vector-search/",
+            n: "Chapter 09 · Finding by meaning",
+            title: "Vector search, at scale",
+            desc: "Chunking, why normal databases can't search by meaning, vector databases and nearest-neighbour search, and building real semantic search.",
+          },
+          {
+            href: "/final-year-projects/journey/rag/",
+            n: "Chapter 10 · RAG",
+            title: "Answers grounded in your documents",
+            desc: "Retrieval-augmented generation end to end: the grounding contract, citations, honest refusal, and the advanced techniques that make it reliable.",
+          },
+          {
+            href: "/final-year-projects/journey/agents/",
+            n: "Chapter 11 · Models that act",
+            title: "AI agents and tool calling",
+            desc: "Tool calling, the think-act-observe loop, connecting a model to real functions, multi-agent systems, and the safety that agency demands.",
+          },
+          {
+            href: "/final-year-projects/journey/production/",
+            n: "Chapter 12 · Production & capstone",
+            title: "Making it safe, and making it yours",
+            desc: "Guardrails, PII redaction, rate limiting and cost control, the full capstone architecture, and the career roadmap from here to a job.",
+          },
+        ].map((c) => (
+          <Link
+            key={c.href}
+            href={c.href}
+            className="group mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+          >
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+                {c.n}
               </span>
-              <h2 className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
-                {p.title}
-              </h2>
+              <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+                {c.title}
+              </h3>
+              <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+                {c.desc}
+              </p>
             </div>
-
-            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {p.days.map((d) => (
-                <article
-                  key={d.day}
-                  className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-colors duration-200 hover:border-cyan/30"
-                >
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
-                    Day {String(d.day).padStart(2, "0")}
-                  </span>
-                  <h3 className="mt-2.5 text-lg font-semibold tracking-tight text-zinc-50">
-                    {d.title}
-                  </h3>
-                  <ul className="mt-4 space-y-2.5">
-                    {d.topics.map((t) => (
-                      <li key={t} className="flex gap-2.5 text-sm leading-relaxed text-zinc-400">
-                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-ice" />
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-          </section>
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+              Read →
+            </span>
+          </Link>
         ))}
-      </div>
+      </section>
 
       <div className="mt-20">
         <CampusLeadForm

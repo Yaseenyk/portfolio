@@ -130,6 +130,31 @@ SURFACES = [
         "hook": "Shaping the answer: a vague scattered cloud of small grey shapes on the left passing through a flat rectangular framed stencil in the middle and emerging on the right as one clean ordered grid of aligned bright squares - a loose request shaped into a precise result. Strictly flat matte shapes on near-black navy, cyan and violet only, no people, no letters, no glow.",
     },
     {
+        "name": "journey-embeddings",
+        "title": "Chapter 8 - Embeddings, Meaning as Numbers",
+        "hook": "Meaning becoming position: a field of small scattered shapes drifting into three or four tight clusters where similar shapes sit close together, faint short lines linking the nearest ones - related meanings gathering into neighbourhoods. Strictly flat matte shapes on near-black navy, cyan and violet only, no people, no letters, no glow.",
+    },
+    {
+        "name": "journey-vector-search",
+        "title": "Chapter 9 - Vector Search",
+        "hook": "Finding by nearness: on a flat uniform near-black navy field, one larger solid cyan dot at the centre with straight thin lines reaching out to three nearby solid cyan dots that are larger than the surrounding scattered small slate dots. Pure flat vector, uniform matte background edge to edge, absolutely no glow, no blur, no gradient, no letters, no symbols.",
+    },
+    {
+        "name": "journey-rag",
+        "title": "Chapter 10 - RAG, Grounded Answers",
+        "hook": "Retrieve then generate: on the left a small solid cyan dot with a short line pulling three flat violet document-card rectangles out of a stack; the cards and a line from the dot both flow rightward into one cyan faceted hexagon core that emits a single straight beam to the right edge. Pure flat vector on uniform matte near-black navy, cyan and violet only, absolutely no letters, no symbols, no question marks, no glow.",
+    },
+    {
+        "name": "journey-agents",
+        "title": "Chapter 11 - AI Agents and Tool Calling",
+        "hook": "A model that acts: one central faceted node with several arms reaching out to operate distinct flat tool shapes around it - a small magnifier frame, a bracket-like wrench, a short cylinder - with one curved loop arrow returning to the centre. Strictly flat matte shapes on near-black navy, cyan and violet only, no people, no robots, no letters, no glow.",
+    },
+    {
+        "name": "journey-production",
+        "title": "Chapter 12 - Guardrails and Production",
+        "hook": "A system made safe: a neat inner cluster of connected flat boxes wrapped by a single rounded protective outer frame, with small flat filter-gate markers sitting on the arrows entering and leaving the frame - a finished architecture guarded at its edges. Strictly flat matte shapes on near-black navy, cyan and violet only, no people, no letters, no glow.",
+    },
+    {
         "name": "cat-mobile",
         "title": "Mobile App Projects",
         "hook": "The app in hand: a minimal abstract phone silhouette with flat geometric interface shapes, screen glowing softly in palette colours only.",

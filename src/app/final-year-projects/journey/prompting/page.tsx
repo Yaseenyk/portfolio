@@ -369,9 +369,12 @@ MODEL:
           >
             Back to the 16-day journey
           </Link>
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
-            Chapter 08 · coming next
-          </span>
+          <Link
+            href="/final-year-projects/journey/embeddings/"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-ice underline decoration-cyan/30 underline-offset-4 hover:decoration-cyan"
+          >
+            Next → Chapter 08 · Embeddings
+          </Link>
         </div>
       </article>
 
