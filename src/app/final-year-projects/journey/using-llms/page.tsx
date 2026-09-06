@@ -378,9 +378,12 @@ const summary = res.choices[0].message.content;`}</Code>
           >
             Back to the 16-day journey
           </Link>
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
-            Chapter 07 · coming next
-          </span>
+          <Link
+            href="/final-year-projects/journey/prompting/"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-ice underline decoration-cyan/30 underline-offset-4 hover:decoration-cyan"
+          >
+            Next → Chapter 07 · Prompting that works
+          </Link>
         </div>
       </article>
 

@@ -125,6 +125,11 @@ SURFACES = [
         "hook": "Tuning a stream: three flat circular dials in a row, each rotated differently, above a horizontal ribbon of small varied squares flowing from a plug socket toward the right edge - control over a flowing output. Strictly flat matte shapes, no people, no letters, no glow.",
     },
     {
+        "name": "journey-prompting",
+        "title": "Chapter 7 - Prompting That Works",
+        "hook": "Shaping the answer: a vague scattered cloud of small grey shapes on the left passing through a flat rectangular framed stencil in the middle and emerging on the right as one clean ordered grid of aligned bright squares - a loose request shaped into a precise result. Strictly flat matte shapes on near-black navy, cyan and violet only, no people, no letters, no glow.",
+    },
+    {
         "name": "cat-mobile",
         "title": "Mobile App Projects",
         "hook": "The app in hand: a minimal abstract phone silhouette with flat geometric interface shapes, screen glowing softly in palette colours only.",

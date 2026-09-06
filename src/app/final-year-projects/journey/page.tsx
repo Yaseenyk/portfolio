@@ -198,6 +198,27 @@ export default function JourneyPage() {
             Read →
           </span>
         </Link>
+        <Link
+          href="/final-year-projects/journey/prompting/"
+          className="group mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+              Chapter 07 · Prompting that works
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+              Getting the answer you actually wanted
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+              System prompts, zero/few-shot and chain-of-thought, forcing
+              strict JSON, and the failure side — reducing hallucination and
+              defending against prompt injection.
+            </p>
+          </div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+            Read →
+          </span>
+        </Link>
       </section>
 
       <div className="mt-16 space-y-16">
