@@ -156,6 +156,48 @@ export default function JourneyPage() {
             Read →
           </span>
         </Link>
+        <Link
+          href="/final-year-projects/journey/llm/"
+          className="group mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+              Chapter 05 · The LLM, from scratch
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+              What an LLM actually is, and how one gets built
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+              Next-word prediction, tokens, parameters, attention, and the
+              full build pipeline — data, pretraining, fine-tuning, RLHF —
+              and the people behind every stage.
+            </p>
+          </div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+            Read →
+          </span>
+        </Link>
+        <Link
+          href="/final-year-projects/journey/using-llms/"
+          className="group mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple/30 bg-purple/[0.05] p-6 transition-colors duration-200 hover:border-purple/60"
+        >
+          <div>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-purple">
+              Chapter 06 · Using an LLM
+            </span>
+            <h3 className="mt-2 text-lg font-semibold tracking-tight text-zinc-50">
+              The knobs, the wire, and the bill
+            </h3>
+            <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-zinc-400">
+              The API call, system vs user prompts, temperature, top-p and
+              top-k, max tokens, streaming, token cost, hosted vs local —
+              and why the key never touches the frontend.
+            </p>
+          </div>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-ice transition-transform duration-200 group-hover:translate-x-1">
+            Read →
+          </span>
+        </Link>
       </section>
 
       <div className="mt-16 space-y-16">

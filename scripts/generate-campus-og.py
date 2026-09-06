@@ -115,6 +115,16 @@ SURFACES = [
         "hook": "The memory that survives: one large calm stacked-cylinder vault with neat rows of small identical blocks stored inside visible layers, a single block being placed or retrieved by a thin beam - order, permanence, safekeeping. No people, no text.",
     },
     {
+        "name": "journey-llm",
+        "title": "Chapter 5 - What an LLM Is and How One Is Built",
+        "hook": "Built in stages: a wide field of tiny scattered slate rectangles (raw text fragments) funneling left-to-right through three orderly flat frame gates, emerging as one compact ordered faceted polygon core - raw internet text becoming a model. Strictly flat matte shapes, no people, no letters, no glow.",
+    },
+    {
+        "name": "journey-llm-using",
+        "title": "Chapter 6 - Using an LLM: The Knobs and the Wire",
+        "hook": "Tuning a stream: three flat circular dials in a row, each rotated differently, above a horizontal ribbon of small varied squares flowing from a plug socket toward the right edge - control over a flowing output. Strictly flat matte shapes, no people, no letters, no glow.",
+    },
+    {
         "name": "cat-mobile",
         "title": "Mobile App Projects",
         "hook": "The app in hand: a minimal abstract phone silhouette with flat geometric interface shapes, screen glowing softly in palette colours only.",

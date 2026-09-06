@@ -366,9 +366,12 @@ export default function DatabaseChapterPage() {
           >
             Back to the 16-day journey
           </Link>
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-600">
-            Chapter 05 · coming next
-          </span>
+          <Link
+            href="/final-year-projects/journey/llm/"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-ice underline decoration-cyan/30 underline-offset-4 hover:decoration-cyan"
+          >
+            Next → Chapter 05 · What an LLM is
+          </Link>
         </div>
       </article>
 
