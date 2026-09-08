@@ -1,0 +1,333 @@
+"use client";
+
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+
+/**
+ * Turns a journey chapter into a full-screen slide deck without changing the
+ * page itself: the article stays in the DOM exactly as written, so readers and
+ * crawlers get the prose, and this only builds slides when someone presses
+ * Present.
+ *
+ * Slides are split on the chapter's <h2> boundaries — every chapter is a flat
+ * run of headings and content inside one container, so a heading plus the
+ * siblings up to the next heading is exactly one section.
+ *
+ * Slide bodies are CLONES. Interactive demos are React-owned, and moving their
+ * nodes out of the tree they were mounted into breaks the next render — so in
+ * present mode a demo shows its current state rather than staying clickable.
+ */
+
+interface Slide {
+  kicker: string;
+  title: string;
+  bodyHtml: string;
+  /** A continuation slide dims its heading — the idea already landed. */
+  continued?: boolean;
+}
+
+const CONTENT_SELECTOR = "main div.mx-auto";
+
+function buildSlides(): Slide[] {
+  const root = document.querySelector<HTMLElement>(CONTENT_SELECTOR);
+  if (!root) return [];
+
+  const slides: Slide[] = [];
+
+  const h1 = root.querySelector("h1");
+  const eyebrow = root.querySelector("header span");
+  if (h1) {
+    // The title slide takes the intro paragraphs that sit before the first h2.
+    const intro: string[] = [];
+    for (const p of Array.from(root.querySelectorAll("header p"))) {
+      intro.push(p.outerHTML);
+    }
+    slides.push({
+      kicker: eyebrow?.textContent?.trim() ?? "",
+      title: h1.textContent?.trim() ?? "",
+      bodyHtml: intro.join(""),
+      continued: false,
+    });
+  }
+
+  for (const h2 of Array.from(root.querySelectorAll("h2"))) {
+    const numberEl = h2.querySelector("span");
+    const kicker = numberEl?.textContent?.trim() ?? "";
+    const clone = h2.cloneNode(true) as HTMLElement;
+    clone.querySelector("span")?.remove();
+    const title = clone.textContent?.trim() ?? "";
+
+    // A section of prose is far more than a slide holds. Chunk it: anything
+    // visual (diagram, code, image, table) earns a slide of its own, and prose
+    // runs two blocks at a time. Continuations keep the heading so the room
+    // never loses the thread.
+    const blocks: { html: string; visual: boolean }[] = [];
+    let node: Element | null = h2.nextElementSibling;
+    while (node && node.tagName !== "H2") {
+      const isNav = node.tagName === "DIV" && !!node.querySelector("a[href*='/journey/']");
+      if (!isNav) {
+        const visual = !!node.querySelector("svg, pre, img, table") ||
+          ["FIGURE", "PRE", "TABLE", "IMG"].includes(node.tagName);
+        blocks.push({ html: node.outerHTML, visual });
+      }
+      node = node.nextElementSibling;
+    }
+
+    const chunks: string[][] = [];
+    let run: string[] = [];
+    for (const b of blocks) {
+      if (b.visual) {
+        if (run.length) chunks.push(run);
+        chunks.push([b.html]);
+        run = [];
+        continue;
+      }
+      run.push(b.html);
+      if (run.length === 2) {
+        chunks.push(run);
+        run = [];
+      }
+    }
+    if (run.length) chunks.push(run);
+    if (!chunks.length) chunks.push([]);
+
+    chunks.forEach((c, i) => {
+      slides.push({
+        kicker: chunks.length > 1 ? `${kicker} · ${i + 1}/${chunks.length}` : kicker,
+        title,
+        bodyHtml: c.join(""),
+        continued: i > 0,
+      });
+    });
+  }
+
+  return slides;
+}
+
+export default function PresentMode() {
+  const [slides, setSlides] = useState<Slide[] | null>(null);
+  const [index, setIndex] = useState(0);
+  const [dir, setDir] = useState<1 | -1>(1);
+  const [available, setAvailable] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  // A chapter opens as a deck. The journey index has no sections worth
+  // presenting, so it stays a normal page.
+  useEffect(() => {
+    const root = document.querySelector(CONTENT_SELECTOR);
+    const isChapter = (root?.querySelectorAll("h2").length ?? 0) >= 4;
+    setAvailable(isChapter);
+    if (!isChapter) return;
+    const built = buildSlides();
+    if (!built.length) return;
+    setSlides(built);
+    document.documentElement.style.overflow = "hidden";
+  }, []);
+
+  const open = useCallback(() => {
+    const built = buildSlides();
+    if (!built.length) return;
+    setSlides(built);
+    setIndex(0);
+    setDir(1);
+    document.documentElement.style.overflow = "hidden";
+  }, []);
+
+  /** Browsers refuse requestFullscreen outside a user gesture, so the deck
+   *  opens windowed and goes full-screen on the presenter's first input. */
+  const goFullscreen = useCallback(() => {
+    if (document.fullscreenElement) return;
+    void document.documentElement.requestFullscreen?.().catch(() => {});
+  }, []);
+
+  const close = useCallback(() => {
+    setSlides(null);
+    document.documentElement.style.overflow = "";
+    if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {});
+  }, []);
+
+  const go = useCallback(
+    (delta: number) => {
+      setSlides((current) => {
+        if (!current) return current;
+        setIndex((i) => {
+          const next = Math.min(current.length - 1, Math.max(0, i + delta));
+          if (next !== i) setDir(delta > 0 ? 1 : -1);
+          return next;
+        });
+        return current;
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!slides) return;
+    const onKey = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowRight":
+        case "PageDown":
+        case " ":
+          e.preventDefault();
+          goFullscreen();
+          go(1);
+          break;
+        case "ArrowLeft":
+        case "PageUp":
+          e.preventDefault();
+          go(-1);
+          break;
+        case "Home":
+          e.preventDefault();
+          setIndex(0);
+          break;
+        case "End":
+          e.preventDefault();
+          setIndex(slides.length - 1);
+          break;
+        case "Escape":
+          close();
+          break;
+        default:
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [slides, go, close, goFullscreen]);
+
+  // Leaving fullscreen with F11 or the browser chrome should leave the deck too.
+  useEffect(() => {
+    if (!slides) return;
+    const onFs = () => {
+      if (!document.fullscreenElement) {
+        setSlides(null);
+        document.documentElement.style.overflow = "";
+      }
+    };
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, [slides]);
+
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  /** Sections vary wildly in length; anything that would clip is scaled down
+   *  to fit instead. A slide that cuts off mid-sentence looks broken in a way
+   *  a slightly smaller one never does. */
+  useLayoutEffect(() => {
+    const body = bodyRef.current;
+    const stage = stageRef.current;
+    if (!body || !stage) return;
+    body.style.transform = "scale(1)";
+    const available = stage.clientHeight;
+    const needed = body.scrollHeight;
+    const scale = needed > available ? Math.max(0.55, available / needed) : 1;
+    body.style.transform = `scale(${scale})`;
+    body.style.transformOrigin = "top left";
+    body.style.width = scale < 1 ? `${100 / scale}%` : "100%";
+  }, [index, slides]);
+
+  if (!available) return null;
+
+  const slide = slides?.[index];
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={open}
+        data-print="hide"
+        className="fixed bottom-6 left-6 z-40 hidden items-center gap-2 rounded-full border border-purple/40 bg-purple/10 px-5 py-3 text-sm font-medium text-zinc-100 backdrop-blur transition-colors hover:border-purple hover:bg-purple/20 md:inline-flex"
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden>
+          <rect x="3" y="4" width="18" height="12" rx="2" stroke="#A855F7" strokeWidth="1.8" />
+          <path d="M12 16v4M8 20h8" stroke="#A855F7" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+        Present
+      </button>
+
+      {slides && slide && (
+        <div
+          ref={overlayRef}
+          className="fixed inset-0 z-[100] flex flex-col bg-ink"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Presentation"
+        >
+          <div
+            className="pointer-events-none absolute inset-0 opacity-70"
+            style={{
+              background:
+                "radial-gradient(900px 500px at 85% -10%, rgba(34,211,238,0.10), transparent 60%), radial-gradient(900px 500px at 10% 110%, rgba(168,85,247,0.10), transparent 60%)",
+            }}
+          />
+
+          <div className="relative flex items-center justify-between px-10 pt-8">
+            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-600">
+              {slide.kicker || " "}
+            </span>
+            <div className="flex items-center gap-5">
+              <span className="font-mono text-[11px] tabular-nums text-zinc-600">
+                {index + 1} / {slides.length}
+              </span>
+              <button
+                type="button"
+                onClick={goFullscreen}
+                className="rounded-full border border-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:border-white/25 hover:text-zinc-300"
+              >
+                Fullscreen
+              </button>
+              <button
+                type="button"
+                onClick={close}
+                className="rounded-full border border-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:border-white/25 hover:text-zinc-300"
+              >
+                Read as article
+              </button>
+            </div>
+          </div>
+
+          <div className="relative flex flex-1 items-center overflow-hidden px-[7vw]">
+            <div
+              key={index}
+              className="present-slide w-full"
+              style={{ ["--enter" as string]: dir > 0 ? "36px" : "-36px" }}
+            >
+              <h2 className={`present-title${slide.continued ? " present-title--cont" : ""}`}>{slide.title}</h2>
+              <div ref={stageRef} className="present-stage">
+                <div
+                  ref={bodyRef}
+                  className="present-body"
+                  dangerouslySetInnerHTML={{ __html: slide.bodyHtml }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="relative px-10 pb-7">
+            <div className="h-[3px] w-full overflow-hidden rounded-full bg-white/8">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-cyan to-purple transition-[width] duration-500"
+                style={{ width: `${((index + 1) / slides.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Click zones — a presenter clicks forward far more than back. */}
+          <button
+            type="button"
+            aria-label="Previous slide"
+            onClick={() => go(-1)}
+            className="absolute inset-y-0 left-0 w-[18%] cursor-w-resize opacity-0"
+          />
+          <button
+            type="button"
+            aria-label="Next slide"
+            onClick={() => go(1)}
+            className="absolute inset-y-0 right-0 w-[60%] cursor-e-resize opacity-0"
+          />
+        </div>
+      )}
+    </>
+  );
+}
