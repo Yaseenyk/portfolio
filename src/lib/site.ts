@@ -2,6 +2,17 @@
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
 
+/**
+ * The domain Google Preferred Sources actually recognises.
+ *
+ * Deliberately NOT the host of SITE_URL. Searching the full subdomain in
+ * Google's Source preferences returns "No results" — Preferred Sources
+ * matches publications at the registrable domain, and a subdomain cannot be
+ * registered as its own source. Pointing the button at the subdomain sent
+ * every reader to an empty search, so it points at the parent instead.
+ */
+export const PREFERRED_SOURCE_DOMAIN = "streamerosai.com";
+
 /** Sitewide default description — root metadata, OG, and the WebSite entity. */
 export const SITE_DESCRIPTION =
   "Yaseen Khatib — Senior Full-Stack Developer (MERN) building production AI systems: Agentic RAG, LLM orchestration, and five solo-shipped products. Open to remote, hybrid, or on-site roles.";

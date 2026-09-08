@@ -1,8 +1,8 @@
-import { SITE_URL } from "@/lib/site";
+import { PREFERRED_SOURCE_DOMAIN } from "@/lib/site";
 
 // Google Preferred Sources deep link — a bare domain, no protocol/path.
-const DOMAIN = SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
-const PREFERRED_URL = `https://www.google.com/preferences/source?q=${DOMAIN}`;
+// See PREFERRED_SOURCE_DOMAIN for why this is not the subdomain.
+const PREFERRED_URL = `https://www.google.com/preferences/source?q=${PREFERRED_SOURCE_DOMAIN}`;
 
 /** "Add me as a preferred source on Google" — when a reader opts in, my fresh
  *  posts surface higher in their Top Stories / "From your sources". A plain
