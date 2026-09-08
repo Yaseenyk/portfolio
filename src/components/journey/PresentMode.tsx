@@ -34,12 +34,23 @@ function buildSlides(): Slide[] {
   const slides: Slide[] = [];
 
   const h1 = root.querySelector("h1");
-  const eyebrow = root.querySelector("header span");
-  if (h1) {
-    // The title slide takes the intro paragraphs that sit before the first h2.
+  const header = root.querySelector("header");
+  const eyebrow = header?.querySelector("span");
+  if (h1 && header) {
+    // The opening slide is the header's prose plus whatever sits between it
+    // and the first heading — which is where each chapter's hero illustration
+    // lives. Taking only the paragraphs left the title slide empty.
     const intro: string[] = [];
-    for (const p of Array.from(root.querySelectorAll("header p"))) {
-      intro.push(p.outerHTML);
+    for (const el of Array.from(header.children)) {
+      if (el.tagName === "P") intro.push(el.outerHTML);
+    }
+    // Stop at the first element that CONTAINS a heading, not just one that is
+    // a heading — the sections live inside an <article>, so checking tagName
+    // alone swallowed the entire chapter onto the title slide.
+    let after: Element | null = header.nextElementSibling;
+    while (after && after.tagName !== "H2" && !after.querySelector("h2")) {
+      intro.push(after.outerHTML);
+      after = after.nextElementSibling;
     }
     slides.push({
       kicker: eyebrow?.textContent?.trim() ?? "",
@@ -60,34 +71,53 @@ function buildSlides(): Slide[] {
     // visual (diagram, code, image, table) earns a slide of its own, and prose
     // runs two blocks at a time. Continuations keep the heading so the room
     // never loses the thread.
-    const blocks: { html: string; visual: boolean }[] = [];
+    const blocks: { html: string; visual: boolean; list: boolean }[] = [];
     let node: Element | null = h2.nextElementSibling;
     while (node && node.tagName !== "H2") {
       const isNav = node.tagName === "DIV" && !!node.querySelector("a[href*='/journey/']");
       if (!isNav) {
         const visual = !!node.querySelector("svg, pre, img, table") ||
           ["FIGURE", "PRE", "TABLE", "IMG"].includes(node.tagName);
-        blocks.push({ html: node.outerHTML, visual });
+        const list = !visual && ["OL", "UL"].includes(node.tagName) &&
+          node.children.length > 3;
+        blocks.push({ html: node.outerHTML, visual, list });
       }
       node = node.nextElementSibling;
     }
 
     const chunks: string[][] = [];
     let run: string[] = [];
+    const flush = () => {
+      if (run.length) chunks.push(run);
+      run = [];
+    };
     for (const b of blocks) {
       if (b.visual) {
-        if (run.length) chunks.push(run);
+        flush();
         chunks.push([b.html]);
-        run = [];
+        continue;
+      }
+      // A six-item list is six ideas, not one block. Split it so each slide
+      // carries a readable few, keeping <ol> numbering continuous.
+      if (b.list) {
+        flush();
+        const holder = document.createElement("div");
+        holder.innerHTML = b.html;
+        const listEl = holder.firstElementChild as HTMLElement | null;
+        const items = listEl ? Array.from(listEl.children) : [];
+        const PER = 3;
+        for (let i = 0; i < items.length; i += PER) {
+          const part = listEl!.cloneNode(false) as HTMLElement;
+          if (part.tagName === "OL") part.setAttribute("start", String(i + 1));
+          items.slice(i, i + PER).forEach((li) => part.appendChild(li.cloneNode(true)));
+          chunks.push([part.outerHTML]);
+        }
         continue;
       }
       run.push(b.html);
-      if (run.length === 2) {
-        chunks.push(run);
-        run = [];
-      }
+      if (run.length === 2) flush();
     }
-    if (run.length) chunks.push(run);
+    flush();
     if (!chunks.length) chunks.push([]);
 
     chunks.forEach((c, i) => {
@@ -219,7 +249,8 @@ export default function PresentMode() {
     const stage = stageRef.current;
     if (!body || !stage) return;
     body.style.transform = "scale(1)";
-    const available = stage.clientHeight;
+    body.style.width = "100%";
+    const available = window.innerHeight * 0.66;
     const needed = body.scrollHeight;
     const scale = needed > available ? Math.max(0.55, available / needed) : 1;
     body.style.transform = `scale(${scale})`;
@@ -290,7 +321,7 @@ export default function PresentMode() {
           <div className="relative flex flex-1 items-center overflow-hidden px-[7vw]">
             <div
               key={index}
-              className="present-slide w-full"
+              className={`present-slide w-full${index === 0 ? " present-slide--title" : ""}`}
               style={{ ["--enter" as string]: dir > 0 ? "36px" : "-36px" }}
             >
               <h2 className={`present-title${slide.continued ? " present-title--cont" : ""}`}>{slide.title}</h2>
