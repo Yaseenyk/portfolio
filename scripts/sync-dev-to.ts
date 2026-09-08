@@ -309,7 +309,9 @@ async function main(): Promise<void> {
   let writes = 0;
 
   for (const file of files) {
-    if (writes >= maxWrites) {
+    // A dry run is a diagnostic — it should list the whole backlog, not the
+    // first few. Only real writes are rationed.
+    if (!dryRun && writes >= maxWrites) {
       console.log(`· reached MAX_WRITES=${maxWrites} — ${files.length - writes} file(s) left for the next run`);
       break;
     }
@@ -317,8 +319,7 @@ async function main(): Promise<void> {
       const post = await parseLocalPost(file);
       const match = findMatch(post, index);
       if (dryRun) {
-        console.log(`· would ${match ? `update #${match.id}` : "create"}: ${post.title}  (${file})`);
-        writes += 1;
+        console.log(`· would ${match ? `update #${match.id}` : "create"}: ${post.title}`);
         continue;
       }
       if (match) {
