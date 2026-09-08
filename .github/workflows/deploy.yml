@@ -30,6 +30,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          # Full history: the sitemap takes each page's lastmod from the last
+          # commit that touched it, and a shallow clone collapses every file
+          # onto one commit date.
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
