@@ -266,20 +266,16 @@ export default function PresentMode() {
   const [available, setAvailable] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // A chapter opens as a deck. The journey index has no sections worth
-  // presenting, so it stays a normal page.
+  // A chapter offers the deck; it does not take the page over. Opening it
+  // automatically meant the article painted, then a beat later slammed into
+  // full-screen slides and locked scrolling — which read as the page
+  // glitching. The presenter decides when the deck starts.
   //
   // Availability is decided by the route, not by counting headings in the
   // DOM: the button has to be there every time, and a markup change or a
   // slow-hydrating section must never be able to take it away.
   useEffect(() => {
-    const isChapter = isChapterRoute();
-    setAvailable(isChapter);
-    if (!isChapter) return;
-    const built = buildSlides();
-    if (!built.length) return;
-    setSlides(built);
-    document.documentElement.style.overflow = "hidden";
+    setAvailable(isChapterRoute());
   }, []);
 
   const open = useCallback(() => {
@@ -289,6 +285,11 @@ export default function PresentMode() {
     setIndex(0);
     setDir(1);
     document.documentElement.style.overflow = "hidden";
+    // The click is the user gesture browsers require, so the deck can go
+    // full-screen straight away rather than waiting for the first arrow key.
+    if (!document.fullscreenElement) {
+      void document.documentElement.requestFullscreen?.().catch(() => {});
+    }
   }, []);
 
   /** Browsers refuse requestFullscreen outside a user gesture, so the deck
