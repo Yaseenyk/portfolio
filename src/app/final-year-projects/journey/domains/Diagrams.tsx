@@ -144,12 +144,12 @@ export function PipelineDiagram() {
         <text x="127" y="205" textAnchor="middle" fontFamily="monospace" fontSize="9" fill="#52525b">git — the diary of every change</text>
 
         {/* hotfix path */}
-        <path d="M127 90 C 200 20, 560 20, 632 86" fill="none" stroke="#A855F7" strokeWidth="1.5" strokeDasharray="6 4" markerEnd="url(#pl-arrow-v)" />
-        <text x="380" y="36" textAnchor="middle" fontFamily="monospace" fontSize="10" fill="#A855F7">hotfix — smallest possible fix, straight to production</text>
+        <path d="M127 90 C 210 40, 550 40, 632 86" fill="none" stroke="#A855F7" strokeWidth="1.5" strokeDasharray="6 4" markerEnd="url(#pl-arrow-v)" />
+        <text x="380" y="26" textAnchor="middle" fontFamily="monospace" fontSize="10" fill="#A855F7">hotfix — smallest possible fix, straight to production</text>
 
         {/* rollback path */}
-        <path d="M700 176 C 700 240, 580 252, 545 252" fill="none" stroke="#52525b" strokeWidth="1.5" strokeDasharray="6 4" markerEnd="url(#pl-arrow)" />
-        <text x="420" y="256" textAnchor="middle" fontFamily="monospace" fontSize="10" fill="#a1a1aa">rollback — put the last working version back, then investigate calmly</text>
+        <path d="M700 176 C 700 242, 620 256, 566 256" fill="none" stroke="#52525b" strokeWidth="1.5" strokeDasharray="6 4" markerEnd="url(#pl-arrow)" />
+        <text x="290" y="260" textAnchor="middle" fontFamily="monospace" fontSize="10" fill="#a1a1aa">rollback — put the last working version back</text>
       </svg>
     </Panel>
   );
