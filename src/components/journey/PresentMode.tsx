@@ -332,7 +332,7 @@ export default function PresentMode() {
         type="button"
         onClick={open}
         data-print="hide"
-        className="fixed bottom-6 left-6 z-40 hidden items-center gap-2 rounded-full border border-purple/40 bg-purple/10 px-5 py-3 text-sm font-medium text-zinc-100 backdrop-blur transition-colors hover:border-purple hover:bg-purple/20 md:inline-flex"
+        className="fixed bottom-5 left-5 z-40 inline-flex items-center gap-2 rounded-full border border-purple/40 bg-purple/10 px-4 py-2.5 text-xs font-medium text-zinc-100 backdrop-blur transition-colors hover:border-purple hover:bg-purple/20 md:bottom-6 md:left-6 md:px-5 md:py-3 md:text-sm"
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden>
           <rect x="3" y="4" width="18" height="12" rx="2" stroke="#A855F7" strokeWidth="1.8" />
