@@ -140,13 +140,29 @@
   max-width: 24ch;
   text-wrap: balance;
 }
-/* A continuation slide keeps the heading for orientation, quietly. */
+/* A continuation slide keeps the heading for orientation, but as an eyebrow
+   rather than a second title — two lines of grey sentence-case above the
+   body read as stray text, not as a label. */
 .present-title--cont {
-  font-size: clamp(18px, 1.6vw, 26px);
-  color: #71717a;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
+  font-size: clamp(11px, 0.78vw, 15px);
   font-weight: 500;
-  letter-spacing: 0;
-  margin-bottom: clamp(14px, 1.6vh, 22px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8b8b96;
+  max-width: none;
+  margin-bottom: clamp(20px, 2.4vh, 34px);
+}
+.present-title--cont::before {
+  content: "";
+  flex: none;
+  width: clamp(26px, 2.2vw, 44px);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #22d3ee, #a855f7);
 }
 
 /* max-height, never height: a short slide must collapse so the flex parent
@@ -157,9 +173,23 @@
 }
 
 .present-body {
-  font-size: clamp(19px, 1.65vw, 31px);
-  line-height: 1.5;
-  color: #d4d4d8;
+  font-size: clamp(20px, 2.05vw, 40px);
+  line-height: 1.45;
+  color: #e4e4e7;
+}
+/* Each block arrives a beat after the one above it, so a slide reveals
+   rather than appearing all at once. */
+.present-body > * { animation: present-block 420ms cubic-bezier(0.21, 0.47, 0.32, 0.98) both; }
+.present-body > *:nth-child(2) { animation-delay: 90ms; }
+.present-body > *:nth-child(3) { animation-delay: 180ms; }
+.present-body > *:nth-child(4) { animation-delay: 270ms; }
+.present-body > *:nth-child(n + 5) { animation-delay: 340ms; }
+@keyframes present-block {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .present-body > * { animation: none; }
 }
 .present-body > * { margin-top: 0.8em; }
 .present-body > *:first-child { margin-top: 0; }
@@ -167,15 +197,30 @@
   font-size: inherit;
   line-height: inherit;
   color: inherit;
-  max-width: 58ch;
+  max-width: 42ch;
 }
-.present-body strong { color: #fafafa; }
-.present-body em { color: #e4e4e7; }
+/* Bold alone barely separates from body white at projector distance — an
+   underline in brand cyan is what the eye actually catches. */
+.present-body strong {
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 -0.12em 0 rgba(34, 211, 238, 0.55);
+}
+.present-body em { color: #f4f4f5; font-style: italic; }
+.present-body code {
+  font-size: 0.82em;
+  padding: 0.1em 0.34em;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #a5f3fc;
+}
 .present-body li { font-size: inherit; line-height: 1.45; }
-.present-body ul, .present-body ol { max-width: 60ch; }
+.present-body ul, .present-body ol { max-width: 44ch; }
 .present-body li + li { margin-top: 0.6em; }
 .present-body svg { max-width: 100%; max-height: 58vh; height: auto; }
-.present-body figure { margin: 0; }
+/* The interactive figures keep animating — the sentence they build grows a
+   line at a time — so no one-off fit converges. Bound them instead. */
+.present-body figure { margin: 0; max-height: 66vh; overflow: hidden; }
 .present-body pre { font-size: 0.55em; line-height: 1.5; max-height: 58vh; overflow: auto; }
 .present-body img { max-height: 56vh; width: auto; object-fit: contain; }
 /* The article's own vertical rhythm fights the slide's — neutralise it. */

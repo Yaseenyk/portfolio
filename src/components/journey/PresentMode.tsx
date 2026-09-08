@@ -25,10 +25,20 @@ interface Slide {
   continued?: boolean;
 }
 
-const CONTENT_SELECTOR = "main div.mx-auto";
+/** A chapter is any journey route with a slug; the index has nothing to present. */
+function isChapterRoute(): boolean {
+  return /\/journey\/[^/]+\/?$/.test(window.location.pathname);
+}
+
+function contentRoot(): HTMLElement | null {
+  return (
+    document.querySelector<HTMLElement>("main article") ??
+    document.querySelector<HTMLElement>("main div.mx-auto")
+  );
+}
 
 function buildSlides(): Slide[] {
-  const root = document.querySelector<HTMLElement>(CONTENT_SELECTOR);
+  const root = contentRoot();
   if (!root) return [];
 
   const slides: Slide[] = [];
@@ -91,41 +101,79 @@ function buildSlides(): Slide[] {
     }
 
     const chunks: string[][] = [];
-    let run: string[] = [];
-    const flush = () => {
-      if (run.length) chunks.push(run);
-      run = [];
-    };
     // Budget by characters, not block count. Two short paragraphs and two long
     // ones are very different slides, and letting autofit absorb the
     // difference is what made the type size jump between slides.
-    const BUDGET = 560;
-    let weight = 0;
-    const flushWeighted = () => {
-      flush();
-      weight = 0;
+    const BUDGET = 430;
+
+    // Pack a run of prose with a lookahead rather than greedily. Greedy
+    // filling capped the number of slides up front, so whatever was left
+    // over piled onto the last one — that is how a slide ended up at 691
+    // characters while its neighbours held 300.
+    let group: { html: string; weight: number }[] = [];
+    const flushGroup = () => {
+      if (!group.length) return;
+      const rest: number[] = new Array(group.length + 1).fill(0);
+      for (let i = group.length - 1; i >= 0; i--) rest[i] = rest[i + 1] + group[i].weight;
+
+      let run: string[] = [];
+      let weight = 0;
+      group.forEach((b, i) => {
+        run.push(b.html);
+        weight += b.weight;
+        const next = group[i + 1];
+        if (!next) return;
+        if (weight + next.weight <= BUDGET) return;
+        // A tail too small to be its own slide rides along instead.
+        if (rest[i + 1] < BUDGET * 0.4 && weight + rest[i + 1] <= BUDGET * 1.15) return;
+        chunks.push(run);
+        run = [];
+        weight = 0;
+      });
+      if (run.length) chunks.push(run);
+      group = [];
     };
+
     for (const b of blocks) {
       if (b.visual) {
-        flushWeighted();
+        flushGroup();
         chunks.push([b.html]);
         continue;
       }
       // A six-item list is six ideas, not one block. Split it so each slide
       // carries a readable few, keeping <ol> numbering continuous.
       if (b.list) {
-        flushWeighted();
+        flushGroup();
         const holder = document.createElement("div");
         holder.innerHTML = b.html;
         const listEl = holder.firstElementChild as HTMLElement | null;
         const items = listEl ? Array.from(listEl.children) : [];
-        const PER = 3;
-        for (let i = 0; i < items.length; i += PER) {
+        // Split by weight, not by a fixed count: three one-line items and
+        // three paragraph-long ones are not the same slide.
+        const totalWeight = items.reduce((sum, li) => sum + (li.textContent?.length ?? 0), 0);
+        const groups = Math.max(1, Math.ceil(totalWeight / BUDGET));
+        const targetWeight = totalWeight / groups;
+        let taken: Element[] = [];
+        let takenWeight = 0;
+        let start = 1;
+        const emit = () => {
+          if (!taken.length) return;
           const part = listEl!.cloneNode(false) as HTMLElement;
-          if (part.tagName === "OL") part.setAttribute("start", String(i + 1));
-          items.slice(i, i + PER).forEach((li) => part.appendChild(li.cloneNode(true)));
+          if (part.tagName === "OL") part.setAttribute("start", String(start));
+          taken.forEach((li) => part.appendChild(li.cloneNode(true)));
           chunks.push([part.outerHTML]);
-        }
+          start += taken.length;
+          taken = [];
+          takenWeight = 0;
+        };
+        items.forEach((li, i) => {
+          taken.push(li);
+          takenWeight += li.textContent?.length ?? 0;
+          const left = items.length - i - 1;
+          const madeSoFar = start - 1;
+          if (takenWeight >= targetWeight && left > 0 && madeSoFar + taken.length < items.length) emit();
+        });
+        emit();
         continue;
       }
       // A single paragraph can outweigh the whole budget on its own, and a
@@ -134,14 +182,13 @@ function buildSlides(): Slide[] {
       // jump between slides. Break it at sentence ends instead.
       const parts = b.weight > BUDGET ? splitProse(b.html, BUDGET) : [b.html];
       for (const html of parts) {
-        const w = parts.length > 1 ? Math.ceil(b.weight / parts.length) : b.weight;
-        if (run.length && weight + w > BUDGET) flushWeighted();
-        run.push(html);
-        weight += w;
-        if (weight >= BUDGET) flushWeighted();
+        group.push({
+          html,
+          weight: parts.length > 1 ? Math.ceil(b.weight / parts.length) : b.weight,
+        });
       }
     }
-    flushWeighted();
+    flushGroup();
     if (!chunks.length) chunks.push([]);
 
     chunks.forEach((c, i) => {
@@ -186,7 +233,7 @@ function splitProse(html: string, budget: number): string[] {
       filled += child.textContent?.length ?? 0;
       continue;
     }
-    for (const sentence of (child.textContent ?? "").split(/(?<=[.!?])\s+/)) {
+    for (const sentence of (child.textContent ?? "").split(/(?<=[.!?:;])\s+/)) {
       if (!sentence) continue;
       if (filled >= target) start();
       current.appendChild(document.createTextNode(filled ? " " + sentence : sentence));
@@ -194,6 +241,21 @@ function splitProse(html: string, budget: number): string[] {
     }
   }
   start();
+  // A remainder of one clause is not a slide. Rather than fold it back — which
+  // just makes the part above oversized — walk sentences backwards from the
+  // part above until the tail carries its share.
+  if (parts.length > 1) {
+    const tail = parts[parts.length - 1];
+    const prev = parts[parts.length - 2];
+    while (
+      (tail.textContent?.length ?? 0) < target * 0.55 &&
+      prev.childNodes.length > 1
+    ) {
+      const moved = prev.lastChild!;
+      prev.removeChild(moved);
+      tail.insertBefore(moved, tail.firstChild);
+    }
+  }
   return parts.length ? parts.map((el) => el.outerHTML) : [html];
 }
 
@@ -206,9 +268,12 @@ export default function PresentMode() {
 
   // A chapter opens as a deck. The journey index has no sections worth
   // presenting, so it stays a normal page.
+  //
+  // Availability is decided by the route, not by counting headings in the
+  // DOM: the button has to be there every time, and a markup change or a
+  // slow-hydrating section must never be able to take it away.
   useEffect(() => {
-    const root = document.querySelector(CONTENT_SELECTOR);
-    const isChapter = (root?.querySelectorAll("h2").length ?? 0) >= 4;
+    const isChapter = isChapterRoute();
     setAvailable(isChapter);
     if (!isChapter) return;
     const built = buildSlides();
@@ -312,14 +377,40 @@ export default function PresentMode() {
     const body = bodyRef.current;
     const stage = stageRef.current;
     if (!body || !stage) return;
-    body.style.transform = "scale(1)";
-    body.style.width = "100%";
-    const available = window.innerHeight * 0.72;
-    const needed = body.scrollHeight;
-    const scale = needed > available ? Math.max(0.82, available / needed) : 1;
-    body.style.transform = `scale(${scale})`;
-    body.style.transformOrigin = "top left";
-    body.style.width = scale < 1 ? `${100 / scale}%` : "100%";
+
+    const fit = () => {
+      body.style.transform = "scale(1)";
+      body.style.width = "100%";
+      const available = window.innerHeight * 0.72;
+      const needed = body.scrollHeight;
+      // Prose holds a floor so type size stays even from slide to slide, but a
+      // diagram or a code block has no type to compare against — it may shrink
+      // as far as it needs to rather than be cut off.
+      const fixed = !body.querySelector("svg, img, pre, table, figure");
+      const scale = needed > available
+        ? Math.max(fixed ? 0.82 : 0.45, available / needed)
+        : 1;
+      body.style.transform = `scale(${scale})`;
+      body.style.transformOrigin = "top left";
+      body.style.width = scale < 1 ? `${100 / scale}%` : "100%";
+    };
+
+    fit();
+    // A figure that finishes laying out after the first pass — an SVG sizing
+    // itself, a late font — left the slide fitted to the wrong height and
+    // clipped at the bottom. Re-fit once the frame has settled.
+    let raf = requestAnimationFrame(() => {
+      raf = requestAnimationFrame(fit);
+    });
+    // The interactive figures keep growing past the second frame, so take one
+    // more pass once they have settled.
+    const settled = window.setTimeout(fit, 400);
+    window.addEventListener("resize", fit);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(settled);
+      window.removeEventListener("resize", fit);
+    };
   }, [index, slides]);
 
   if (!available) return null;
@@ -332,7 +423,7 @@ export default function PresentMode() {
         type="button"
         onClick={open}
         data-print="hide"
-        className="fixed bottom-5 left-5 z-40 inline-flex items-center gap-2 rounded-full border border-purple/40 bg-purple/10 px-4 py-2.5 text-xs font-medium text-zinc-100 backdrop-blur transition-colors hover:border-purple hover:bg-purple/20 md:bottom-6 md:left-6 md:px-5 md:py-3 md:text-sm"
+        className="fixed bottom-5 left-5 z-40 inline-flex items-center gap-2 rounded-full border border-purple/60 bg-purple/15 px-4 py-2.5 text-xs font-semibold text-zinc-50 shadow-[0_10px_30px_-10px_rgba(168,85,247,0.7)] backdrop-blur transition-colors hover:border-purple hover:bg-purple/25 md:bottom-6 md:left-6 md:px-5 md:py-3 md:text-sm"
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden>
           <rect x="3" y="4" width="18" height="12" rx="2" stroke="#A855F7" strokeWidth="1.8" />
