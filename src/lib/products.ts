@@ -54,7 +54,10 @@ export const PRODUCTS: ProductMeta[] = [
     tech: ["Rust", "Tauri v2", "WebSockets", "Next.js", "OBS WebSocket v5"],
     // The streamerOS app repo is private; this is the public website/landing repo.
     repoUrl: "https://github.com/Yaseenyk/streamer-os-website",
-    liveUrl: "https://yaseenyk.github.io/streamer-os-website/",
+    // The product's own domain, not the github.io mirror it 301s from — the
+    // mirror was the only address this site ever pointed at, so the canonical
+    // one got none of the association.
+    liveUrl: "https://streamerosai.com",
   },
   {
     slug: "linkedin-pipeline",

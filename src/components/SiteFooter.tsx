@@ -32,6 +32,10 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
       { href: "/#contact", label: "Contact" },
       { href: SOCIALS.linkedin, label: "LinkedIn", external: true },
       { href: SOCIALS.github, label: "GitHub", external: true },
+      // The shipped product these notes are written about. This site pointed
+      // only at the github.io mirror, so the live product domain and the
+      // write-ups explaining it were never connected for a reader or a crawler.
+      { href: "https://streamerosai.com", label: "streamerOS (live product)", external: true },
     ],
   },
   {
