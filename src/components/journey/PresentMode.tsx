@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * Turns a journey chapter into a full-screen slide deck without changing the
@@ -26,9 +27,7 @@ interface Slide {
 }
 
 /** A chapter is any journey route with a slug; the index has nothing to present. */
-function isChapterRoute(): boolean {
-  return /\/journey\/[^/]+\/?$/.test(window.location.pathname);
-}
+const CHAPTER_ROUTE = /\/journey\/[^/]+\/?$/;
 
 function contentRoot(): HTMLElement | null {
   return (
@@ -263,20 +262,12 @@ export default function PresentMode() {
   const [slides, setSlides] = useState<Slide[] | null>(null);
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
-  const [available, setAvailable] = useState(false);
+  // Taken from the route at render time, not from an effect. Deciding this
+  // client-side meant the button only existed once React had hydrated, so
+  // anything that stopped hydration — an extension, a chunk that failed to
+  // load — took the button with it. This way it ships in the HTML.
+  const available = CHAPTER_ROUTE.test(usePathname() ?? "");
   const overlayRef = useRef<HTMLDivElement>(null);
-
-  // A chapter offers the deck; it does not take the page over. Opening it
-  // automatically meant the article painted, then a beat later slammed into
-  // full-screen slides and locked scrolling — which read as the page
-  // glitching. The presenter decides when the deck starts.
-  //
-  // Availability is decided by the route, not by counting headings in the
-  // DOM: the button has to be there every time, and a markup change or a
-  // slow-hydrating section must never be able to take it away.
-  useEffect(() => {
-    setAvailable(isChapterRoute());
-  }, []);
 
   const open = useCallback(() => {
     const built = buildSlides();
