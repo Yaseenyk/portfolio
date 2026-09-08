@@ -71,7 +71,7 @@ function buildSlides(): Slide[] {
     // visual (diagram, code, image, table) earns a slide of its own, and prose
     // runs two blocks at a time. Continuations keep the heading so the room
     // never loses the thread.
-    const blocks: { html: string; visual: boolean; list: boolean }[] = [];
+    const blocks: { html: string; visual: boolean; list: boolean; weight: number }[] = [];
     let node: Element | null = h2.nextElementSibling;
     while (node && node.tagName !== "H2") {
       const isNav = node.tagName === "DIV" && !!node.querySelector("a[href*='/journey/']");
@@ -80,7 +80,12 @@ function buildSlides(): Slide[] {
           ["FIGURE", "PRE", "TABLE", "IMG"].includes(node.tagName);
         const list = !visual && ["OL", "UL"].includes(node.tagName) &&
           node.children.length > 3;
-        blocks.push({ html: node.outerHTML, visual, list });
+        blocks.push({
+          html: node.outerHTML,
+          visual,
+          list,
+          weight: node.textContent?.trim().length ?? 0,
+        });
       }
       node = node.nextElementSibling;
     }
@@ -91,16 +96,25 @@ function buildSlides(): Slide[] {
       if (run.length) chunks.push(run);
       run = [];
     };
+    // Budget by characters, not block count. Two short paragraphs and two long
+    // ones are very different slides, and letting autofit absorb the
+    // difference is what made the type size jump between slides.
+    const BUDGET = 560;
+    let weight = 0;
+    const flushWeighted = () => {
+      flush();
+      weight = 0;
+    };
     for (const b of blocks) {
       if (b.visual) {
-        flush();
+        flushWeighted();
         chunks.push([b.html]);
         continue;
       }
       // A six-item list is six ideas, not one block. Split it so each slide
       // carries a readable few, keeping <ol> numbering continuous.
       if (b.list) {
-        flush();
+        flushWeighted();
         const holder = document.createElement("div");
         holder.innerHTML = b.html;
         const listEl = holder.firstElementChild as HTMLElement | null;
@@ -114,10 +128,20 @@ function buildSlides(): Slide[] {
         }
         continue;
       }
-      run.push(b.html);
-      if (run.length === 2) flush();
+      // A single paragraph can outweigh the whole budget on its own, and a
+      // block is the smallest thing the packer can move — so an 800-character
+      // one used to land alone and get scaled down, which is the type-size
+      // jump between slides. Break it at sentence ends instead.
+      const parts = b.weight > BUDGET ? splitProse(b.html, BUDGET) : [b.html];
+      for (const html of parts) {
+        const w = parts.length > 1 ? Math.ceil(b.weight / parts.length) : b.weight;
+        if (run.length && weight + w > BUDGET) flushWeighted();
+        run.push(html);
+        weight += w;
+        if (weight >= BUDGET) flushWeighted();
+      }
     }
-    flush();
+    flushWeighted();
     if (!chunks.length) chunks.push([]);
 
     chunks.forEach((c, i) => {
@@ -131,6 +155,46 @@ function buildSlides(): Slide[] {
   }
 
   return slides;
+}
+
+/**
+ * Split one long paragraph into near-equal parts at sentence boundaries.
+ * Inline children (<strong>, <code>, <a>) are atomic — they move whole, so
+ * markup never breaks even though the text does.
+ */
+function splitProse(html: string, budget: number): string[] {
+  const holder = document.createElement("div");
+  holder.innerHTML = html;
+  const source = holder.firstElementChild as HTMLElement | null;
+  if (!source) return [html];
+
+  const total = source.textContent?.trim().length ?? 0;
+  const target = Math.ceil(total / Math.ceil(total / budget));
+  const parts: HTMLElement[] = [];
+  let current = source.cloneNode(false) as HTMLElement;
+  let filled = 0;
+
+  const start = () => {
+    if (current.childNodes.length) parts.push(current);
+    current = source.cloneNode(false) as HTMLElement;
+    filled = 0;
+  };
+
+  for (const child of Array.from(source.childNodes)) {
+    if (child.nodeType !== Node.TEXT_NODE) {
+      current.appendChild(child.cloneNode(true));
+      filled += child.textContent?.length ?? 0;
+      continue;
+    }
+    for (const sentence of (child.textContent ?? "").split(/(?<=[.!?])\s+/)) {
+      if (!sentence) continue;
+      if (filled >= target) start();
+      current.appendChild(document.createTextNode(filled ? " " + sentence : sentence));
+      filled += sentence.length;
+    }
+  }
+  start();
+  return parts.length ? parts.map((el) => el.outerHTML) : [html];
 }
 
 export default function PresentMode() {
@@ -250,9 +314,9 @@ export default function PresentMode() {
     if (!body || !stage) return;
     body.style.transform = "scale(1)";
     body.style.width = "100%";
-    const available = window.innerHeight * 0.66;
+    const available = window.innerHeight * 0.72;
     const needed = body.scrollHeight;
-    const scale = needed > available ? Math.max(0.55, available / needed) : 1;
+    const scale = needed > available ? Math.max(0.82, available / needed) : 1;
     body.style.transform = `scale(${scale})`;
     body.style.transformOrigin = "top left";
     body.style.width = scale < 1 ? `${100 / scale}%` : "100%";

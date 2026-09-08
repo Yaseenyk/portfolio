@@ -152,7 +152,7 @@
 /* max-height, never height: a short slide must collapse so the flex parent
    can centre it, otherwise it hangs from the top of a tall empty box. */
 .present-stage {
-  max-height: 66vh;
+  max-height: 72vh;
   overflow: hidden;
 }
 
