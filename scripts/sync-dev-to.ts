@@ -301,10 +301,26 @@ async function main(): Promise<void> {
 
   const failures: string[] = [];
 
+  // A backfill of fifty posts in one run reads as a dump to DEV.to and to its
+  // readers. MAX_WRITES lets the backlog drip out over several runs; unset, it
+  // is unlimited, so the normal per-push sync is unaffected.
+  const maxWrites = Number(process.env.MAX_WRITES ?? 0) || Infinity;
+  const dryRun = process.env.DRY_RUN === "true";
+  let writes = 0;
+
   for (const file of files) {
+    if (writes >= maxWrites) {
+      console.log(`· reached MAX_WRITES=${maxWrites} — ${files.length - writes} file(s) left for the next run`);
+      break;
+    }
     try {
       const post = await parseLocalPost(file);
       const match = findMatch(post, index);
+      if (dryRun) {
+        console.log(`· would ${match ? `update #${match.id}` : "create"}: ${post.title}  (${file})`);
+        writes += 1;
+        continue;
+      }
       if (match) {
         const updated = await updateArticle(match.id, post.payload, apiKey);
         console.log(`↻ updated #${match.id}: ${updated.url}  (${file})`);
@@ -312,11 +328,12 @@ async function main(): Promise<void> {
         const created = await createArticle(post.payload, apiKey);
         console.log(`＋ created #${created.id}: ${created.url}  (${file})`);
       }
+      writes += 1;
     } catch (err) {
       console.error(`✗ ${file}: ${(err as Error).message}`);
       failures.push(file);
     }
-    await sleep(RATE_LIMIT_PAUSE_MS);
+    if (!dryRun) await sleep(RATE_LIMIT_PAUSE_MS);
   }
 
   // Unpublish DEV.to copies of posts removed from the repo. The deleted file is

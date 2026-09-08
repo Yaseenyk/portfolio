@@ -50,3 +50,6 @@ https___yaseenkhatib*
 # Google Search Console exports — local analysis only, regenerated on demand
 # and growing with every download. Not part of the site.
 gsc/
+
+# Generated DEV.to export (scripts/export-posts-markdown.mjs)
+.devto/

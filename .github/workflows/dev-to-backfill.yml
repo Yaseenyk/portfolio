@@ -1,0 +1,64 @@
+name: Backfill DEV.to from the whole blog
+
+# Half the blog is `.tsx`, which the per-push sync cannot read — it only
+# watches `src/content/blog/**.mdx`. This builds the site, converts every
+# published post from its built HTML to Markdown, and syncs them.
+#
+# Manual on purpose. MAX_WRITES drips the backlog out over several runs
+# instead of dumping fifty articles onto DEV.to in one go.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "How many articles to create/update this run"
+        required: false
+        default: "5"
+        type: string
+      dry_run:
+        description: "List what would be posted without writing to DEV.to"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: dev-to-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          # The sitemap reads each page's lastmod from git history.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the site
+        run: npm run build
+
+      - name: Export every post as Markdown
+        run: node scripts/export-posts-markdown.mjs
+
+      - name: Sync to DEV.to
+        env:
+          DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+          MAX_WRITES: ${{ inputs.limit }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ADDED_FILES="$(ls .devto/*.md | tr '\n' ' ')"
+          export ADDED_FILES
+          echo "Candidates: $(echo "$ADDED_FILES" | wc -w)"
+          npx tsx scripts/sync-dev-to.ts
