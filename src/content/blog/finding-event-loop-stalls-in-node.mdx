@@ -14,6 +14,11 @@ keywords:
 - node async hooks pending promises
 - node process hangs no error
 - diagnose slow node api
+takeaways:
+- A blocked loop and a suspended await look identical from outside and have opposite fixes; measure loop delay first.
+- monitorEventLoopDelay from perf_hooks is the single most useful Node metric most services do not collect.
+- For idle hangs, wrap must-finish operations in a labelled deadline so a silent hang becomes a loud error.
+- Most idle hangs are an HTTP call with no timeout, a lock released outside a finally, or a promise that never rejects.
 readingMinutes: 8
 ---
 

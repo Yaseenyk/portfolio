@@ -1,0 +1,156 @@
+---
+title: 'Web Workers, and the React jank they actually fix'
+slug: web-workers-keep-react-responsive
+date: '2026-07-29'
+description: 'Moving work off the main thread only helps if the main thread was the problem. How to tell, what the structured-clone tax costs you, and the transfer that makes workers worth it.'
+tags:
+- React
+- Performance
+- TypeScript
+keywords:
+- react web worker offload
+- comlink react worker
+- structured clone cost worker
+- transferable objects postmessage
+- long task main thread react
+- react ui jank profiling
+takeaways:
+- Workers fix long synchronous tasks, not slow network calls; check the Performance panel for long tasks before reaching for one.
+- postMessage copies by default, and for large payloads the copy can cost more than the work you moved.
+- Transfer ArrayBuffers instead of cloning them, and remember the sender loses access.
+- Keep one long-lived worker rather than creating one per operation; startup is milliseconds you pay every time.
+readingMinutes: 7
+---
+
+"Move it to a Web Worker" is offered as the fix for any slow React UI, and it is
+often the wrong one. Workers solve exactly one problem: **long synchronous work
+occupying the main thread**. If your UI is slow because a request takes 800ms,
+a worker will not help — the main thread was already idle, waiting.
+
+So the first job is to find out which kind of slow you have.
+
+## Confirm the main thread is actually blocked
+
+Open the Performance panel, record an interaction, and look for **long tasks** —
+the red-cornered blocks over 50ms. That is the browser telling you it could not
+respond to input for that long.
+
+If you see long tasks, a worker may help. If the timeline is mostly empty with a
+network bar across it, your problem is latency and a worker changes nothing.
+
+Rough guide to what is worth moving:
+
+- parsing or transforming a large JSON or CSV payload
+- text processing across thousands of items — search indexing, diffing, tokenising
+- image or canvas pixel manipulation
+- cryptography, compression, anything numeric over big arrays
+
+And what is not worth it: a single `.map` over 200 rows, formatting dates,
+almost any work whose input is small. Under about a millisecond of actual
+computation, the messaging overhead dominates and you have made it slower with
+extra complexity.
+
+## The tax nobody mentions
+
+`postMessage` does not share memory. It **structured-clones** the payload:
+serialised out, copied, deserialised in. For a 30MB array that copy can cost
+more than the computation you were trying to move.
+
+Transferables are the way out. An `ArrayBuffer` can be handed over rather than
+copied, which is near-instant:
+
+```ts
+const buffer = new Float32Array(samples).buffer;
+
+worker.postMessage({ type: "analyse", buffer }, [buffer]);
+// buffer.byteLength === 0 here: ownership moved, this thread lost it
+```
+
+That second argument is the transfer list, and the consequence is exactly what
+it looks like — the sending side can no longer read the buffer. That is usually
+fine and occasionally a nasty surprise, so make it obvious in the calling code.
+
+Only `ArrayBuffer`, `MessagePort`, `ImageBitmap` and a few others are
+transferable. A plain object of strings and numbers will always be copied, so
+shape your worker's interface around buffers when the payload is large.
+
+## Wiring it into React without the ceremony
+
+Raw `postMessage` with a message-type switch gets unpleasant quickly. Comlink
+turns the worker into an object you await:
+
+```ts
+// analyser.worker.ts
+import * as Comlink from "comlink";
+
+const api = {
+  score(buffer: ArrayBuffer) {
+    const samples = new Float32Array(buffer);
+    return computeScores(samples);     // synchronous, but off the main thread
+  },
+};
+
+Comlink.expose(api);
+```
+
+```tsx
+function useAnalyser() {
+  const workerRef = useRef<Comlink.Remote<Api>>();
+
+  useEffect(() => {
+    const worker = new Worker(new URL("./analyser.worker.ts", import.meta.url), {
+      type: "module",
+    });
+    workerRef.current = Comlink.wrap<Api>(worker);
+    return () => worker.terminate();
+  }, []);
+
+  return useCallback(async (buffer: ArrayBuffer) => {
+    return workerRef.current?.score(Comlink.transfer(buffer, [buffer]));
+  }, []);
+}
+```
+
+Two things worth copying from this: the worker is created **once** in an effect
+and terminated on unmount, and `new URL(..., import.meta.url)` is what lets
+Vite, webpack and Next bundle the worker correctly instead of you hand-managing
+a separate build.
+
+Creating a worker per operation is a common mistake. Startup is a few
+milliseconds plus module evaluation, paid on every call, which for frequent
+small jobs erases the benefit entirely.
+
+## Cancellation, because users change their minds
+
+A worker that is halfway through 40,000 rows does not stop because the user
+typed another character. Without cancellation you get results arriving out of
+order and a UI that flickers between stale and fresh.
+
+The simplest reliable pattern is a request id: send one with every call, and
+ignore any response whose id is not the latest.
+
+```ts
+const latest = useRef(0);
+
+async function run(input: ArrayBuffer) {
+  const id = ++latest.current;
+  const result = await analyse(input);
+  if (id !== latest.current) return;   // superseded, drop it
+  setResult(result);
+}
+```
+
+For genuinely long jobs, have the worker check a shared `SharedArrayBuffer`
+flag between chunks and bail out — but only reach for that when the request-id
+approach is not enough, since `SharedArrayBuffer` needs cross-origin isolation
+headers and that is a deployment change, not a code change.
+
+## The honest summary
+
+A worker is a real tool with real overhead: a separate module graph, a
+messaging protocol, cancellation you now have to think about, and debugging
+that is a little harder. It earns that when you have long tasks and a payload
+you can transfer rather than copy.
+
+Measure first. Half the time the fix is not a worker at all — it is not doing
+the work, memoising it, or doing it on the server.

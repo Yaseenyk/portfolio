@@ -1,0 +1,154 @@
+---
+title: 'Backpressure in Node, or why your queue ate all the memory'
+slug: backpressure-in-node-streams
+date: '2026-07-28'
+description: 'An unbounded queue is a memory leak with a scheduler. How Node streams signal backpressure, why pipeline beats pipe, and what to do when the producer genuinely cannot slow down.'
+tags:
+- Node.js
+- Performance
+- Architecture
+keywords:
+- node stream backpressure explained
+- node pipeline vs pipe
+- writable drain event node
+- unbounded queue memory leak node
+- node highwatermark tuning
+- bounded queue drop oldest strategy
+takeaways:
+- An unbounded in-memory queue is not a buffer, it is a memory leak that fails under exactly the load it was meant to absorb.
+- write() returning false is the signal to stop; ignoring it is what turns a slow consumer into an OOM.
+- Use pipeline rather than pipe so errors propagate and streams are destroyed instead of leaking.
+- When the producer cannot slow down, choose your loss deliberately: drop oldest, drop newest, or sample.
+readingMinutes: 8
+---
+
+Every system that moves data faster than it can process it eventually meets the
+same question: what happens to the excess? There are only three answers — slow
+the producer, drop something, or run out of memory. A surprising number of
+services pick the third by accident, because the code that does it looks
+completely reasonable.
+
+```js
+const queue = [];
+
+socket.on("message", (msg) => queue.push(msg));   // this is the bug
+setInterval(() => processBatch(queue.splice(0, 100)), 100);
+```
+
+That is not a buffer. It is a memory leak with a scheduler attached. It works
+perfectly until the consumer slows down or the producer speeds up — which is
+precisely the situation a buffer was supposed to survive.
+
+## What Node already gives you
+
+Streams have backpressure built in, and most people ignore the part that
+implements it: the return value of `write`.
+
+```js
+const ok = writable.write(chunk);
+if (!ok) {
+  readable.pause();
+  writable.once("drain", () => readable.resume());
+}
+```
+
+`write` returns `false` when the internal buffer has passed its
+`highWaterMark`. It still accepts the chunk — it does not throw, it does not
+drop — it is telling you *stop sending*. Ignore it in a loop and you buffer the
+entire source in memory, which is the same bug as the array above wearing a
+stream costume.
+
+`pipe` handles this for you, which is its whole point. But use `pipeline`
+instead:
+
+```js
+import { pipeline } from "node:stream/promises";
+
+await pipeline(
+  createReadStream("in.csv"),
+  parseRows(),
+  transformRows(),
+  createWriteStream("out.ndjson"),
+);
+```
+
+`pipe` does not forward errors and does not destroy the streams when something
+fails, which leaks file descriptors and sockets in exactly the failure cases
+you most want to survive. `pipeline` does both, and the promise version gives
+you ordinary `try/catch`.
+
+## Async iteration gets it right for free
+
+If you consume a stream with `for await`, backpressure is automatic — the loop
+does not ask for the next chunk until the body finishes:
+
+```js
+for await (const chunk of readable) {
+  await handle(chunk);     // the stream waits for this
+}
+```
+
+This is the version to reach for by default. It is readable, it cannot
+accidentally ignore a `false` return, and the flow control falls out of the
+language rather than out of your discipline.
+
+The one trap: doing the work *without* awaiting it. `for await` with a
+fire-and-forget handler inside restores the unbounded queue, just hidden in the
+microtask queue instead of an array.
+
+## When the producer cannot slow down
+
+Backpressure assumes the producer can wait. Sometimes it cannot: a chat
+firehose, a metrics feed, a market data socket. Those keep arriving whether you
+are ready or not, and the honest choice is which data to lose.
+
+Make that choice explicit rather than letting the OOM killer make it:
+
+```js
+class BoundedQueue {
+  #items = [];
+  constructor(readonly limit) {}
+
+  push(item) {
+    this.#items.push(item);
+    if (this.#items.length > this.limit) {
+      this.#items.shift();      // drop oldest: keep the freshest state
+      this.dropped += 1;
+    }
+  }
+}
+```
+
+Three strategies, each right in a different place:
+
+- **Drop oldest** for state you only need the latest of — telemetry, presence,
+  prices. Old samples have no value once a newer one exists.
+- **Drop newest** for work queues where the earlier items are commitments you
+  have already accepted. Rejecting the new arrival is more honest than
+  abandoning one you took.
+- **Sample** — keep one in N — for a feed you are only displaying, where the
+  shape matters more than any individual point.
+
+Whichever you pick, **count what you drop and export the counter**. A system
+silently discarding 40% of its input looks healthy on every dashboard until
+somebody notices the numbers are wrong.
+
+## Sizing the buffer
+
+`highWaterMark` defaults to 16KB for byte streams and 16 objects for object
+mode. The defaults are reasonable and people change them for the wrong reason.
+
+Raising it does not increase throughput; it increases how much you buffer
+before applying backpressure, which trades memory for tolerance of bursty
+consumers. Raise it if your consumer is fast but jittery. Do not raise it
+because things feel slow — that is a consumer problem, and a bigger buffer just
+delays the moment you find out.
+
+## The check worth running today
+
+Search your codebase for arrays or Maps that only ever get pushed to inside an
+event handler. Every one is a candidate for the first snippet in this post. For
+each, ask: what stops this growing if the consumer stalls for ten minutes?
+
+If the answer is "nothing", you have found a future incident. Give it a bound
+and a dropped-item counter, and it becomes a graph instead of a page at 3am.

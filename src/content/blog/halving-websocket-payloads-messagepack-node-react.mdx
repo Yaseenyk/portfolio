@@ -14,6 +14,11 @@ keywords:
 - binary websocket react client
 - reduce websocket payload size
 - socket binarytype arraybuffer react
+takeaways:
+- Batching messages beats changing the encoding; it costs nothing and usually wins more.
+- Set binaryType to arraybuffer on the browser socket, or every message pays for an async Blob read.
+- MessagePack lands 40 to 55 percent smaller than JSON for telemetry-shaped objects but still encodes the keys.
+- Measure with permessage-deflate on and off; compressed JSON sometimes beats uncompressed binary.
 readingMinutes: 8
 ---
 

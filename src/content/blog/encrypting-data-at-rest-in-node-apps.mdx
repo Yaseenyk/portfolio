@@ -14,6 +14,11 @@ keywords:
 - key rotation node application
 - node envelope encryption kms
 - store encryption key environment variable
+takeaways:
+- Use AES-256-GCM with a fresh random 12-byte nonce every time; nonce reuse is catastrophic.
+- Call setAuthTag before final and let final throw, or you have silently downgraded to unauthenticated encryption.
+- Version the key at write time from day one so rotation never needs downtime or guesswork.
+- Encryption at rest protects a stolen copy of the data; it does nothing about your logs, which is where personal data usually leaks.
 readingMinutes: 8
 ---
 

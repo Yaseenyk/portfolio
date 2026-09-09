@@ -1,0 +1,141 @@
+---
+title: 'Shrinking a React bundle: what actually moved the number'
+slug: shrinking-react-bundles-what-actually-works
+date: '2026-07-30'
+description: 'Bundle analysis past the treemap: which dependencies are worth replacing, why a barrel file quietly defeats tree-shaking, and the difference between smaller and faster.'
+tags:
+- React
+- Performance
+- TypeScript
+keywords:
+- reduce react bundle size
+- webpack bundle analyzer treemap
+- tree shaking barrel file sideeffects
+- dynamic import code splitting react
+- moment vs date-fns bundle
+- lighthouse tbt bundle size
+takeaways:
+- Measure compressed bytes, not raw; a treemap showing raw sizes will send you after the wrong dependency.
+- Barrel files defeat tree-shaking by making the whole module look reachable; import from the source path instead.
+- Split on routes and on genuinely optional UI, not on every component, or you trade one big request for fifty small ones.
+- Smaller is not automatically faster; Total Blocking Time is what users feel, and parse-and-execute is what moves it.
+readingMinutes: 8
+---
+
+Bundle size is a proxy metric. Nobody experiences kilobytes — they experience a
+page that does not respond to a tap. Worth keeping in view, because it is easy
+to spend a week removing 40KB that changed nothing anyone could feel.
+
+That said, the work usually is worth doing, because the same few mistakes
+produce most of the weight.
+
+## Measure the right number
+
+`@next/bundle-analyzer` or `rollup-plugin-visualizer` gives you a treemap.
+Before reading it, switch it to **gzip or brotli sizes**. Raw sizes lie:
+minified JavaScript compresses extremely well and highly repetitive code
+compresses better still, so raw numbers will point you at a dependency that
+costs a third of what the picture claims.
+
+Then read the map with one question: *is this in the initial bundle, and does
+the first screen need it?* Most wins are not "this library is fat", they are
+"this is loaded on every page and used on one".
+
+## The classics, still worth checking
+
+- **A date library you barely use.** `moment` is around 70KB gzipped with
+  locales and cannot be tree-shaken. `date-fns` imports per function;
+  `Intl.DateTimeFormat` is built into the browser and formats better than most
+  of what people install.
+- **A whole icon set.** Importing from the package root can pull in thousands of
+  components. Import the specific icons, and check the treemap afterwards to
+  confirm it worked.
+- **`lodash` instead of `lodash-es`.** The CommonJS build cannot be
+  tree-shaken. Half of what people use it for is now language built-ins.
+- **Two libraries doing one job** — a chart library on one page and a different
+  one on another, two toast libraries, three ways of making a request.
+
+## The subtle one: barrel files
+
+This is the pattern that quietly costs the most, because it looks like good
+hygiene:
+
+```ts
+// src/components/index.ts
+export * from "./Button";
+export * from "./Chart";      // pulls in a charting library
+export * from "./Editor";     // pulls in a code editor
+```
+
+```ts
+import { Button } from "@/components";   // innocent-looking
+```
+
+The bundler must evaluate the entire barrel to resolve one name. Modern
+bundlers can sometimes shake it out, but any module with a side effect anywhere
+in that graph — a CSS import, a polyfill, a `window` touch at module scope —
+pins it, and now every page importing a `Button` ships a code editor.
+
+Two fixes: import from the file directly, and set `"sideEffects": false` in
+`package.json` (or list the genuinely effectful files) so the bundler is allowed
+to drop unused branches.
+
+## Splitting, but not everywhere
+
+`React.lazy` and dynamic `import()` are the right tool for anything not needed
+for the first paint:
+
+```tsx
+const Editor = lazy(() => import("./Editor"));
+
+<Suspense fallback={<EditorSkeleton />}>
+  {isEditing && <Editor />}
+</Suspense>
+```
+
+Good candidates: routes, modals, charts below the fold, anything behind a
+permission or a feature flag, rich editors, video players.
+
+Bad candidates: components on the critical path, and anything small. Splitting
+everything replaces one large request with dozens of small ones and a waterfall
+of them, which is slower on a high-latency connection and much harder to
+reason about.
+
+Match the fallback to the real layout. A spinner where a chart will appear
+causes a layout shift the moment it loads; a skeleton of the right dimensions
+does not.
+
+## Smaller is not the same as faster
+
+The number users feel is **Total Blocking Time** — how long the main thread was
+too busy to respond. Bytes contribute to it, but so does what the code does on
+startup.
+
+A 300KB bundle that renders and stops is a better experience than a 200KB one
+that hydrates a huge tree, runs six effects, and lays out a table of 5,000
+rows. Once you have taken the easy weight off, look for:
+
+- work at module scope, running on import whether or not it is needed
+- effects that fire on mount and immediately fetch
+- large lists rendered without virtualisation
+- state at the top of the tree re-rendering everything below on every keystroke
+
+## What I would do, in order
+
+1. Analyse with **compressed** sizes and look only at the initial chunk.
+2. Fix imports — barrels, icon sets, `lodash-es`, per-function date imports.
+3. Split routes and genuinely optional UI, with correctly sized fallbacks.
+4. Set a **budget in CI** so the size cannot creep back:
+
+```json
+{
+  "budgets": [{ "type": "bundle", "name": "main", "maximumWarning": "180kb" }]
+}
+```
+
+5. Then measure Total Blocking Time and go after the runtime work, which is
+   usually where the remaining experience gap lives.
+
+Step four matters more than any single deletion. Bundles do not grow because of
+one bad decision; they grow by ten kilobytes a sprint, and only a number that
+fails the build reliably notices.

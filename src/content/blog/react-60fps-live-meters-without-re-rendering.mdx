@@ -14,6 +14,11 @@ keywords:
 - react ring buffer telemetry
 - react re-render performance profiler
 - canvas meter react hooks
+takeaways:
+- At 60fps, setState is the wrong tool; React batches faster than it flushes, so you pay for reconciliation and still get a laggy meter.
+- Use a fixed typed-array ring buffer written by the socket and read once per animation frame.
+- React should render the canvas element once and never again; the frame loop owns the pixels.
+- Verify in the React Profiler that the meter component appears exactly once, at mount.
 readingMinutes: 7
 ---
 

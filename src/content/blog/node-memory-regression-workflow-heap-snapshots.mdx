@@ -14,6 +14,11 @@ keywords:
 - v8 heap statistics node
 - node memory regression ci
 - node --expose-gc leak test
+takeaways:
+- Reproduce growth with a committed load script, not a sequence of clicks, so every run is identical.
+- Take three heap snapshots and use the comparison view; a single snapshot shows what is in memory, not what is growing.
+- Read the retainer path from the bottom up rather than chasing the largest object; a chain ending in module scope can never be collected.
+- Turn the fix into a nightly CI assertion on heapUsed so the leak cannot quietly return.
 readingMinutes: 7
 ---
 

@@ -14,6 +14,11 @@ keywords:
 - reconnect jitter thundering herd
 - react usewebsocket reconnect
 - websocket resume after disconnect
+takeaways:
+- Model reconnection as four explicit states; ad-hoc booleans end with two sockets open at once.
+- Add full jitter to exponential backoff, otherwise every client reconnects in unison after a restart.
+- An open socket can still be dead; heartbeat both ends and use terminate rather than close for an unresponsive peer.
+- Reconnecting restores the pipe, not the missed data; send a last-seen event id and let the server replay.
 readingMinutes: 8
 ---
 

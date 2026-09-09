@@ -1,0 +1,149 @@
+---
+title: 'Faster JSON on Node hot paths, and when it is worth it'
+slug: faster-json-parsing-in-node-hot-paths
+date: '2026-07-27'
+description: 'JSON.parse and JSON.stringify are fast until they are your bottleneck. Where the time actually goes, what fast-json-stringify and simdjson buy you, and how to avoid parsing at all.'
+tags:
+- Node.js
+- Performance
+- TypeScript
+keywords:
+- node json parse performance
+- fast-json-stringify schema
+- simdjson node benchmark
+- node json bottleneck profiling
+- avoid json parse hot path
+- node stringify large payload slow
+takeaways:
+- Profile before swapping libraries; JSON is rarely the bottleneck people assume it is, and blocking the loop is the real cost.
+- Serialising is usually slower than parsing, and fast-json-stringify fixes it by compiling a schema ahead of time.
+- The fastest parse is the one you skip; pass buffers through untouched when the service is only routing them.
+- Any parse over roughly a megabyte belongs off the main thread, whatever library does it.
+readingMinutes: 7
+---
+
+`JSON.parse` is written in C++ and is genuinely fast. For most services it will
+never be the thing that is slow. But it is synchronous, so when it does become
+the bottleneck it does not merely take time — it takes the whole event loop
+with it, and every other request waits.
+
+That is the real reason to care. Not throughput. Blocking.
+
+## Find out whether it is actually JSON
+
+Before adding a dependency, take a CPU profile with `--cpu-prof` and look for
+`JSON.parse` or `JSON.stringify` in the self-time column. What people usually
+find surprises them: the parse is 3% and the ORM is 60%.
+
+If JSON genuinely dominates, one of these is true:
+
+- payloads are large, in the megabytes rather than kilobytes
+- the same object is serialised many times per request
+- you are parsing something you never actually read
+
+Each has a different fix, and only one of them is a faster library.
+
+## Serialising is usually the slower half
+
+`JSON.stringify` has to walk your object, check types, escape strings and
+discover the shape as it goes — every single time, even though the shape is
+identical on every request.
+
+`fast-json-stringify` removes that by compiling a serialiser from a JSON Schema
+once, at startup:
+
+```js
+import build from "fast-json-stringify";
+
+const stringify = build({
+  title: "Report",
+  type: "object",
+  properties: {
+    id: { type: "string" },
+    total: { type: "number" },
+    rows: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { label: { type: "string" }, value: { type: "number" } },
+      },
+    },
+  },
+});
+
+res.end(stringify(report));   // 2-4x faster than JSON.stringify in practice
+```
+
+The catch is the one that bites people: **fields not in the schema are silently
+dropped**. That is a feature — it stops you leaking a `passwordHash` you forgot
+to delete — but it will absolutely produce a bug report about a missing field
+if you add one to the object and not to the schema. Generate the schema from
+the same source as your types if you can.
+
+Fastify does this internally when you attach a response schema to a route,
+which is most of why it benchmarks the way it does.
+
+## Parsing: the fastest parse is no parse
+
+Before reaching for `simdjson`, ask whether you need the object at all.
+
+A gateway that receives a payload, checks one header and forwards the body does
+not need to parse anything. Passing the raw `Buffer` through costs nothing:
+
+```js
+// Do not do this if you only forward it
+const body = await req.json();
+await fetch(upstream, { body: JSON.stringify(body) });
+
+// Do this
+await fetch(upstream, { body: req.body, duplex: "half" });
+```
+
+If you need one field out of a large document, a streaming parser that emits
+just that path beats materialising the whole tree. And if you are storing the
+document, store the bytes and parse on read — most documents are written once
+and read rarely, or the reverse, and only one side needs to pay.
+
+When you genuinely must parse large documents fast, `simdjson` bindings use
+SIMD instructions to parse several bytes per cycle. The wins are real on
+multi-megabyte inputs and close to nil on small ones, where the native binding
+overhead cancels the gain.
+
+## The rule that matters more than any library
+
+Anything over roughly a megabyte should not be parsed on the main thread at
+all. A 20MB document takes tens of milliseconds to parse, and for that entire
+time your service answers nothing.
+
+```js
+import { Worker } from "node:worker_threads";
+
+const worker = new Worker("./parse-worker.js");
+
+export function parseOffThread(buffer) {
+  return new Promise((resolve, reject) => {
+    worker.once("message", resolve);
+    worker.once("error", reject);
+    worker.postMessage(buffer, [buffer.buffer]);  // transfer, do not copy
+  });
+}
+```
+
+The transfer list on `postMessage` matters. Without it the buffer is
+structured-cloned — copied — which for a 20MB payload costs more than the parse
+you were trying to move.
+
+## What I would check, in order
+
+1. **Profile.** Confirm JSON is really the cost before changing anything.
+2. **Stop parsing what you do not read.** Pass buffers through; parse one path
+   instead of the whole document.
+3. **Compile your serialiser** with a schema if you return the same shape
+   repeatedly.
+4. **Move big parses to a worker**, with a transfer rather than a copy.
+5. **Then** consider a faster parser, and benchmark it on your real payloads
+   rather than someone else's.
+
+Steps one to four are free or nearly so. Step five adds a native dependency to
+your build, which is a cost you carry forever, for a win that only exists at
+sizes most services never see.

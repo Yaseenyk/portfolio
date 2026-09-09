@@ -17,6 +17,10 @@
  * so this map can never point at nothing.
  */
 export const BLOG_REDIRECTS: Record<string, string> = {
+  "serdejson-to-simd-json-in-streameros-ipc-hot-path-deserialization": "faster-json-parsing-in-node-hot-paths",
+  "tauri-rust-backpressure-bounded-vs-unbounded-channels-for-chat-floods": "backpressure-in-node-streams",
+  "simd-sentiment-scoring-in-rust-via-wasm-workers-no-ui-jank": "web-workers-keep-react-responsive",
+  "shrink-streameros-rust-binaries-optz-fat-lto-panicabort": "shrinking-react-bundles-what-actually-works",
 
   // Rust/Tauri posts rewritten as their React/Node equivalent — same
   // engineering subject, the stack this site is actually about.
