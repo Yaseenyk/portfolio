@@ -107,6 +107,17 @@ export default function FineTuningChapterPage() {
           brittle of the three. The professional move is the opposite order:
           reach for it last.
         </P>
+        <P>
+          Think of a new hostel warden on their first day. If you want them to
+          answer &ldquo;what time does the gate close?&rdquo;, you do not send
+          them for six months of training — you hand them the rule book and
+          tell them to read from it. That is <Term>RAG</Term>. If you want them
+          to answer politely, in Marathi, in three lines, never guessing when
+          they are unsure, you tell them so once. That is{" "}
+          <Term>prompting</Term>. Training is what you would do to change who
+          they fundamentally are — expensive, slow, and pointless if the real
+          problem was that nobody gave them the rule book.
+        </P>
 
         {/* 02 */}
         <H2 n="02">What fine-tuning actually is</H2>

@@ -58,7 +58,9 @@ function buildSlides(): Slide[] {
     // alone swallowed the entire chapter onto the title slide.
     let after: Element | null = header.nextElementSibling;
     while (after && after.tagName !== "H2" && !after.querySelector("h2")) {
-      intro.push(after.outerHTML);
+      if (after.tagName !== "FIGURE" && !after.querySelector("figure")) {
+        intro.push(after.outerHTML);
+      }
       after = after.nextElementSibling;
     }
     slides.push({
@@ -84,7 +86,12 @@ function buildSlides(): Slide[] {
     let node: Element | null = h2.nextElementSibling;
     while (node && node.tagName !== "H2") {
       const isNav = node.tagName === "DIV" && !!node.querySelector("a[href*='/journey/']");
-      if (!isNav) {
+      // Diagrams and the interactive widgets are <figure> on every chapter.
+      // They earn their place in the article, where a reader can click through
+      // them — on a slide they are a static picture of an interaction nobody
+      // can perform, and they crowd out the words being spoken over them.
+      const isFigure = node.tagName === "FIGURE" || !!node.querySelector("figure");
+      if (!isNav && !isFigure) {
         const visual = !!node.querySelector("svg, pre, img, table") ||
           ["FIGURE", "PRE", "TABLE", "IMG"].includes(node.tagName);
         const list = !visual && ["OL", "UL"].includes(node.tagName) &&

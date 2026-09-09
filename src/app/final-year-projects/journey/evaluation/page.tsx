@@ -120,6 +120,16 @@ export default function EvaluationChapterPage() {
           you can actually measure. The moment you have a golden dataset, every
           future change gets a verdict instead of a shrug.
         </P>
+        <P>
+          You have seen exactly this system from the student&rsquo;s side. A
+          board exam is not graded on whether the answer &ldquo;looks
+          good&rdquo; — there is a model answer sheet, written before any
+          paper was marked, and every script is compared against it by people
+          who never meet you. That is why two examiners give roughly the same
+          marks. Your golden dataset is that answer sheet, written for your
+          own project, and running it is the moment you stop marking your own
+          homework.
+        </P>
 
         {/* 03 */}
         <H2 n="03">Grade the two halves separately</H2>

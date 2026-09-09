@@ -102,6 +102,16 @@ export default function ScalingChapterPage() {
           normal &ldquo;wait for the answer&rdquo; pattern quietly stops
           working.
         </P>
+        <P>
+          You already know how this feels from the other side. Ten in the
+          morning, tatkal booking opens, and IRCTC goes from instant to a
+          spinning wheel to &ldquo;something went wrong&rdquo;. Nothing was
+          broken — far more people arrived at once than there were seats to
+          serve, and the requests that could not be answered in time were
+          dropped. Your project meets a small version of the same wall on demo
+          day, when thirty classmates open it at once because the examiner
+          told them to.
+        </P>
         <LatencyDemo />
 
         {/* 02 */}

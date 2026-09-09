@@ -102,6 +102,15 @@ export default function ProductionChapterPage() {
           Chapter 2&rsquo;s &ldquo;design the unhappy paths&rdquo; grown all
           the way up.
         </P>
+        <P>
+          The version of this you will actually meet is demo day. The app you
+          have opened four hundred times on your own laptop now has your guide,
+          the external examiner and half your batch on it at once — on the
+          college Wi-Fi, on an old Android phone, with one person typing in
+          Hindi and another pasting an entire question paper into a box you
+          sized for a sentence. Nothing in that list is unfair. It is simply
+          the first time your project has met people who did not build it.
+        </P>
 
         {/* 02 */}
         <H2 n="02">Guardrails — the checks around the model</H2>

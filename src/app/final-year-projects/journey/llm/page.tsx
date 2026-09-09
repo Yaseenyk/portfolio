@@ -118,6 +118,18 @@ export default function LlmChapterPage() {
           all of those are needed to guess the next word well. That is the
           strange, genuine surprise the whole AI era is built on.
         </P>
+        <P>
+          Here is the picture to keep. Imagine a friend who has read almost
+          every book, magazine and manual ever printed in India — and who is
+          sitting in a room with no phone and no internet. Ask them to explain
+          how GST works, or to write your project&rsquo;s abstract, and they
+          are brilliant. Ask them today&rsquo;s IRCTC seat availability, or
+          what your college notice board said this morning, and they will
+          still answer — confidently, and wrongly — because guessing the next
+          word is the only thing they can do. <Term>That gap is the whole
+          reason the rest of this course exists.</Term> Chapters 9 to 11 are
+          about handing that friend the right page to read before they speak.
+        </P>
 
         {/* ------------------------------------------------------------ */}
         <H2 n="02">Watch it choose a word</H2>

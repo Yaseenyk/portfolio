@@ -104,6 +104,17 @@ export default function VectorSearchChapterPage() {
           systems often use both together (called hybrid search), but the new
           and powerful half is the semantic one, so that is what we build.
         </P>
+        <P>
+          You use both every week without naming them. On IRCTC you type
+          &ldquo;12951&rdquo; and expect that exact train — that is keyword
+          search, and anything cleverer would be a bug. On Swiggy you type
+          &ldquo;something light, not too spicy&rdquo; and expect idli and
+          curd rice to come back, even though not one of those words appears
+          on the dish. That second one is semantic search, and it is what your
+          notice-board project needs: a student will ask &ldquo;when do I have
+          to pay?&rdquo; about a notice that only ever says <Term>fee
+          deadline</Term>.
+        </P>
 
         {/* 02 */}
         <H2 n="02">First, chunking — cut documents into bites</H2>

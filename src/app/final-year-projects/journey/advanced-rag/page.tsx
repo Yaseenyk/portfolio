@@ -99,6 +99,16 @@ export default function AdvancedRagChapterPage() {
           <em>advanced retrieval</em>: making sure the genuinely relevant text
           reaches the top of the pile.
         </P>
+        <P>
+          Picture asking a junior in the library to fetch the fee notice, and
+          watching them come back with the sports-day circular. It does not
+          matter how carefully you then ask your question, how good your
+          English is, or how clever the person answering is — the wrong sheet
+          of paper is on the table, so the answer will be wrong. Everything in
+          this chapter is about that junior: teaching them what to look for,
+          sending them twice when one trip is not enough, and having someone
+          check the pile before it reaches you.
+        </P>
         <RetrievalCompare />
 
         {/* 02 */}
