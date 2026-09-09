@@ -1,0 +1,170 @@
+---
+title: 'Polling versus events for Node background work'
+slug: polling-vs-events-in-node-background-work
+date: '2026-08-04'
+description: 'A setInterval that finds nothing to do is not free. When polling is the right answer anyway, how to make it cheap, and the overlap bug that turns a five-second poll into a pile-up.'
+tags:
+- Node.js
+- Architecture
+- Performance
+keywords:
+- node setinterval vs event driven
+- node polling database queue
+- setinterval overlapping executions
+- postgres listen notify node
+- redis pubsub vs polling
+- node idle cpu background job
+takeaways:
+- setInterval schedules by start time, so a job slower than its interval overlaps itself and piles up; chain setTimeout instead.
+- A poll that finds nothing still costs a query, a round trip and a wake-up, multiplied by every instance you run.
+- Events remove the idle cost but add delivery guarantees you now own; a missed notification is a job that never runs.
+- The durable pattern is events for latency plus a slow poll as a safety net, with the poll finding nothing on a healthy day.
+readingMinutes: 7
+---
+
+Every background worker starts as a `setInterval` that checks whether there is
+anything to do. That is a reasonable place to start and it has two problems
+that only appear later: it costs something even when idle, and it can overlap
+itself.
+
+## The overlap bug
+
+This is the one that causes incidents:
+
+```js
+setInterval(async () => {
+  const jobs = await claimJobs(10);
+  await Promise.all(jobs.map(process));
+}, 5_000);
+```
+
+`setInterval` schedules by **start** time. If a run takes seven seconds, the
+next one begins two seconds before the previous finished. Under load, runs
+overlap, each holding connections, and the overlap grows without bound until
+the pool is exhausted.
+
+Chain a `setTimeout` from the end of the work instead:
+
+```js
+async function loop(signal) {
+  while (!signal.aborted) {
+    try {
+      await runOnce();
+    } catch (err) {
+      log.error({ err }, "worker iteration failed");
+    }
+    await setTimeout(5_000, undefined, { signal });   // gap starts when work ends
+  }
+}
+```
+
+Now the interval is a *gap between runs*, not a schedule, and a slow run simply
+delays the next one. The `try/catch` inside the loop matters too: without it,
+one thrown error ends the worker silently and nothing processes jobs until
+somebody notices.
+
+## What idle polling actually costs
+
+"It only runs every five seconds" understates it. Twelve polls a minute is
+17,280 a day. Across eight instances that is 138,000 queries a day that find
+nothing, plus the connection each holds while asking, plus a process wake-up
+that stops the runtime idling.
+
+On a laptop this is invisible. On a metered database, or on anything running on
+battery, it is a real line item.
+
+## Events, and the guarantee you inherit
+
+Event-driven work removes the idle cost. Postgres has `LISTEN/NOTIFY`, Redis
+has pub/sub, and most queues push rather than expecting a poll:
+
+```js
+await client.query("LISTEN jobs_ready");
+client.on("notification", () => void drainQueue());
+```
+
+Latency drops from "up to five seconds" to milliseconds, and an idle system
+does nothing at all.
+
+What you take on is delivery. Postgres `NOTIFY` is fire-and-forget: if your
+listener is disconnected at that moment — a deploy, a network blip, a failover
+— the notification is gone. Nothing retries it. Redis pub/sub is the same. The
+job sits in the table forever and no one is coming.
+
+That failure is quiet, and it is why event-driven workers that looked perfect
+in staging develop a reputation for "sometimes not running".
+
+## The pattern that survives
+
+Use both, and let each cover the other's weakness:
+
+```js
+// Fast path: react immediately.
+client.on("notification", () => void drain());
+
+// Safety net: catch anything the fast path missed.
+setInterval(() => void drain(), 60_000);
+```
+
+The event gives you latency. The slow poll gives you the guarantee. Once a
+minute instead of once every five seconds is a twelfth of the idle cost, and on
+a healthy day it finds nothing — which is exactly what you want it to find.
+
+Make `drain()` safe to call concurrently, since both paths can fire at once. A
+simple in-flight flag is enough:
+
+```js
+let draining = false;
+
+async function drain() {
+  if (draining) return;
+  draining = true;
+  try {
+    for (;;) {
+      const jobs = await claimJobs(10);
+      if (jobs.length === 0) return;
+      await Promise.all(jobs.map(process));
+    }
+  } finally {
+    draining = false;
+  }
+}
+```
+
+Note it loops until empty rather than processing one batch. A notification
+means "there is work", not "there is exactly one job", and draining fully
+avoids needing a second trigger for the rest.
+
+## Claiming, so instances do not collide
+
+Any of this with more than one instance needs atomic claiming, or two workers
+process the same job:
+
+```sql
+UPDATE jobs SET status = 'running', claimed_at = now()
+WHERE id IN (
+  SELECT id FROM jobs
+  WHERE status = 'pending'
+  ORDER BY created_at
+  LIMIT 10
+  FOR UPDATE SKIP LOCKED
+)
+RETURNING *;
+```
+
+`FOR UPDATE SKIP LOCKED` is what makes this work: each worker takes rows nobody
+else has locked instead of queueing behind them. Add a sweep that returns jobs
+stuck in `running` past a timeout, because a worker will be killed mid-job
+eventually and that row must come back.
+
+## Picking
+
+- **Poll only**: simple, no extra infrastructure, seconds of latency, constant
+  idle cost. Correct for jobs where a minute of delay is irrelevant.
+- **Events only**: lowest latency and lowest idle cost, and you must accept
+  that a missed notification means a job never runs.
+- **Both**: slightly more code, and the only one with no failure mode that
+  ends in silence.
+
+Default to both. The extra `setInterval` is three lines and it is the thing you
+will be glad of at 3am.

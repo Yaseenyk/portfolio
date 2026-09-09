@@ -109,7 +109,7 @@ function Body() {
       </p>
       <p>
         If you want to see what this looks like shipped, the{" "}
-        <a href="/#projects">project breakdowns</a> walk through production systems — agentic RAG pipelines, real-time admin portals, a Rust desktop cockpit — each built and taken to production this way.
+        <a href="/#projects">project breakdowns</a> walk through production systems — agentic RAG pipelines, real-time admin portals, a real-time telemetry cockpit — each built and taken to production this way.
       </p>
     </>
   );

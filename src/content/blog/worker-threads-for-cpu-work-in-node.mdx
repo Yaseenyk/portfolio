@@ -1,0 +1,153 @@
+---
+title: 'Worker threads in Node, and the pool you actually need'
+slug: worker-threads-for-cpu-work-in-node
+date: '2026-08-07'
+description: 'CPU-bound work blocks every request, not just its own. When a worker thread is the right tool over a child process or a queue, why a pool beats spawning per task, and what the copy costs.'
+tags:
+- Node.js
+- Performance
+- Architecture
+keywords:
+- node worker_threads pool
+- node cpu bound blocking event loop
+- worker threads vs child process node
+- piscina worker pool node
+- sharedarraybuffer node worker
+- transfer arraybuffer worker postmessage
+takeaways:
+- One CPU-bound request blocks every other request on that instance, which is why it shows up as site-wide latency.
+- Spawning a worker per task costs tens of milliseconds of startup; keep a pool sized to your cores.
+- postMessage structured-clones by default, so transfer ArrayBuffers rather than copying large payloads.
+- Workers share a process and a memory limit; genuinely untrusted or crash-prone code belongs in a child process.
+readingMinutes: 8
+---
+
+Node is single-threaded for your JavaScript, which is fine because almost
+everything a web service does is waiting — for a database, a network call, a
+disk. Waiting is exactly what an event loop is good at.
+
+The exception is work that is genuinely computational: hashing a password,
+resizing an image, parsing a 20MB document, running a diff over thousands of
+rows. That work does not wait. It occupies the thread, and while it does, every
+other request on that instance is stopped.
+
+That is why CPU-bound work presents as *site-wide* latency rather than one slow
+endpoint, and why it is often misdiagnosed.
+
+## Confirm it is CPU before threading anything
+
+Measure event-loop delay first:
+
+```js
+import { monitorEventLoopDelay } from "node:perf_hooks";
+const h = monitorEventLoopDelay({ resolution: 20 });
+h.enable();
+setInterval(() => console.log("p99ms", h.percentile(99) / 1e6), 10_000);
+```
+
+A high p99 with high CPU means blocking, and a worker will help. A high p99
+with low CPU means something else — an unbounded queue, a synchronous file
+read, garbage collection pressure — and adding threads will not touch it.
+
+## Worker threads, child processes, or a queue
+
+Three tools, and they are not interchangeable:
+
+- **`worker_threads`** — same process, separate V8 isolate, can share memory via
+  `SharedArrayBuffer`. Startup is milliseconds. The right default for CPU work
+  in your own trusted code.
+- **`child_process`** — separate process and memory limit. Slower to start,
+  properly isolated: it can crash or run away without taking your server with
+  it. The right choice for untrusted or unstable code.
+- **A job queue** — a different machine entirely. The right choice when the work
+  takes seconds rather than milliseconds, or when the user does not need to
+  wait for it. Nothing on this page beats "do it later, elsewhere".
+
+Reach for a worker when the work is hundreds of milliseconds, must complete
+within the request, and is code you trust.
+
+## Use a pool
+
+The single most common mistake:
+
+```js
+// Tens of milliseconds of startup, on every request
+app.post("/render", async (req, res) => {
+  const worker = new Worker("./render.js");
+  worker.postMessage(req.body);
+  worker.once("message", (result) => { res.json(result); worker.terminate(); });
+});
+```
+
+Creating a worker means a new isolate and re-evaluating the module graph. Doing
+that per request can cost more than the work.
+
+`piscina` is the well-worn answer and is about four lines:
+
+```js
+import Piscina from "piscina";
+
+const pool = new Piscina({
+  filename: new URL("./render-worker.js", import.meta.url).href,
+  maxThreads: Math.max(1, os.availableParallelism() - 1),
+});
+
+app.post("/render", async (req, res) => {
+  res.json(await pool.run(req.body));
+});
+```
+
+Size it to `availableParallelism() - 1`, leaving a core for the main thread —
+which still has to accept connections and serialise responses. More threads
+than cores does not increase throughput for CPU work; it adds context switching
+and makes latency worse.
+
+## The copy is not free
+
+`postMessage` structured-clones its payload. For a large buffer that copy can
+dominate the work you moved off the thread. Transfer instead:
+
+```js
+const buffer = new Uint8Array(imageBytes).buffer;
+await pool.run({ buffer }, { transferList: [buffer] });
+// buffer is now detached in this thread
+```
+
+For data several threads read concurrently, `SharedArrayBuffer` avoids copying
+altogether — at the cost of needing `Atomics` for any coordination, which is a
+genuinely different discipline. Use it for large read-only inputs; avoid it for
+anything mutable unless you are prepared to think carefully about ordering.
+
+## Backpressure still applies
+
+A pool has a queue, and by default that queue is unbounded. Under a burst you
+accept every request, queue them all, and answer none of them before the client
+times out.
+
+```js
+if (pool.queueSize > 100) {
+  return res.status(503).json({ error: "overloaded, retry shortly" });
+}
+```
+
+Rejecting quickly is better service than accepting work you cannot finish. A
+503 with a retry hint is a real answer; a request that times out after thirty
+seconds is not.
+
+## What not to move
+
+Not everything CPU-shaped belongs in a worker:
+
+- **Small work.** Under a millisecond, messaging overhead exceeds the win.
+- **Work that touches request state.** Workers cannot see your database
+  connections, your context, or your closures. Anything you send must be
+  serialisable.
+- **I/O.** Already non-blocking. A worker adds latency and complexity for
+  nothing.
+- **Work nobody is waiting for.** That is a queue, not a thread.
+
+The honest summary is that most services never need worker threads, and the
+ones that do usually need exactly one pool for exactly one operation — the
+image resize, the export, the hash. If you find yourself adding a second pool,
+it is worth asking whether that work should have left the request path
+entirely.

@@ -1,0 +1,167 @@
+---
+title: 'Caching in Node: in-process, Redis, and the cost of both'
+slug: caching-layers-in-node-lru-and-redis
+date: '2026-08-03'
+description: 'A two-layer cache is fast until one instance serves stale data forever. Bounded in-process caches, when Redis earns its hop, stampede protection, and invalidation that actually invalidates.'
+tags:
+- Node.js
+- Performance
+- Architecture
+keywords:
+- node lru cache in process
+- redis cache aside pattern node
+- cache stampede protection node
+- two layer cache invalidation
+- stale while revalidate node api
+- unbounded map cache memory leak
+takeaways:
+- An unbounded Map is not a cache; without eviction it is a memory leak that grows with your traffic.
+- In-process caching is the fastest hop and the hardest to invalidate, because every instance holds its own copy.
+- Deduplicate concurrent misses by caching the promise, not the value, or the first cold key stampedes your database.
+- Prefer short TTLs over clever invalidation for anything that can tolerate being briefly stale.
+readingMinutes: 8
+---
+
+Caching is two easy problems and one hard one. Storing a value is easy. Reading
+it back is easy. Knowing when it stopped being true is where the bugs live, and
+no library solves that part for you.
+
+## Layer one: in-process, and bounded
+
+The fastest cache is a `Map` in the same process. No network hop, no
+serialisation, sub-microsecond reads. It has exactly one rule:
+
+**It must be bounded.** A `Map` keyed by user id in a long-lived process grows
+until the process dies. That is not a cache, it is a leak whose size is
+proportional to your success.
+
+```js
+import { LRUCache } from "lru-cache";
+
+const cache = new LRUCache({
+  max: 5_000,                  // entries, evicted least-recently-used first
+  ttl: 60_000,                 // and nothing lives more than a minute
+  updateAgeOnGet: false,       // TTL from write, not from last read
+});
+```
+
+`updateAgeOnGet` deserves a moment. Left on, a hot key is refreshed on every
+read and can be served indefinitely without ever being re-fetched — a value
+that is never evicted and never updated. Off, the TTL means what you think it
+means.
+
+Size the cache in entries you have actually measured. `max: 5000` of small
+objects is a few megabytes; `max: 5000` of rendered HTML pages is not.
+
+## Layer two: Redis, and when the hop pays
+
+An in-process cache has one flaw that matters at scale: every instance has its
+own. Ten instances means ten copies, ten misses on a cold key, and ten
+different answers after an update.
+
+Redis fixes that by being shared, at the cost of a network round trip and
+serialisation. It earns that cost when:
+
+- the value is expensive to compute, so a millisecond hop is cheap by comparison
+- the value must be consistent across instances
+- you need it to survive a deploy, which in-process caches never do
+
+It does not earn it for values you can compute in a hundred microseconds. A
+Redis lookup to avoid a `JSON.parse` is slower than the parse.
+
+The two-layer arrangement is standard: check memory, then Redis, then origin,
+populating both on the way back.
+
+```js
+async function getUser(id) {
+  const local = cache.get(id);
+  if (local) return local;
+
+  const cached = await redis.get(`user:${id}`);
+  if (cached) {
+    const value = JSON.parse(cached);
+    cache.set(id, value);
+    return value;
+  }
+
+  const value = await db.users.findOne({ _id: id });
+  await redis.set(`user:${id}`, JSON.stringify(value), "EX", 300);
+  cache.set(id, value);
+  return value;
+}
+```
+
+Give the in-process layer a **shorter TTL than Redis**. It is the layer you
+cannot invalidate remotely, so it should be the one that forgets soonest.
+
+## The stampede
+
+The code above has a bug that only appears under load. A popular key expires,
+and in the microseconds before anyone repopulates it, two hundred concurrent
+requests all miss, and all two hundred hit the database with the same query.
+
+Cache the **promise**, not the value:
+
+```js
+const inflight = new Map();
+
+function dedupe(key, fn) {
+  const existing = inflight.get(key);
+  if (existing) return existing;
+
+  const promise = fn().finally(() => inflight.delete(key));
+  inflight.set(key, promise);
+  return promise;
+}
+
+const user = await dedupe(`user:${id}`, () => loadUser(id));
+```
+
+Now two hundred concurrent misses produce one query and one hundred and
+ninety-nine awaits of the same promise. This is a dozen lines and it is the
+difference between a cache that helps under load and one that amplifies it.
+
+## Invalidation, honestly
+
+There are three approaches and they trade off differently.
+
+**Short TTLs.** Accept staleness for a bounded window and let entries expire.
+Simple, robust, and correct far more often than people expect — most data does
+not need to be current to the second, it needs to be current to the minute.
+
+**Explicit deletion on write.** Delete the key when you update the record.
+Precise, and fragile: every write path must remember, and the in-process copies
+on other instances do not hear about it at all. Workable with Redis pub/sub to
+broadcast invalidations, which is real machinery to maintain.
+
+**Versioned keys.** Include a version in the key — `user:123:v7` — and bump it
+on write. Old entries are never read again and expire on their own. No deletion
+to coordinate, at the cost of holding both versions briefly.
+
+Default to the first. Reach for the third when correctness matters more than
+memory. Reach for the second only when you have measured that the other two do
+not work for you.
+
+## Stale-while-revalidate
+
+For expensive values, serving the old one immediately while refreshing in the
+background is usually the best experience available:
+
+```js
+const entry = cache.get(key);
+if (entry && entry.expiresAt < Date.now()) {
+  void refresh(key);      // do not await
+  return entry.value;     // instant, slightly stale
+}
+```
+
+Nobody waits for a recomputation, and the value is at most one TTL behind. The
+one thing to be careful of: `refresh` needs the same deduplication as above, or
+a burst of stale reads triggers a burst of refreshes.
+
+## Before you add a cache
+
+Two questions worth answering first. What is the hit rate going to be — because
+a cache below about 80% is mostly overhead and complexity. And what does a
+stale value actually cost — because if the answer is "a user sees a wrong
+balance", the honest fix is a faster query, not a cache.

@@ -1,0 +1,154 @@
+---
+title: 'Keeping a long-running Node process flat for twelve hours'
+slug: keeping-long-running-node-processes-flat
+date: '2026-08-05'
+description: 'Short-lived scripts forgive everything. A process that runs all day does not. Allocation churn, buffer reuse, the caches you forgot were caches, and reading V8 heap statistics without guessing.'
+tags:
+- Node.js
+- Performance
+- Architecture
+keywords:
+- node memory usage flat long running
+- v8 getHeapStatistics node
+- node buffer pool reuse allocation
+- gc pressure node reduce allocations
+- node max-old-space-size tuning
+- rss vs heapused node
+takeaways:
+- Growth and churn are different problems; RSS climbing is a leak, sawtooth heap with high CPU is allocation pressure.
+- Allocate buffers once and reuse them on hot paths rather than creating a new one per message.
+- Anything that only grows - a Map, an array, a listener list - needs a bound before it needs a feature.
+- Export heapUsed, rss and external as metrics; a graph over days finds what a snapshot never will.
+readingMinutes: 8
+---
+
+A script that runs for ninety seconds can allocate as carelessly as it likes.
+The process exits, the operating system reclaims everything, and no habit you
+formed there gets punished.
+
+A process that runs for twelve hours punishes all of them. Two different
+problems produce that punishment, they look similar on a dashboard, and the
+fixes are unrelated — so the first task is telling them apart.
+
+## Growth versus churn
+
+**Growth** is memory that goes up and does not come down. Something is retained
+that should not be: a cache with no eviction, listeners added per request, a
+timer holding a closure. RSS climbs steadily and eventually the process is
+killed.
+
+**Churn** is memory that goes up and down, constantly. Nothing is leaking, but
+you are allocating so aggressively that the garbage collector runs
+continuously. Memory looks fine; CPU does not, and latency has a spiky tail
+because every so often a collection pauses you.
+
+Tell them apart from these three numbers:
+
+```js
+import v8 from "node:v8";
+
+setInterval(() => {
+  const { heapUsed, rss, external } = process.memoryUsage();
+  const { number_of_native_contexts: contexts } = v8.getHeapStatistics();
+  log.info({ heapUsed, rss, external, contexts });
+}, 30_000);
+```
+
+- `heapUsed` climbing steadily → a JavaScript leak, go and take heap snapshots
+- `rss` climbing while `heapUsed` is flat → native memory: buffers, a C++
+  addon, or fragmentation
+- `external` climbing → `Buffer` allocations held somewhere
+- sawtooth `heapUsed` with high CPU → churn, not a leak
+
+Export those to your metrics system. A graph over a week finds things no single
+snapshot ever will.
+
+## Reducing churn: allocate once
+
+The pattern that matters most on a hot path is reusing a buffer instead of
+creating one per operation.
+
+```js
+// A new 64KB buffer per message, thousands of times a second
+function encode(message) {
+  const buffer = Buffer.allocUnsafe(64 * 1024);
+  const length = write(buffer, message);
+  return buffer.subarray(0, length);
+}
+
+// One buffer, reused; the caller must consume before the next call
+const scratch = Buffer.allocUnsafe(64 * 1024);
+
+function encodeInto(message) {
+  const length = write(scratch, message);
+  return scratch.subarray(0, length);
+}
+```
+
+The second version allocates nothing per message. It also introduces a real
+constraint — the returned view is only valid until the next call — and that
+constraint must be documented at the call site, because a caller who holds it
+across an `await` will read someone else's data.
+
+That trade is worth making on a genuine hot path and nowhere else. Reused
+buffers in ordinary request handling buy nothing and cost you a class of bug
+that is very hard to reproduce.
+
+Cheaper wins with no such catch:
+
+- **Avoid `array.shift()` in loops.** It is O(n) and reallocates. Use an index
+  or a ring buffer.
+- **Do not build intermediate arrays** to throw away — chained `.filter().map()`
+  over large arrays allocates each stage. One loop, or a generator.
+- **Do not build strings by concatenation** in a loop. Push to an array and
+  `join` once.
+- **Hoist regexes and formatters** out of functions. `new Intl.NumberFormat` per
+  call is startlingly expensive.
+
+## Bounding everything that grows
+
+Growth is nearly always one of four shapes, and each has the same fix — a
+bound, decided deliberately:
+
+- a `Map` or array used as a cache → `LRUCache` with `max` and `ttl`
+- listeners added per request on a long-lived emitter → remove them, or use
+  `once`, and watch for the max-listeners warning
+- a queue fed faster than it drains → a bounded queue with a drop policy and a
+  dropped counter
+- accumulating history for debugging → keep the last N, not all of it
+
+The heuristic that catches nearly all of them: **find everything that is only
+ever appended to and never removed from**. Each one is a leak whose size is
+proportional to your traffic.
+
+## Heap limits, and why raising them rarely helps
+
+The default old-space limit depends on your Node version and available memory,
+and raising it is the first thing people try:
+
+```bash
+node --max-old-space-size=4096 server.js
+```
+
+That is correct when you genuinely need a large working set — an in-memory
+index, a big cache you have sized on purpose. It is the wrong answer to a leak,
+where it buys hours before the same crash, and the wrong answer to churn, where
+a larger heap means longer collections and worse tail latency.
+
+Raise it only when you can say what the memory is for.
+
+## Restarts are a mitigation, not a fix
+
+A scheduled restart, or a process manager restarting on a memory threshold, is
+a legitimate operational safety net — it converts a 3am page into a blip.
+
+It is not a fix, and treating it as one has a specific failure mode: the leak
+keeps growing, the restart interval keeps shortening, and one day the process
+cannot survive between restarts. Keep the safety net and still find the leak.
+
+## The habit worth keeping
+
+Log the three numbers every thirty seconds from the first day of any
+long-running service. It costs nothing, and it means that when memory becomes a
+question — a month from now, in production, under pressure — you have history
+instead of a hypothesis.

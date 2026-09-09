@@ -53,7 +53,7 @@ Key API shape (Automerge 2.x):
 - initSyncState(), generateSyncMessage(doc, syncState), receiveSyncMessage(doc, syncState, msg)
 
 ### Code example: Node + TypeScript mDNS + TCP sync service
-The example below is a LAN-sync sidecar you can run alongside Electron/Tauri or embed in a Node service. It uses bonjour-service for mDNS/DNS-SD and net for TCP. The service is advertised with a shared docId, and peers initiate connections deterministically to prevent connection storms.
+The example below is a LAN-sync sidecar you can run alongside a desktop shell or embed in a Node service. It uses bonjour-service for mDNS/DNS-SD and net for TCP. The service is advertised with a shared docId, and peers initiate connections deterministically to prevent connection storms.
 
 ```ts
 // src/lan-sync.ts

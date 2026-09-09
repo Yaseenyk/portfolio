@@ -70,7 +70,7 @@ function Body() {
       </p>
       <p>
         And then I started building for myself. Over the following year I
-        shipped five products solo — a Rust desktop cockpit for streamers, a
+        shipped five products solo — a realtime telemetry cockpit for streamers, a
         React Flow workflow engine, a local-first AI finance agent, and two
         autonomous pipelines that write and distribute content for this site.
         Each one exists because I wanted to test a conviction about how AI

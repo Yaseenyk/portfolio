@@ -5,7 +5,7 @@ function Body() {
     <>
       <p>
         In the last twelve months I designed, built, and shipped five production
-        products — a Rust desktop cockpit, a node-based workflow engine, a
+        products — a realtime telemetry cockpit, a node-based workflow engine, a
         local-first AI finance agent, an autonomous content pipeline, and a
         LinkedIn outreach machine. No team. No funding. No standups. Every
         architecture decision, every line of infrastructure, every product call
@@ -20,7 +20,7 @@ function Body() {
       <h2>The portfolio, in one table</h2>
       <ul>
         <li>
-          <strong>streamerOS</strong> — a Rust + Tauri desktop cockpit for
+          <strong>streamerOS</strong> — a realtime telemetry cockpit for
           streamers: live system telemetry, multi-platform chat velocity, and
           automated OBS scene control, rendering at 60fps on a fraction of
           Electron&apos;s memory.
@@ -55,8 +55,8 @@ function Body() {
         the wiring between it and my systems — but AI is leverage, not vision.
         A model can generate a component; it cannot decide that a finance app
         should never let the model touch the money, or that a streaming cockpit
-        should be written in Rust because streamers run OBS, a game, and an
-        encoder on the same machine. Those calls are the product. The rest is
+        should hold its own state in process because streamers run OBS, a game,
+        and an encoder on the same machine. Those calls are the product. The rest is
         throughput.
       </p>
 
@@ -104,7 +104,7 @@ export const shippedFiveProductsSolo: BlogPost = {
   title:
     "I Shipped 5 Products in 12 Months — Solo, Unfunded, and Faster Than Most Teams Ship One",
   description:
-    "Five production systems — a Rust desktop cockpit, a workflow engine, a local-first AI finance agent, and two autonomous pipelines — designed, built, and shipped by one engineer. Here's the operating model.",
+    "Five production systems — a realtime telemetry cockpit, a workflow engine, a local-first AI finance agent, and two autonomous pipelines — designed, built, and shipped by one engineer. Here's the operating model.",
   keywords: [
     "solo founder engineer",
     "shipped production products",

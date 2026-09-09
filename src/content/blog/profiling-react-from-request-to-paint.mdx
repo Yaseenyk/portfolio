@@ -1,0 +1,144 @@
+---
+title: 'Profiling a React app from request to paint'
+slug: profiling-react-from-request-to-paint
+date: '2026-07-31'
+description: 'A slow interaction has four possible homes: the network, the server, hydration, or your render. Reading the Performance panel and the React Profiler together tells you which one, before you optimise the wrong thing.'
+tags:
+- React
+- Performance
+- Node.js
+keywords:
+- react profiler flame chart reading
+- chrome performance panel long tasks
+- react commit phase slow
+- server timing header node
+- interaction to next paint react
+- why is my react app slow
+takeaways:
+- Attribute the time before optimising; a slow interaction lives in the network, the server, hydration or the render, and the fixes do not overlap.
+- Use Server-Timing headers so backend phases show up in the browser timeline instead of being one opaque bar.
+- In the React Profiler, read why a component rendered rather than how long it took; the cause is almost always a new object identity.
+- Interaction to Next Paint is the number users feel; optimise until interactions are under 200ms and stop.
+readingMinutes: 8
+---
+
+"The app feels slow" is not a bug report, it is a category. Before changing any
+code, the useful work is deciding which of four places the time is actually
+going — because the fixes have nothing in common and three of them will waste
+your week.
+
+1. **The network** — the request is in flight.
+2. **The server** — the response is being produced.
+3. **Hydration** — JavaScript is attaching to server-rendered HTML.
+4. **The render** — React is reconciling and the browser is painting.
+
+## Start in the Performance panel, not the React one
+
+The React DevTools Profiler is excellent and it only sees React. If your
+problem is a 900ms API call, it will show you a component that took 3ms and you
+will conclude, wrongly, that everything is fine.
+
+Record the interaction in Chrome's **Performance** panel instead and read the
+strip from the top:
+
+- a long **network bar** with an idle main thread → the server or the network
+- a **long task** immediately after the response → parsing, hydration, or your render
+- long tasks with no network at all → pure client-side work
+
+That single glance decides which of the four you are in, and it takes ten
+seconds.
+
+## Make the server legible
+
+A network bar tells you the request took 900ms and nothing about why. The
+`Server-Timing` header fixes that, and it shows up natively in DevTools:
+
+```js
+app.get("/api/report", async (req, res) => {
+  const t0 = performance.now();
+  const rows = await db.query(sql);
+  const t1 = performance.now();
+  const body = render(rows);
+  const t2 = performance.now();
+
+  res.setHeader("Server-Timing", [
+    `db;dur=${(t1 - t0).toFixed(1)}`,
+    `render;dur=${(t2 - t1).toFixed(1)}`,
+  ].join(", "));
+
+  res.json(body);
+});
+```
+
+Now the Timing tab breaks that opaque bar into phases. This is ten lines and it
+ends most arguments about whether the frontend or the backend is at fault.
+
+## Reading the React Profiler properly
+
+Once you know the time is in React, record with the Profiler and switch to the
+**ranked** chart, which sorts by self time. Then ignore the durations for a
+moment and look at *why* things rendered — enable "Record why each component
+rendered" in the Profiler settings first.
+
+The answers are nearly always one of four:
+
+- **Props changed** — and the prop is an object or array literal created inline
+  during the parent's render, so it is a new identity every time even though
+  nothing meaningful changed.
+- **Hooks changed** — a `useMemo` whose dependency array contains one of those
+  fresh identities, so it never memoises anything.
+- **Parent rendered** — the component has no memo boundary and re-renders
+  because something above it did.
+- **Context changed** — one provider holding several unrelated values, so a
+  change to any of them re-renders every consumer of all of them.
+
+Those four cover most React performance work. Notice none of them is "this
+component is slow" — the component is usually fine and running far more often
+than it needs to.
+
+## The fixes, in the order that helps
+
+**Stop creating identities in render.** This is the highest-value habit:
+
+```tsx
+// every render: new object, new function, new array
+<Chart options={{ grid: true }} onSelect={(id) => select(id)} series={[a, b]} />
+
+// stable across renders
+const options = useMemo(() => ({ grid: true }), []);
+const onSelect = useCallback((id) => select(id), [select]);
+const series = useMemo(() => [a, b], [a, b]);
+```
+
+**Split contexts by change frequency.** A context holding both a theme and a
+live cursor position re-renders every consumer on every mouse move. Two
+contexts, and the theme consumers stop moving.
+
+**Move state down.** State living at the top of the tree because "several
+things need it" is the most common cause of whole-app re-renders. Push it to
+the smallest component that owns it, and lift only when genuinely shared.
+
+**Then** reach for `memo`. It is a boundary, not a fix; wrapping a component
+whose props are new objects every render adds a comparison and changes nothing.
+
+## Hydration, the one people miss
+
+If the long task lands right after HTML arrives and before anything is
+interactive, you are looking at hydration. Server-rendered markup is inert
+until React walks the tree and attaches handlers, and on a mid-range phone that
+walk can take hundreds of milliseconds.
+
+The fix is not faster hydration, it is less of it: render as server components
+where your framework supports it, defer below-the-fold sections, and stop
+shipping interactivity for things that are actually static.
+
+## Know when to stop
+
+**Interaction to Next Paint** is the metric that matches the complaint. Under
+200ms feels instant; over 500ms feels broken. Measure it on a throttled CPU —
+4x slowdown in the Performance panel — because your laptop is not the device
+this is failing on.
+
+When your interactions are under 200ms on throttled hardware, stop. Further
+optimisation is real work with no user-visible return, and there is always
+something in the other three categories that would help more.

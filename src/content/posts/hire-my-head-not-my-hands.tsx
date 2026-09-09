@@ -17,7 +17,7 @@ function Body() {
       <p>
         Everything claimed on this site is deployed and inspectable. Five
         products built solo — each one embodying a different architectural
-        judgment call. A Rust cockpit that chose native weight over Electron
+        judgment call. A realtime cockpit that chose a long-lived Node process over serverless
         convenience because the user&apos;s machine was the constraint. A
         finance agent that made the AI structurally unable to touch the money.
         A workflow engine that cut payloads 94% by refusing to persist the

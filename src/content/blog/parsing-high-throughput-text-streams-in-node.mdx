@@ -1,0 +1,155 @@
+---
+title: 'Parsing high-throughput text streams in Node without falling behind'
+slug: parsing-high-throughput-text-streams-in-node
+date: '2026-08-06'
+description: 'Line-delimited protocols at thousands of messages a second: why split on every chunk is the bottleneck, handling messages that straddle a chunk boundary, and staying on buffers until the last moment.'
+tags:
+- Node.js
+- Performance
+- WebSockets
+keywords:
+- node parse line delimited stream
+- node buffer indexOf newline parser
+- split chunk boundary partial line node
+- node string decoder multibyte
+- high throughput ndjson parsing node
+- readline vs manual buffer parsing
+takeaways:
+- Converting every chunk to a string and calling split allocates several times per chunk and is usually the bottleneck.
+- Scan the buffer for the delimiter and slice only complete messages; keep the remainder for the next chunk.
+- A chunk boundary can land mid-message and mid-character; StringDecoder handles the second and only the second.
+- Parse to strings as late as possible, and only for the fields you actually read.
+readingMinutes: 8
+---
+
+Chat protocols, NDJSON logs, market feeds and most line-delimited wire formats
+share a shape: a stream of bytes with a delimiter between messages. At a few
+hundred messages a second, the naive parser is fine. At several thousand it
+becomes the reason your process cannot keep up, and the fix is not a faster
+machine.
+
+## The naive version, and its three costs
+
+```js
+socket.on("data", (chunk) => {
+  for (const line of chunk.toString("utf8").split("\r\n")) {
+    handle(JSON.parse(line));     // two bugs and a performance problem
+  }
+});
+```
+
+Per chunk this allocates a string for the whole chunk, an array from `split`,
+and a string per line. At 5,000 messages a second that is a lot of short-lived
+garbage, and the collector will find time for it whether you have any to spare
+or not.
+
+It is also wrong twice, and both bugs are invisible under light load.
+
+## Bug one: messages straddle chunks
+
+TCP does not deliver your messages, it delivers bytes. A chunk can end halfway
+through a line, and the next chunk begins with the rest of it. The naive parser
+treats the fragment as a complete message, `JSON.parse` throws, and you drop
+data — but only under exactly the load that makes chunks large enough to split
+mid-message.
+
+You need a remainder buffer:
+
+```js
+const DELIM = Buffer.from("\r\n");
+let rest = Buffer.alloc(0);
+
+socket.on("data", (chunk) => {
+  let buffer = rest.length ? Buffer.concat([rest, chunk]) : chunk;
+  let start = 0;
+
+  for (;;) {
+    const index = buffer.indexOf(DELIM, start);
+    if (index === -1) break;
+    handleLine(buffer.subarray(start, index));   // a view, not a copy
+    start = index + DELIM.length;
+  }
+
+  rest = start < buffer.length ? buffer.subarray(start) : Buffer.alloc(0);
+});
+```
+
+`Buffer.indexOf` is implemented natively and scans quickly. `subarray` returns a
+**view over the same memory** rather than copying, so slicing out fifty
+messages allocates fifty small views rather than fifty new buffers.
+
+One caveat that matters: because `rest` is a view into the previous chunk, it
+keeps that whole chunk alive in memory. For a small trailing fragment of a
+large chunk, copy it instead — `Buffer.from(buffer.subarray(start))` — so the
+big allocation can be collected.
+
+## Bug two: characters straddle chunks too
+
+A multi-byte UTF-8 character can also be split across chunks. `chunk.toString()`
+on a boundary produces a replacement character, and the data is corrupted in a
+way that survives all the way to your database.
+
+`StringDecoder` exists exactly for this:
+
+```js
+import { StringDecoder } from "node:string_decoder";
+const decoder = new StringDecoder("utf8");
+
+const text = decoder.write(chunk);   // holds back an incomplete character
+```
+
+It buffers the incomplete trailing bytes and prepends them to the next call.
+
+Note it solves only the character problem, not the message problem. You need
+both: the delimiter scan for messages, and either `StringDecoder` or
+byte-boundary-aware slicing for characters. Most parsers that get one right get
+the other wrong.
+
+## Stay on buffers as long as you can
+
+The largest remaining win is not decoding what you never read. Many protocols
+are mostly routing metadata with a payload you only sometimes need:
+
+```js
+function handleLine(line) {
+  // Route on bytes: no string allocated for messages we ignore.
+  if (line.length > 4 && line[0] === 0x50 && line[1] === 0x49) {  // "PI"
+    return respondToPing();
+  }
+  const message = JSON.parse(line.toString("utf8"));  // only when needed
+  dispatch(message);
+}
+```
+
+Comparing a few bytes is dramatically cheaper than decoding a string and
+matching on it, and on a feed where most messages are keep-alives it removes
+almost all of the parsing cost.
+
+## When readline is the right answer
+
+For files and moderate rates, do not write any of this:
+
+```js
+import { createInterface } from "node:readline";
+
+const lines = createInterface({ input: createReadStream("events.ndjson"), crlfDelay: Infinity });
+for await (const line of lines) {
+  handle(JSON.parse(line));
+}
+```
+
+It handles both boundary problems, gives you backpressure for free through
+`for await`, and is fast enough for the overwhelming majority of workloads.
+Reach for a hand-written parser when you have measured that it is the
+bottleneck — not before, because the manual version is where the two bugs above
+live.
+
+## Measure the right thing
+
+Throughput is the wrong number. What matters is whether you are keeping up,
+which shows as queue depth or lag rather than messages per second.
+
+Track the gap between arrival and processing, and watch the socket's buffered
+amount. If either grows, you are falling behind, and no amount of parser
+micro-optimisation fixes a consumer that is simply slower than its producer —
+that is a backpressure problem, and a different post.

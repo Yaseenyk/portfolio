@@ -1,0 +1,161 @@
+---
+title: 'MongoDB migrations that do not lock production'
+slug: mongodb-migrations-that-dont-lock-production
+date: '2026-08-02'
+description: 'Schemaless does not mean migration-free. Versioned documents, expand-and-contract rollouts, background indexes, and backfills that can be paused halfway.'
+tags:
+- MongoDB
+- Node.js
+- Architecture
+keywords:
+- mongodb migration strategy node
+- expand and contract migration
+- mongodb createIndex background production
+- schema version field documents
+- backfill script resumable mongodb
+- mongoose migration without downtime
+takeaways:
+- Schemaless moves the migration into your application code; it does not remove it.
+- Put a schemaVersion on documents from day one so old and new shapes can coexist safely.
+- Expand and contract: add the field, dual-write, backfill, switch reads, then remove the old field in a later deploy.
+- Backfills must be resumable and rate-limited; a single updateMany over ten million documents is an outage.
+readingMinutes: 8
+---
+
+The pitch for a document database is that you do not need migrations. What
+actually happens is that the migration moves out of the database and into your
+application code, where it is invisible, untested, and discovered at runtime by
+a `TypeError` on a document written eighteen months ago.
+
+Schemaless means *the database will not stop you*. It does not mean the problem
+is gone.
+
+## Version your documents on day one
+
+One integer per document is the cheapest insurance in this entire post:
+
+```js
+{ _id: ..., email: "...", schemaVersion: 3 }
+```
+
+With it, code can be explicit about what it is looking at, and a backfill can
+find exactly what it has not yet processed:
+
+```js
+function normalise(doc) {
+  switch (doc.schemaVersion ?? 1) {
+    case 1: return { ...doc, name: { first: doc.firstName, last: doc.lastName } };
+    case 2: return { ...doc, roles: doc.role ? [doc.role] : [] };
+    default: return doc;
+  }
+}
+```
+
+Without it you are guessing from the presence or absence of fields, which fails
+the moment a field is legitimately optional.
+
+Adding this later means writing a script that guesses which version each
+existing document is. Adding it now costs four bytes.
+
+## Expand and contract
+
+Never change a field in place while both old and new code are running. Deploys
+are not atomic, and for a period both versions are live against the same data.
+
+Five steps, each independently deployable and reversible:
+
+1. **Expand.** Add the new field. Nothing reads it yet.
+2. **Dual-write.** New writes populate old and new. Reads still use old.
+3. **Backfill.** Migrate historical documents in the background.
+4. **Switch reads.** Read the new field, falling back to the old one.
+5. **Contract.** In a *later* deploy, stop writing the old field and remove it.
+
+The gap between four and five is the part people compress, and it is the part
+that makes rollback possible. If step four misbehaves, you roll back the code
+and the old field is still there and still correct. Delete it in the same
+deploy and you have nothing to roll back to.
+
+## Backfills that can be interrupted
+
+A single `updateMany` across ten million documents holds resources for minutes
+and cannot be stopped cleanly. Batch it, key it on the version, and make it
+resumable:
+
+```js
+const BATCH = 1000;
+
+async function backfill(signal) {
+  for (;;) {
+    signal.throwIfAborted();
+
+    const docs = await users
+      .find({ schemaVersion: { $lt: 3 } })
+      .limit(BATCH)
+      .toArray();
+
+    if (docs.length === 0) return;
+
+    const ops = docs.map((doc) => ({
+      updateOne: {
+        filter: { _id: doc._id, schemaVersion: { $lt: 3 } },  // idempotent
+        update: { $set: { ...migrate(doc), schemaVersion: 3 } },
+      },
+    }));
+
+    await users.bulkWrite(ops, { ordered: false });
+    await setTimeout(50);        // leave room for production traffic
+  }
+}
+```
+
+Three properties worth copying:
+
+- **The query is the cursor.** No offset to lose, no checkpoint file. Kill it
+  and restart it and it resumes exactly where it stopped.
+- **The filter is repeated in the update.** If two workers pick up the same
+  document, the second one matches nothing instead of overwriting.
+- **A deliberate pause.** A backfill that saturates your database is an outage
+  you scheduled yourself. Slow is fine — nobody is waiting.
+
+## Indexes, quietly the riskiest part
+
+An index build on a large collection consumes IO and memory for a long time.
+Modern MongoDB builds indexes without blocking writes, but it is still real
+load on your primary at whatever moment you happen to deploy.
+
+Build them deliberately, not as a side effect of application startup:
+
+```js
+// Not this: every instance racing to build the same index on boot
+await users.createIndex({ email: 1 }, { unique: true });
+```
+
+Move index creation into an explicit migration step you run when you choose,
+and be aware that a `unique` index will fail outright if duplicates already
+exist — which is exactly when you want to find out, but not during a rolling
+deploy at peak.
+
+## Keep migrations in the repo, numbered
+
+Whatever runner you use — `migrate-mongo` or twenty lines of your own — the
+important properties are the same:
+
+- migrations live in version control beside the code that needs them
+- they are numbered and run in order
+- a collection records which have run
+- each is idempotent, because it will be run twice by someone eventually
+
+The runner is not the interesting part. Having the change written down,
+reviewable, and repeatable in staging is.
+
+## The check worth doing now
+
+Query your largest collection for documents missing a field your code assumes
+exists:
+
+```js
+db.users.countDocuments({ preferences: { $exists: false } })
+```
+
+If that number is not zero, you already have an unfinished migration in
+production. Better to find it with a query than in an exception handler.

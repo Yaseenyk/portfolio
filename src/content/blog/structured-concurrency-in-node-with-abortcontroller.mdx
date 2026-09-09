@@ -1,0 +1,170 @@
+---
+title: 'Structured concurrency in Node with AbortController'
+slug: structured-concurrency-in-node-with-abortcontroller
+date: '2026-08-01'
+description: 'Promise.all is not concurrency control. Bounding parallelism, cancelling siblings when one fails, and making sure nothing outlives the request that started it.'
+tags:
+- Node.js
+- Architecture
+- TypeScript
+keywords:
+- node limit concurrency promise
+- abortcontroller node fetch cancel
+- promise.all unbounded parallelism
+- p-limit alternative node
+- abortsignal.any node
+- cancel background work request aborted
+takeaways:
+- Promise.all starts everything at once; with a few hundred items that is a self-inflicted denial of service on your own dependencies.
+- Bound parallelism with a small worker pool so the queue is in your process, not in the socket layer of whatever you are calling.
+- Thread one AbortSignal through every call so a failed sibling or a disconnected client stops the rest.
+- Attach the timeout with AbortSignal.any so a slow call cannot outlive its request.
+readingMinutes: 8
+---
+
+Two rules make concurrent code in Node manageable, and most services follow
+neither:
+
+1. Work started for a request should not outlive that request.
+2. The number of things happening at once should be a number you chose.
+
+`Promise.all` gives you neither, which is worth knowing given it is what most
+of us reach for first.
+
+## What Promise.all actually does
+
+It does not limit anything. It starts every promise you hand it immediately and
+waits for all of them.
+
+```js
+// 800 simultaneous requests to the same upstream
+const results = await Promise.all(ids.map((id) => fetchDetails(id)));
+```
+
+With ten items that is fine. With eight hundred you have opened eight hundred
+sockets, and the failure that follows is not yours — it is the upstream's rate
+limiter, or your own database's connection pool timing out because every
+connection is checked out.
+
+The other half is the failure behaviour: when one rejects, `Promise.all` rejects
+immediately, but **the other 799 keep running**. Your handler has returned an
+error to the client while its work continues in the background, holding
+connections and eventually writing to a response nobody is reading.
+
+## Bound the parallelism
+
+The fix is a small pool. `p-limit` does it in one line, and it is short enough
+to write yourself when you do not want the dependency:
+
+```js
+async function mapWithLimit(items, limit, fn, signal) {
+  const results = new Array(items.length);
+  let cursor = 0;
+
+  const worker = async () => {
+    while (cursor < items.length) {
+      signal?.throwIfAborted();
+      const index = cursor++;
+      results[index] = await fn(items[index], signal);
+    }
+  };
+
+  await Promise.all(Array.from({ length: limit }, worker));
+  return results;
+}
+```
+
+`limit` workers each pull from a shared cursor. Eight is a reasonable default
+for network-bound work — enough to hide latency, low enough that no dependency
+notices you.
+
+The number should be deliberate and, ideally, related to something real: your
+database pool size, the upstream's documented rate limit, the number of cores
+for CPU work. A magic number in a constant with a comment explaining where it
+came from beats an unbounded fan-out every time.
+
+## One signal, threaded everywhere
+
+`AbortController` is how you get the first rule. Create one per unit of work,
+pass its signal to everything, and abort it when the work is over — however it
+ends.
+
+```js
+export async function buildReport(ids, parentSignal) {
+  const controller = new AbortController();
+  // Abort if the caller aborts, or if we time out.
+  const signal = AbortSignal.any([
+    controller.signal,
+    parentSignal,
+    AbortSignal.timeout(10_000),
+  ]);
+
+  try {
+    return await mapWithLimit(ids, 8, (id) => fetchDetails(id, signal), signal);
+  } finally {
+    controller.abort();   // stop anything still in flight, on every path
+  }
+}
+```
+
+Three things make this work:
+
+- **`AbortSignal.any`** combines sources, so a client disconnect, an internal
+  failure or a timeout all stop the same work. It is in Node 20+ and is much
+  cleaner than wiring listeners by hand.
+- **`AbortSignal.timeout`** replaces the `Promise.race` timeout pattern, and
+  unlike that pattern it actually *cancels* the loser rather than ignoring it.
+- **`abort()` in `finally`** is the part people leave out. Without it, a
+  successful return leaves siblings running.
+
+Then honour it at the leaves:
+
+```js
+const res = await fetch(url, { signal });
+```
+
+A signal that is not passed to the actual I/O call cancels nothing. This is the
+most common way the whole pattern quietly fails to work — the plumbing is
+there, the last connection is missing.
+
+## Connect it to the request
+
+In Express or Fastify, the client disconnecting should abort the work it
+started:
+
+```js
+app.get("/report", async (req, res) => {
+  const controller = new AbortController();
+  res.on("close", () => controller.abort());
+
+  try {
+    res.json(await buildReport(ids, controller.signal));
+  } catch (err) {
+    if (err.name === "AbortError") return;   // client left; nothing to send
+    throw err;
+  }
+});
+```
+
+Users close tabs and refresh constantly. Without this, every abandoned request
+keeps its full fan-out running to completion, and under load that is a
+meaningful share of your capacity spent on results nobody will see.
+
+## Errors: fail fast or collect
+
+Once parallelism is bounded, decide explicitly what a partial failure means.
+
+`Promise.all` semantics — first error wins, cancel the rest — suit a report
+that is worthless if any part is missing. `Promise.allSettled` suits a
+dashboard where five widgets loading and one failing is a perfectly good
+outcome:
+
+```js
+const settled = await Promise.allSettled(tasks);
+const ok = settled.filter((s) => s.status === "fulfilled").map((s) => s.value);
+const failed = settled.filter((s) => s.status === "rejected");
+if (failed.length) log.warn({ count: failed.length }, "partial failure");
+```
+
+Whichever you choose, choose it. The default of "throw and leave everything
+else running" is the one option nobody would pick on purpose.

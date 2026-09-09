@@ -17,6 +17,15 @@
  * so this map can never point at nothing.
  */
 export const BLOG_REDIRECTS: Record<string, string> = {
+  "pinning-a-18-idle-cpu-evented-vs-polling-in-tauri-tray-apps": "polling-vs-events-in-node-background-work",
+  "rust-arena-allocation-to-keep-streameros-under-152-mb-for-12h": "keeping-long-running-node-processes-flat",
+  "zero-copy-twitch-irc-parsing-in-rust-with-bytes-nom-at-5ks": "parsing-high-throughput-text-streams-in-node",
+  "tauri-v2-tokio-console-18-cpu-with-4-concurrent-streams": "worker-threads-for-cpu-work-in-node",
+  "streameros-rust-over-electron": "node-over-serverless-for-realtime",
+  "flamegraphs-over-tauri-ipc-from-rust-event-to-react-paint": "profiling-react-from-request-to-paint",
+  "rust-structured-concurrency-cap-media-decoders-w-tokio-joinset": "structured-concurrency-in-node-with-abortcontroller",
+  "tauri-sqlx-sqlite-migrations-and-wal-for-local-apps": "mongodb-migrations-that-dont-lock-production",
+  "zero-copy-scene-caches-with-memmap2-instant-loads-no-rss-bloat": "caching-layers-in-node-lru-and-redis",
   "serdejson-to-simd-json-in-streameros-ipc-hot-path-deserialization": "faster-json-parsing-in-node-hot-paths",
   "tauri-rust-backpressure-bounded-vs-unbounded-channels-for-chat-floods": "backpressure-in-node-streams",
   "simd-sentiment-scoring-in-rust-via-wasm-workers-no-ui-jank": "web-workers-keep-react-responsive",
