@@ -86,7 +86,7 @@ jobs:
         if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
         run: npm ci
 
-      - name: Cross-post as drafts
+      - name: Cross-post to DEV.to
         if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}

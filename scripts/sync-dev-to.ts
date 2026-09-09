@@ -306,6 +306,10 @@ async function main(): Promise<void> {
   // is unlimited, so the normal per-push sync is unaffected.
   const maxWrites = Number(process.env.MAX_WRITES ?? 0) || Infinity;
   const dryRun = process.env.DRY_RUN === "true";
+  // A scheduled backfill must make progress. Counting updates against
+  // MAX_WRITES would re-push the same first few articles every night and
+  // never reach the backlog, so the drip only ever creates what is missing.
+  const createOnly = process.env.CREATE_ONLY === "true";
   let writes = 0;
 
   for (const file of files) {
@@ -318,6 +322,7 @@ async function main(): Promise<void> {
     try {
       const post = await parseLocalPost(file);
       const match = findMatch(post, index);
+      if (match && createOnly) continue;
       if (dryRun) {
         console.log(`· would ${match ? `update #${match.id}` : "create"}: ${post.title}`);
         continue;

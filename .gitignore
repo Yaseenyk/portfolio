@@ -53,3 +53,7 @@ gsc/
 
 # Generated DEV.to export (scripts/export-posts-markdown.mjs)
 .devto/
+
+# Local secret scratch files (Upstash/API tokens pasted for setup)
+Upstash Token
+*.token

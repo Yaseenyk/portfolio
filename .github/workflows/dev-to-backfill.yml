@@ -7,6 +7,12 @@ name: Backfill DEV.to from the whole blog
 # Manual on purpose. MAX_WRITES drips the backlog out over several runs
 # instead of dumping fifty articles onto DEV.to in one go.
 on:
+  # Drains the backlog on its own, three a night, then quietly no-ops once
+  # every post exists on DEV.to — including any new one, picked up within a
+  # day. Three rather than fifty because a burst reads as a dump to DEV's
+  # spam heuristics and to anyone following the feed.
+  schedule:
+    - cron: '30 4 * * *'
   workflow_dispatch:
     inputs:
       limit:
@@ -55,8 +61,11 @@ jobs:
       - name: Sync to DEV.to
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
-          MAX_WRITES: ${{ inputs.limit }}
-          DRY_RUN: ${{ inputs.dry_run }}
+          MAX_WRITES: ${{ inputs.limit || '3' }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+          # The nightly run only fills gaps. Editing a post still updates its
+          # DEV.to copy through the push-triggered workflow.
+          CREATE_ONLY: 'true'
         run: |
           ADDED_FILES="$(ls .devto/*.md | tr '\n' ' ')"
           export ADDED_FILES
