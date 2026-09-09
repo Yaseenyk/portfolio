@@ -1,0 +1,191 @@
+---
+title: 'A WebSocket reconnect state machine for React and Node'
+slug: websocket-reconnect-state-machine-react-node
+date: '2026-07-24'
+description: 'Reconnection logic written as ad-hoc flags always breaks. An explicit state machine with backoff, jitter and heartbeats survives flaky networks and server restarts.'
+tags:
+- WebSockets
+- React
+- Node.js
+keywords:
+- websocket reconnect exponential backoff
+- websocket state machine react hook
+- websocket heartbeat ping pong node
+- reconnect jitter thundering herd
+- react usewebsocket reconnect
+- websocket resume after disconnect
+readingMinutes: 8
+---
+
+Every real-time feature starts the same way: open a socket, handle messages,
+ship it. Then a laptop lid closes, a server deploys, a train goes into a tunnel,
+and you discover that reconnection is most of the work.
+
+Reconnect logic written as a handful of booleans — `isConnecting`,
+`hasReconnected`, `shouldRetry` — always ends up with a state nobody planned
+for, usually two sockets open at once. It is worth writing as an explicit state
+machine on the first day.
+
+## Four states, and only four
+
+```
+        connect()          open
+IDLE ─────────────▶ CONNECTING ─────▶ OPEN
+ ▲                      │              │
+ │                      │ error        │ close
+ │                      ▼              ▼
+ └────────────────  WAITING ◀──────────┘
+      give up / stop     (backoff timer)
+```
+
+- **IDLE** — nothing open, nothing scheduled.
+- **CONNECTING** — a socket exists but has not opened.
+- **OPEN** — usable.
+- **WAITING** — closed, with a timer scheduled to try again.
+
+The rule that prevents nearly every bug: **a transition may only happen from
+the state that owns it.** A `close` event arriving while in `WAITING` is
+ignored, because that close belongs to a socket already abandoned. Without that
+check, a slow close event schedules a second reconnect and you get two sockets,
+then four.
+
+## Backoff, and why jitter is not optional
+
+Retrying immediately in a loop is how a client turns a brief server hiccup into
+an outage. Exponential backoff spaces attempts out:
+
+```ts
+const BASE_MS = 500;
+const MAX_MS = 30_000;
+
+function delayFor(attempt: number) {
+  const exponential = Math.min(MAX_MS, BASE_MS * 2 ** attempt);
+  // Full jitter: pick anywhere in [0, exponential].
+  return Math.random() * exponential;
+}
+```
+
+The jitter matters more than the exponent. When a server restarts, every
+connected client is disconnected at the same instant. Without jitter they all
+back off by the same amount and reconnect *in unison*, hammering the server the
+moment it comes back — the thundering herd. Randomising the delay spreads them
+out, and it costs one line.
+
+## Heartbeats, because "open" lies
+
+A socket in the `OPEN` state is not necessarily alive. If the network drops
+without a clean close — a dead router, a sleeping phone — the socket stays open
+until the OS eventually gives up, which can take minutes. The user sees a UI
+that looks connected and never updates.
+
+Both ends need a heartbeat. Server side, `ws` gives you the primitives:
+
+```js
+const HEARTBEAT_MS = 30_000;
+
+wss.on("connection", (socket) => {
+  socket.isAlive = true;
+  socket.on("pong", () => { socket.isAlive = true; });
+});
+
+setInterval(() => {
+  for (const socket of wss.clients) {
+    if (!socket.isAlive) {
+      socket.terminate();   // not close(): the peer is already gone
+      continue;
+    }
+    socket.isAlive = false;
+    socket.ping();
+  }
+}, HEARTBEAT_MS);
+```
+
+`terminate()` rather than `close()` is deliberate. `close()` starts a closing
+handshake with a peer that is not answering, so the socket lingers.
+
+Browsers cannot send pings from JavaScript, so the client side is an
+application-level timer: if no message of any kind has arrived in
+`HEARTBEAT_MS * 2`, assume the connection is dead and close it yourself, which
+drops you into `WAITING` and triggers the normal reconnect path.
+
+## The React side
+
+The socket belongs in a ref, not in state. Its *status* belongs in state,
+because the UI genuinely needs to re-render when it changes.
+
+```tsx
+type Status = "idle" | "connecting" | "open" | "waiting";
+
+function useSocket(url: string) {
+  const [status, setStatus] = useState<Status>("idle");
+  const socketRef = useRef<WebSocket | null>(null);
+  const attemptRef = useRef(0);
+
+  useEffect(() => {
+    let disposed = false;
+    let timer: number | undefined;
+
+    const connect = () => {
+      setStatus("connecting");
+      const socket = new WebSocket(url);
+      socketRef.current = socket;
+
+      socket.onopen = () => {
+        attemptRef.current = 0;   // reset backoff only on a real open
+        setStatus("open");
+      };
+
+      socket.onclose = () => {
+        if (disposed || socketRef.current !== socket) return; // stale event
+        setStatus("waiting");
+        timer = window.setTimeout(connect, delayFor(attemptRef.current++));
+      };
+    };
+
+    connect();
+    return () => {
+      disposed = true;
+      window.clearTimeout(timer);
+      socketRef.current?.close();
+    };
+  }, [url]);
+
+  return { status, send: (data: unknown) => socketRef.current?.send(JSON.stringify(data)) };
+}
+```
+
+Two details carry most of the correctness. `socketRef.current !== socket`
+discards events from sockets you have already replaced. And the attempt counter
+resets on `open`, not on `connecting` — otherwise a connection that opens and
+immediately fails resets the backoff every time and you are back to hammering.
+
+## Resuming, not just reconnecting
+
+Reconnecting gets the pipe back. It does not get the missed data back, and for
+anything stateful that gap is visible to the user.
+
+The cheap version: have the client remember the last event id it processed and
+send it on reconnect, so the server can replay from there.
+
+```js
+socket.onopen = () => socket.send(JSON.stringify({ resumeFrom: lastEventId }));
+```
+
+The server keeps a bounded buffer of recent events per channel — a few hundred
+is usually plenty — and replays anything newer. If the requested id has fallen
+out of the buffer, say so explicitly and let the client fetch a fresh snapshot
+over HTTP instead of pretending it is up to date.
+
+That last part is the one people skip, and it is the one that produces
+long-lived, silently stale UIs.
+
+## What to show the user
+
+Status deserves to be visible, but not loudly. `connecting` and `waiting` in
+the first few seconds are normal and showing a red banner for them trains
+people to ignore banners. Wait until you have been out of `open` for five
+seconds or so before saying anything, then be specific: "Reconnecting…" while
+in `WAITING`, and an explicit "Disconnected — retry" once you have given up.
+
+A state machine makes that trivially expressible, which is the last argument
+for writing one: the UI copy maps one-to-one onto states you already have.

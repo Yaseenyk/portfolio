@@ -1,0 +1,152 @@
+---
+title: 'Halving WebSocket payloads with MessagePack in Node and React'
+slug: halving-websocket-payloads-messagepack-node-react
+date: '2026-07-23'
+description: 'Where JSON over WebSockets actually costs you, what MessagePack does and does not fix, and how to batch high-frequency events so the wire is not the bottleneck.'
+tags:
+- Node.js
+- React
+- WebSockets
+keywords:
+- messagepack websocket node
+- msgpack vs json performance node
+- websocket batching high frequency events
+- binary websocket react client
+- reduce websocket payload size
+- socket binarytype arraybuffer react
+readingMinutes: 8
+---
+
+A telemetry socket sending 40 small JSON messages a second works fine on a
+laptop next to the server and falls apart over a phone connection. The usual
+first instinct is to reach for a binary format. That is half the answer, and on
+its own it is the smaller half.
+
+## Where the cost actually is
+
+Measure before you change anything. There are three separate costs and they
+respond to different fixes:
+
+1. **Bytes on the wire** — what compression and binary encoding address.
+2. **Messages per second** — what batching addresses. Every WebSocket frame has
+   framing overhead, and every message costs a task on both event loops.
+3. **Parse and serialise time** — CPU on both ends.
+
+A payload of `{"cpu":18.4,"mem":152,"t":1699999999999}` is about 46 bytes of
+JSON. The field names are roughly half of it, repeated on every single message,
+forever. That repetition is the thing worth attacking.
+
+## What MessagePack does
+
+MessagePack encodes the same structure in a binary form: small integers become
+one byte, floats keep their width, and strings carry a length prefix instead of
+quotes and escaping. For telemetry-shaped objects — short keys, numeric values
+— it typically lands **40 to 55 percent smaller** than the equivalent JSON.
+
+```js
+import { encode, decode } from "@msgpack/msgpack";
+
+const frame = { cpu: 18.4, mem: 152, t: Date.now() };
+const bytes = encode(frame);        // Uint8Array
+socket.send(bytes);                 // ws sends binary frames natively
+```
+
+On the browser side you must ask for binary explicitly, or you will receive
+`Blob` objects and pay for an async read on every message:
+
+```ts
+const socket = new WebSocket(url);
+socket.binaryType = "arraybuffer";  // not "blob"
+
+socket.onmessage = (event) => {
+  const frame = decode(new Uint8Array(event.data));
+  buffer.push(frame);
+};
+```
+
+That one line is worth checking in any existing codebase. `Blob` is the default,
+and reading a Blob returns a promise — so a socket that looks synchronous is
+quietly scheduling a microtask per message.
+
+## What MessagePack does not do
+
+It does not remove the keys. `cpu`, `mem` and `t` are still encoded as strings
+in every message. If your messages are highly repetitive and you control both
+ends, dropping to a positional array beats any general-purpose encoder:
+
+```js
+// [cpu, mem, timestamp] — the schema lives in code, not on the wire
+socket.send(encode([18.4, 152, Date.now()]));
+```
+
+That is another 30–40% off, at the cost of a schema you must keep in sync
+manually. Worth it for a hot telemetry channel; not worth it for a control
+channel that changes shape every sprint.
+
+It also does not help if your transport already compresses. `permessage-deflate`
+on a WebSocket squeezes repetitive JSON extremely well precisely *because* the
+repeated keys compress away. If you have deflate enabled, measure both — binary
+encoding plus compression is sometimes larger than compressed JSON, because
+binary data has less redundancy for the compressor to find.
+
+## The bigger win: batching
+
+Forty messages a second is forty frames, forty event-loop tasks on the server,
+forty `onmessage` callbacks in the browser. The data is tiny; the overhead is
+not.
+
+Batch on an interval and send one frame:
+
+```js
+let pending = [];
+
+function emit(sample) {
+  pending.push(sample);
+}
+
+setInterval(() => {
+  if (pending.length === 0) return;
+  socket.send(encode(pending));
+  pending = [];
+}, 50); // 20 sends a second instead of 40+
+```
+
+Fifty milliseconds is invisible for a meter and halves your frame count. For a
+UI that only paints at 60fps anyway, batching at 16ms costs nothing perceptible
+and still collapses bursts.
+
+The client then treats one message as many samples, which pairs naturally with
+a ring buffer feeding a canvas — the socket writes several entries, the next
+animation frame reads the whole window.
+
+## Keeping it debuggable
+
+The real cost of binary framing is that you can no longer read your own traffic
+in DevTools. Two things make that bearable:
+
+- Keep a `?format=json` query parameter on the socket endpoint that flips the
+  server back to plain JSON. Development and debugging use it; production does
+  not.
+- Log decoded frames behind a flag on the client rather than reading the wire.
+
+```js
+const useBinary = process.env.NODE_ENV === "production";
+socket.send(useBinary ? encode(batch) : JSON.stringify(batch));
+```
+
+An escape hatch you can toggle is worth more than a few percent of bandwidth.
+
+## What I would actually do first
+
+In order of return on effort:
+
+1. **Batch.** Costs nothing, needs no new dependency, usually the largest win.
+2. **Set `binaryType = "arraybuffer"`** if you are already sending binary.
+3. **Measure with compression on and off** before adding an encoder.
+4. **Then** MessagePack, if the numbers still justify it.
+5. Positional arrays only for a channel whose shape is genuinely stable.
+
+The order matters because steps one to three are free and reversible, and step
+four adds a dependency to both ends of your system. Reach for the format change
+when you have proved the bytes are the problem — not because binary sounds
+faster than text.

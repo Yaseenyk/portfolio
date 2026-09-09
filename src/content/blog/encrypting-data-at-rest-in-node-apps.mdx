@@ -1,0 +1,158 @@
+---
+title: 'Encrypting data at rest in a Node app without inventing crypto'
+slug: encrypting-data-at-rest-in-node-apps
+date: '2026-07-26'
+description: 'Field-level encryption in Node with the built-in crypto module: AES-GCM, where the key actually lives, key rotation that does not require downtime, and what encryption at rest does not protect you from.'
+tags:
+- Node.js
+- Security
+- MongoDB
+keywords:
+- node aes-256-gcm encrypt field
+- node crypto encryption at rest
+- field level encryption mongodb node
+- key rotation node application
+- node envelope encryption kms
+- store encryption key environment variable
+readingMinutes: 8
+---
+
+"Encrypt it at rest" gets written into a requirements document, then implemented
+as `AES` with a key in an environment variable, an all-zero IV, and no
+authentication tag. That is not encryption at rest; it is a checkbox with a
+performance cost.
+
+The primitives in Node's standard library are fine. The parts that go wrong are
+the ones around them.
+
+## Use AES-GCM, and never reuse a nonce
+
+Authenticated encryption is not optional. Without it, an attacker who can
+modify the ciphertext can modify the plaintext in ways you will not detect, and
+you will decrypt attacker-controlled data believing it is yours.
+
+```js
+import { randomBytes, createCipheriv, createDecipheriv } from "node:crypto";
+
+const ALGORITHM = "aes-256-gcm";
+
+export function encrypt(plaintext, key) {
+  const iv = randomBytes(12);                       // 96-bit nonce for GCM
+  const cipher = createCipheriv(ALGORITHM, key, iv);
+  const ciphertext = Buffer.concat([
+    cipher.update(plaintext, "utf8"),
+    cipher.final(),
+  ]);
+  const tag = cipher.getAuthTag();
+  // Store all three. The nonce and tag are not secret.
+  return Buffer.concat([iv, tag, ciphertext]).toString("base64");
+}
+
+export function decrypt(encoded, key) {
+  const raw = Buffer.from(encoded, "base64");
+  const iv = raw.subarray(0, 12);
+  const tag = raw.subarray(12, 28);
+  const ciphertext = raw.subarray(28);
+
+  const decipher = createDecipheriv(ALGORITHM, key, iv);
+  decipher.setAuthTag(tag);                          // before final()
+  return Buffer.concat([
+    decipher.update(ciphertext),
+    decipher.final(),                                // throws if tampered
+  ]).toString("utf8");
+}
+```
+
+Three rules carry most of the safety:
+
+- **A fresh random nonce per encryption.** Reusing a nonce with the same key in
+  GCM is catastrophic — it leaks the XOR of two plaintexts and can expose the
+  authentication key. `randomBytes(12)` every time, no exceptions, no counters
+  you maintain yourself.
+- **`setAuthTag` before `final()`.** Forgetting it means `final()` will not
+  verify, and you have silently downgraded to unauthenticated encryption.
+- **Let `final()` throw.** A failed tag check is a tampering signal. Do not
+  catch it and return a default.
+
+## Where the key actually lives
+
+This is the part that decides whether any of the above matters.
+
+A key in an environment variable is protected by exactly one thing: nobody
+reading your environment. That is a real improvement over plaintext in the
+database — it means a stolen database dump is useless — and it is worth doing.
+Be clear-eyed that it stops there.
+
+The next step up is envelope encryption. A managed KMS holds a master key that
+never leaves it. Your app asks the KMS to decrypt a **data key**, uses that data
+key locally, and discards it:
+
+```js
+// Stored alongside the record: the wrapped key and the ciphertext.
+const { Plaintext: dataKey } = await kms.decrypt({ CiphertextBlob: record.wrappedKey });
+const value = decrypt(record.payload, dataKey);
+dataKey.fill(0);   // best-effort: do not leave it lying in the heap
+```
+
+The gain is real: rotating the master key, revoking access, and auditing every
+decryption become operations you perform in one place rather than a redeploy of
+every service.
+
+## Rotation you can actually perform
+
+Any scheme where the key can never change is a scheme that will one day need
+downtime. Version the key at write time and keep old keys readable:
+
+```js
+const KEYS = {
+  2: Buffer.from(process.env.KEY_V2, "base64"),
+  1: Buffer.from(process.env.KEY_V1, "base64"),
+};
+const CURRENT = 2;
+
+export function encryptField(value) {
+  return { v: CURRENT, data: encrypt(value, KEYS[CURRENT]) };
+}
+
+export function decryptField(field) {
+  const key = KEYS[field.v];
+  if (!key) throw new Error(`no key for version ${field.v}`);
+  return decrypt(field.data, key);
+}
+```
+
+New writes use the current key; old records stay readable. A background job
+re-encrypts historical rows at its own pace, and once it finishes you drop the
+old key. No downtime, no big-bang migration.
+
+Storing that version tag from day one costs one integer. Retrofitting it later
+means guessing which key encrypted which row.
+
+## What you give up
+
+Encrypted fields are opaque to the database, and people are consistently
+surprised by how much that costs:
+
+- **No queries on the value.** No `find({ email })`, no range queries, no
+  sorting. If you must look records up by an encrypted field, store a separate
+  blind index — an HMAC of the normalised value with a distinct key — and query
+  that. It leaks equality, which is a real trade-off to make deliberately.
+- **No partial updates.** The unit of encryption is the whole field.
+- **Larger records.** Nonce plus tag is 28 bytes per field before base64.
+
+Because of this, encrypt selectively. Names, emails, phone numbers, tokens and
+anything a regulator would call personal — not every column in the table.
+
+## What it does not protect against
+
+Worth stating plainly, because it is where expectations and reality diverge.
+
+Encryption at rest protects a **stolen copy of the data**: a disk image, a
+backup, a dumped collection. It does nothing against an attacker with
+application-level access, because your app holds the key and will happily
+decrypt for them. It does nothing against SQL or NoSQL injection returning
+decrypted values through your own API. And it does nothing about data in your
+logs, which is where personal data most often actually leaks.
+
+Grep your logging for the fields you just encrypted. That is usually the highest
+return on effort in this entire exercise.

@@ -17,6 +17,15 @@
  * so this map can never point at nothing.
  */
 export const BLOG_REDIRECTS: Record<string, string> = {
+
+  // Rust/Tauri posts rewritten as their React/Node equivalent — same
+  // engineering subject, the stack this site is actually about.
+  "a-reproducible-ram-regression-workflow-in-rust-with-dhat-heaptrack": "node-memory-regression-workflow-heap-snapshots",
+  "crossbeam-spsc-ring-buffers-for-60-fps-rust-audio-meters": "react-60fps-live-meters-without-re-rendering",
+  "halving-tauri-v2-ipc-batch-events-rmp-serde-messagepack": "halving-websocket-payloads-messagepack-node-react",
+  "on-device-twitch-irc-in-rust-reconnect-state-machine-backoff": "websocket-reconnect-state-machine-react-node",
+  "kill-async-deadlocks-in-tauri-with-tokio-task-dumps-tracing": "finding-event-loop-stalls-in-node",
+  "encrypt-tauri-local-storage-at-rest-with-age-os-keychain": "encrypting-data-at-rest-in-node-apps",
   // Claude / Anthropic roadmap lessons → the two surviving lessons + hub
   "adaptive-extended-thinking-latency-vs-compute": "mastering-claude-architecture-context-windows-output-limits",
   "beyond-the-prompt-llm-mechanics": "mastering-claude-architecture-context-windows-output-limits",

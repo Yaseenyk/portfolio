@@ -1,0 +1,149 @@
+---
+title: '60fps live meters in React without re-rendering the tree'
+slug: react-60fps-live-meters-without-re-rendering
+date: '2026-07-22'
+description: 'Streaming telemetry into a React UI at 60fps: why setState per frame is the wrong tool, and how a ring buffer plus a direct canvas write keeps the component tree still.'
+tags:
+- React
+- Performance
+- TypeScript
+keywords:
+- react 60fps chart
+- react requestanimationframe canvas
+- react setstate high frequency data
+- react ring buffer telemetry
+- react re-render performance profiler
+- canvas meter react hooks
+readingMinutes: 7
+---
+
+A live meter — CPU, audio level, requests per second — is the easiest way to
+make a React app feel slow. The data arrives sixty times a second, and the
+obvious implementation calls `setState` sixty times a second, asking React to
+reconcile an entire subtree for a bar that is four pixels taller than it was.
+
+The fix is not to make the re-render faster. It is to stop re-rendering.
+
+## Why setState is the wrong tool here
+
+React's model is that state changes describe *what* the UI should be, and React
+works out the DOM operations. That is exactly right for a form, a list, a
+route. It is exactly wrong for a value that changes every frame, because the
+reconciliation is pure overhead: you already know precisely which pixels change.
+
+There is a subtler problem too. At 60fps you produce updates faster than React
+flushes them, so React batches — and batching means the meter no longer shows
+the current value, it shows whichever value survived the batch. You pay the
+cost of re-rendering *and* get a laggy meter.
+
+## The shape that works
+
+Three pieces:
+
+1. a **ring buffer** holding the last N samples, allocated once
+2. a **single `requestAnimationFrame` loop** that draws
+3. **React renders the container exactly once** and never again
+
+The buffer is a plain typed array. Fixed size, no allocation per sample, and
+the oldest sample is overwritten rather than shifted — which matters, because
+`Array.prototype.shift` on a hot path is O(n) and produces garbage every frame.
+
+```ts
+export class RingBuffer {
+  private readonly data: Float32Array;
+  private head = 0;
+
+  constructor(readonly capacity: number) {
+    this.data = new Float32Array(capacity);
+  }
+
+  push(value: number) {
+    this.data[this.head] = value;
+    this.head = (this.head + 1) % this.capacity;
+  }
+
+  /** Oldest to newest, into a caller-owned array so nothing is allocated. */
+  read(out: Float32Array) {
+    for (let i = 0; i < this.capacity; i += 1) {
+      out[i] = this.data[(this.head + i) % this.capacity];
+    }
+  }
+}
+```
+
+## Wiring it to React without state
+
+The component mounts, creates the buffer and the canvas, starts one animation
+frame loop, and returns. The data path never touches React.
+
+```tsx
+function Meter({ source }: { source: AsyncIterable<number> }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const bufferRef = useRef(new RingBuffer(240));
+
+  useEffect(() => {
+    const buffer = bufferRef.current;
+    const scratch = new Float32Array(buffer.capacity);
+    const ctx = canvasRef.current!.getContext("2d")!;
+    let raf = 0;
+    let stopped = false;
+
+    (async () => {
+      for await (const sample of source) {
+        if (stopped) return;
+        buffer.push(sample);
+      }
+    })();
+
+    const draw = () => {
+      buffer.read(scratch);
+      paint(ctx, scratch);
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+
+    return () => {
+      stopped = true;
+      cancelAnimationFrame(raf);
+    };
+  }, [source]);
+
+  return <canvas ref={canvasRef} width={480} height={64} />;
+}
+```
+
+Note what is absent: no `useState`, no dependency on the sample value, no
+re-render. React owns the canvas element's existence; the animation loop owns
+its pixels. That division is the entire design.
+
+## Decoupling arrival rate from frame rate
+
+This structure fixes a problem people usually meet later. Samples do not arrive
+at 60Hz — they arrive whenever the socket delivers them, sometimes three at
+once, sometimes none for 40ms. Because the producer only writes to the buffer
+and the consumer only reads on a frame, the two rates are independent. A burst
+of ten samples between frames is not ten renders; it is ten cheap writes and
+one paint.
+
+That is what the ring buffer buys beyond speed: the reader always sees a
+consistent window, and neither side waits for the other.
+
+## When you do want React state
+
+Draw the line at human timescales. If a person needs to *read* a number — a
+"current CPU: 18%" label — that changes at most a few times a second, and
+`setState` on a 500ms interval is correct and far simpler. Use the canvas path
+only for what is genuinely per-frame.
+
+Mixing them is fine and usually right: a canvas graph updating every frame, and
+a text readout beside it updating twice a second from ordinary state.
+
+## Measuring it
+
+Open the React DevTools Profiler and record while the meter runs. The correct
+result is that your meter component appears **once**, at mount, and never
+again. If it shows up in the commit list repeatedly, something is still feeding
+frame data into state — usually a parent passing a changing prop.
+
+The frame budget is 16.7ms. A canvas paint of a few hundred points costs well
+under a millisecond. Reconciling a subtree to achieve the same thing does not.

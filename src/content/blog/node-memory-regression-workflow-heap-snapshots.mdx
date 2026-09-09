@@ -1,0 +1,143 @@
+---
+title: 'A reproducible memory-regression workflow for Node'
+slug: node-memory-regression-workflow-heap-snapshots
+date: '2026-07-21'
+description: 'Catching Node memory regressions before production: a repeatable load script, three heap snapshots, and reading retainer paths instead of guessing at the biggest object.'
+tags:
+- Node.js
+- Performance
+- Debugging
+keywords:
+- node heap snapshot leak
+- node memory leak retainer path
+- node writeHeapSnapshot
+- v8 heap statistics node
+- node memory regression ci
+- node --expose-gc leak test
+readingMinutes: 7
+---
+
+A Node process that grows for twelve hours and then gets OOM-killed is not a
+mystery — it is an unmeasured process. The hard part is never the fix. It is
+proving the leak exists, proving your fix removed it, and being able to do both
+again next month without re-deriving the whole procedure.
+
+This is the workflow I use. It is deliberately boring, because a debugging
+procedure you cannot repeat under pressure is not a procedure.
+
+## Step one: a load script you can trust
+
+Before touching a profiler, write the smallest script that reproduces the
+growth. It matters that this is code and not a sequence of clicks, because you
+will run it dozens of times and every run has to be identical.
+
+```js
+// scripts/load.mjs
+const ITERATIONS = Number(process.env.ITERATIONS ?? 5000);
+
+for (let i = 0; i < ITERATIONS; i += 1) {
+  await fetch("http://localhost:3000/api/report", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ id: i, rows: 200 }),
+  });
+  if (i % 500 === 0) console.log(i, process.memoryUsage().rss);
+}
+```
+
+Start the server with `--expose-gc` so you can force collection between
+measurements. That separates *garbage that has not been collected yet* from
+*garbage that cannot be collected*. Those look identical on a memory graph and
+mean completely different things.
+
+## Step two: three snapshots, not one
+
+A single heap snapshot tells you what is in memory. It does not tell you what
+is growing, which is the only question that matters. Take three:
+
+1. after startup, before any load
+2. after one load run, plus a forced GC
+3. after a second, identical load run, plus a forced GC
+
+```js
+import { writeHeapSnapshot } from "node:v8";
+
+process.on("SIGUSR2", () => {
+  global.gc?.();
+  console.log("snapshot:", writeHeapSnapshot());
+});
+```
+
+Now `kill -USR2 <pid>` between runs. Load all three into Chrome DevTools →
+Memory and use the **Comparison** view with snapshot 2 as the baseline against
+snapshot 3.
+
+The comparison is the whole trick. Between two identical runs, anything with a
+positive delta is retained work — objects the second run created and never
+released. Everything else is noise you can ignore.
+
+## Step three: read the retainer path, not the object
+
+The instinct is to look at the biggest allocation. That is usually a string or
+an array buffer, and it tells you nothing, because the object is not the
+problem. Whatever is *holding* it is.
+
+Select the leaked object and read the **Retainers** panel from the bottom up,
+looking for the first thing you recognise as yours. In practice it is almost
+always one of four shapes:
+
+- **A module-level `Map` or array** used as a cache with no eviction. It grows
+  for the life of the process by design; nobody wrote the eviction because
+  nobody wrote it down as a cache.
+- **A listener added per request** on a long-lived emitter. Every request adds
+  a closure capturing the request and response; the emitter outlives both.
+- **A timer holding a closure.** `setInterval` keeps its callback, its captured
+  scope, and everything reachable from it, forever, unless something calls
+  `clearInterval`.
+- **A promise that never settles**, keeping its continuation and captured
+  variables alive indefinitely.
+
+All four produce a retainer chain ending at a global or a module scope. That is
+your marker: if the chain terminates in module scope, the object can never be
+collected while the process lives.
+
+## Step four: turn the fix into a test
+
+Once fixed, the regression test is not "memory looks fine". It is the same load
+script with an assertion:
+
+```js
+global.gc();
+const before = process.memoryUsage().heapUsed;
+await runLoad();
+global.gc();
+const after = process.memoryUsage().heapUsed;
+
+// A few hundred KB of drift is normal; a linear leak is not.
+assert.ok(after - before < 5 * 1024 * 1024, `heap grew ${after - before} bytes`);
+```
+
+Run it in CI with `node --expose-gc`. It is slower than a unit test, so it
+belongs in a nightly job rather than on every commit — but it is the only thing
+that stops the leak returning six months later in different clothes.
+
+## What this does not catch
+
+Two honest limits.
+
+Heap snapshots only see the JavaScript heap. A leak in a native addon, or
+buffers held by a C++ library, shows up as RSS growth with a flat heap — the
+most confusing failure mode there is. If RSS climbs while `heapUsed` stays
+level, stop looking at the heap profiler and start looking at native
+dependencies.
+
+And snapshots are expensive. Taking one on a production process pauses it for
+as long as the heap takes to walk, which on a large heap is seconds. Reproduce
+locally, where you can afford it.
+
+## The point
+
+None of this is clever. The value is that it is repeatable: a load script in
+the repo, three snapshots, a comparison view, a retainer chain, an assertion in
+CI. Six months from now, when a different leak appears, you run the same five
+steps instead of rediscovering them at two in the morning.

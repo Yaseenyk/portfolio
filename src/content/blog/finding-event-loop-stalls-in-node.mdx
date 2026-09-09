@@ -1,0 +1,173 @@
+---
+title: 'Finding event-loop stalls in Node before your users do'
+slug: finding-event-loop-stalls-in-node
+date: '2026-07-25'
+description: 'Async code that never resumes, and sync work that blocks everything else, look identical from outside. Event-loop delay monitoring, async hooks and a stall detector tell them apart.'
+tags:
+- Node.js
+- Performance
+- Debugging
+keywords:
+- node event loop delay monitor
+- node event loop blocked detection
+- perf_hooks monitorEventLoopDelay
+- node async hooks pending promises
+- node process hangs no error
+- diagnose slow node api
+readingMinutes: 8
+---
+
+A Node service that stops responding without throwing is the least pleasant
+kind of failure. There is no stack trace, no error log, nothing in the crash
+reporter. Requests simply queue and time out, and every dashboard shows a
+healthy process using no CPU.
+
+Two very different faults produce that symptom, and the first job is to tell
+them apart.
+
+## The two faults
+
+**The loop is blocked.** Some synchronous work — a large `JSON.parse`, a regex
+backtracking, a `crypto.pbkdf2Sync`, a 50MB `readFileSync` — is occupying the
+thread. CPU is at 100% of one core. Nothing else runs until it finishes.
+
+**The loop is idle but work never resumes.** An `await` is waiting on a promise
+nothing will ever settle: a request with no timeout, a lock never released, a
+callback-to-promise wrapper whose error path forgets to reject. CPU is near
+zero. The process is perfectly healthy and doing nothing, forever.
+
+They look the same from outside and have opposite fixes, so measure first.
+
+## Measuring loop delay
+
+Node ships the instrument for this in `perf_hooks`. It samples how late timers
+fire, which is precisely how blocked the loop is:
+
+```js
+import { monitorEventLoopDelay } from "node:perf_hooks";
+
+const histogram = monitorEventLoopDelay({ resolution: 20 });
+histogram.enable();
+
+setInterval(() => {
+  console.log({
+    p50: Math.round(histogram.mean / 1e6),
+    p99: Math.round(histogram.percentile(99) / 1e6),
+    max: Math.round(histogram.max / 1e6),
+  });
+  histogram.reset();
+}, 10_000);
+```
+
+Values are nanoseconds, so divide by 1e6 for milliseconds. On a healthy service
+the mean sits in single-digit milliseconds. A p99 in the hundreds means
+something synchronous is running long enough for users to feel it. A max in the
+thousands means somebody is doing real work on the main thread.
+
+Export those three numbers to whatever you already use for metrics. This is the
+single most useful Node metric that most services do not collect.
+
+## When the loop is blocked
+
+Once you know it is blocking, find it by sampling. Start the process with
+`--cpu-prof` and reproduce, or attach with `--inspect` and take a CPU profile in
+Chrome DevTools. The blocking function is, by definition, the one at the top of
+the stack for most samples — this is the easy case.
+
+The fixes are boring and effective:
+
+- Replace `*Sync` calls on request paths with their async forms.
+- Move genuine CPU work — hashing, image processing, big parses — to a
+  `worker_thread`, so it runs off the main loop entirely.
+- Chunk large loops with `await setImmediate()` between batches so other work
+  interleaves.
+- Check regexes for catastrophic backtracking. A regex that is instant on short
+  input and hangs on a 10KB string is a backtracking problem, not a slow
+  computer.
+
+## When the loop is idle
+
+This is the harder one, because there is nothing to sample. The stack is empty;
+the work is suspended.
+
+A stall detector is a reasonable first line: wrap operations that must finish in
+a timeout that reports rather than silently hanging.
+
+```js
+export async function withDeadline(promise, ms, label) {
+  let timer;
+  const deadline = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} exceeded ${ms}ms`)), ms);
+  });
+  try {
+    return await Promise.race([promise, deadline]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+```
+
+That converts a silent hang into a loud error with a label you chose, which is
+usually enough to identify the culprit in one production incident instead of
+three.
+
+For finding what is actually pending, `async_hooks` can track resources that
+were created and never destroyed:
+
+```js
+import { createHook } from "node:async_hooks";
+
+const pending = new Map();
+
+createHook({
+  init(id, type, triggerId) {
+    if (type === "PROMISE") return;              // too noisy to track
+    pending.set(id, { type, at: Date.now(), stack: new Error().stack });
+  },
+  destroy(id) {
+    pending.delete(id);
+  },
+}).enable();
+
+// On SIGUSR2, print anything alive for more than a minute.
+process.on("SIGUSR2", () => {
+  const old = [...pending.values()].filter((r) => Date.now() - r.at > 60_000);
+  console.log(`${old.length} long-lived async resources`, old.slice(0, 20));
+});
+```
+
+Be honest about the cost: `async_hooks` slows the process measurably, and
+capturing a stack per resource is expensive. This belongs in a staging
+environment reproducing the hang, or behind a flag you turn on deliberately —
+not on by default in production.
+
+## The three causes worth checking first
+
+In practice, idle hangs are nearly always one of these:
+
+1. **An HTTP call without a timeout.** Node's default agent has no request
+   timeout. If the peer accepts the connection and never answers, you wait
+   forever. Set `AbortSignal.timeout(ms)` on every outbound call — every one,
+   not just the flaky ones.
+2. **A lock or semaphore whose release is not in a `finally`.** An exception on
+   the happy path leaves the lock held, and every subsequent caller waits.
+3. **A promise created in a callback API wrapper that only resolves on success.**
+   If the error branch never calls `reject`, the awaiting code waits forever.
+   `promisify` gets this right; hand-rolled wrappers frequently do not.
+
+## Wiring it into health checks
+
+The lasting fix is that a stalled process should fail its health check rather
+than sit there looking fine. Report unhealthy when loop delay crosses a
+threshold you have chosen deliberately:
+
+```js
+app.get("/healthz", (req, res) => {
+  const p99 = histogram.percentile(99) / 1e6;
+  if (p99 > 1000) return res.status(503).json({ status: "degraded", p99 });
+  res.json({ status: "ok", p99 });
+});
+```
+
+An orchestrator will then restart it, which is not a fix but is a great deal
+better than a process that is up, healthy, and serving nobody.
