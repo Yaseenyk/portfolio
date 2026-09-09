@@ -18,7 +18,7 @@ on:
       limit:
         description: "How many articles to create/update this run"
         required: false
-        default: "5"
+        default: "15"
         type: string
       dry_run:
         description: "List what would be posted without writing to DEV.to"
@@ -61,13 +61,13 @@ jobs:
       - name: Sync to DEV.to
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
-          MAX_WRITES: ${{ inputs.limit || '3' }}
+          MAX_WRITES: ${{ inputs.limit || '15' }}
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
           # The nightly run only fills gaps. Editing a post still updates its
           # DEV.to copy through the push-triggered workflow.
           CREATE_ONLY: 'true'
         run: |
-          ADDED_FILES="$(ls .devto/*.md | tr '\n' ' ')"
+          ADDED_FILES="$(tr '\n' ' ' < .devto/_order.txt)"
           export ADDED_FILES
           echo "Candidates: $(echo "$ADDED_FILES" | wc -w)"
           npx tsx scripts/sync-dev-to.ts

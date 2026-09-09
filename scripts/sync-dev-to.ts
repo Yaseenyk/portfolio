@@ -32,6 +32,8 @@ interface PostFrontmatter {
   description?: string;
   slug?: string;
   tags?: string[] | string;
+  /** Absolute URL of the cover image; DEV.to renders it above the title. */
+  cover?: string;
 }
 
 /** Exact request body shared by POST /articles and PUT /articles/{id}. */
@@ -43,6 +45,7 @@ interface ArticlePayload {
     canonical_url: string;
     description?: string;
     tags?: string[];
+    main_image?: string;
   };
 }
 
@@ -224,6 +227,7 @@ async function parseLocalPost(file: string): Promise<LocalPost> {
           ? { description: fm.description.trim() }
           : {}),
         tags: normalizeTags(fm.tags),
+        ...(fm.cover?.trim() ? { main_image: fm.cover.trim() } : {}),
       },
     },
   };

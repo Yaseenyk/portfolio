@@ -130,6 +130,9 @@ async function main() {
 
   let written = 0;
   const skipped = [];
+  // Filename order is alphabetical, which would publish the backlog in an
+  // order nobody chose. Collected here and sorted newest-first instead.
+  const order = [];
   for (const slug of slugs) {
     const file = path.join(BUILD, slug, "index.html");
     if (!existsSync(file)) continue;
@@ -145,7 +148,18 @@ async function main() {
       continue;
     }
 
-    const markdown = absolutise(turndown.turndown(body).trim());
+    let markdown = absolutise(turndown.turndown(body).trim());
+
+    // DEV.to renders the cover from `main_image` as a banner above the title.
+    // The article also opens with that same image inline, so without this the
+    // post shows its cover twice.
+    // Only a cover made for this post. Twenty-six articles all carrying the
+    // site's generic lockup looks like a bot filling a feed; for those, none.
+    const ogImage = attr(html, /<meta property="og:image" content="([^"]*)"/);
+    const cover = ogImage && ogImage.includes("/og/") ? ogImage : null;
+    if (cover) {
+      markdown = markdown.replace(/^!\[[^\]]*\]\([^)]*\)\s*/, "").trim();
+    }
     if (markdown.length < 400) {
       skipped.push(`${slug} (body too short: ${markdown.length} chars)`);
       continue;
@@ -162,6 +176,7 @@ async function main() {
       `slug: ${JSON.stringify(slug)}`,
       ...(description ? [`description: ${JSON.stringify(description)}`] : []),
       ...(tags.length ? [`tags: ${JSON.stringify(tags)}`] : []),
+      ...(cover ? [`cover: ${JSON.stringify(cover)}`] : []),
       "---",
       "",
     ].join("\n");
@@ -176,6 +191,12 @@ async function main() {
       `[yaseenkhatib.streamerosai.com/blog/${slug}/](${SITE}/blog/${slug}/).*
 `;
 
+    order.push({
+      slug,
+      date: attr(html, /<meta property="article:published_time" content="([^"]*)"/) ?? "",
+      topic: tags[0] ?? "other",
+    });
+
     await writeFile(
       path.join(DEST, `${slug}.md`),
       `${frontMatter}${markdown}${footer}`,
@@ -184,7 +205,33 @@ async function main() {
     written += 1;
   }
 
-  console.log(`devto export: ${written} posts written to .devto/`);
+  // Newest first within a topic, then round-robin across topics. Sorting by
+  // date alone front-loads whatever was written most recently — right now
+  // that is a run of React posts, so a night's batch would look like a
+  // single-subject feed and the Rust and Tauri work would wait weeks.
+  order.sort((a, b) => b.date.localeCompare(a.date));
+  const byTopic = new Map();
+  for (const item of order) {
+    if (!byTopic.has(item.topic)) byTopic.set(item.topic, []);
+    byTopic.get(item.topic).push(item);
+  }
+  const queues = [...byTopic.values()];
+  const interleaved = [];
+  while (interleaved.length < order.length) {
+    for (const q of queues) {
+      const next = q.shift();
+      if (next) interleaved.push(next);
+    }
+  }
+  order.length = 0;
+  order.push(...interleaved);
+  await writeFile(
+    path.join(DEST, "_order.txt"),
+    order.map((o) => `.devto/${o.slug}.md`).join("\n") + "\n",
+    "utf8",
+  );
+
+  console.log(`devto export: ${written} posts written to .devto/ (newest first in _order.txt)`);
   if (skipped.length) console.log(`devto export: skipped ${skipped.length} — ${skipped.join(", ")}`);
 }
 
