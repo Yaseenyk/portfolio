@@ -447,32 +447,35 @@ export default function PresentMode() {
             }}
           />
 
-          <div className="relative flex items-center justify-between px-10 pt-8">
-            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-600">
+          <div className="relative flex items-center justify-between gap-4 px-5 pt-5 md:px-10 md:pt-8">
+            {/* The kicker is orientation, not content — on a phone it wrapped
+                the whole bar onto three lines, so it waits for a wider screen. */}
+            <span className="hidden truncate font-mono text-[11px] uppercase tracking-[0.28em] text-zinc-600 sm:block">
               {slide.kicker || " "}
             </span>
-            <div className="flex items-center gap-5">
-              <span className="font-mono text-[11px] tabular-nums text-zinc-600">
+            <div className="ml-auto flex items-center gap-3 md:gap-5">
+              <span className="whitespace-nowrap font-mono text-[11px] tabular-nums text-zinc-600">
                 {index + 1} / {slides.length}
               </span>
               <button
                 type="button"
                 onClick={goFullscreen}
-                className="rounded-full border border-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:border-white/25 hover:text-zinc-300"
+                className="hidden whitespace-nowrap rounded-full border border-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:border-white/25 hover:text-zinc-300 md:inline-block"
               >
                 Fullscreen
               </button>
               <button
                 type="button"
                 onClick={close}
-                className="rounded-full border border-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:border-white/25 hover:text-zinc-300"
+                className="whitespace-nowrap rounded-full border border-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-500 transition-colors hover:border-white/25 hover:text-zinc-300"
               >
-                Read as article
+                <span className="md:hidden">Exit</span>
+                <span className="hidden md:inline">Read as article</span>
               </button>
             </div>
           </div>
 
-          <div className="relative flex flex-1 items-center overflow-hidden px-[7vw]">
+          <div className="relative flex flex-1 items-center overflow-hidden px-5 md:px-[7vw]">
             <div
               key={index}
               className={`present-slide w-full${index === 0 ? " present-slide--title" : ""}`}

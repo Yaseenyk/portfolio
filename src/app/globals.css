@@ -223,6 +223,65 @@
 .present-body figure { margin: 0; max-height: 66vh; overflow: hidden; }
 .present-body pre { font-size: 0.55em; line-height: 1.5; max-height: 58vh; overflow: auto; }
 .present-body img { max-height: 56vh; width: auto; object-fit: contain; }
+/* A table carries the article's own type sizes — `text-sm` on the table,
+   `text-[10px]` on the headers — so on a slide it rendered at a fraction of
+   the body size and could not be read across a room. Force the slide's scale
+   back onto it, and let the slide widen, since a two-column table wastes the
+   frame at the prose measure. */
+.present-slide:has(table) {
+  max-width: min(1600px, 94vw);
+}
+.present-body table {
+  width: 100%;
+  min-width: 0 !important;
+  border-collapse: collapse;
+  /* Sized off the slide body. Putting the fraction on the cells instead
+     compounds it against the table's own `text-sm` and lands at 8px. */
+  font-size: 0.62em !important;
+}
+.present-body th,
+.present-body td {
+  font-size: 1em !important;
+  line-height: 1.35;
+  padding: 0.55em 0.7em;
+}
+.present-body th {
+  letter-spacing: 0.12em !important;
+  color: #a1a1aa !important;
+}
+.present-body td:first-child {
+  color: #fafafa;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Phone and tablet. A column sized for a projected screen wastes a fifth of a
+   390px one, and the table 0.62em lands at 12px there — small enough that
+   the slide is useless on the device most students will open it on. */
+@media (max-width: 1100px) {
+  .present-slide,
+  .present-slide:has(table) {
+    max-width: 100%;
+  }
+  .present-stage {
+    max-height: 76vh;
+  }
+  .present-body p {
+    max-width: none;
+  }
+  .present-body table {
+    font-size: 0.82em !important;
+  }
+  .present-body th,
+  .present-body td {
+    padding: 0.45em 0.5em;
+  }
+  /* Wrapping beats a table that scrolls sideways inside a slide. */
+  .present-body td:first-child {
+    white-space: normal;
+  }
+}
+
 /* The article's own vertical rhythm fights the slide's — neutralise it. */
 .present-body [class*="mt-1"],
 .present-body [class*="mt-2"],
