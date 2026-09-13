@@ -94,6 +94,13 @@ export function generateMetadata({ params }: Params): Metadata {
     title: copy.h1,
     description,
     alternates: { canonical: url },
+    // These per-degree landing pages are near-duplicates of each other and of
+    // the FYP hub — thin/doorway pattern that dilutes crawl budget on a young
+    // domain (they sat in GSC "Discovered/Crawled – not indexed"). noindex so
+    // Google spends its limited crawl on the money pages; follow:true keeps
+    // link equity flowing to the real project listings they point at. Also
+    // removed from sitemap.ts.
+    robots: { index: false, follow: true },
     openGraph: {
       type: "website",
       title: `${copy.h1} | Yaseen Khatib`,

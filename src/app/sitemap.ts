@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/site";
 import { getAllPosts } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
 import { PRODUCTS } from "@/lib/products";
-import { CAMPUS_PROJECTS, DEGREE_SLUGS } from "@/lib/campus";
+import { CAMPUS_PROJECTS } from "@/lib/campus";
 import { GUIDES } from "@/lib/guides";
 import { routeDate } from "@/lib/lastmod";
 
@@ -281,12 +281,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.9,
     })),
-    ...Object.values(DEGREE_SLUGS).map((slug) => ({
-      url: `${SITE_URL}/final-year-projects/for/${slug}/`,
-      lastModified: routeDate("src/app/final-year-projects/for/${slug}", lastBlogUpdate),
-      changeFrequency: "monthly" as const,
-      priority: 0.9,
-    })),
+    // Per-degree /for/<slug>/ pages are intentionally noindex (near-duplicate
+    // doorway pattern — see the page's generateMetadata). Excluded from the
+    // sitemap so we don't ask Google to index what we tell it not to.
     ...CAMPUS_PROJECTS.map((p) => ({
       url: `${SITE_URL}/final-year-projects/${p.slug}/`,
       lastModified: p.publishedAt,
