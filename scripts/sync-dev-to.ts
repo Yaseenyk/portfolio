@@ -15,12 +15,13 @@
  * Exit code is non-zero if the article list can't be fetched or any post fails.
  */
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 
 const DEV_TO_BASE = "https://dev.to/api";
 const SITE_BLOG_BASE = "https://yaseenkhatib.streamerosai.com/blog";
+const CONTENT_DIR = "src/content/blog"; // where the .mdx posts live
 const PER_PAGE = 100;
 const MAX_PAGES = 100; // safety stop (~10k articles) — never loop forever
 const RATE_LIMIT_PAUSE_MS = 1000; // DEV.to rate-limits article writes
@@ -256,8 +257,21 @@ function findMatch(post: LocalPost, index: ArticleIndex): DevToArticle | undefin
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Changed files arrive via env (space/newline separated), never argv. */
-function filesToSync(): string[] {
+/**
+ * Which files to consider this run.
+ *   SCAN_ALL=true  -> every local .mdx post, sorted, for the scheduled drip to
+ *                     pick the next un-crossposted one (paired with CREATE_ONLY
+ *                     + MAX_WRITES=1). Ignores ADDED_FILES.
+ *   otherwise      -> the changed files the workflow diffed into ADDED_FILES.
+ */
+async function filesToSync(): Promise<string[]> {
+  if (process.env.SCAN_ALL === "true") {
+    const entries = await readdir(CONTENT_DIR);
+    return entries
+      .filter((f) => f.endsWith(".mdx"))
+      .sort() // deterministic order; CREATE_ONLY skips what's already live
+      .map((f) => `${CONTENT_DIR}/${f}`);
+  }
   return (process.env.ADDED_FILES ?? "")
     .split(/\s+/)
     .map((f) => f.trim())
@@ -281,7 +295,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const files = filesToSync();
+  const files = await filesToSync();
   const deleted = deletedFiles();
   if (files.length === 0 && deleted.length === 0) {
     console.log("No changed Markdown files to sync. Nothing to do.");
@@ -314,6 +328,10 @@ async function main(): Promise<void> {
   // MAX_WRITES would re-push the same first few articles every night and
   // never reach the backlog, so the drip only ever creates what is missing.
   const createOnly = process.env.CREATE_ONLY === "true";
+  // Push path: propagate EDITS to already-live articles but never publish a
+  // brand-new post on a push — new posts are left for the scheduled drip, so a
+  // batch push (or the AI blogger) can never dump several onto DEV.to at once.
+  const updateOnly = process.env.UPDATE_ONLY === "true";
   let writes = 0;
 
   for (const file of files) {
@@ -326,7 +344,8 @@ async function main(): Promise<void> {
     try {
       const post = await parseLocalPost(file);
       const match = findMatch(post, index);
-      if (match && createOnly) continue;
+      if (match && createOnly) continue; // drip: only create what's missing
+      if (!match && updateOnly) continue; // push: only update, never burst-create
       if (dryRun) {
         console.log(`· would ${match ? `update #${match.id}` : "create"}: ${post.title}`);
         continue;

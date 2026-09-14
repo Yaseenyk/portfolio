@@ -1,18 +1,27 @@
 name: Cross-post new posts to DEV.to
 
-# When a Markdown post is added OR edited on main, upsert it to DEV.to
-# (published, canonicalised back to the site): update the existing article if
-# one matches its canonical_url, otherwise create it. No duplicates on edits.
+# Publishing cadence is a slow, steady DRIP — at most one NEW article every two
+# days — so DEV.to and its followers never see a batch dump.
+#
+#   • schedule (every 2 days): scan all local posts, publish the next one that
+#     isn't on DEV.to yet. One create per run (SCAN_ALL + CREATE_ONLY + MAX_WRITES=1).
+#   • push (edited/deleted .mdx): propagate EDITS to already-live articles and
+#     unpublish deletes — but never publish a brand-new post (UPDATE_ONLY), so a
+#     batch push or the AI blogger can't burst several live at once. New posts
+#     wait for the drip.
+#   • workflow_dispatch: manual one-off (publish a named post, or the drip).
 on:
+  schedule:
+    # ~00:00 UTC on odd days of the month ≈ one post every two days.
+    - cron: "0 0 */2 * *"
   push:
     branches: [main]
     paths:
       - "src/content/blog/**.mdx"
-  # Manual one-off: cross-post an existing post on demand (e.g. a backfill).
   workflow_dispatch:
     inputs:
       file:
-        description: "Post to cross-post now (blank = the most recently added post)"
+        description: "Post to cross-post now (blank = run the drip: publish the next missing post)"
         required: false
         type: string
 
@@ -31,7 +40,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          # Full history so we can diff the whole push range for *added* files.
+          # Full history so we can diff the whole push range for changed files.
           fetch-depth: 0
 
       - name: Determine posts to sync
@@ -43,23 +52,25 @@ jobs:
           AFTER_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          files=""
           deleted=""
-          if [ "$EVENT" = "workflow_dispatch" ]; then
+          if [ "$EVENT" = "schedule" ]; then
+            # The scheduled drip scans all posts itself (SCAN_ALL) — no diff.
+            :
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
             if [ -n "${MANUAL_FILE:-}" ]; then
               files="$MANUAL_FILE"                       # a specific post you named
-            else
-              # Blank input: cross-post the most recently ADDED post.
-              files="$(git log --diff-filter=A --name-only --format= \
-                -- 'src/content/blog/*.mdx' | grep -m1 . || true)"
             fi
+            # Blank input: leave files empty; the cross-post step runs the drip.
           else
             # push: a branch's first push reports an all-zero "before" SHA;
             # diff against the empty tree so every file counts as changed.
             if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
               BEFORE_SHA="$(git hash-object -t tree /dev/null)"
             fi
-            # ACMR = added, copied, modified, renamed (NOT deleted). Modified is
-            # what makes edits upsert instead of being ignored.
+            # ACMR = added, copied, modified, renamed (NOT deleted). Under
+            # UPDATE_ONLY the script skips brand-new posts, so this effectively
+            # only syncs EDITS to already-live articles.
             files="$(
               git diff --name-only --diff-filter=ACMR "$BEFORE_SHA" "$AFTER_SHA" \
                 -- 'src/content/blog/*.mdx' | tr '\n' ' ' | sed 's/ *$//'
@@ -75,23 +86,46 @@ jobs:
           echo "Posts to sync: ${files:-<none>}"
           echo "Posts to unpublish: ${deleted:-<none>}"
 
+      # The scheduled drip and a blank manual run always execute; push/dispatch
+      # with changes execute; a push that changed nothing relevant is a no-op.
+      - name: Should run?
+        id: gate
+        env:
+          EVENT: ${{ github.event_name }}
+          FILES: ${{ steps.added.outputs.files }}
+          DELETED: ${{ steps.added.outputs.deleted }}
+        run: |
+          if [ "$EVENT" = "schedule" ] || [ "$EVENT" = "workflow_dispatch" ] \
+             || [ -n "$FILES" ] || [ -n "$DELETED" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Node.js
-        if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
+        if: steps.gate.outputs.run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
       - name: Install dependencies
-        if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
+        if: steps.gate.outputs.run == 'true'
         run: npm ci
 
       - name: Cross-post to DEV.to
-        if: steps.added.outputs.files != '' || steps.added.outputs.deleted != ''
+        if: steps.gate.outputs.run == 'true'
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
           # Passed through the environment — NOT interpolated into the command —
           # so the file list can never inject shell.
           ADDED_FILES: ${{ steps.added.outputs.files }}
           DELETED_FILES: ${{ steps.added.outputs.deleted }}
+          # Scheduled drip (and a blank manual run): scan everything, create only
+          # the next post that isn't on DEV.to, at most one per run.
+          SCAN_ALL: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.file == '')) && 'true' || '' }}
+          CREATE_ONLY: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.file == '')) && 'true' || '' }}
+          MAX_WRITES: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.file == '')) && '1' || '' }}
+          # Push: only propagate edits to live posts; new posts wait for the drip.
+          UPDATE_ONLY: ${{ github.event_name == 'push' && 'true' || '' }}
         run: npx tsx scripts/sync-dev-to.ts
