@@ -199,3 +199,40 @@ Being explicit about the limits:
 - **Why Google chose this crawl budget** is not observable at all. The
   correlation with zero referring domains is strong and is the standard
   explanation, but it remains inference.
+
+---
+
+## 10. What changed on 1 October, after this audit
+
+Recorded here so the numbers above are not read as current.
+
+| | before | after |
+| --- | --- | --- |
+| Blog posts | 53 | **34** |
+| Sitemap URLs | 127 | **108** |
+| Titles over 60 characters | 76 | **0** |
+| Descriptions over 160 | 105 | **1** |
+| `/blog/tag/` crawled | yes | **disallowed in robots.txt** |
+
+**Nineteen posts deleted** — the React and Node rewrites of 9 September. They
+were written without access to any real incident, measurement or decision, so
+they read as interchangeable with ten thousand other tutorials from domains with
+actual authority. Seventeen of the nineteen were never crawled. Every retired
+slug now redirects in one hop to the nearest surviving first-person post, so the
+Rust-era URLs linked from LinkedIn and DEV.to still land somewhere real.
+
+**On streamerOS**, the trailing-slash fix was serving a second full copy of
+every page. Replaced with redirect stubs: indexable pages 128 → 73, duplicate
+titles and descriptions 126 → 0.
+
+**Technical SEO now passes every check on both sites** — titles, descriptions,
+canonicals, OG and Twitter tags, viewport, `lang`, a single `<h1>`, JSON-LD,
+image alt text, sitemap declared in robots, `lastmod` on every URL, HTTPS
+redirect. The only markup gap left is 20 portfolio pages without an `og:image`.
+
+**None of this will show in Search Console quickly.** Every change needs a
+recrawl to register, and slow recrawling is the problem being fixed. Read the
+numbers again in 4–6 weeks, and judge them on *discovered-never-crawled falling*
+rather than *indexed rising* — that is the leading indicator. If it has not
+moved by mid-November, the answer is not more technical work; it is that the
+referring domains still are not there.
