@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL, PERSON, RESUME_URL } from "@/lib/site";
@@ -11,7 +12,7 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   title: "Hire a Senior Full-Stack AI Engineer",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   keywords: [
     "hire full-stack AI engineer",
     "senior AI engineer for hire",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     title: "Hire Yaseen Khatib — Senior Full-Stack AI Engineer",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: URL,
     siteName: "Yaseen Khatib",
   },
@@ -36,7 +37,7 @@ const serviceJsonLd = {
   "@type": "Service",
   name: "Full-Stack AI Engineering — Yaseen Khatib",
   serviceType: "Full-stack AI engineering, RAG & LLM systems, MERN development",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   provider: { "@type": "Person", "@id": PERSON_ID, name: PERSON.name },
   areaServed: "Worldwide (remote), or on-site in India",
   audience: {

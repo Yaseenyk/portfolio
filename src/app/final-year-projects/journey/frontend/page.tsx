@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -10,15 +11,15 @@ const DESCRIPTION =
   "Frontend development the way it works now: Claude Code setup, CLAUDE.md, feeding docs to the AI, MCP servers, an AI-friendly folder structure, and the plan-build-verify loop — in plain words.";
 
 export const metadata: Metadata = {
-  title: "Chapter 2 — Building the Frontend with Claude Code",
-  description: DESCRIPTION,
+  title: "Chapter 2 — Building the Frontend",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/frontend/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 2 — Building the Frontend with Claude Code",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/frontend/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-frontend.jpg`],

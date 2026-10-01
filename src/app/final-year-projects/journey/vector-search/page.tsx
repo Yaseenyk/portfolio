@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "Vector databases and semantic search, in plain words: chunking documents, why normal databases can't search by meaning, how vector databases find nearest neighbours fast, and building real meaning-based search.";
 
 export const metadata: Metadata = {
-  title: "Chapter 9 — Vector Search: Finding by Meaning at Scale",
-  description: DESCRIPTION,
+  title: "Chapter 9 — Vector Search",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/vector-search/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 9 — Vector Search: Finding by Meaning at Scale",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/vector-search/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-vector-search.jpg`],

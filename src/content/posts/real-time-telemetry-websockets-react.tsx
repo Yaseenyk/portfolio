@@ -132,7 +132,7 @@ function Body() {
 
 export const realTimeTelemetry: BlogPost = {
   slug: "real-time-telemetry-websockets-react",
-  title: "Real-Time Telemetry: Why Polling Lies, and WebSockets Don't",
+  title: "Real-Time Telemetry: Why Polling Lies",
   description:
     "Polling dashboards lie between ticks — I learned that the hard way. Now I push telemetry over WebSockets for sub-second parity across every React client.",
   keywords: [

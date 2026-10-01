@@ -114,7 +114,7 @@ function Body() {
 export const nodeOverServerlessRealtime: BlogPost = {
   slug: "node-over-serverless-for-realtime",
   title:
-    "Everyone Said 'Just Go Serverless.' I Ran a Long-Lived Node Process — Here's What That Bought",
+    "I Ran a Long-Lived Node Process, Not Serverless",
   description:
     "A live dashboard holding thousands of open connections is the one workload serverless is worst at. Why in-process state, loop-based fan-out and real backpressure were the product decision, not a preference.",
   keywords: [

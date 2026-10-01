@@ -142,7 +142,7 @@ function Body() {
 
 export const aiNativePortfolio: BlogPost = {
   slug: "ai-native-portfolio-landing-lead-roles",
-  title: "The AI-Native Portfolio: Landing Lead Roles by Shipping the System",
+  title: "The AI-Native Portfolio: Landing Lead Roles",
   description:
     "A portfolio that lists 'used ChatGPT' reads junior. One that demonstrates systems architecture — RAG, agents, guardrails, latency budgets — reads like the lead they're trying to hire. Here's how to build the second one.",
   keywords: [

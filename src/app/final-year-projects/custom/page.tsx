@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/site";
 import {
@@ -19,13 +20,13 @@ const DESCRIPTION = `Get a custom final year project built to your approved prob
 )} depending on scope, with daily live sessions explaining the code and payment in monthly installments.`;
 
 export const metadata: Metadata = {
-  title: "Custom Final Year Project — Built to Your Problem Statement",
-  description: DESCRIPTION,
+  title: "Custom Final Year Project, Built to Spec",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/custom/` },
   openGraph: {
     type: "website",
     title: "Custom Final Year Project | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/custom/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/custom.jpg`],
@@ -55,7 +56,7 @@ const serviceJsonLd = {
   "@type": "Service",
   name: "Custom Final Year Project Development",
   serviceType: "Bespoke academic software development with code mentorship",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   provider: personRef,
   areaServed: { "@type": "Country", name: "India" },
   offers: {

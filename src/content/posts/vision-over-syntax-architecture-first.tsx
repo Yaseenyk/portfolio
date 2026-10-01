@@ -92,7 +92,7 @@ function Body() {
 export const visionOverSyntax: BlogPost = {
   slug: "vision-over-syntax-architecture-first",
   title:
-    "Vision Over Syntax: I Design the Entire Product in My Head Before the First Commit",
+    "Vision Over Syntax: Design Before Code",
   description:
     "Syntax is solved; vision is not. How architecture-first thinking — data contracts, trust boundaries, and deliberate refusals — is the real engineering skill in the AI era, shown through shipped products.",
   keywords: [

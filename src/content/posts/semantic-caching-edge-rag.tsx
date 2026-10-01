@@ -168,7 +168,7 @@ function Body() {
 
 export const semanticCachingEdge: BlogPost = {
   slug: "semantic-caching-edge-rag",
-  title: "Semantic Caching That Actually Hits: Matching Meaning at the Edge",
+  title: "Semantic Caching That Actually Hits",
   description:
     "The streamerOS support agent kept re-answering the same question phrased ten ways, so I built a semantic cache that matches meaning, not the string.",
   keywords: [

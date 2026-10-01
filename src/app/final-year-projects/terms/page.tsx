@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -10,12 +11,12 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   title: "Terms — Final Year Projects",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/terms/` },
   openGraph: {
     type: "website",
     title: "Terms — Final Year Projects | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/terms/`,
     siteName: "Yaseen Khatib",
   },

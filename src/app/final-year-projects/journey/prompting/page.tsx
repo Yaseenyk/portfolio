@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "Prompt engineering for real software: system vs user prompts, zero-shot, few-shot and chain-of-thought, forcing strict JSON, and defending against hallucination and prompt injection — in plain words.";
 
 export const metadata: Metadata = {
-  title: "Chapter 7 — Prompting That Works (and Doesn't Break)",
-  description: DESCRIPTION,
+  title: "Chapter 7 — Prompting That Works",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/prompting/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 7 — Prompting That Works",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/prompting/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-prompting.jpg`],

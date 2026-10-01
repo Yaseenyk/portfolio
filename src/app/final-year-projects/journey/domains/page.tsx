@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "Frontend, backend, database, dev and production, bugs and hotfixes — the map of how software actually works, explained in plain words for students who only got syntax in college.";
 
 export const metadata: Metadata = {
-  title: "Chapter 1 — Domains: How Software Actually Works, in Plain Words",
-  description: DESCRIPTION,
+  title: "Chapter 1 — How Software Actually Works",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/domains/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 1 — Domains",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/domains/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-domains.jpg`],

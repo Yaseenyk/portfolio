@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -12,12 +13,12 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   title: "Final Year Project Cost — Instant Estimate",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: URL },
   openGraph: {
     type: "website",
     title: "Final Year Project Cost Estimator",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: URL,
     siteName: "Yaseen Khatib",
     images: ["/og/campus/cost-estimator.jpg"],
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Final Year Project Cost Estimator",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     images: ["/og/campus/cost-estimator.jpg"],
   },
 };
@@ -52,7 +53,7 @@ const toolJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Final Year Project Cost Estimator",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   url: URL,
   applicationCategory: "EducationalApplication",
   operatingSystem: "Any",

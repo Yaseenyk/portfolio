@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
@@ -41,7 +42,7 @@ const FAQ_ITEMS: FaqItem[] = [
 
 export const metadata: Metadata = {
   title: { absolute: "Interview Context | Yaseen Khatib" },
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   keywords: [
     "Yaseen Khatib",
     "Lead MERN Architect",
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     title: "Interview Context | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/interview/`,
     siteName: "Yaseen Khatib",
   },

@@ -77,7 +77,7 @@ function Body() {
 export const zeroDollarContentEngine: BlogPost = {
   slug: "zero-dollar-content-engine",
   title:
-    "The $0 Content Engine: My Blog Writes, Commits, and Deploys Itself Twice a Week",
+    "The $0 Content Engine That Runs Itself",
   description:
     "A cron-scheduled pipeline drafts articles with Gemini, writes MDX, commits to Git, and redeploys the static site — no CMS, no server, no database, no bill. The architecture of refusing infrastructure.",
   keywords: [

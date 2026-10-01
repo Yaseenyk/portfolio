@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "AI agents in plain words: what makes an AI agentic, tool calling, the think-act-observe loop, connecting a model to search, calculators and databases, multi-agent systems, and the safety that agency demands.";
 
 export const metadata: Metadata = {
-  title: "Chapter 11 — AI Agents: Models That Act, Not Just Answer",
-  description: DESCRIPTION,
+  title: "Chapter 11 — AI Agents That Act",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/agents/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 11 — AI Agents: Models That Act, Not Just Answer",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/agents/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-agents.jpg`],

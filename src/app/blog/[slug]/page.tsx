@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
@@ -136,7 +137,7 @@ export async function generateMetadata({
     // 16-character brand suffix was pushing the headline's actual value past
     // the cut on 89% of posts. The brand is on the SERP as the domain anyway.
     title: { absolute: post.title },
-    description: post.description,
+    description: seoDescription(post.description),
     keywords: post.keywords,
     authors: [{ name: post.author.name }],
     alternates: { canonical: url },
@@ -147,7 +148,7 @@ export async function generateMetadata({
       type: "article",
       url,
       title: post.title,
-      description: post.description,
+      description: seoDescription(post.description),
       siteName: "Yaseen Khatib",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt ?? post.publishedAt,
@@ -158,7 +159,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.description,
+      description: seoDescription(post.description),
       images: [ogImage ?? "/og-lockup.png"],
     },
   };
@@ -179,7 +180,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       "@context": "https://schema.org",
       "@type": "TechArticle",
       headline: post.title,
-      description: post.description,
+      description: seoDescription(post.description),
       abstract: post.takeaways.join(" "),
       datePublished: post.publishedAt,
       dateModified: post.updatedAt ?? post.publishedAt,

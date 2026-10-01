@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -10,13 +11,13 @@ const DESCRIPTION =
   "Practical guides for Indian final year students: the viva questions panels actually ask, project topics for BCA, MCA and B.Tech with honest difficulty ratings, report format chapter by chapter, and how to choose a project you can finish.";
 
 export const metadata: Metadata = {
-  title: "Final Year Project Guides — Topics, Viva Prep and Report Format",
-  description: DESCRIPTION,
+  title: "Final Year Project Guides",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/guides/` },
   openGraph: {
     type: "website",
     title: "Final Year Project Guides | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/guides/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/guides.jpg`],
@@ -31,7 +32,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: g.meta.title,
-    description: g.meta.description,
+    description: seoDescription(g.meta.description),
     url: guideUrl(g.meta.slug),
   })),
 };
@@ -40,7 +41,7 @@ const collectionJsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   name: "Final Year Project Guides",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   url: `${SITE_URL}/final-year-projects/guides/`,
   author: personRef,
 };

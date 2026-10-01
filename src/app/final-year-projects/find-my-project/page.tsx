@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -14,13 +15,13 @@ const DESCRIPTION =
   "Answer four quick questions — your degree, the area you enjoy, the time you have, and your goal — and get the 2-3 final year projects that fit you best, each with source code and live viva prep.";
 
 export const metadata: Metadata = {
-  title: "Find Your Final Year Project — a 30-Second Match",
-  description: DESCRIPTION,
+  title: "Find Your Final Year Project",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: URL },
   openGraph: {
     type: "website",
     title: "Find Your Final Year Project",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: URL,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/find-my-project.jpg`],
@@ -49,7 +50,7 @@ const toolJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Find Your Final Year Project",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   url: URL,
   applicationCategory: "EducationalApplication",
   operatingSystem: "Any",

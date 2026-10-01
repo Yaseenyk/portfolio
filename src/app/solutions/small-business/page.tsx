@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -14,13 +15,13 @@ const DESCRIPTION =
   "Custom software for small businesses without enterprise pricing — a booking page, invoicing, stock tracking or an enquiry system, built once then hosted and maintained from ₹800 a month. Cancel any month, data exported free.";
 
 export const metadata: Metadata = {
-  title: "Small Business Software From ₹800/month — Built, Hosted, Maintained",
-  description: DESCRIPTION,
+  title: "Small Business Software From ₹800/month",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/solutions/small-business/` },
   openGraph: {
     type: "website",
     title: "Small Business Software from ₹800/month | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/solutions/small-business/`,
     siteName: "Yaseen Khatib",
   },
@@ -77,7 +78,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Hosted small business software",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   provider: personRef,
   areaServed: { "@type": "Country", name: "India" },
   offers: HOSTED_TIERS.map((t) => ({
@@ -92,7 +93,7 @@ const jsonLd = {
       unitText: "MONTH",
       billingIncrement: 1,
     },
-    description: t.best,
+    description: seoDescription(t.best),
   })),
 };
 

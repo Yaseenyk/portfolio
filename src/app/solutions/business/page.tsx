@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -17,13 +18,13 @@ const DESCRIPTION =
   "Architecture review, AI integration, fixed-scope custom systems and ERP replacement for Indian and remote businesses. Fixed prices published, code delivered into your repository, no licence and no per-seat fee.";
 
 export const metadata: Metadata = {
-  title: "For Businesses — Architecture, AI Integration, Custom Systems & ERP",
-  description: DESCRIPTION,
+  title: "Architecture, AI Integration and ERP",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/solutions/business/` },
   openGraph: {
     type: "website",
     title: "Solutions for Businesses | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/solutions/business/`,
     siteName: "Yaseen Khatib",
   },
@@ -39,7 +40,7 @@ const jsonLd = {
     item: {
       "@type": "Service",
       name: s.name,
-      description: s.summary,
+      description: seoDescription(s.summary),
       provider: personRef,
       areaServed: { "@type": "Country", name: "India" },
       offers: {

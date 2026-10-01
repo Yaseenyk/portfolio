@@ -102,7 +102,7 @@ function Body() {
 export const shippedFiveProductsSolo: BlogPost = {
   slug: "shipped-5-products-solo-12-months",
   title:
-    "I Shipped 5 Products in 12 Months — Solo, Unfunded, and Faster Than Most Teams Ship One",
+    "I Shipped 5 Products in 12 Months, Solo",
   description:
     "Five production systems — a realtime telemetry cockpit, a workflow engine, a local-first AI finance agent, and two autonomous pipelines — designed, built, and shipped by one engineer. Here's the operating model.",
   keywords: [

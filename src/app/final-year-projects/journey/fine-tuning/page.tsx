@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -12,13 +13,13 @@ const DESCRIPTION =
   "Fine-tuning in plain words and when NOT to do it: prompt vs RAG vs fine-tuning, how fine-tuning actually works, who trains and fine-tunes models, cost and data reality, and the career roadmap from this journey onward.";
 
 export const metadata: Metadata = {
-  title: "Chapter 16 — Fine-Tuning, and the Road Ahead",
-  description: DESCRIPTION,
+  title: "Chapter 16 — Fine-Tuning",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/journey/fine-tuning/` },
   openGraph: {
     type: "article",
     title: "Chapter 16 — Fine-Tuning, and the Road Ahead",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/fine-tuning/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-finetuning.jpg`],

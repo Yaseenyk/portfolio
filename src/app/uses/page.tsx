@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
@@ -11,7 +12,7 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   title: { absolute: "Uses | AI & MERN Development Stack" },
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   keywords: [
     "uses",
     "developer setup",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     title: "Uses | AI & MERN Development Stack",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/uses/`,
     siteName: "Yaseen Khatib",
   },
@@ -147,7 +148,7 @@ const usesJsonLd = {
   "@context": "https://schema.org",
   "@type": "TechArticle",
   headline: "Uses — AI & MERN Development Stack",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   datePublished: "2026-06-06",
   dateModified: "2026-06-06",
   author: { "@id": PERSON_ID, name: PERSON.name },
@@ -158,7 +159,7 @@ const usesJsonLd = {
     c.items.map((i) => ({
       "@type": c.schemaType,
       name: i.name,
-      description: i.desc,
+      description: seoDescription(i.desc),
     }))
   ),
 };

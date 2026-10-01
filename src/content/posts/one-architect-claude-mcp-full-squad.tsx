@@ -101,7 +101,7 @@ function Body() {
 export const oneArchitectFullSquad: BlogPost = {
   slug: "one-architect-claude-mcp-full-squad",
   title:
-    "One Architect + Claude + MCP = A Full Engineering Squad: The Operating Model I'd Install at Your Company",
+    "One Architect + Claude + MCP = A Full Squad",
   description:
     "The exact three-layer operating model — architect, Claude Code, MCP-wired systems — that lets one engineer ship like a squad, and the 30-day plan for installing it inside a real company.",
   keywords: [

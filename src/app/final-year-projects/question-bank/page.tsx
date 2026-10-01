@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -12,13 +13,13 @@ const COUNT = VIVA_QUESTIONS.length;
 const DESCRIPTION = `${COUNT} real final year project viva questions, filterable by category and project type, each showing what the examiner is actually testing. Tick them off as you prepare — your progress is saved in the browser.`;
 
 export const metadata: Metadata = {
-  title: `${COUNT} Final Year Project Viva Questions — Filterable Question Bank`,
-  description: DESCRIPTION,
+  title: `${COUNT} Final Year Project Viva Questions`,
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/question-bank/` },
   openGraph: {
     type: "website",
     title: "Final Year Project Viva Question Bank",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/question-bank/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/question-bank.jpg`],
@@ -47,7 +48,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Final Year Project Viva Question Bank",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   url: `${SITE_URL}/final-year-projects/question-bank/`,
   applicationCategory: "EducationalApplication",
   operatingSystem: "Any",

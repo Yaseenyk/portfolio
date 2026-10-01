@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -34,13 +35,13 @@ const DESCRIPTION =
   "Final year projects for BCA, MCA and B.Tech students, built for you end to end — code, report, diagrams and deployment — or your own idea built from scratch. Daily live Google Meet sessions explain the code line by line so you can defend it in your viva. Direct payment in monthly installments.";
 
 export const metadata: Metadata = {
-  title: "Final Year Projects — Built For You, Then Explained To You",
-  description: DESCRIPTION,
+  title: "Final Year Projects, Built and Explained",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/` },
   openGraph: {
     type: "website",
     title: "Final Year Projects | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/hub.jpg`],
@@ -52,7 +53,7 @@ const serviceJsonLd = {
   "@type": "Service",
   name: "Final Year Project Build & Mentorship",
   serviceType: "Academic project development and code mentorship",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   provider: personRef,
   areaServed: { "@type": "Country", name: "India" },
   audience: {
@@ -76,7 +77,7 @@ const itemListJsonLd = {
     "@type": "ListItem",
     position: i + 1,
     name: p.title,
-    description: p.summary,
+    description: seoDescription(p.summary),
     url: campusUrl(p.slug),
   })),
 };

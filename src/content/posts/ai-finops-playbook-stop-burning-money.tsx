@@ -90,7 +90,7 @@ function Body() {
 export const aiFinopsPlaybook: BlogPost = {
   slug: "ai-finops-playbook-stop-burning-money",
   title:
-    "Your Company Is Overpaying for AI by 80% — I Built a Live Simulator That Proves It",
+    "Your Company Is Overpaying for AI by 80%",
   description:
     "Most production AI traffic is simple or repetitive, yet it's billed at frontier-model prices. The cache → flash → frontier cascade that fixes the economics, with a live interactive cost simulator.",
   keywords: [

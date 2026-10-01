@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
@@ -21,12 +22,12 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   title: "About Yaseen Khatib",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/about/` },
   openGraph: {
     type: "profile",
     title: "About Yaseen Khatib — Senior Full-Stack AI Engineer",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/about/`,
     siteName: "Yaseen Khatib",
   },
@@ -44,7 +45,7 @@ const aboutJsonLd = {
   "@type": "AboutPage",
   url: `${SITE_URL}/about/`,
   name: "About Yaseen Khatib",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   isPartOf: { "@id": WEBSITE_ID },
   mainEntity: {
     "@id": PERSON_ID,

@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/site";
 import { AN_ROADMAP, AN_META, type AnLesson } from "@/lib/anthropic-roadmap";
@@ -10,7 +11,7 @@ const url = `${SITE_URL}/anthropic-roadmap/`;
 
 export const metadata: Metadata = {
   title: AN_META.title,
-  description: AN_META.tagline,
+  description: seoDescription(AN_META.tagline),
   keywords: [
     "Anthropic",
     "Claude",
@@ -26,14 +27,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     title: `${AN_META.title} | Yaseen Khatib`,
-    description: AN_META.tagline,
+    description: seoDescription(AN_META.tagline),
     url,
     siteName: "Yaseen Khatib",
   },
   twitter: {
     card: "summary_large_image",
     title: AN_META.title,
-    description: AN_META.tagline,
+    description: seoDescription(AN_META.tagline),
   },
 };
 
@@ -49,7 +50,7 @@ export default function AnthropicRoadmapPage() {
       "@context": "https://schema.org",
       "@type": "Course",
       name: AN_META.title,
-      description: AN_META.tagline,
+      description: seoDescription(AN_META.tagline),
       url,
       provider: personRef,
       hasCourseInstance: {
@@ -60,7 +61,7 @@ export default function AnthropicRoadmapPage() {
       syllabusSections: liveLessons.map((l) => ({
         "@type": "Syllabus",
         name: `Lesson ${l.step}: ${l.title}`,
-        description: l.blurb,
+        description: seoDescription(l.blurb),
         url: `${SITE_URL}/blog/${l.slug}`,
       })),
     },

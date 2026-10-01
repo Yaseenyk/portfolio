@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import GridBackground from "@/components/GridBackground";
@@ -24,12 +25,12 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   title: "Projects",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/projects/` },
   openGraph: {
     type: "website",
     title: "Projects | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/projects/`,
     siteName: "Yaseen Khatib",
   },

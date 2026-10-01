@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -10,13 +11,13 @@ const DESCRIPTION =
   "Enter your submission date and see how many weeks you actually have for your final year project, after exams and a realistic buffer — plus a week-by-week plan with dates for every phase.";
 
 export const metadata: Metadata = {
-  title: "Final Year Project Timeline Planner — How Many Weeks Do You Really Have?",
-  description: DESCRIPTION,
+  title: "Final Year Project Timeline Planner",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/planner/` },
   openGraph: {
     type: "website",
     title: "Final Year Project Timeline Planner",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/planner/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/planner.jpg`],
@@ -45,7 +46,7 @@ const toolJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "Final Year Project Timeline Planner",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   url: `${SITE_URL}/final-year-projects/planner/`,
   applicationCategory: "EducationalApplication",
   operatingSystem: "Any",

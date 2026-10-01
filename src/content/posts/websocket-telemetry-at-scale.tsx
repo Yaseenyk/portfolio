@@ -84,7 +84,7 @@ metrics.on("tick", (m) => io.to("telemetry").emit("metric", m));`}
 
 export const websocketTelemetryAtScale: BlogPost = {
   slug: "websocket-telemetry-at-scale",
-  title: "WebSocket Telemetry at Scale: When One Process Isn't Enough",
+  title: "WebSocket Telemetry at Scale",
   description:
     "A single WebSocket server is a weekend project; streaming telemetry to thousands across instances broke for me on streamerOS — Redis pub/sub, rooms, coalescing.",
   keywords: [

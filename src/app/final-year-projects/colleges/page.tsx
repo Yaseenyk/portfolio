@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,13 +12,13 @@ const DESCRIPTION =
   "For HODs and placement cells: a free workshop for your final year students, batch mentoring, and distinct projects across a cohort so no two submissions collide. Run by a working Senior Full-Stack AI Engineer.";
 
 export const metadata: Metadata = {
-  title: "For Colleges — Final Year Project Mentoring for a Whole Batch",
-  description: DESCRIPTION,
+  title: "Final Year Project Mentoring for Colleges",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/colleges/` },
   openGraph: {
     type: "website",
     title: "For Colleges | Final Year Project Mentoring",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/colleges/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/social/colleges-wide.jpg`],
@@ -61,7 +62,7 @@ const serviceJsonLd = {
   "@type": "Service",
   name: "Final Year Project Mentoring for Colleges",
   serviceType: "Academic project mentoring, workshops and cohort supervision",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   provider: personRef,
   areaServed: { "@type": "Country", name: "India" },
   audience: {

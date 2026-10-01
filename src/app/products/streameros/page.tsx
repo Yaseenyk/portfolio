@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import { getProduct, productUrl } from "@/lib/products";
 import { personRef, breadcrumbJsonLd } from "@/lib/seo";
@@ -13,7 +14,7 @@ const product = getProduct("streameros")!;
 
 export const metadata: Metadata = {
   title: `${product.name} — Rust Streaming Cockpit`,
-  description: product.summary,
+  description: seoDescription(product.summary),
   keywords: [
     "Rust",
     "Tauri v2",
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     title: `${product.name} | Yaseen Khatib`,
-    description: product.summary,
+    description: seoDescription(product.summary),
     url: productUrl(product.slug),
     siteName: "Yaseen Khatib",
   },
@@ -49,7 +50,7 @@ const jsonLd = [
     name: product.name,
     applicationCategory: "MultimediaApplication",
     operatingSystem: "Windows, macOS, Linux",
-    description: product.summary,
+    description: seoDescription(product.summary),
     keywords: product.tech.join(", "),
     author: personRef,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },

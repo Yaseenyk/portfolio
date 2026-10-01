@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL, PERSON } from "@/lib/site";
@@ -18,13 +19,13 @@ const DESCRIPTION =
   "Solution architecture and software builds for businesses that were quoted enterprise prices for a problem that does not need one — AI integration, custom internal systems, and ERP replacement. Plus hosted tools for small businesses from ₹800 a month. Fixed prices, you own the code.";
 
 export const metadata: Metadata = {
-  title: "Solutions — Systems Built For What They Should Cost",
-  description: DESCRIPTION,
+  title: "Systems Built For What They Should Cost",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/solutions/` },
   openGraph: {
     type: "website",
     title: "Solutions | Yaseen Khatib",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/solutions/`,
     siteName: "Yaseen Khatib",
   },
@@ -34,7 +35,7 @@ const serviceJsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   name: "Yaseen Khatib — Solution Architecture & Software Engineering",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   url: `${SITE_URL}/solutions/`,
   provider: personRef,
   founder: personRef,
@@ -49,7 +50,7 @@ const serviceJsonLd = {
     itemListElement: SERVICES.map((s) => ({
       "@type": "Offer",
       name: s.name,
-      description: s.summary,
+      description: seoDescription(s.summary),
       priceCurrency: "INR",
       priceSpecification: {
         "@type": "PriceSpecification",

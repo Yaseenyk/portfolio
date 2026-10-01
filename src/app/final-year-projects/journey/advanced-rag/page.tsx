@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,13 +12,13 @@ const DESCRIPTION =
   "Advanced RAG in plain words: why basic RAG disappoints, and the techniques that fix it — query expansion, hybrid search, re-ranking, better chunking and metadata filtering — each a targeted fix for a specific failure.";
 
 export const metadata: Metadata = {
-  title: "Chapter 13 — Advanced RAG: Making Retrieval Actually Reliable",
-  description: DESCRIPTION,
+  title: "Chapter 13 — Advanced RAG",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/journey/advanced-rag/` },
   openGraph: {
     type: "article",
     title: "Chapter 13 — Advanced RAG",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/advanced-rag/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-advanced-rag.jpg`],

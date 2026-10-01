@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "What a large language model actually is and how one gets built, from scratch in plain words: next-word prediction, tokens, parameters, pretraining, fine-tuning, RLHF, and the people behind each stage.";
 
 export const metadata: Metadata = {
-  title: "Chapter 5 — What an LLM Is, and How One Is Built",
-  description: DESCRIPTION,
+  title: "Chapter 5 — What an LLM Actually Is",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/llm/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 5 — What an LLM Is, and How One Is Built",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/llm/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-llm.jpg`],

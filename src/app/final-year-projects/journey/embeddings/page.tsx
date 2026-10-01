@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "Embeddings in plain words: how meaning becomes a list of numbers, what a vector space is without heavy maths, and how cosine similarity lets a computer measure that two different sentences mean the same thing.";
 
 export const metadata: Metadata = {
-  title: "Chapter 8 — Embeddings: Turning Meaning Into Numbers",
-  description: DESCRIPTION,
+  title: "Chapter 8 — Embeddings and Meaning",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/embeddings/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 8 — Embeddings: Turning Meaning Into Numbers",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/embeddings/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-embeddings.jpg`],

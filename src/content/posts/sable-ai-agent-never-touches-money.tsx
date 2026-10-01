@@ -80,7 +80,7 @@ function Body() {
 export const sableTrustBoundary: BlogPost = {
   slug: "sable-ai-agent-never-touches-money",
   title:
-    "I Built an AI Money Agent That's Structurally Incapable of Touching the Money",
+    "An AI Money Agent That Can't Touch the Money",
   description:
     "Sable is a local-first AI financial agent: all data in on-device SQLite, no cloud backend, and a Review & Confirm boundary where the model proposes but only a human commits. The trust architecture, explained.",
   keywords: [

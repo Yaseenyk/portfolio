@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
@@ -17,7 +18,7 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   title: { absolute: "Sandbox | Live React Flow Workflow Engine" },
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   keywords: [
     "React Flow",
     "Zustand",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     title: "Sandbox | Live React Flow Workflow Engine",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/sandbox/`,
     siteName: "Yaseen Khatib",
   },

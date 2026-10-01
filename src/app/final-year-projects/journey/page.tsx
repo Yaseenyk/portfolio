@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,13 +12,13 @@ const DESCRIPTION =
   "A 16-day live program — 4 hours a day, 64 hours total — taking you from how LLMs actually work through embeddings, vector search and RAG to agents, guardrails and a full system-design capstone.";
 
 export const metadata: Metadata = {
-  title: "The 16-Day AI Engineering Journey — Live, 4 Hours a Day",
-  description: DESCRIPTION,
+  title: "The 16-Day AI Engineering Journey",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/journey/` },
   openGraph: {
     type: "website",
     title: "The 16-Day AI Engineering Journey",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/guides.jpg`],

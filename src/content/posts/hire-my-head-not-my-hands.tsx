@@ -88,7 +88,7 @@ function Body() {
 export const hireMyHead: BlogPost = {
   slug: "hire-my-head-not-my-hands",
   title:
-    "Hire My Head, Not My Hands: What 5 Solo Products Prove That a Résumé Can't",
+    "Hire My Head, Not My Hands",
   description:
     "AI made hands abundant; heads stayed scarce. The closing argument of the Founder's Log series — the architectural judgment pattern across five shipped products, addressed to the person deciding whether to interview me.",
   keywords: [

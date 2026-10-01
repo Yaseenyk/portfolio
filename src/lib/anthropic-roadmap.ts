@@ -25,7 +25,7 @@ export interface AnLesson {
 }
 
 export const AN_META = {
-  title: "The Complete Anthropic & Claude Developer Roadmap (Basics to Production)",
+  title: "The Anthropic & Claude Developer Roadmap",
   tagline:
     "A free 15-part roadmap for taking Claude from first prompt to enterprise production — context-window physics, structural prompting, type-safe tool use, enterprise MCP aggregation, durable agent runtimes, evals, and autonomous cron routines.",
   /** Estimated total read time, kept in sync with the lessons below. */

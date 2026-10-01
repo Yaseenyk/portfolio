@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "RAG explained end to end, in plain words: combining vector search with an LLM so it answers only from your real documents, the grounding contract, citations, refusal, and the advanced techniques that make it reliable.";
 
 export const metadata: Metadata = {
-  title: "Chapter 10 — RAG: Answers Grounded in Your Own Documents",
-  description: DESCRIPTION,
+  title: "Chapter 10 — RAG, Grounded in Your Docs",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/rag/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 10 — RAG: Answers Grounded in Your Own Documents",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/rag/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-rag.jpg`],

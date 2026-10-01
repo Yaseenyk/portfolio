@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "Taking AI to production, in plain words: guardrails and content moderation, PII redaction, rate limiting and cost control, the full capstone architecture, and the career roadmap from this journey to a job.";
 
 export const metadata: Metadata = {
-  title: "Chapter 12 — Guardrails, Production & the Capstone",
-  description: DESCRIPTION,
+  title: "Chapter 12 — Guardrails and Production",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/production/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 12 — Guardrails, Production & the Capstone",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/production/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-production.jpg`],

@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,13 +12,13 @@ const DESCRIPTION =
   "Evaluating AI systems in plain words: how to test software whose answers change every time, golden datasets, judging retrieval vs answer quality, LLM-as-judge, and catching regressions before users do.";
 
 export const metadata: Metadata = {
-  title: "Chapter 14 — Evaluating AI: Testing the Non-Deterministic",
-  description: DESCRIPTION,
+  title: "Chapter 14 — Evaluating AI Systems",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/journey/evaluation/` },
   openGraph: {
     type: "article",
     title: "Chapter 14 — Evaluating AI Systems",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/evaluation/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-evaluation.jpg`],

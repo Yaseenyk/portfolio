@@ -74,7 +74,7 @@ function Body() {
 export const linkedinPipelineStory: BlogPost = {
   slug: "linkedin-pipeline-job-search-runs-itself",
   title:
-    "My Networking Runs Itself: The LinkedIn Pipeline That Grew My Reach While I Slept",
+    "My Networking Runs Itself: A LinkedIn Pipeline",
   description:
     "How I engineered consistency: an autonomous GitHub Actions pipeline that turns real work into scheduled LinkedIn posts, tracks state in Git, costs $0 to run — and what the same pattern automates inside a company.",
   keywords: [

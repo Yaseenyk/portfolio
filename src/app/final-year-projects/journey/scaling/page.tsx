@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,13 +12,13 @@ const DESCRIPTION =
   "Scaling and real-time AI in plain words: the timeout problem when models are slow, synchronous vs asynchronous architectures, message queues, streaming and WebSockets vs polling, caching, and keeping cost sane at scale.";
 
 export const metadata: Metadata = {
-  title: "Chapter 15 — Scaling & Real-Time AI: When Models Are Slow",
-  description: DESCRIPTION,
+  title: "Chapter 15 — Scaling and Real-Time AI",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/final-year-projects/journey/scaling/` },
   openGraph: {
     type: "article",
     title: "Chapter 15 — Scaling & Real-Time AI",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/scaling/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-scaling.jpg`],

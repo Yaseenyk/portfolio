@@ -86,7 +86,7 @@ function Body() {
 export const ninetyFourPercentDecision: BlogPost = {
   slug: "the-94-percent-decision-integratex",
   title:
-    "The 94% Decision: One Architecture Call That Made IntegrateX Feel Instant",
+    "The 94% Decision That Made IntegrateX Instant",
   description:
     "Persisting React Flow's UI objects nearly sank the product. Drawing a serialization boundary between view and domain cut payloads 94% — the reasoning behind the call, and how to audit your own product for it.",
   keywords: [

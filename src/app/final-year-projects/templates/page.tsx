@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,13 +12,13 @@ const DESCRIPTION =
   "Free final year project report template and synopsis template — the exact chapter-by-chapter structure Indian colleges expect, with a prompt for what belongs in each section. Grab both, no email spam.";
 
 export const metadata: Metadata = {
-  title: "Free Final Year Project Report & Synopsis Templates",
-  description: DESCRIPTION,
+  title: "Free Project Report & Synopsis Templates",
+  description: seoDescription(DESCRIPTION),
   alternates: { canonical: URL },
   openGraph: {
     type: "website",
     title: "Final Year Project Report & Synopsis Templates",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: URL,
     siteName: "Yaseen Khatib",
     images: ["/og/campus/templates.jpg"],
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Final Year Project Report & Synopsis Templates",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     images: ["/og/campus/templates.jpg"],
   },
 };
@@ -52,7 +53,7 @@ const templatesJsonLd = {
   "@context": "https://schema.org",
   "@type": "CreativeWork",
   name: "Final Year Project Report & Synopsis Templates",
-  description: DESCRIPTION,
+  description: seoDescription(DESCRIPTION),
   url: URL,
   author: personRef,
   learningResourceType: "Template",

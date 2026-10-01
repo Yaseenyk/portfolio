@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -10,15 +11,15 @@ const DESCRIPTION =
   "Databases with Claude Code, in plain words: tables and relationships, schema design from a data-model doc, migrations, indexes, SQL injection, the one-door rule, and why production data is sacred.";
 
 export const metadata: Metadata = {
-  title: "Chapter 4 — The Database, with Claude Code",
-  description: DESCRIPTION,
+  title: "Chapter 4 — The Database",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/database/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 4 — The Database, with Claude Code",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/database/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-database.jpg`],

@@ -1,3 +1,4 @@
+import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
@@ -11,15 +12,15 @@ const DESCRIPTION =
   "Using an LLM like an engineer: the API call, system vs user prompts, temperature, top-p and top-k, max tokens, streaming, tokens and cost, hosted vs local, and why the model key never touches the frontend.";
 
 export const metadata: Metadata = {
-  title: "Chapter 6 — Using an LLM: The Knobs and the Wire",
-  description: DESCRIPTION,
+  title: "Chapter 6 — Using an LLM",
+  description: seoDescription(DESCRIPTION),
   alternates: {
     canonical: `${SITE_URL}/final-year-projects/journey/using-llms/`,
   },
   openGraph: {
     type: "article",
     title: "Chapter 6 — Using an LLM: The Knobs and the Wire",
-    description: DESCRIPTION,
+    description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/final-year-projects/journey/using-llms/`,
     siteName: "Yaseen Khatib",
     images: [`${SITE_URL}/og/campus/journey-llm-using.jpg`],
