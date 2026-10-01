@@ -29,7 +29,6 @@ import { aiFinopsPlaybook } from "@/content/posts/ai-finops-playbook-stop-burnin
 import { linkedinPipelineStory } from "@/content/posts/linkedin-pipeline-job-search-runs-itself";
 import { zeroDollarContentEngine } from "@/content/posts/zero-dollar-content-engine";
 import { sableTrustBoundary } from "@/content/posts/sable-ai-agent-never-touches-money";
-import { nodeOverServerlessRealtime } from "@/content/posts/node-over-serverless-for-realtime";
 import { ninetyFourPercentDecision } from "@/content/posts/the-94-percent-decision-integratex";
 import { hireMyHead } from "@/content/posts/hire-my-head-not-my-hands";
 
@@ -45,7 +44,6 @@ export const FOUNDERS_LOG_SLUGS = [
   "linkedin-pipeline-job-search-runs-itself",
   "zero-dollar-content-engine",
   "sable-ai-agent-never-touches-money",
-  "node-over-serverless-for-realtime",
   "the-94-percent-decision-integratex",
   "hire-my-head-not-my-hands",
 ] as const;
@@ -95,7 +93,6 @@ const POSTS: BlogPost[] = [
   linkedinPipelineStory,
   zeroDollarContentEngine,
   sableTrustBoundary,
-  nodeOverServerlessRealtime,
   ninetyFourPercentDecision,
   hireMyHead,
   // Claude/Anthropic — the two lessons that earned impressions; the rest of the
