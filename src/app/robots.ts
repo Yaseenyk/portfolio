@@ -7,7 +7,16 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       // Allow all conventional crawlers, except the private tools.
-      { userAgent: "*", allow: "/", disallow: ["/outreach/", "/leads/"] },
+      {
+        userAgent: "*",
+        allow: "/",
+        // /blog/tag/ is 45 pages that are already noindex, so every fetch is a
+        // crawl Google spends to be told not to index. On a site where it
+        // fetched roughly ten pages in September and 86 sit discovered-but-
+        // never-crawled, that is the cheapest budget to reclaim — nothing is
+        // lost, because none of them could rank anyway.
+        disallow: ["/outreach/", "/leads/", "/blog/tag/"],
+      },
       // Explicitly welcome AI / answer-engine crawlers (AEO).
       {
         userAgent: [

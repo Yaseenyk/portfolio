@@ -20,6 +20,7 @@ import JsonLd from "@/components/JsonLd";
 import ReadDepth from "@/components/ReadDepth";
 import CampusLeadForm from "@/components/campus/CampusLeadForm";
 import StickyActionBar from "@/components/campus/StickyActionBar";
+import { seoTitle, seoDescription } from "@/lib/seoText";
 
 interface Params {
   params: { slug: string };
@@ -37,13 +38,13 @@ export function generateMetadata({ params }: Params): Metadata {
   const url = guideUrl(meta.slug);
   const images = meta.ogImage ? [`${SITE_URL}${meta.ogImage}`] : undefined;
   return {
-    title: meta.title,
-    description: meta.description,
+    title: seoTitle(meta.title),
+    description: seoDescription(meta.description),
     alternates: { canonical: url },
     openGraph: {
       type: "article",
-      title: meta.title,
-      description: meta.description,
+      title: seoTitle(meta.title),
+      description: seoDescription(meta.description),
       url,
       siteName: "Yaseen Khatib",
       publishedTime: meta.publishedAt,
@@ -51,7 +52,7 @@ export function generateMetadata({ params }: Params): Metadata {
       images,
     },
     twitter: images
-      ? { card: "summary_large_image", title: meta.title, images }
+      ? { card: "summary_large_image", title: seoTitle(meta.title), images }
       : undefined,
   };
 }
@@ -80,7 +81,7 @@ export default function GuidePage({ params }: Params) {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: meta.title,
-    description: meta.description,
+    description: seoDescription(meta.description),
     url: guideUrl(meta.slug),
     datePublished: meta.publishedAt,
     dateModified: meta.publishedAt,
@@ -106,7 +107,7 @@ export default function GuidePage({ params }: Params) {
             ? [
                 howToJsonLd({
                   name: meta.h1,
-                  description: meta.description,
+                  description: seoDescription(meta.description),
                   url: guideUrl(meta.slug),
                   ...(meta.howTo.totalTime
                     ? { totalTime: meta.howTo.totalTime }

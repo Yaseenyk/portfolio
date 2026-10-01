@@ -22,6 +22,7 @@ import EarlyBirdBand from "@/components/campus/EarlyBirdBand";
 import StickyActionBar from "@/components/campus/StickyActionBar";
 import TierTable from "@/components/campus/TierTable";
 import TrustStrip from "@/components/campus/TrustStrip";
+import { seoTitle, seoDescription } from "@/lib/seoText";
 
 interface Params {
   params: { slug: string };
@@ -38,21 +39,24 @@ export function generateMetadata({ params }: Params): Metadata {
   const url = campusUrl(project.slug);
   const image = campusImageUrl(project);
   return {
-    title: `${project.title} — Final Year Project`,
-    description: project.summary,
+    // The project title alone runs to 64 characters; " — Final Year Project"
+    // and the root layout's " | Yaseen Khatib" took it past 100, so Google cut
+    // it mid-word. Budgeted against both suffixes now.
+    title: seoTitle(project.title, " — Final Year Project"),
+    description: seoDescription(project.summary),
     alternates: { canonical: url },
     openGraph: {
       type: "website",
-      title: `${project.title} | Final Year Project`,
-      description: project.summary,
+      title: seoTitle(project.title, " | Final Year Project"),
+      description: seoDescription(project.summary),
       url,
       siteName: "Yaseen Khatib",
       images: [image],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${project.title} | Final Year Project`,
-      description: project.summary,
+      title: seoTitle(project.title, " | Final Year Project"),
+      description: seoDescription(project.summary),
       images: [image],
     },
   };
