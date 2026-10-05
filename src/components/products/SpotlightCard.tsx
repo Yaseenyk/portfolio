@@ -139,15 +139,17 @@ export default function SpotlightCard({
                 <ExternalLinkIcon className="h-[18px] w-[18px]" />
               </a>
             )}
-            <a
-              href={product.repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${product.name} — source code`}
-              className="text-zinc-500 transition-colors duration-200 hover:text-ice"
-            >
-              <GithubIcon className="h-[18px] w-[18px]" />
-            </a>
+            {product.repoUrl && (
+              <a
+                href={product.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${product.name} — source code`}
+                className="text-zinc-500 transition-colors duration-200 hover:text-ice"
+              >
+                <GithubIcon className="h-[18px] w-[18px]" />
+              </a>
+            )}
           </div>
         </div>
       </div>

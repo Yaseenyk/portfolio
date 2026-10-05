@@ -12,6 +12,15 @@ const path = require('path');
     // All projects live on page 2.
     const PROJECTS = [
       {
+        name: 'FitRank — Typed AI Decisions for Staffing',
+        badge: 'Flagship Product',
+        desc: 'Ranks people for tasks with typed AI decisions: code applies hard rules, a 149M ModernBERT model I distilled scores five bounded questions with probabilities, and a manager makes every final call.',
+        tags: ['Beats Baseline on hit@5 (94% vs 91%)', 'Knowledge Distillation', 'ModernBERT / PyTorch', 'FastAPI', 'pgvector'],
+        links: [
+          { label: 'Case Study', url: 'https://yaseenkhatib.streamerosai.com/products/fitrank' },
+        ],
+      },
+      {
         name: 'Portfolio Concierge — RAG + MCP Server',
         badge: 'Live AI Infrastructure',
         desc: 'One zero-dependency Cloudflare Worker, two interfaces: a grounded RAG API answering questions about my work from a Vectorize index of my 100-article corpus (hard refusal below a similarity threshold — no hallucinated answers), and a public MCP server any recruiter can add to Claude to interrogate this résumé from inside their own AI. Corpus re-embeds automatically after every site deploy.',
@@ -50,11 +59,6 @@ const path = require('path');
           { label: 'Code', url: 'https://github.com/Yaseenyk/streamerOS' },
           { label: 'Website', url: 'https://github.com/Yaseenyk/streamer-os-website' },
         ],
-      },
-      {
-        name: 'IntegrateX Automation Core',
-        desc: 'A node-routing workflow-automation environment with responsive connectors, processing layers, and directional edge bindings. A custom state Serialization Adapter compresses graph definitions over the wire.',
-        tags: ['94% Payload Compression', 'React Flow', 'Zustand', 'TypeScript'],
       },
       {
         name: 'Autonomous Content Machine',
@@ -292,7 +296,7 @@ const path = require('path');
     <h2 class="text-[14px] font-bold tracking-wider uppercase text-zinc-900 border-b border-zinc-200 pb-1 mb-3">
       AI &amp; Full Stack Projects
     </h2>
-    <div class="space-y-4">
+    <div class="space-y-3">
       ${projectsHtml}
     </div>
   </div>

@@ -5,9 +5,10 @@ export default function RepoButton({
   href,
   label = "View source on GitHub",
 }: {
-  href: string;
+  href?: string;
   label?: string;
 }) {
+  if (!href) return null;
   return (
     <a
       href={href}

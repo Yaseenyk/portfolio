@@ -59,7 +59,7 @@ public/
 
 | Route | Type | Notes |
 | --- | --- | --- |
-| `/` | Static | Home SPA. `SoftwareApplication` JSON-LD (streamerOS, IntegrateX). |
+| `/` | Static | Home SPA. `SoftwareApplication` JSON-LD (Sable, streamerOS, FitRank). |
 | `/blog` | Static | Client Command Center. |
 | `/blog/[slug]` | SSG | One per post via `generateStaticParams`. `TechArticle` + `BreadcrumbList`. |
 | `/uses` | Static | `TechArticle` JSON-LD with `mentions`. |

@@ -19,6 +19,7 @@ import RoleGate from "./projects/RoleGate";
 import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
 import AiBloggerArt from "./products/art/AiBloggerArt";
 import SableArt from "./products/art/SableArt";
+import FitRankArt from "./products/art/FitRankArt";
 
 interface ProjectLink {
   href: string;
@@ -45,11 +46,11 @@ export interface Project {
 // should meet the strongest work, not all of it. The rest of the entries
 // below are retained as data (deep dives live in /products and the blog).
 const FLAGSHIP_NAMES = new Set([
+  "FitRank",
   "streamerOS",
   "Sable",
   "Path Saathi LMS",
   "Portfolio Concierge — RAG + MCP",
-  "IntegrateX",
 ]);
 
 /** Anchor id for a project's detail card (used by the /projects bento). */
@@ -58,6 +59,17 @@ export function projectAnchor(name: string): string {
 }
 
 export const PROJECTS: Project[] = [
+  {
+    name: "FitRank",
+    href: "/products/fitrank/",
+    category: "Flagship · Decision Model",
+    description:
+      "Ranks people for open tasks with typed AI decisions instead of a chatbot's opinion. Code applies the hard rules; a ModernBERT student I distilled from an open-weight teacher answers five bounded questions with a probability for every option; thresholds band each person shortlist / review / hidden — and a manager makes every final call. Their accepts and rejects become the next model's training data.",
+    roi: "Own 149M model on CPU · beats the code baseline on hit@5 (94% vs 91%) — and shows where it doesn't",
+    metrics: ["Typed Decisions", "Distilled Student Model", "Human-in-the-Loop"],
+    tech: ["Python", "FastAPI", "ModernBERT", "PyTorch", "pgvector", "React"],
+    Animation: FitRankArt,
+  },
   {
     name: "streamerOS",
     href: "/products/streameros/",

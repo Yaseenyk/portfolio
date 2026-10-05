@@ -89,12 +89,12 @@ const projectsJsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "IntegrateX",
+    name: "FitRank",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description:
-      "A node-based workflow-automation environment with a custom state Serialization Adapter pattern that compressed workflow graph payloads by 94%.",
-    keywords: "React Flow, Zustand, TypeScript, workflow automation",
+      "A staffing decision model: code applies hard rules, a distilled ModernBERT student answers five typed questions with a probability for every option, thresholds band each candidate, and a manager makes every final call.",
+    keywords: "decision model, ModernBERT, knowledge distillation, logprobs, FastAPI, pgvector, human-in-the-loop",
     author,
   },
 ];

@@ -3,6 +3,7 @@
 import { SITE_URL } from "@/lib/site";
 
 export type ProductSlug =
+  | "fitrank"
   | "sable"
   | "streameros"
   | "linkedin-pipeline"
@@ -19,13 +20,30 @@ export interface ProductMeta {
   summary: string;
   /** Languages / frameworks / APIs shown as pills. */
   tech: string[];
-  /** Public source repository. */
-  repoUrl: string;
+  /** Public source repository (omitted when the code is private). */
+  repoUrl?: string;
   /** Optional live deployment. */
   liveUrl?: string;
 }
 
 export const PRODUCTS: ProductMeta[] = [
+  {
+    slug: "fitrank",
+    name: "FitRank",
+    category: "Decision Model · Applied ML",
+    tagline: "Typed AI decisions for staffing — the model recommends, a human decides",
+    summary:
+      "Ranks people for open tasks with typed decisions that return a probability for every option. Code applies the hard rules, a ModernBERT student distilled from an open-weight teacher answers five bounded questions, and a manager makes every final call.",
+    tech: [
+      "Python",
+      "FastAPI",
+      "ModernBERT",
+      "PyTorch",
+      "Postgres + pgvector",
+      "React + TypeScript",
+    ],
+    // Source is private; the page links nothing rather than a 404.
+  },
   {
     slug: "sable",
     name: "Sable",
