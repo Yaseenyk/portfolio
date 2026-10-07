@@ -62,7 +62,17 @@ export default function GuidePage({ params }: Params) {
   if (!guide) notFound();
 
   const { meta, Body } = guide;
-  const others = GUIDES.filter((g) => g.meta.slug !== meta.slug).slice(0, 3);
+  // Rotate rather than slice. Taking the first three every time meant the same
+  // three guides received every sibling link and the rest arrived with one
+  // inbound link from the index alone — which is where Ahrefs found them.
+  // Walking forward from this guide and wrapping gives each of them three.
+  const others = (() => {
+    const i = GUIDES.findIndex((g) => g.meta.slug === meta.slug);
+    if (i === -1) return GUIDES.slice(0, 3);
+    return Array.from({ length: Math.min(3, GUIDES.length - 1) }, (_, k) =>
+      GUIDES[(i + 1 + k) % GUIDES.length],
+    );
+  })();
 
   // Internal linking: send guide readers into the catalog. A guide tagged with
   // degrees surfaces the projects that fit them; an untagged guide (applies to

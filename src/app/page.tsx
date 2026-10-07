@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     absolute: "Yaseen Khatib — Senior Full-Stack AI Engineer (MERN, RAG)",
   },
   description:
-    "Yaseen Khatib is a Senior Full-Stack AI Engineer (MERN + TypeScript) who ships production LLM systems — RAG pipelines, agent orchestration, and real-time architectures. Five products built solo. Open to senior and lead engineering roles, remote or on-site.",
+    "Senior Full-Stack AI Engineer (MERN + TypeScript) shipping production LLM systems — RAG pipelines, agents, real-time architecture. Five products built solo.",
   openGraph: {
     title: "Yaseen Khatib — Senior Full-Stack AI Engineer",
     description:

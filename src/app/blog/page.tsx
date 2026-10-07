@@ -8,13 +8,13 @@ import { SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Field Notes",
   description:
-    "Field notes on architecting MERN stacks, agentic AI workflows, and shipping production systems at AI-speed.",
+    "Field notes on MERN architecture, agentic AI workflows and production systems - written from the work, with the decisions and numbers behind them.",
   alternates: { canonical: `${SITE_URL}/blog/` },
   openGraph: {
     type: "website",
     title: "Field Notes | Yaseen Khatib",
     description:
-      "Field notes on architecting MERN stacks, agentic AI workflows, and shipping production systems at AI-speed.",
+      "Field notes on MERN architecture, agentic AI workflows and production systems - written from the work, with the decisions and numbers behind them.",
     url: `${SITE_URL}/blog/`,
     siteName: "Yaseen Khatib",
   },

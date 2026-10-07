@@ -11,6 +11,8 @@
 
 const TITLE_MAX = 60;
 const DESCRIPTION_MAX = 155;
+/** Below this a snippet is wasting room Google would have shown. */
+const DESCRIPTION_MIN = 120;
 
 function trimToWord(text: string, max: number): string {
   const clean = text.replace(/\s+/g, " ").trim();
@@ -35,10 +37,13 @@ export function seoDescription(text: string): string {
   const clean = text.replace(/\s+/g, " ").trim();
   if (clean.length <= DESCRIPTION_MAX) return clean;
 
-  // Prefer ending on a sentence if one lands in the last third of the budget.
+  // Prefer ending on a sentence, but only if the result is still a useful
+  // length. Cutting at the first full stop is tidy and can leave 95 characters
+  // where 150 were available — Ahrefs flags anything under about 110 as too
+  // short, and a snippet that stops early wastes the space Google gives you.
   const cut = clean.slice(0, DESCRIPTION_MAX);
   const lastStop = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("? "), cut.lastIndexOf("! "));
-  if (lastStop > DESCRIPTION_MAX * 0.6) return cut.slice(0, lastStop + 1);
+  if (lastStop >= DESCRIPTION_MIN) return cut.slice(0, lastStop + 1);
 
   return trimToWord(clean, DESCRIPTION_MAX - 1) + "…";
 }
