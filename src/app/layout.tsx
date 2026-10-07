@@ -83,9 +83,12 @@ export const metadata: Metadata = {
   },
   verification: {
     ...(VERIFICATION.google ? { google: VERIFICATION.google } : {}),
-    ...(VERIFICATION.bing
-      ? { other: { "msvalidate.01": VERIFICATION.bing } }
-      : {}),
+    other: {
+      ...(VERIFICATION.bing ? { "msvalidate.01": VERIFICATION.bing } : {}),
+      ...(VERIFICATION.ahrefs
+        ? { "ahrefs-site-verification": VERIFICATION.ahrefs }
+        : {}),
+    },
   },
 };
 

@@ -26,6 +26,8 @@ export const SITE_DESCRIPTION =
 export const VERIFICATION = {
   google: "OG5PRiRPw3I5jB5p-G7nDzf_mlxdiZzrpLaFYCZ0p1M",
   bing: "001424A9DC931D947201E7F6E9CA9A23",
+  /** Ahrefs Webmaster Tools — unlocks the backlink profile and Domain Rating. */
+  ahrefs: "8c8fff0bb64830a296ea5e9e8ad896a03d60acfcc1c64d3b6427350925fdfcf5",
 };
 
 /**
