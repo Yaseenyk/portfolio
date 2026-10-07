@@ -115,6 +115,14 @@ export default function RootLayout({
           async
           src="https://gc.zgo.at/count.js"
         />
+        {/* Ahrefs Web Analytics — cookieless, and the key is per-site, so this
+            tag belongs to yaseenkhatib.streamerosai.com alone. Pairs with
+            Ahrefs Webmaster Tools, which is where the backlink profile lives. */}
+        <script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="BZB0ZG8j3Gs022MHXqStJg"
+          async
+        />
       </body>
     </html>
   );
