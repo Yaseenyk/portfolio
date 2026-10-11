@@ -33,11 +33,11 @@ export const PRODUCTS: ProductMeta[] = [
     category: "Decision Model · Applied ML",
     tagline: "Typed AI decisions for staffing — the model recommends, a human decides",
     summary:
-      "Ranks people for open tasks with typed decisions that return a probability for every option. Code applies the hard rules, a ModernBERT student distilled from an open-weight teacher answers five bounded questions, and a manager makes every final call.",
+      "Ranks people for open tasks with typed decisions that return a probability for every option. Code applies the hard rules, a MiniLM student distilled from an open-weight teacher answers five bounded questions, and a manager makes every final call.",
     tech: [
       "Python",
       "FastAPI",
-      "ModernBERT",
+      "MiniLM",
       "PyTorch",
       "Postgres + pgvector",
       "React + TypeScript",

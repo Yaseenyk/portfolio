@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "typed decisions",
     "logprobs",
     "knowledge distillation",
-    "ModernBERT",
+    "MiniLM",
     "calibration",
     "human-in-the-loop",
     "resource matching",
@@ -98,7 +98,7 @@ export default function FitRankPage() {
             </p>
             <p>
               Those questions are answered by a model I trained myself: a{" "}
-              <strong>149M-parameter ModernBERT student</strong> distilled from
+              <strong>23M-parameter MiniLM student</strong> distilled from
               an open-weight teacher, served on CPU. Every accept or reject a
               manager makes flows back as training data, so the system learns
               what the people using it actually choose.
@@ -112,7 +112,7 @@ export default function FitRankPage() {
           {[
             ["Backend", "Python 3.12 + FastAPI — router → service → repository, a Postgres job queue and a background worker for match runs."],
             ["Data", "Postgres + pgvector, SQLAlchemy models and Alembic migrations. Synthetic people and tasks only — no real employee data."],
-            ["Decision model", "ModernBERT-base + five linear heads, trained on Kaggle GPUs with a KL loss against the teacher's full distributions."],
+            ["Decision model", "MiniLM-L6 (sentence-transformers) + five linear heads, trained on Kaggle GPUs with a KL loss against the teacher's full distributions."],
             ["Teacher", "Qwen3.5-9B in 4-bit, scored through the same prompts, option shuffles and logprob normalisation as the LLM engine."],
             ["Frontend", "React + TypeScript + Vite, API types generated from the backend's OpenAPI, role-aware screens and an admin area."],
             ["Delivery", "JWT + refresh-cookie auth with roles, rate limits, a budget guard, Docker images, GitHub Actions CI, 93.5% backend test coverage."],
@@ -164,7 +164,7 @@ flags = {"low_confidence_format"} if unmapped > 0.2 else set()`}</code>
               Paying an API per candidate does not scale, and a hosted model can
               change under you. So an open-weight <strong>teacher</strong>{" "}
               labelled 3,010 task–person pairs on Kaggle using the exact same
-              decision definitions, and a <strong>ModernBERT student</strong>{" "}
+              decision definitions, and a <strong>MiniLM student</strong>{" "}
               learned from them. The loss is KL divergence against the
               teacher&apos;s whole distribution, so the student learns how
               confident to be, not just the top answer. Pairs are split by task

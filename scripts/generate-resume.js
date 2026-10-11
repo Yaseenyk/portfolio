@@ -14,8 +14,8 @@ const path = require('path');
       {
         name: 'FitRank — Typed AI Decisions for Staffing',
         badge: 'Flagship Product',
-        desc: 'Ranks people for tasks with typed AI decisions: code applies hard rules, a 149M ModernBERT model I distilled scores five bounded questions with probabilities, and a manager makes every final call.',
-        tags: ['Beats Baseline on hit@5 (94% vs 91%)', 'Knowledge Distillation', 'ModernBERT / PyTorch', 'FastAPI', 'pgvector'],
+        desc: 'Ranks people for tasks with typed AI decisions: code applies hard rules, a 23M MiniLM model I distilled scores five bounded questions with probabilities, and a manager makes every final call.',
+        tags: ['Knowledge Distillation', 'MiniLM / PyTorch', 'Tested vs Rules Baseline', 'FastAPI', 'pgvector'],
         links: [
           { label: 'Case Study', url: 'https://yaseenkhatib.streamerosai.com/products/fitrank' },
         ],

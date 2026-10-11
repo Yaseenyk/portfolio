@@ -12,7 +12,7 @@ export default function FitRankArt() {
       viewBox="0 0 400 300"
       fill="none"
       role="img"
-      aria-label="FitRank architecture: hard rules in code filter candidates, a ModernBERT decision model returns probabilities for five typed questions, policy thresholds band each person as shortlist, review or hidden, and a manager accepts or rejects"
+      aria-label="FitRank architecture: hard rules in code filter candidates, a MiniLM decision model returns probabilities for five typed questions, policy thresholds band each person as shortlist, review or hidden, and a manager accepts or rejects"
       className="h-auto w-full"
     >
       <defs>
@@ -48,7 +48,7 @@ export default function FitRankArt() {
         <rect width="128" height="148" rx="10" fill="#18181b" stroke="#27272a" />
         <circle cx="16" cy="17" r="5" fill="none" stroke="url(#fr-cp)" strokeWidth="1.5" />
         <circle cx="16" cy="17" r="2" fill="#67E8F9" className="animate-pulse" />
-        <text x="27" y="20" fontSize="8" fontFamily="monospace" fill="#e4e4e7">ModernBERT · 5 heads</text>
+        <text x="27" y="20" fontSize="8" fontFamily="monospace" fill="#e4e4e7">MiniLM · 5 heads</text>
         {heads.map(([label, p], i) => (
           <g key={label} transform={`translate(10 ${36 + i * 22})`}>
             <text x="0" y="7" fontSize="7" fontFamily="monospace" fill="#71717a">{label}</text>

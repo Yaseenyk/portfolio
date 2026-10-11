@@ -64,10 +64,10 @@ export const PROJECTS: Project[] = [
     href: "/products/fitrank/",
     category: "Flagship · Decision Model",
     description:
-      "Ranks people for open tasks with typed AI decisions instead of a chatbot's opinion. Code applies the hard rules; a ModernBERT student I distilled from an open-weight teacher answers five bounded questions with a probability for every option; thresholds band each person shortlist / review / hidden — and a manager makes every final call. Their accepts and rejects become the next model's training data.",
-    roi: "Own 149M model on CPU · beats the code baseline on hit@5 (94% vs 91%) — and shows where it doesn't",
+      "Ranks people for open tasks with typed AI decisions instead of a chatbot's opinion. Code applies the hard rules; a MiniLM student I distilled from an open-weight teacher answers five bounded questions with a probability for every option; thresholds band each person shortlist / review / hidden — and a manager makes every final call. Their accepts and rejects become the next model's training data.",
+    roi: "Own 23M model on CPU, $0 per decision · tested against a rules-only baseline on every release — and shows where it doesn't win",
     metrics: ["Typed Decisions", "Distilled Student Model", "Human-in-the-Loop"],
-    tech: ["Python", "FastAPI", "ModernBERT", "PyTorch", "pgvector", "React"],
+    tech: ["Python", "FastAPI", "MiniLM", "PyTorch", "pgvector", "React"],
     Animation: FitRankArt,
   },
   {

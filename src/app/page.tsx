@@ -93,8 +93,8 @@ const projectsJsonLd = [
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
     description:
-      "A staffing decision model: code applies hard rules, a distilled ModernBERT student answers five typed questions with a probability for every option, thresholds band each candidate, and a manager makes every final call.",
-    keywords: "decision model, ModernBERT, knowledge distillation, logprobs, FastAPI, pgvector, human-in-the-loop",
+      "A staffing decision model: code applies hard rules, a distilled MiniLM student answers five typed questions with a probability for every option, thresholds band each candidate, and a manager makes every final call.",
+    keywords: "decision model, MiniLM, knowledge distillation, logprobs, FastAPI, pgvector, human-in-the-loop",
     author,
   },
 ];
