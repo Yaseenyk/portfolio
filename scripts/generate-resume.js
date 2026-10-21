@@ -4,6 +4,10 @@
 // site, or GitHub on 2026-10-21. Private repositories get no "Code" link —
 // a 404 on a résumé costs more than the link is worth. Metrics that could not
 // be verified (the old CMZ / Hospital-API / TV-suite percentages) are left out.
+//
+// Page 1 is a classic two-column résumé: charcoal sidebar (contact, skills,
+// education) and a white main column (title, numbers, summary, experience,
+// key projects). Pages 2–3 are the product and applied-work write-ups.
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
@@ -18,20 +22,65 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
-    // Page 1 strip: the four pieces of work a reader must meet in the first
-    // seven seconds. One hard fact each; the full write-ups live on page 2.
-    const HIGHLIGHTS = [
+    // ---- data -------------------------------------------------------------
+
+    // Numbers an HR screener can read without knowing what a model is.
+    const STATS = [
+      ['5+', 'years full-stack'],
+      ['6', 'products shipped solo'],
+      ['94%', 'smaller API payloads'],
+      ['2x', 'faster dashboards'],
+      ['34', 'articles published'],
+    ];
+
+    // Page 1 key projects — one line each; full write-ups on page 2.
+    const KEY_PROJECTS = [
+      { name: 'FitRank', line: 'AI staffing decisions — React + TypeScript front end, FastAPI back end, a 23M model I distilled that beats a rules baseline.', link: { label: 'Live', url: 'https://fitrank.streamerosai.com' } },
+      { name: 'IntegrateX', line: 'React Flow workflow engine with a Zustand store; a serialization adapter cut MongoDB payloads by 94%.', link: { label: 'Live sandbox', url: `${SITE}/sandbox/` } },
+      { name: 'Sable', line: 'React Native / Expo finance agent — on-device SQLite, OpenAI function calling, every write behind Review & Confirm.', link: { label: 'Case study', url: `${SITE}/products/sable/` } },
+      { name: 'streamerOS', line: 'Rust + Tauri 2 desktop app with a Next.js site, written with Claude Code — 24k lines of Rust, 306 tests, launching Nov 2026.', link: { label: 'Website', url: 'https://streamerosai.com' } },
+    ];
+
+    // Sidebar skills: plain lists, spelled the way job descriptions spell them.
+    const SKILLS = [
+      ['Frontend', ['React', 'Next.js', 'TypeScript', 'JavaScript (ES2023)', 'Redux Toolkit', 'Zustand', 'React Flow', 'React Native / Expo', 'Tailwind CSS', 'HTML / CSS']],
+      ['Backend', ['Node.js', 'Express', 'REST APIs', 'WebSockets', 'JWT auth', 'Python / FastAPI', 'Java / Spring Boot', 'ASP.NET']],
+      ['Databases', ['MongoDB', 'PostgreSQL', 'SQL Server', 'SQLite', 'Redis', 'Firestore', 'pgvector']],
+      ['AI engineering', ['LLM integration', 'RAG', 'Embeddings & vector search', 'Function calling', 'Agentic workflows', 'MCP', 'Prompt engineering', 'Fine-tuning / distillation', 'LLM evals', 'OpenAI · Gemini · Claude APIs', 'PyTorch', 'Ollama']],
+      ['Tools & delivery', ['Git', 'GitHub Actions', 'CI/CD', 'Docker', 'Cloudflare Workers', 'Unit & integration testing', 'System design', 'Agile delivery', 'Rust / Tauri 2 (using Claude Code)']],
+    ];
+
+    const EXPERIENCE = [
       {
-        name: 'FitRank',
-        kicker: 'Applied ML · Live',
-        fact: '23M MiniLM student distilled from a 9B teacher. Beats a rules-only baseline on hit@5 and pairwise ordering, served on CPU at $0 per decision.',
-        link: { label: 'fitrank.streamerosai.com', url: 'https://fitrank.streamerosai.com' },
+        role: 'Senior Software Developer',
+        company: 'Sparity',
+        where: 'Hyderabad · Hybrid',
+        period: '06/2025 – Present',
+        bullets: [
+          'Own the <b>LLM and agentic layer</b> of production MERN systems end to end — architecture, orchestration, deployment.',
+          'Ship <b>Agentic RAG services</b> with schema-validated outputs, guardrails, and cost-aware routing between models.',
+        ],
       },
       {
-        name: 'streamerOS',
-        kicker: 'Desktop · Rust',
-        fact: 'Rust + Tauri 2 desktop cockpit for streamers, written with Claude Code. 24k lines of Rust, 306 Rust tests, OBS automation, local LLM. Launching November 2026.',
-        link: { label: 'streamerosai.com', url: 'https://streamerosai.com' },
+        role: 'Full Stack Developer',
+        company: 'MSA Software',
+        where: 'Remote',
+        period: '01/2023 – 05/2025',
+        bullets: [
+          'Cut dashboard response times <b>1.5–2x</b> by profiling slow MongoDB aggregation pipelines, adding a caching layer, and lazy-loading heavy panels.',
+          'Moved the team\'s legacy JavaScript to <b>TypeScript and Next.js</b>, removing a whole class of type-related production bugs.',
+          'Migrated shared state from hand-rolled Redux to <b>Redux Toolkit slices</b>.',
+        ],
+      },
+      {
+        role: 'Software Developer (SDE 1)',
+        company: 'Manorama Infosolutions',
+        where: 'Healthcare software · Remote',
+        period: '09/2021 – 01/2023',
+        bullets: [
+          'Built REST routing layers for hospital information systems on <b>ASP.NET + React</b>; <b>2x</b> payload throughput on the hot paths.',
+          'Moved tangled request handling into MVC and hardened it for concurrent user sessions.',
+        ],
       },
     ];
 
@@ -179,50 +228,6 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       },
     ];
 
-    // Every term here is backed by something in the repos or the roles above —
-    // these are the keywords an ATS matches on, so they are spelled the way
-    // job descriptions spell them.
-    const SKILLS = [
-      ['AI engineering', ['Generative AI', 'LLMs', 'RAG', 'Embeddings & vector search', 'Prompt engineering', 'Fine-tuning / distillation', 'Agentic workflows', 'Function calling', 'MCP', 'LLM evals', 'OpenAI · Gemini · Claude APIs', 'PyTorch', 'Computer vision (YOLOv8)', 'Ollama', 'pgvector · Vectorize']],
-      ['Frontend', ['JavaScript', 'TypeScript', 'React', 'Next.js', 'Redux Toolkit', 'Zustand', 'React Flow', 'React Native / Expo', 'Tailwind CSS', 'HTML / CSS']],
-      ['Backend & data', ['Node.js', 'Express', 'REST APIs', 'Python', 'FastAPI', 'Rust / Tauri 2 (using Claude Code)', 'Java / Spring Boot', 'ASP.NET', 'MongoDB', 'PostgreSQL', 'SQL Server', 'SQLite', 'Firestore', 'Redis', 'WebSockets', 'JWT auth']],
-      ['Delivery', ['Git', 'GitHub Actions', 'CI/CD', 'Docker', 'Cloudflare Workers', 'GitHub Pages', 'Unit & integration testing', 'System design', 'Agile delivery']],
-    ];
-
-    const EXPERIENCE = [
-      {
-        role: 'Senior Software Developer',
-        company: 'Sparity',
-        where: 'Hyderabad · Hybrid',
-        period: '06/2025 – Present',
-        bullets: [
-          'Own the <b>LLM and agentic layer</b> of production MERN systems end to end — architecture, orchestration, deployment.',
-          'Ship <b>Agentic RAG services</b> with schema-validated outputs, guardrails, and cost-aware routing between models.',
-        ],
-      },
-      {
-        role: 'Full Stack Developer',
-        company: 'MSA Software',
-        where: 'Remote',
-        period: '01/2023 – 05/2025',
-        bullets: [
-          'Cut dashboard response times <b>1.5–2x</b> by profiling slow MongoDB aggregation pipelines, adding a caching layer, and lazy-loading heavy panels.',
-          'Moved the team\'s legacy JavaScript to <b>TypeScript and Next.js</b>, removing a whole class of type-related production bugs.',
-          'Migrated shared state from hand-rolled Redux to <b>Redux Toolkit slices</b>.',
-        ],
-      },
-      {
-        role: 'Software Developer (SDE 1)',
-        company: 'Manorama Infosolutions',
-        where: 'Healthcare software · Remote',
-        period: '09/2021 – 01/2023',
-        bullets: [
-          'Built REST routing layers for hospital information systems on <b>ASP.NET + React</b>; <b>2x</b> payload throughput on the hot paths.',
-          'Moved tangled request handling into MVC and hardened it for concurrent user sessions.',
-        ],
-      },
-    ];
-
     // ---- rendering helpers -------------------------------------------------
     const ICON = {
       mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
@@ -232,23 +237,57 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
       pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
     };
-    const contact = (icon, label, url, accent) =>
-      `<span class="inline-flex items-center gap-1.5 ${accent ? 'text-orange-700' : 'text-stone-600'}"><span class="w-[11px] h-[11px] text-stone-400">${ICON[icon]}</span>${url ? `<a href="${url}">${label}</a>` : label}</span>`;
 
     const a = (l) => `<a href="${l.url}" class="text-orange-700 font-semibold whitespace-nowrap">${l.label}&nbsp;↗</a>`;
     const pill = (t) =>
       `<span class="inline-block bg-stone-100 text-stone-700 border border-stone-200 px-1.5 py-[1px] rounded text-[9px] font-medium leading-[1.5]">${t}</span>`;
-    const h2 = (t, extra = '') =>
-      `<div class="flex items-center gap-2.5 mb-3"><span class="w-1.5 h-1.5 rounded-sm bg-orange-600"></span><h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-800">${t}</h2>${extra ? `<span class="text-[9.5px] text-stone-400">${extra}</span>` : ''}<span class="flex-1 h-px bg-stone-200"></span></div>`;
     const badge = (t) =>
       `<span class="text-[9px] font-semibold text-orange-700 bg-orange-50 border border-orange-100 px-2 py-[2px] rounded-full whitespace-nowrap">${t}</span>`;
+
+    // Main-column section heading: small caps, terracotta marker, hairline.
+    const h2 = (t, extra = '') =>
+      `<div class="flex items-center gap-2.5 mb-2.5"><span class="w-1.5 h-1.5 rounded-sm bg-orange-600"></span><h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-800">${t}</h2>${extra ? `<span class="text-[9.5px] text-stone-400">${extra}</span>` : ''}<span class="flex-1 h-px bg-stone-200"></span></div>`;
+    // Sidebar section heading: light on charcoal.
+    const sh2 = (t) =>
+      `<h2 class="text-[9.5px] font-bold uppercase tracking-[0.22em] text-orange-400 border-b border-white/10 pb-1.5 mb-2.5">${t}</h2>`;
+
+    const sideContact = (icon, label, url) =>
+      `<div class="flex items-center gap-2 text-[9.5px] text-stone-200 leading-snug"><span class="w-[11px] h-[11px] shrink-0 text-orange-400">${ICON[icon]}</span>${url ? `<a href="${url}" class="text-stone-200">${label}</a>` : `<span>${label}</span>`}</div>`;
+
+    const sideSkills = ([group, items]) => `
+      <div>
+        <p class="text-[9px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">${group}</p>
+        <p class="text-[9.5px] text-stone-200 leading-[1.6]">${items.map((t) => `<span class="whitespace-nowrap">${t}</span>`).join('&nbsp;<span class="text-stone-500">·</span> ')}</p>
+      </div>`;
+
+    const stat = ([n, l]) => `
+      <div class="rounded-md border border-stone-200 bg-stone-50 px-2.5 py-2 text-center">
+        <div class="text-[18px] font-extrabold leading-none text-orange-700 tracking-tight">${n}</div>
+        <div class="mt-1 text-[8.5px] font-semibold text-stone-600 uppercase tracking-wider leading-tight">${l}</div>
+      </div>`;
+
+    const job = (j, last) => `
+      <div class="relative pl-5 ${last ? '' : 'pb-3'}">
+        <span class="absolute left-0 top-[5px] w-[9px] h-[9px] rounded-full bg-white border-2 border-orange-600"></span>
+        ${last ? '' : '<span class="absolute left-[4px] top-[14px] bottom-0 w-px bg-stone-200"></span>'}
+        <div class="flex items-baseline justify-between gap-3">
+          <h3 class="font-bold text-[12.5px] text-stone-900">${j.role}</h3>
+          <span class="text-[9.5px] font-medium text-stone-500 whitespace-nowrap">${j.period}</span>
+        </div>
+        <p class="text-[10.5px] text-orange-700 font-semibold">${j.company} <span class="font-normal text-stone-400">· ${j.where}</span></p>
+        <ul class="mt-1 space-y-0.5 text-[10.5px] text-stone-600 leading-[1.5]">${j.bullets.map((b) => `<li class="flex gap-2"><span class="mt-[7px] w-1 h-1 rounded-full bg-stone-400 shrink-0"></span><span>${b}</span></li>`).join('')}</ul>
+      </div>`;
+
+    const keyProject = (p) => `
+      <div class="flex gap-3 items-baseline text-[10.5px] leading-[1.5]">
+        <span class="w-[78px] shrink-0 font-bold text-stone-900">${p.name}</span>
+        <p class="text-stone-600">${p.line} <span class="text-[9.5px] ml-1">${a(p.link)}</span></p>
+      </div>`;
 
     const card = (p) => `
       <div class="break-inside-avoid rounded-lg border border-stone-200 bg-white px-4 py-3 border-l-[3px] border-l-orange-600">
         <div class="flex items-start justify-between gap-4">
-          <div>
-            <h3 class="font-bold text-[13px] text-stone-900 leading-tight">${p.name} <span class="font-normal text-stone-500">— ${p.sub}</span></h3>
-          </div>
+          <h3 class="font-bold text-[13px] text-stone-900 leading-tight">${p.name} <span class="font-normal text-stone-500">— ${p.sub}</span></h3>
           <div class="flex items-center gap-2 shrink-0">${badge(p.badge)}</div>
         </div>
         <p class="text-[11px] text-stone-600 mt-1.5 leading-[1.55]">${p.desc}</p>
@@ -257,36 +296,6 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
           <div class="flex flex-wrap gap-1.5">${p.tags.map(pill).join('')}</div>
           <div class="text-[9.5px] shrink-0 space-x-3">${p.links.map(a).join('')}</div>
         </div>
-      </div>`;
-
-    const highlight = (h) => `
-      <div class="rounded-lg border border-stone-200 bg-stone-50/70 px-3.5 py-2">
-        <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12px] text-stone-900">${h.name}</h3>
-          <span class="text-[8.5px] font-semibold uppercase tracking-wider text-orange-700">${h.kicker}</span>
-        </div>
-        <p class="text-[10px] text-stone-600 mt-0.5 leading-[1.45]">${h.fact}</p>
-        <p class="text-[9.5px] mt-1">${a(h.link)}</p>
-      </div>`;
-
-    const job = (j, last) => `
-      <div class="relative pl-5 ${last ? '' : 'pb-2.5'}">
-        <span class="absolute left-0 top-[5px] w-[9px] h-[9px] rounded-full bg-white border-2 border-orange-600"></span>
-        ${last ? '' : '<span class="absolute left-[4px] top-[14px] bottom-0 w-px bg-stone-200"></span>'}
-        <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12.5px] text-stone-900">${j.role}</h3>
-          <span class="text-[9.5px] font-medium text-stone-500 whitespace-nowrap">${j.period}</span>
-        </div>
-        <p class="text-[10.5px] text-orange-700 font-semibold">${j.company} <span class="font-normal text-stone-400">· ${j.where}</span></p>
-        <ul class="mt-1 space-y-0.5 text-[10.5px] text-stone-600 leading-[1.45]">${j.bullets.map((b) => `<li class="flex gap-2"><span class="mt-[7px] w-1 h-1 rounded-full bg-stone-400 shrink-0"></span><span>${b}</span></li>`).join('')}</ul>
-      </div>`;
-
-    // One boxed list, a row per group: the ATS reads every term, the human
-    // sees four labelled lines instead of a tag cloud.
-    const skillRow = ([group, items], i) => `
-      <div class="${i ? 'mt-2' : ''}">
-        <div class="flex items-center gap-1.5 mb-0.5"><span class="w-1.5 h-1.5 rounded-sm bg-orange-600"></span><span class="text-[9px] font-bold uppercase tracking-[0.14em] text-stone-800">${group}</span></div>
-        <p class="text-[9px] text-stone-700 leading-[1.5]">${items.map((t) => `<span class="whitespace-nowrap">${t}</span>`).join('&nbsp;<span class="text-stone-300">·</span> ')}</p>
       </div>`;
 
     const writingCard = (w) => `
@@ -301,7 +310,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
 
     const running = (label) => `
       <div class="flex items-baseline justify-between border-b border-stone-200 pb-2 mb-4">
-        <span class="text-[13px] font-bold tracking-tight text-stone-900">Yaseen Khatib <span class="font-normal text-stone-400">· Senior Full-Stack AI Engineer</span></span>
+        <span class="text-[13px] font-bold tracking-tight text-stone-900">Yaseen Khatib <span class="font-normal text-stone-400">· Senior MERN Stack Developer · AI Systems</span></span>
         <span class="text-[9px] uppercase tracking-[0.2em] text-stone-400 font-semibold">${label}</span>
       </div>`;
 
@@ -319,86 +328,80 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
     svg { width: 100%; height: 100%; }
   </style>
 </head>
-<body class="bg-white text-stone-900 antialiased w-[210mm] mx-auto px-[13mm]">
+<body class="bg-white text-stone-900 antialiased w-[210mm] mx-auto">
 
-  <!-- ============================ PAGE 1 ============================ -->
-  <!-- Hero band bleeds to the page edges: negative margins undo the PDF
-       margins, matching padding puts the content back on the grid. -->
-  <header class="-mx-[13mm] px-[13mm] pt-[7mm] pb-3 bg-[#1F1D1B] text-white relative overflow-hidden">
-    <div class="absolute inset-x-0 top-0 h-[5px] bg-gradient-to-r from-orange-600 via-orange-400 to-stone-400"></div>
-    <div class="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-orange-500/10 blur-3xl"></div>
-    <div class="absolute -left-16 bottom-0 w-56 h-56 rounded-full bg-stone-400/10 blur-3xl"></div>
-    <div class="relative flex items-start justify-between gap-8">
+  <!-- ============================ PAGE 1: SIDEBAR + MAIN ============================ -->
+  <!-- 285mm = A4 height minus the 12mm bottom margin, so the sidebar runs the
+       full page. Page margins are zero; each column carries its own padding. -->
+  <div class="flex min-h-[285mm]">
+
+    <aside class="w-[64mm] shrink-0 bg-[#1F1D1B] text-white px-[7mm] pt-[11mm] pb-[8mm] space-y-5">
       <div>
-        <h1 class="text-[32px] font-extrabold tracking-tight leading-none">Yaseen Khatib</h1>
-        <p class="mt-2 text-[13px] font-semibold text-orange-400">Senior Full-Stack AI Engineer</p>
-        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I ship AI products end to end — six solo in twelve months, each with a link you can open.</p>
-      </div>
-      <div class="text-right text-[10px] text-stone-400 leading-[1.7] shrink-0 pt-1">
-        <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-stone-200">yaseenkhatib04@gmail.com</a></div>
-        <div><a href="tel:+918208335028" class="text-stone-200">+91 8208335028</a></div>
-        <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-orange-400">linkedin.com/in/yaseen-yk</a></div>
-        <div><a href="${GH}" class="text-orange-400">github.com/Yaseenyk</a></div>
-        <div><a href="${SITE}/" class="text-orange-400">yaseenkhatib.streamerosai.com</a></div>
-        <div class="mt-1 text-stone-500">Hyderabad, India · Remote / Hybrid / On-site</div>
-      </div>
-    </div>
-    <div class="relative mt-3.5 grid grid-cols-5 divide-x divide-white/10 border-t border-white/10 pt-3">
-      ${[
-        ['6', 'products shipped solo', 'in twelve months'],
-        ['23M', 'parameter model distilled', 'from a 9B teacher, runs on CPU'],
-        ['94%', 'payload reduction', 'React Flow serialization adapter'],
-        ['1.5–2x', 'faster dashboards', 'MongoDB pipeline profiling'],
-        ['93.5%', 'backend test coverage', 'FitRank API, CI on every release'],
-      ].map(([n, l, s], i) => `
-        <div class="${i ? 'pl-4' : ''} pr-3">
-          <div class="text-[22px] font-extrabold leading-none text-white tracking-tight">${n}</div>
-          <div class="mt-1 text-[9.5px] font-semibold text-orange-400 uppercase tracking-wider">${l}</div>
-          <div class="text-[9px] text-stone-500 leading-snug mt-0.5">${s}</div>
-        </div>`).join('')}
-    </div>
-  </header>
-
-  <section class="mt-3">
-    ${h2('The story')}
-    <p class="text-[10.5px] text-stone-700 leading-[1.55]">
-      I started in 2021 on <b>hospital information systems</b> — ASP.NET and React, real users every day — and learned how data moves through a system before I knew why that mattered. In 2023 I went <b>full-stack on MERN</b> at MSA Software, profiling slow MongoDB pipelines and moving the team to TypeScript and Next.js; ChatGPT had launched a few weeks earlier, so my nights became embeddings, retrieval and evals. By 2025 the two tracks merged: at Sparity I build the <b>LLM and agentic layer</b> of production systems by day, and on the side I have shipped <b>six products solo</b> — a distilled decision model, a Rust desktop app, a local-first finance agent, a workflow engine and two autonomous content pipelines — each with a link you can open.
-    </p>
-  </section>
-
-  <section class="mt-3">
-    ${h2('Selected work', 'full write-ups on pages 2–3')}
-    <div class="grid grid-cols-2 gap-3">${HIGHLIGHTS.map(highlight).join('')}</div>
-  </section>
-
-  <div class="grid grid-cols-12 gap-x-6 mt-3">
-    <section class="col-span-7">
-      ${h2('Experience')}
-      <div>${EXPERIENCE.map((j, i) => job(j, i === EXPERIENCE.length - 1)).join('')}</div>
-    </section>
-
-    <aside class="col-span-5">
-      ${h2('Skills')}
-      <div class="rounded-lg border border-stone-200 bg-stone-50/60 px-3 py-2.5">${SKILLS.map(skillRow).join('')}</div>
-      <div class="mt-3">
-        ${h2('Education')}
-        <div class="text-[10.5px] leading-[1.45] space-y-1.5">
-          <div><p class="font-bold text-stone-900">B.E. Computer Science <span class="font-medium text-stone-400">· 2021</span></p><p class="text-stone-600">D. Y. Patil College of Engineering</p></div>
-          <div><p class="font-bold text-stone-900">Diploma, Computer Science <span class="font-medium text-stone-400">· 2018</span></p><p class="text-stone-600">D. Y. Patil Polytechnic</p></div>
-          <div class="pt-1 text-[9.5px] text-stone-500 leading-[1.45]"><span class="font-bold text-stone-700">Certifications</span> — Coding Ninjas: Front End Architecture · React Production Development · Advanced Backend Systems</div>
+        ${sh2('Contact')}
+        <div class="space-y-1.5">
+          ${sideContact('mail', 'yaseenkhatib04@gmail.com', 'mailto:yaseenkhatib04@gmail.com')}
+          ${sideContact('phone', '+91 8208335028', 'tel:+918208335028')}
+          ${sideContact('linkedin', 'linkedin.com/in/yaseen-yk', 'https://www.linkedin.com/in/yaseen-yk')}
+          ${sideContact('github', 'github.com/Yaseenyk', GH)}
+          ${sideContact('globe', 'yaseenkhatib.streamerosai.com', `${SITE}/`)}
+          ${sideContact('pin', 'Hyderabad, India · Remote / Hybrid / On-site')}
         </div>
       </div>
+
+      <div>
+        ${sh2('Skills')}
+        <div class="space-y-2.5">${SKILLS.map(sideSkills).join('')}</div>
+      </div>
+
+      <div>
+        ${sh2('Education')}
+        <div class="space-y-2 text-[9.5px] leading-[1.5]">
+          <div><p class="font-bold text-white">B.E. Computer Science</p><p class="text-stone-300">D. Y. Patil College of Engineering · 2021</p></div>
+          <div><p class="font-bold text-white">Diploma, Computer Science</p><p class="text-stone-300">D. Y. Patil Polytechnic · 2018</p></div>
+        </div>
+      </div>
+
+      <div>
+        ${sh2('Certifications')}
+        <p class="text-[9.5px] text-stone-300 leading-[1.5]">Coding Ninjas — Front End Architecture · React Production Development · Advanced Backend Systems</p>
+      </div>
     </aside>
+
+    <main class="flex-1 px-[9mm] pt-[11mm] pb-[8mm]">
+      <header>
+        <h1 class="text-[30px] font-extrabold tracking-tight text-stone-900 leading-none">Yaseen Khatib</h1>
+        <p class="mt-2 text-[13px] font-semibold text-orange-700">Senior MERN Stack Developer <span class="text-stone-400 font-medium">·</span> AI Systems</p>
+      </header>
+
+      <div class="grid grid-cols-5 gap-2 mt-4">${STATS.map(stat).join('')}</div>
+
+      <section class="mt-5">
+        ${h2('Summary')}
+        <p class="text-[10.5px] text-stone-700 leading-[1.55]">
+          Senior MERN Stack Developer with <b>5+ years</b> designing, building and deploying full-stack web applications with <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and since 2025 integrating AI into production systems — <b>RAG pipelines, LLM orchestration, function-calling agents and MCP servers</b>. Proven record of performance work (<b>1.5–2x faster dashboards</b>, <b>94% smaller payloads</b>), migrating legacy JavaScript to TypeScript, and shipping products end to end: <b>six shipped solo</b> in the last twelve months, each with a public link. Comfortable owning a system from database schema to deployed UI, with CI/CD on GitHub Actions and Docker. Open to senior remote, hybrid or on-site roles.
+        </p>
+      </section>
+
+      <section class="mt-5">
+        ${h2('Experience')}
+        <div>${EXPERIENCE.map((j, i) => job(j, i === EXPERIENCE.length - 1)).join('')}</div>
+      </section>
+
+      <section class="mt-5">
+        ${h2('Key projects', 'full write-ups on pages 2–3')}
+        <div class="space-y-1.5">${KEY_PROJECTS.map(keyProject).join('')}</div>
+      </section>
+    </main>
   </div>
 
   <!-- ============================ PAGE 2: PRODUCTS ============================ -->
-  <div class="pt-[12mm]" style="page-break-before: always;">
+  <div class="px-[13mm] pt-[12mm]" style="page-break-before: always;">
     ${running('Products — designed, built and shipped solo')}
     <div class="space-y-3">${PRODUCTS.map(card).join('')}</div>
   </div>
 
   <!-- ============================ PAGE 3: APPLIED WORK, WRITING ============================ -->
-  <div class="pt-[12mm]" style="page-break-before: always;">
+  <div class="px-[13mm] pt-[12mm]" style="page-break-before: always;">
     ${running('Applied & client work · Writing & teaching')}
     ${h2('Applied & client work')}
     <div class="space-y-3">${APPLIED.map(card).join('')}</div>
@@ -423,8 +426,8 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       path: outputPdfPath,
       format: 'A4',
       printBackground: true,
-      // Top and sides are zero so the hero band can bleed to the page edge;
-      // the body carries the horizontal gutter and each page its top space.
+      // Zero top and sides so the sidebar reaches the page edge; each column
+      // and each later page carries its own padding instead.
       margin: { top: '0', bottom: '12mm', left: '0', right: '0' },
     });
 
