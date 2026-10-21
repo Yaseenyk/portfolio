@@ -53,10 +53,13 @@ JSON-LD, and OG tags only exist post-build.
   at yaseen-concierge.yaseenyk.workers.dev) and re-embeds the corpus into
   Vectorize after every Pages deploy. Corpus source: `/llms-full.txt`.
 - Sibling repo `../linkedin-bot` posts to LinkedIn Tue/Wed/Thu at 10:00 UTC
-  (queue: `urls.txt`, state: `published.json`). The article URL is kept OUT
-  of the post body — LinkedIn demotes off-platform links — and is posted
-  automatically as the first comment instead. Cover-image style rules there
-  are brand-locked and must stay byte-identical to the two portfolio scripts.
+  on a fixed cycle (post, post, meme, post, poll). Technical posts come from
+  `topics.txt` first (grounded in a `FACTS` block in its `main.py`, linking to
+  the portfolio home), then from `urls.txt` articles. State: `published.json`.
+  The link is the last line of the post body (the first-comment approach was
+  dropped as unreliable). Its cover-image style is deliberately NOT
+  brand-locked — LinkedIn covers depict the post's subject; do not sync them
+  with the two portfolio scripts.
 
 If `git push` is rejected, a bot committed — `git stash push package-lock.json`
 (if dirty), `git pull --rebase`, push.
