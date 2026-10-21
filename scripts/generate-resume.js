@@ -333,7 +333,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       <div>
         <h1 class="text-[32px] font-extrabold tracking-tight leading-none">Yaseen Khatib</h1>
         <p class="mt-2 text-[13px] font-semibold text-[#C9A227]">Senior MERN Stack Developer <span class="text-stone-500">·</span> AI Systems</p>
-        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">5+ years on React, Node.js and MongoDB — now building the AI inside production systems.</p>
+        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build MERN products end to end, then put the AI inside them — six shipped solo, each one you can open.</p>
       </div>
       <div class="text-right text-[10px] text-stone-400 leading-[1.7] shrink-0 pt-1">
         <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-stone-200">yaseenkhatib04@gmail.com</a></div>
