@@ -10,6 +10,10 @@ function isMobile(): boolean {
 }
 
 export default function OutreachTool() {
+  // "role" tailors to a job description; "agency" introduces Yaseen to a
+  // staffing consultant who has no vacancy in hand, where the JD field is
+  // meaningless and the email has to answer what a recruiter screens on.
+  const [mode, setMode] = useState<"role" | "agency">("role");
   const [passcode, setPasscode] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
@@ -33,7 +37,7 @@ export default function OutreachTool() {
       const res = await fetch(`${CONCIERGE_URL}/api/outreach`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passcode, company, companyUrl, jd, image }),
+        body: JSON.stringify({ passcode, company, companyUrl, jd, image, mode }),
       });
       const data = (await res.json()) as {
         subject?: string;
@@ -96,6 +100,28 @@ export default function OutreachTool() {
       </p>
 
       <div className="mt-8 space-y-3">
+        <div className="flex gap-2" role="group" aria-label="Draft type">
+          {(
+            [
+              ["role", "A specific role"],
+              ["agency", "A staffing consultant"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setMode(value)}
+              aria-pressed={mode === value}
+              className={`flex-1 rounded-lg border px-3 py-2.5 font-mono text-xs transition-colors ${
+                mode === value
+                  ? "border-cyan/60 bg-cyan/10 text-cyan"
+                  : "border-zinc-800 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <input
           type="password"
           value={passcode}
@@ -126,7 +152,10 @@ export default function OutreachTool() {
           />
         </div>
 
-        {/* Upload a job-post screenshot — OCRs company, role, JD, and email */}
+        {/* Upload a job-post screenshot — OCRs company, role, JD, and email.
+            Meaningless when writing to a consultant with no vacancy. */}
+        {mode === "role" && (
+          <>
         <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-zinc-700 px-3 py-2.5 font-mono text-xs text-zinc-400 transition-colors hover:border-cyan/50 hover:text-cyan">
           <span>📎</span>
           {imageName ? `Screenshot: ${imageName}` : "Upload a job-post screenshot (it reads company, role, JD, email)"}
@@ -174,6 +203,8 @@ export default function OutreachTool() {
             rows={6}
             className={field}
           />
+        )}
+          </>
         )}
 
         <button

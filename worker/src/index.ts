@@ -235,6 +235,7 @@ const PREFERENCES = `- Current CTC: approximately 12 LPA
 
 // Links to weave into every email (plain URLs — they auto-linkify when sent).
 const LINKS = `Portfolio: ${SITE}
+Résumé (PDF): ${SITE}/Resume.pdf
 Know more about me: ${SITE}/about
 Products: ${SITE}/products
 Blog: ${SITE}/blog
@@ -284,6 +285,9 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
     company?: string;
     companyUrl?: string;
     jd?: string;
+    /** "role" (default) tailors to a job description; "agency" introduces
+     *  Yaseen to a staffing consultant who has no specific vacancy in hand. */
+    mode?: string;
     image?: string; // data URL of an uploaded job-post screenshot
   };
   try {
@@ -298,6 +302,7 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
   let company = String(body.company ?? "").trim().slice(0, 120);
   const companyUrl = String(body.companyUrl ?? "").trim().slice(0, 200);
   let jd = String(body.jd ?? "").trim().slice(0, 4000);
+  const agency = String(body.mode ?? "role").trim() === "agency";
   let extractedEmail = "";
 
   try {
@@ -417,12 +422,44 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       "\"high-quality solutions\", \"passionate\", \"leverage\", \"synergy\", " +
       "\"fast-paced\", \"seamless\", \"evolution\".\n";
 
-    const greeting = company ? `Dear ${company} Team,` : "Dear Hiring Manager,";
+    const greeting = company
+      ? `Dear ${company} Team,`
+      : agency
+        ? "Dear Recruitment Team,"
+        : "Dear Hiring Manager,";
+
+    // A staffing consultant has no vacancy in hand - they are deciding whether
+    // to put you on their bench. So the email answers what they screen on
+    // (stack, seniority, rate, location, availability) rather than arguing fit
+    // for a role that does not exist yet.
+    const agencyBrief = agency
+      ? "THIS IS NOT AN APPLICATION TO A VACANCY. The recipient is a staffing " +
+        "consultant or recruitment agency that places engineers with client " +
+        "companies. Write a short introduction asking to be considered for " +
+        "their current and future full-stack and AI mandates.
+" +
+        "- Say plainly what I am: Senior Full-Stack (MERN) moving into production AI.
+" +
+        "- Give them what they screen on in one compact block: stack, the five " +
+        "shipped products as proof, current and expected CTC, preferred " +
+        "locations, and that I am open to contract, contract-to-hire or permanent.
+" +
+        "- Ask them to add me to their candidate pool and send relevant roles.
+" +
+        "- Do NOT invent a vacancy, a client name, or a mutual connection.
+" +
+        "- Under 180 words. A consultant skims; the block matters more than prose.
+" +
+        PREFERENCES + "
+
+"
+      : "";
     const user =
       OUTREACH_FACTS +
       "\n\n" +
       STACK +
       "\n\n" +
+      agencyBrief +
       (jd
         ? `TARGET ROLE / JOB DESCRIPTION — tailor by selecting which of MY REAL proofs (above) best answers their needs. Do NOT treat the technologies below as things I have experience with; they are THEIR requirements, not my background:\n${jd}\n\n`
         : "") +
@@ -430,8 +467,12 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       (siteDigest ? `What their company does (from their website):\n${siteDigest}\n` : "") +
       "\n" + rules +
       "\nSTRUCTURE:\n" +
-      "- \"subject\": a formal application subject line: " +
-      "\"Application: <role from the JD, or 'Full-Stack (MERN) + AI Engineer'> — Yaseen Khatib\".\n" +
+      (agency
+        ? "- \"subject\": \"Senior Full-Stack (MERN) + AI Engineer — available for your mandates — Yaseen Khatib\".
+"
+        : "- \"subject\": a formal application subject line: " +
+          "\"Application: <role from the JD, or 'Full-Stack (MERN) + AI Engineer'> — Yaseen Khatib\".
+") +
       "- \"body\": line 1 is the greeting \"" + greeting + "\", then a blank line, " +
       "then the email, then a courteous close (e.g. \"I would welcome the chance " +
       "to discuss how I can contribute.\"), then a line \"Links:\" followed by " +
@@ -480,6 +521,7 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
         body: emailBody,
         researched: Boolean(siteDigest),
         tailored: Boolean(jd),
+        mode: agency ? "agency" : "role",
         extractedEmail,
         extractedCompany: company,
       },
