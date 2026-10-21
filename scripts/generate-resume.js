@@ -281,13 +281,13 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         <ul class="mt-1.5 space-y-1 text-[10.5px] text-zinc-600 leading-[1.5]">${j.bullets.map((b) => `<li class="flex gap-2"><span class="mt-[7px] w-1 h-1 rounded-full bg-zinc-400 shrink-0"></span><span>${b}</span></li>`).join('')}</ul>
       </div>`;
 
-    // Column widths follow label length, not item count, so no group stacks
-    // into a tall narrow tower while its neighbours sit half-empty.
-    const SKILL_SPAN = ['col-span-4', 'col-span-2', 'col-span-3', 'col-span-3'];
-    const skillRow = ([group, items], i) => `
-      <div class="${SKILL_SPAN[i]}">
-        <p class="text-[9px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">${group}</p>
-        <div class="flex flex-wrap gap-1">${items.map(pill).join('')}</div>
+    const skillPanel = ([group, items]) => `
+      <div class="rounded-lg border border-zinc-200 overflow-hidden h-full">
+        <div class="flex items-center gap-2 bg-zinc-50 border-b border-zinc-200 px-3 py-1.5">
+          <span class="w-1.5 h-1.5 rounded-sm bg-cyan-500"></span>
+          <h3 class="text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-800">${group}</h3>
+        </div>
+        <p class="px-3 py-2 text-[10.5px] text-zinc-700 leading-[1.65]">${items.map((t) => `<span class="whitespace-nowrap">${t}</span>`).join('&nbsp;<span class="text-zinc-300">·</span> ')}</p>
       </div>`;
 
     const writingCard = (w) => `
@@ -354,7 +354,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
 
   <section class="mt-4">
     ${h2('Skills')}
-    <div class="grid grid-cols-12 gap-x-4">${SKILLS.map(skillRow).join('')}</div>
+    <div class="grid grid-cols-2 gap-3">${SKILLS.map(skillPanel).join('')}</div>
   </section>
 
   <div class="grid grid-cols-12 gap-x-7 mt-4">
