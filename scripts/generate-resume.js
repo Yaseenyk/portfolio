@@ -42,9 +42,9 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Typed AI decisions for staffing',
         badge: 'Applied ML · Live',
         desc:
-          'Ranks people for open tasks with typed decisions instead of a chatbot\'s opinion. Code applies the hard rules; a 23M-parameter MiniLM-L6 student with five linear heads — distilled from Qwen3.5-9B with a KL loss against the teacher\'s full distributions — returns a probability for every option; thresholds band each person shortlist / review / hidden, and a manager makes every final call. Managers\' accepts and rejects become the next model\'s training data.',
+          'Ranks people for open tasks with typed decisions instead of a chatbot\'s opinion. Code applies the hard rules; a 23M-parameter MiniLM-L6 student with five linear heads, distilled from Qwen3.5-9B with a KL loss against the teacher\'s full distributions, returns a probability for every option; thresholds band each person shortlist / review / hidden, and a manager makes every final call. Managers\' accepts and rejects become the next model\'s training data.',
         proof:
-          'Evaluated against a code-only baseline on every release (35 held-out tasks, synthetic data): <b>hit@5 94% vs 91%</b>, <b>pairwise 0.88 vs 0.86</b>, NDCG@10 0.89 vs 0.89 — and <b>hit@1 54% vs 74%</b>, which is why it shortlists rather than assigns. FastAPI router → service → repository, Postgres + pgvector, Alembic, JWT + refresh-cookie auth with roles, rate limits, a budget guard, Docker, GitHub Actions CI, <b>93.5% backend test coverage</b>.',
+          'Evaluated against a code-only baseline on every release (35 held-out tasks, synthetic data): <b>hit@5 94% vs 91%</b>, <b>pairwise 0.88 vs 0.86</b>, NDCG@10 0.89 vs 0.89, and <b>hit@1 54% vs 74%</b>, which is why it shortlists rather than assigns. FastAPI router → service → repository, Postgres + pgvector, Alembic, JWT + refresh-cookie auth with roles, rate limits, a budget guard, Docker, GitHub Actions CI, <b>93.5% backend test coverage</b>.',
         tags: ['Knowledge Distillation', 'MiniLM / PyTorch', 'FastAPI', 'Postgres + pgvector', 'React + TypeScript', 'Docker · CI'],
         links: [
           { label: 'Live', url: 'https://fitrank.streamerosai.com' },
@@ -56,9 +56,9 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Local-first streaming cockpit',
         badge: 'Desktop · Rust',
         desc:
-          'A Rust + Tauri 2 desktop app for Twitch and YouTube streamers. Chat is read locally, velocity and sentiment are scored in Rust off the UI thread against the channel\'s own baseline, and scene automation drives OBS over WebSocket v5 — no account, no cloud, pull the network cable and it keeps working. Rust-core-to-webview IPC is batched MessagePack rather than per-event JSON; the assistant runs on Ollama at 127.0.0.1.',
+          'A Rust + Tauri 2 desktop app for Twitch and YouTube streamers. Chat is read locally, velocity and sentiment are scored in Rust off the UI thread against the channel\'s own baseline, and scene automation drives OBS over WebSocket v5. No account, no cloud; pull the network cable and it keeps working. Rust-core-to-webview IPC is batched MessagePack rather than per-event JSON; the assistant runs on Ollama at 127.0.0.1.',
         proof:
-          'Rust written with Claude Code, reviewed and tested by me. <b>187 commits</b> since May 2026, 70 Rust files / <b>24,292 lines of Rust</b>, 42,733 lines of TypeScript, <b>306 Rust tests</b>. The app repository is private; the marketing site and its Tier-1 support agent — a Hono router on Cloudflare Workers that embeds the product docs into Upstash Vector and streams a gemini-flash answer constrained to that context — are public.',
+          'Rust written with Claude Code, reviewed and tested by me. <b>187 commits</b> since May 2026, 70 Rust files / <b>24,292 lines of Rust</b>, 42,733 lines of TypeScript, <b>306 Rust tests</b>. The app repository is private; the marketing site and its Tier-1 support agent (a Hono router on Cloudflare Workers that embeds the product docs into Upstash Vector and streams a gemini-flash answer constrained to that context) are public.',
         tags: ['Rust', 'Tauri 2', 'OBS WebSocket v5', 'MessagePack IPC', 'Ollama', 'Next.js'],
         links: [
           { label: 'Website', url: 'https://streamerosai.com' },
@@ -71,7 +71,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Grounded RAG API + MCP server',
         badge: 'AI Infrastructure · Live',
         desc:
-          'One zero-dependency Cloudflare Worker, two interfaces. A grounded RAG API answers questions about my work from a Vectorize index of the site\'s 80-document corpus (34 articles, 46 project pages) and refuses below a similarity threshold rather than guess. A public MCP server exposes search_portfolio, get_products and get_availability — any recruiter can add the URL to Claude and interview this résumé from inside their own AI. The corpus re-embeds automatically after every deploy.',
+          'One zero-dependency Cloudflare Worker, two interfaces. A grounded RAG API answers questions about my work from a Vectorize index of the site\'s 80-document corpus (34 articles, 46 project pages) and refuses below a similarity threshold rather than guess. A public MCP server exposes search_portfolio, get_products and get_availability, so any recruiter can add the URL to Claude and interview this résumé from inside their own AI. The corpus re-embeds automatically after every deploy.',
         tags: ['Cloudflare Workers', 'Vectorize', 'Workers AI', 'MCP', 'Grounded RAG', 'TypeScript'],
         links: [
           { label: 'Try it', url: `${SITE}/#rag-concierge` },
@@ -84,7 +84,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Workflow automation engine',
         badge: 'React Flow · Live Sandbox',
         desc:
-          'A node-based workflow canvas — triggers, processing layers, directional edge bindings — backed by a Zustand store. The naive design stored the React Flow render model; a custom Serialization Adapter separates the view from the transport record and cut stored payloads by <b>94%</b>, round-trip lossless. The architecture runs live in the browser: drag nodes, rewire the graph, watch the serialization bench.',
+          'A node-based workflow canvas (triggers, processing layers, directional edge bindings) backed by a Zustand store. The naive design stored the React Flow render model; a custom Serialization Adapter separates the view from the transport record and cut stored payloads by <b>94%</b>, round-trip lossless. The architecture runs live in the browser: drag nodes, rewire the graph, watch the serialization bench.',
         tags: ['React Flow', 'Zustand', 'TypeScript', 'Serialization Adapter', 'MongoDB'],
         links: [
           { label: 'Live sandbox', url: `${SITE}/sandbox/` },
@@ -96,7 +96,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Local-first AI financial agent',
         badge: 'Mobile · AI Agent',
         desc:
-          'A React Native / Expo personal-finance agent where the model is structurally incapable of touching the money. 100% of financial data stays on-device in SQLite with no cloud backend; an OpenAI function-calling agent tracks peer-to-peer debts and pushes proactive briefings, and every database mutation renders as a Review & Confirm card — it proposes, only a human commits. Bank-SMS ingestion uses the Adapter pattern with a p-queue serialising SQLite writes.',
+          'A React Native / Expo personal-finance agent where the model is structurally incapable of touching the money. 100% of financial data stays on-device in SQLite with no cloud backend; an OpenAI function-calling agent tracks peer-to-peer debts and pushes proactive briefings, and every database mutation renders as a Review & Confirm card: it proposes, only a human commits. Bank-SMS ingestion uses the Adapter pattern with a p-queue serialising SQLite writes.',
         tags: ['React Native / Expo', 'SQLite', 'OpenAI Function Calling', 'Local RAG', 'TypeScript'],
         links: [{ label: 'Case study', url: `${SITE}/products/sable/` }],
       },
@@ -109,7 +109,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Retail vision for a kirana shop',
         badge: 'Computer Vision · Open Source',
         desc:
-          'Four retail vision problems in one on-premise system: phantom stock, planogram compliance, produce freshness and expiry-date OCR. A manager lays out a rack once; after that a photo counts every facing and staff are told which shelf to walk to. Its most useful property is what it refuses to claim — the detector localises products without naming them, so the planogram endpoint returns 409 rather than a score it cannot support. <b>650 tests</b>.',
+          'Four retail vision problems in one on-premise system: phantom stock, planogram compliance, produce freshness and expiry-date OCR. A manager lays out a rack once; after that a photo counts every facing and staff are told which shelf to walk to. Its most useful property is what it refuses to claim: the detector localises products without naming them, so the planogram endpoint returns 409 rather than a score it cannot support. <b>650 tests</b>.',
         tags: ['FastAPI', 'YOLOv8', 'MobileNetV2', 'Next.js 14', 'Docker', 'Ollama'],
         links: [
           { label: 'Backend', url: `${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be` },
@@ -121,7 +121,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Student association platform',
         badge: 'Full-Stack · Live',
         desc:
-          'Arrived as one 4,019-line HTML file with a live Firebase key in the source and every permission decided in the browser. Rebuilt as a Next.js static export on GitHub Pages and a Spring Boot 3 / Java 25 API on Render, both on Firestore. Firebase Auth answers who you are; the server decides what you may do — the half the original had backwards. Five auth states, <b>29 tests</b>.',
+          'Arrived as one 4,019-line HTML file with a live Firebase key in the source and every permission decided in the browser. Rebuilt as a Next.js static export on GitHub Pages and a Spring Boot 3 / Java 25 API on Render, both on Firestore. Firebase Auth answers who you are; the server decides what you may do, the half the original had backwards. Five auth states, <b>29 tests</b>.',
         tags: ['Next.js', 'Java 25', 'Spring Boot 3', 'Firestore', 'Firebase Auth'],
         links: [
           { label: 'Live', url: 'https://yaseenyk.github.io/SIT-FE/' },
@@ -134,7 +134,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         sub: 'Vocational-skilling platform',
         badge: 'Client · 1-Day Delivery',
         desc:
-          'A free vocational-skilling LMS for a client sitting on a library of course videos and PDFs. Brief and MVP sketch arrived on a Monday; a working platform — auth, course delivery, self-paced flow — was live on the dev environment the next day.',
+          'A free vocational-skilling LMS for a client sitting on a library of course videos and PDFs. Brief and MVP sketch arrived on a Monday; a working platform with auth, course delivery and a self-paced flow was live on the dev environment the next day.',
         tags: ['Next.js', 'React', 'Tailwind', 'TypeScript'],
         links: [{ label: 'Live (dev)', url: 'https://devlms.pathsaathi.in/login' }],
       },
@@ -156,7 +156,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       {
         label: 'Engineering blog',
         stat: '34 articles',
-        text: 'First-person write-ups of the systems above — serialization adapters, grounded RAG, agent tracing with OpenTelemetry, prompt caching, WebSocket telemetry at scale.',
+        text: 'First-person write-ups of the systems above: serialization adapters, grounded RAG, agent tracing with OpenTelemetry, prompt caching, WebSocket telemetry at scale.',
         link: { label: 'Read the blog', url: `${SITE}/blog/` },
       },
       {
@@ -168,7 +168,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       {
         label: 'AI Engineering Journey',
         stat: '16 days · 64 hours',
-        text: 'A curriculum I authored — embeddings, vector search, RAG, agents, evaluation, fine-tuning, production — as 16 interactive chapters with diagrams and a built-in presentation mode.',
+        text: 'A curriculum I authored, from embeddings and vector search through RAG, agents, evaluation and fine-tuning to production, as 16 interactive chapters with diagrams and a built-in presentation mode.',
         link: { label: 'Open the curriculum', url: `${SITE}/final-year-projects/journey/` },
       },
       {
@@ -197,7 +197,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         where: 'Hyderabad · Hybrid',
         period: '06/2025 – Present',
         bullets: [
-          'Own the <b>LLM and agentic layer</b> of production MERN systems end to end — architecture, orchestration, deployment.',
+          'Own the <b>LLM and agentic layer</b> of production MERN systems end to end: architecture, orchestration, deployment.',
           'Ship <b>Agentic RAG services</b> with schema-validated outputs, guardrails, and cost-aware routing between models.',
         ],
       },
@@ -248,7 +248,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       <div class="break-inside-avoid rounded-lg border border-stone-200 bg-white px-4 py-3 border-l-[3px] border-l-[#7F1D3A]">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <h3 class="font-bold text-[13px] text-stone-900 leading-tight">${p.name} <span class="font-normal text-stone-500">— ${p.sub}</span></h3>
+            <h3 class="font-bold text-[13px] text-stone-900 leading-tight">${p.name} <span class="font-normal text-stone-500">· ${p.sub}</span></h3>
           </div>
           <div class="flex items-center gap-2 shrink-0">${badge(p.badge)}</div>
         </div>
@@ -333,7 +333,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       <div>
         <h1 class="text-[32px] font-extrabold tracking-tight leading-none">Yaseen Khatib</h1>
         <p class="mt-2 text-[13px] font-semibold text-[#C9A227]">Senior MERN Stack Developer <span class="text-stone-500">·</span> AI Systems</p>
-        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build MERN products end to end, then put the AI inside them — six shipped solo, each one you can open.</p>
+        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build MERN products end to end, then put the AI inside them. Six shipped solo, each one you can open.</p>
       </div>
       <div class="text-right text-[10px] text-stone-400 leading-[1.7] shrink-0 pt-1">
         <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-stone-200">yaseenkhatib04@gmail.com</a></div>
@@ -363,7 +363,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
   <section class="mt-3">
     ${h2('Summary')}
     <p class="text-[10.5px] text-stone-700 leading-[1.55]">
-      I build full-stack products on <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and for the last year I have been building the AI inside them. I started in 2021 on hospital information systems that clinical staff used every day. In 2023 I joined MSA Software as a full-stack developer, profiled slow MongoDB pipelines until dashboards ran <b>1.5–2x faster</b>, and moved the team to TypeScript and Next.js. Since 2025 I own the <b>LLM and agentic layer</b> of production MERN systems at Sparity — <b>RAG pipelines, function-calling agents, MCP servers</b> — and on the side I have shipped <b>six products solo</b>: a React Flow workflow engine that cut payloads <b>94%</b>, a React Native finance agent, a distilled AI decision model, and three more, each with a public link. I own a system from database schema to deployed UI, and I am open to senior remote, hybrid or on-site roles.
+      I build full-stack products on <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and for the last year I have been building the AI inside them. I started in 2021 on hospital information systems that clinical staff used every day. In 2023 I joined MSA Software as a full-stack developer, profiled slow MongoDB pipelines until dashboards ran <b>1.5–2x faster</b>, and moved the team to TypeScript and Next.js. Since 2025 I own the <b>LLM and agentic layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents, MCP servers</b>. On the side I have shipped <b>six products solo</b>: a React Flow workflow engine that cut payloads <b>94%</b>, a React Native finance agent, a distilled AI decision model, and three more, each with a public link. I own a system from database schema to deployed UI, and I am open to senior remote, hybrid or on-site roles.
     </p>
   </section>
 
@@ -386,7 +386,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         <div class="text-[10.5px] leading-[1.45] space-y-1.5">
           <div><p class="font-bold text-stone-900">B.E. Computer Science <span class="font-medium text-stone-400">· 2021</span></p><p class="text-stone-600">D. Y. Patil College of Engineering</p></div>
           <div><p class="font-bold text-stone-900">Diploma, Computer Science <span class="font-medium text-stone-400">· 2018</span></p><p class="text-stone-600">D. Y. Patil Polytechnic</p></div>
-          <div class="pt-1 text-[9.5px] text-stone-500 leading-[1.45]"><span class="font-bold text-stone-700">Certifications</span> — Coding Ninjas: Front End Architecture · React Production Development · Advanced Backend Systems</div>
+          <div class="pt-1 text-[9.5px] text-stone-500 leading-[1.45]"><span class="font-bold text-stone-700">Certifications</span> (Coding Ninjas): Front End Architecture · React Production Development · Advanced Backend Systems</div>
         </div>
       </div>
     </aside>
@@ -394,7 +394,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
 
   <!-- ============================ PAGE 2: PRODUCTS ============================ -->
   <div class="pt-[12mm]" style="page-break-before: always;">
-    ${running('Products — designed, built and shipped solo')}
+    ${running('Products: designed, built and shipped solo')}
     <div class="space-y-3">${PRODUCTS.map(card).join('')}</div>
   </div>
 
