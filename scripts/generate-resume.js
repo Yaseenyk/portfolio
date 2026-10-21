@@ -233,26 +233,26 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
     };
     const contact = (icon, label, url, accent) =>
-      `<span class="inline-flex items-center gap-1.5 ${accent ? 'text-cyan-700' : 'text-zinc-600'}"><span class="w-[11px] h-[11px] text-zinc-400">${ICON[icon]}</span>${url ? `<a href="${url}">${label}</a>` : label}</span>`;
+      `<span class="inline-flex items-center gap-1.5 ${accent ? 'text-orange-700' : 'text-stone-600'}"><span class="w-[11px] h-[11px] text-stone-400">${ICON[icon]}</span>${url ? `<a href="${url}">${label}</a>` : label}</span>`;
 
-    const a = (l) => `<a href="${l.url}" class="text-cyan-700 font-semibold whitespace-nowrap">${l.label}&nbsp;↗</a>`;
+    const a = (l) => `<a href="${l.url}" class="text-orange-700 font-semibold whitespace-nowrap">${l.label}&nbsp;↗</a>`;
     const pill = (t) =>
-      `<span class="inline-block bg-zinc-100 text-zinc-700 border border-zinc-200 px-1.5 py-[1px] rounded text-[9px] font-medium leading-[1.5]">${t}</span>`;
+      `<span class="inline-block bg-stone-100 text-stone-700 border border-stone-200 px-1.5 py-[1px] rounded text-[9px] font-medium leading-[1.5]">${t}</span>`;
     const h2 = (t, extra = '') =>
-      `<div class="flex items-center gap-2.5 mb-3"><span class="w-1.5 h-1.5 rounded-sm bg-cyan-500"></span><h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-800">${t}</h2>${extra ? `<span class="text-[9.5px] text-zinc-400">${extra}</span>` : ''}<span class="flex-1 h-px bg-zinc-200"></span></div>`;
+      `<div class="flex items-center gap-2.5 mb-3"><span class="w-1.5 h-1.5 rounded-sm bg-orange-600"></span><h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-800">${t}</h2>${extra ? `<span class="text-[9.5px] text-stone-400">${extra}</span>` : ''}<span class="flex-1 h-px bg-stone-200"></span></div>`;
     const badge = (t) =>
-      `<span class="text-[9px] font-semibold text-cyan-700 bg-cyan-50 border border-cyan-100 px-2 py-[2px] rounded-full whitespace-nowrap">${t}</span>`;
+      `<span class="text-[9px] font-semibold text-orange-700 bg-orange-50 border border-orange-100 px-2 py-[2px] rounded-full whitespace-nowrap">${t}</span>`;
 
     const card = (p) => `
-      <div class="break-inside-avoid rounded-lg border border-zinc-200 bg-white px-4 py-3 border-l-[3px] border-l-cyan-500">
+      <div class="break-inside-avoid rounded-lg border border-stone-200 bg-white px-4 py-3 border-l-[3px] border-l-orange-600">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <h3 class="font-bold text-[13px] text-zinc-900 leading-tight">${p.name} <span class="font-normal text-zinc-500">— ${p.sub}</span></h3>
+            <h3 class="font-bold text-[13px] text-stone-900 leading-tight">${p.name} <span class="font-normal text-stone-500">— ${p.sub}</span></h3>
           </div>
           <div class="flex items-center gap-2 shrink-0">${badge(p.badge)}</div>
         </div>
-        <p class="text-[11px] text-zinc-600 mt-1.5 leading-[1.55]">${p.desc}</p>
-        ${p.proof ? `<div class="mt-2 rounded-md bg-zinc-50 border border-zinc-100 px-3 py-2 text-[10.5px] text-zinc-700 leading-[1.5]"><span class="font-bold uppercase tracking-wider text-[8.5px] text-cyan-700 mr-1.5">Proof</span>${p.proof}</div>` : ''}
+        <p class="text-[11px] text-stone-600 mt-1.5 leading-[1.55]">${p.desc}</p>
+        ${p.proof ? `<div class="mt-2 rounded-md bg-stone-50 border border-stone-100 px-3 py-2 text-[10.5px] text-stone-700 leading-[1.5]"><span class="font-bold uppercase tracking-wider text-[8.5px] text-orange-700 mr-1.5">Proof</span>${p.proof}</div>` : ''}
         <div class="flex items-center justify-between gap-4 mt-2.5">
           <div class="flex flex-wrap gap-1.5">${p.tags.map(pill).join('')}</div>
           <div class="text-[9.5px] shrink-0 space-x-3">${p.links.map(a).join('')}</div>
@@ -260,50 +260,49 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       </div>`;
 
     const highlight = (h) => `
-      <div class="rounded-lg border border-zinc-200 bg-zinc-50/70 px-3.5 py-2.5">
+      <div class="rounded-lg border border-stone-200 bg-stone-50/70 px-3.5 py-2">
         <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12px] text-zinc-900">${h.name}</h3>
-          <span class="text-[8.5px] font-semibold uppercase tracking-wider text-cyan-700">${h.kicker}</span>
+          <h3 class="font-bold text-[12px] text-stone-900">${h.name}</h3>
+          <span class="text-[8.5px] font-semibold uppercase tracking-wider text-orange-700">${h.kicker}</span>
         </div>
-        <p class="text-[10.5px] text-zinc-600 mt-1 leading-[1.5]">${h.fact}</p>
-        <p class="text-[9.5px] mt-1.5">${a(h.link)}</p>
+        <p class="text-[10px] text-stone-600 mt-0.5 leading-[1.45]">${h.fact}</p>
+        <p class="text-[9.5px] mt-1">${a(h.link)}</p>
       </div>`;
 
     const job = (j, last) => `
-      <div class="relative pl-5 ${last ? '' : 'pb-3'}">
-        <span class="absolute left-0 top-[5px] w-[9px] h-[9px] rounded-full bg-white border-2 border-cyan-500"></span>
-        ${last ? '' : '<span class="absolute left-[4px] top-[14px] bottom-0 w-px bg-zinc-200"></span>'}
+      <div class="relative pl-5 ${last ? '' : 'pb-2.5'}">
+        <span class="absolute left-0 top-[5px] w-[9px] h-[9px] rounded-full bg-white border-2 border-orange-600"></span>
+        ${last ? '' : '<span class="absolute left-[4px] top-[14px] bottom-0 w-px bg-stone-200"></span>'}
         <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12.5px] text-zinc-900">${j.role}</h3>
-          <span class="text-[9.5px] font-medium text-zinc-500 whitespace-nowrap">${j.period}</span>
+          <h3 class="font-bold text-[12.5px] text-stone-900">${j.role}</h3>
+          <span class="text-[9.5px] font-medium text-stone-500 whitespace-nowrap">${j.period}</span>
         </div>
-        <p class="text-[10.5px] text-cyan-700 font-semibold">${j.company} <span class="font-normal text-zinc-400">· ${j.where}</span></p>
-        <ul class="mt-1.5 space-y-1 text-[10.5px] text-zinc-600 leading-[1.5]">${j.bullets.map((b) => `<li class="flex gap-2"><span class="mt-[7px] w-1 h-1 rounded-full bg-zinc-400 shrink-0"></span><span>${b}</span></li>`).join('')}</ul>
+        <p class="text-[10.5px] text-orange-700 font-semibold">${j.company} <span class="font-normal text-stone-400">· ${j.where}</span></p>
+        <ul class="mt-1 space-y-0.5 text-[10.5px] text-stone-600 leading-[1.45]">${j.bullets.map((b) => `<li class="flex gap-2"><span class="mt-[7px] w-1 h-1 rounded-full bg-stone-400 shrink-0"></span><span>${b}</span></li>`).join('')}</ul>
       </div>`;
 
-    const skillPanel = ([group, items]) => `
-      <div class="rounded-lg border border-zinc-200 overflow-hidden h-full">
-        <div class="flex items-center gap-2 bg-zinc-50 border-b border-zinc-200 px-3 py-1.5">
-          <span class="w-1.5 h-1.5 rounded-sm bg-cyan-500"></span>
-          <h3 class="text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-800">${group}</h3>
-        </div>
-        <p class="px-3 py-2 text-[10.5px] text-zinc-700 leading-[1.65]">${items.map((t) => `<span class="whitespace-nowrap">${t}</span>`).join('&nbsp;<span class="text-zinc-300">·</span> ')}</p>
+    // One boxed list, a row per group: the ATS reads every term, the human
+    // sees four labelled lines instead of a tag cloud.
+    const skillRow = ([group, items], i) => `
+      <div class="${i ? 'mt-2' : ''}">
+        <div class="flex items-center gap-1.5 mb-0.5"><span class="w-1.5 h-1.5 rounded-sm bg-orange-600"></span><span class="text-[9px] font-bold uppercase tracking-[0.14em] text-stone-800">${group}</span></div>
+        <p class="text-[9px] text-stone-700 leading-[1.5]">${items.map((t) => `<span class="whitespace-nowrap">${t}</span>`).join('&nbsp;<span class="text-stone-300">·</span> ')}</p>
       </div>`;
 
     const writingCard = (w) => `
-      <div class="rounded-lg border border-zinc-200 px-3.5 py-3">
+      <div class="rounded-lg border border-stone-200 px-3.5 py-3">
         <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12px] text-zinc-900">${w.label}</h3>
-          <span class="text-[9px] font-semibold text-cyan-700 bg-cyan-50 border border-cyan-100 px-2 py-[2px] rounded-full whitespace-nowrap">${w.stat}</span>
+          <h3 class="font-bold text-[12px] text-stone-900">${w.label}</h3>
+          <span class="text-[9px] font-semibold text-orange-700 bg-orange-50 border border-orange-100 px-2 py-[2px] rounded-full whitespace-nowrap">${w.stat}</span>
         </div>
-        <p class="text-[10.5px] text-zinc-600 mt-1 leading-[1.5]">${w.text}</p>
+        <p class="text-[10.5px] text-stone-600 mt-1 leading-[1.5]">${w.text}</p>
         <p class="text-[9.5px] mt-1.5">${a(w.link)}</p>
       </div>`;
 
     const running = (label) => `
-      <div class="flex items-baseline justify-between border-b border-zinc-200 pb-2 mb-4">
-        <span class="text-[13px] font-bold tracking-tight text-zinc-900">Yaseen Khatib <span class="font-normal text-zinc-400">· Senior Full-Stack AI Engineer</span></span>
-        <span class="text-[9px] uppercase tracking-[0.2em] text-zinc-400 font-semibold">${label}</span>
+      <div class="flex items-baseline justify-between border-b border-stone-200 pb-2 mb-4">
+        <span class="text-[13px] font-bold tracking-tight text-stone-900">Yaseen Khatib <span class="font-normal text-stone-400">· Senior Full-Stack AI Engineer</span></span>
+        <span class="text-[9px] uppercase tracking-[0.2em] text-stone-400 font-semibold">${label}</span>
       </div>`;
 
     const htmlContent = `
@@ -316,71 +315,90 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    b { font-weight: 600; color: #18181b; }
+    b { font-weight: 600; color: #1c1917; }
     svg { width: 100%; height: 100%; }
   </style>
 </head>
-<body class="bg-white text-zinc-900 antialiased max-w-[210mm] mx-auto">
+<body class="bg-white text-stone-900 antialiased w-[210mm] mx-auto px-[13mm]">
 
   <!-- ============================ PAGE 1 ============================ -->
-  <header class="relative">
-    <div class="absolute -top-[12mm] -left-[13mm] -right-[13mm] h-[6px] bg-gradient-to-r from-cyan-500 via-cyan-400 to-violet-500"></div>
-    <div class="flex items-end justify-between">
+  <!-- Hero band bleeds to the page edges: negative margins undo the PDF
+       margins, matching padding puts the content back on the grid. -->
+  <header class="-mx-[13mm] px-[13mm] pt-[7mm] pb-3 bg-[#1F1D1B] text-white relative overflow-hidden">
+    <div class="absolute inset-x-0 top-0 h-[5px] bg-gradient-to-r from-orange-600 via-orange-400 to-stone-400"></div>
+    <div class="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-orange-500/10 blur-3xl"></div>
+    <div class="absolute -left-16 bottom-0 w-56 h-56 rounded-full bg-stone-400/10 blur-3xl"></div>
+    <div class="relative flex items-start justify-between gap-8">
       <div>
-        <h1 class="text-[30px] font-extrabold tracking-tight text-zinc-900 leading-none">Yaseen Khatib</h1>
-        <p class="mt-1.5 text-[13px] font-semibold text-cyan-700">Senior Full-Stack AI Engineer</p>
+        <h1 class="text-[32px] font-extrabold tracking-tight leading-none">Yaseen Khatib</h1>
+        <p class="mt-2 text-[13px] font-semibold text-orange-400">Senior Full-Stack AI Engineer</p>
+        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I ship AI products end to end — six solo in twelve months, each with a link you can open.</p>
       </div>
-      <div class="text-right text-[10px] text-zinc-500 leading-[1.6]">
-        <div>${contact('pin', 'Hyderabad, India')}</div>
-        <div>Remote · Hybrid · On-site</div>
+      <div class="text-right text-[10px] text-stone-400 leading-[1.7] shrink-0 pt-1">
+        <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-stone-200">yaseenkhatib04@gmail.com</a></div>
+        <div><a href="tel:+918208335028" class="text-stone-200">+91 8208335028</a></div>
+        <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-orange-400">linkedin.com/in/yaseen-yk</a></div>
+        <div><a href="${GH}" class="text-orange-400">github.com/Yaseenyk</a></div>
+        <div><a href="${SITE}/" class="text-orange-400">yaseenkhatib.streamerosai.com</a></div>
+        <div class="mt-1 text-stone-500">Hyderabad, India · Remote / Hybrid / On-site</div>
       </div>
     </div>
-    <div class="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[10px]">
-      ${contact('mail', 'yaseenkhatib04@gmail.com', 'mailto:yaseenkhatib04@gmail.com')}
-      ${contact('phone', '+91 8208335028', 'tel:+918208335028')}
-      ${contact('linkedin', 'linkedin.com/in/yaseen-yk', 'https://www.linkedin.com/in/yaseen-yk', true)}
-      ${contact('github', 'github.com/Yaseenyk', GH, true)}
-      ${contact('globe', 'yaseenkhatib.streamerosai.com', `${SITE}/`, true)}
+    <div class="relative mt-3.5 grid grid-cols-5 divide-x divide-white/10 border-t border-white/10 pt-3">
+      ${[
+        ['6', 'products shipped solo', 'in twelve months'],
+        ['23M', 'parameter model distilled', 'from a 9B teacher, runs on CPU'],
+        ['94%', 'payload reduction', 'React Flow serialization adapter'],
+        ['1.5–2x', 'faster dashboards', 'MongoDB pipeline profiling'],
+        ['93.5%', 'backend test coverage', 'FitRank API, CI on every release'],
+      ].map(([n, l, s], i) => `
+        <div class="${i ? 'pl-4' : ''} pr-3">
+          <div class="text-[22px] font-extrabold leading-none text-white tracking-tight">${n}</div>
+          <div class="mt-1 text-[9.5px] font-semibold text-orange-400 uppercase tracking-wider">${l}</div>
+          <div class="text-[9px] text-stone-500 leading-snug mt-0.5">${s}</div>
+        </div>`).join('')}
     </div>
-    <p class="mt-3 text-[11px] text-zinc-700 leading-[1.5] border-t border-zinc-200 pt-3">
-      Five years building web products end to end, now building the AI inside them: systems that answer from real documents instead of guessing, models trained to make bounded decisions a manager signs off, and agents that propose rather than act. Stack: React, Next.js, Node.js, TypeScript, Python, Rust (using Claude Code); RAG, LLM orchestration, function calling, MCP. Shipped solo in the last twelve months: <b>FitRank, streamerOS, Sable, IntegrateX</b> and two autonomous content pipelines — each with a public link you can open.
-    </p>
   </header>
 
-  <section class="mt-4">
+  <section class="mt-3">
+    ${h2('The story')}
+    <p class="text-[10.5px] text-stone-700 leading-[1.55]">
+      I started in 2021 on <b>hospital information systems</b> — ASP.NET and React, real users every day — and learned how data moves through a system before I knew why that mattered. In 2023 I went <b>full-stack on MERN</b> at MSA Software, profiling slow MongoDB pipelines and moving the team to TypeScript and Next.js; ChatGPT had launched a few weeks earlier, so my nights became embeddings, retrieval and evals. By 2025 the two tracks merged: at Sparity I build the <b>LLM and agentic layer</b> of production systems by day, and on the side I have shipped <b>six products solo</b> — a distilled decision model, a Rust desktop app, a local-first finance agent, a workflow engine and two autonomous content pipelines — each with a link you can open.
+    </p>
+  </section>
+
+  <section class="mt-3">
     ${h2('Selected work', 'full write-ups on pages 2–3')}
     <div class="grid grid-cols-2 gap-3">${HIGHLIGHTS.map(highlight).join('')}</div>
   </section>
 
-  <section class="mt-4">
-    ${h2('Skills')}
-    <div class="grid grid-cols-2 gap-3">${SKILLS.map(skillPanel).join('')}</div>
-  </section>
-
-  <div class="grid grid-cols-12 gap-x-7 mt-4">
-    <section class="col-span-8">
+  <div class="grid grid-cols-12 gap-x-6 mt-3">
+    <section class="col-span-7">
       ${h2('Experience')}
       <div>${EXPERIENCE.map((j, i) => job(j, i === EXPERIENCE.length - 1)).join('')}</div>
     </section>
 
-    <aside class="col-span-4">
-      ${h2('Education')}
-      <div class="text-[10.5px] leading-[1.5] space-y-2.5">
-        <div><p class="font-bold text-zinc-900">B.E. Computer Science <span class="font-medium text-zinc-400">· 2021</span></p><p class="text-zinc-600">D. Y. Patil College of Engineering</p></div>
-        <div><p class="font-bold text-zinc-900">Diploma, Computer Science <span class="font-medium text-zinc-400">· 2018</span></p><p class="text-zinc-600">D. Y. Patil Polytechnic</p></div>
-        <div class="pt-1.5 border-t border-zinc-200 text-[10px] text-zinc-500 leading-[1.5]"><span class="font-bold text-zinc-700">Certifications</span><br/>Coding Ninjas — Front End Architecture · React Production Development · Advanced Backend Systems</div>
+    <aside class="col-span-5">
+      ${h2('Skills')}
+      <div class="rounded-lg border border-stone-200 bg-stone-50/60 px-3 py-2.5">${SKILLS.map(skillRow).join('')}</div>
+      <div class="mt-3">
+        ${h2('Education')}
+        <div class="text-[10.5px] leading-[1.45] space-y-1.5">
+          <div><p class="font-bold text-stone-900">B.E. Computer Science <span class="font-medium text-stone-400">· 2021</span></p><p class="text-stone-600">D. Y. Patil College of Engineering</p></div>
+          <div><p class="font-bold text-stone-900">Diploma, Computer Science <span class="font-medium text-stone-400">· 2018</span></p><p class="text-stone-600">D. Y. Patil Polytechnic</p></div>
+          <div class="pt-1 text-[9.5px] text-stone-500 leading-[1.45]"><span class="font-bold text-stone-700">Certifications</span> — Coding Ninjas: Front End Architecture · React Production Development · Advanced Backend Systems</div>
+        </div>
       </div>
     </aside>
   </div>
 
   <!-- ============================ PAGE 2: PRODUCTS ============================ -->
-  <div style="page-break-before: always;">
+  <div class="pt-[12mm]" style="page-break-before: always;">
     ${running('Products — designed, built and shipped solo')}
     <div class="space-y-3">${PRODUCTS.map(card).join('')}</div>
   </div>
 
   <!-- ============================ PAGE 3: APPLIED WORK, WRITING ============================ -->
-  <div style="page-break-before: always;">
+  <div class="pt-[12mm]" style="page-break-before: always;">
     ${running('Applied & client work · Writing & teaching')}
     ${h2('Applied & client work')}
     <div class="space-y-3">${APPLIED.map(card).join('')}</div>
@@ -388,7 +406,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       ${h2('Writing & teaching')}
       <div class="grid grid-cols-2 gap-3">${WRITING.map(writingCard).join('')}</div>
     </section>
-    <p class="mt-6 text-[8.5px] text-zinc-400 leading-snug text-center">Every link in this document was checked on the date of generation. Repositories not linked are private. Metrics are the latest published evaluation, including where the model loses.</p>
+    <p class="mt-6 text-[8.5px] text-stone-400 leading-snug text-center">Every link in this document was checked on the date of generation. Repositories not linked are private. Metrics are the latest published evaluation, including where the model loses.</p>
   </div>
 
 </body>
@@ -405,7 +423,9 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       path: outputPdfPath,
       format: 'A4',
       printBackground: true,
-      margin: { top: '12mm', bottom: '12mm', left: '13mm', right: '13mm' },
+      // Top and sides are zero so the hero band can bleed to the page edge;
+      // the body carries the horizontal gutter and each page its top space.
+      margin: { top: '0', bottom: '12mm', left: '0', right: '0' },
     });
 
     await browser.close();
