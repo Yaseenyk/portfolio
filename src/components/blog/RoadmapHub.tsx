@@ -177,7 +177,7 @@ export default function RoadmapHub({
       {/* Playlist */}
       <motion.ol
         variants={listVariants}
-        initial="hidden"
+        initial={false}
         animate="show"
         className="mt-12 flex flex-col gap-6"
       >

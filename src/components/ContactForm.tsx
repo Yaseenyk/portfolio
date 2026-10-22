@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
 import SectionLabel from "./SectionLabel";
+import Reveal from "./Reveal";
 import { track } from "@/lib/analytics";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -94,13 +95,7 @@ export default function ContactForm() {
         <SectionLabel index="03" title="Contact" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.6 }}
-        className="text-center"
-      >
+      <Reveal className="text-center">
         <h2 className="mx-auto mt-12 max-w-xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
           Have a product to build? <br className="hidden sm:block" />
           <span className="text-gradient animate-gradient">Let&apos;s ship it.</span>
@@ -192,7 +187,7 @@ export default function ContactForm() {
             )}
           </div>
         </form>
-      </motion.div>
+      </Reveal>
     </section>
   );
 }

@@ -30,7 +30,9 @@ export default function Hero() {
   return (
     <section className="grid grid-cols-1 items-center gap-8 py-12 sm:gap-12 sm:py-16 md:min-h-[80vh] md:grid-cols-2 md:gap-10 md:py-20 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
       {/* Left: copy */}
-      <motion.div variants={container} initial="hidden" animate="show">
+      {/* initial={false}: the h1 is the LCP element and must be in the server
+          HTML visible, not faded in after hydration. */}
+      <motion.div variants={container} initial={false} animate="show">
         <motion.div variants={item} className="flex flex-wrap items-center gap-2.5">
           <span className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-4 py-1.5 text-xs font-medium text-emerald-300">
             <PulseDot color="bg-emerald-400" />
@@ -105,7 +107,7 @@ export default function Hero() {
       {/* Right: AI core animation — constrained on mobile so it doesn't
           dominate the first screen */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={false}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.9, ease: EASE, delay: 0.3 }}
         className="mx-auto w-full max-w-[260px] sm:max-w-[400px] md:max-w-none"

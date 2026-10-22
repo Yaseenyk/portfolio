@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useHydrated } from "@/lib/useHydrated";
 
 export interface IndexPost {
   slug: string;
@@ -46,10 +47,13 @@ function BlogCard({
   post: IndexPost;
   activeCategory: string;
 }) {
+  // Cards present at hydration render visible in the server HTML; cards
+  // mounted later by a filter change still animate in.
+  const hydrated = useHydrated();
   return (
     <motion.article
       layout
-      initial={{ opacity: 0, scale: 0.92 }}
+      initial={hydrated ? { opacity: 0, scale: 0.92 } : false}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.92 }}
       transition={{ type: "spring", stiffness: 320, damping: 30 }}

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
+import { useHydrated } from "@/lib/useHydrated";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -64,6 +65,10 @@ export interface LogEntry {
 
 export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
   const ENTRIES = entries;
+  const listRef = useRef<HTMLOListElement>(null);
+  const hydrated = useHydrated();
+  const listInView = useInView(listRef, { once: true, margin: "-40px" });
+  const hidden = hydrated && !listInView;
   return (
     <section id="founders-log" className="scroll-mt-24 py-10 sm:py-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -99,14 +104,16 @@ export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
         <Stat value={1} suffix=" day" label="fastest client ship" />
       </div>
 
-      <ol className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ol ref={listRef} className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {ENTRIES.map((post, i) => (
           <motion.li
             key={post.slug}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.45, ease: EASE, delay: (i % 3) * 0.08 }}
+            initial={false}
+            animate={
+              hidden
+                ? { opacity: 0, y: 20, transition: { duration: 0 } }
+                : { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE, delay: (i % 3) * 0.08 } }
+            }
           >
             <Link
               href={`/blog/${post.slug}`}

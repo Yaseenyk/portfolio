@@ -266,7 +266,7 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        initial={{ y: -24, opacity: 0 }}
+        initial={false}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: EASE }}
         className="fixed left-1/2 top-6 z-50 -translate-x-1/2"

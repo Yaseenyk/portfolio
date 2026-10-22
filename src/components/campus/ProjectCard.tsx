@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import { useHydrated } from "@/lib/useHydrated";
 import { formatInr, lowestPrice, type CampusProject } from "@/lib/campus";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
@@ -13,12 +15,18 @@ export default function ProjectCard({
   project: CampusProject;
   index: number;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const hydrated = useHydrated();
+  const inView = useInView(ref, { once: true, margin: "-60px" });
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay: Math.min(index, 4) * 0.06, ease: EASE }}
+      ref={ref}
+      initial={false}
+      animate={
+        hydrated && !inView
+          ? { opacity: 0, y: 20, transition: { duration: 0 } }
+          : { opacity: 1, y: 0, transition: { duration: 0.5, delay: Math.min(index, 4) * 0.06, ease: EASE } }
+      }
     >
       <Link
         href={`/final-year-projects/${project.slug}`}

@@ -1,6 +1,8 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
+import { useRef } from "react";
+import { useHydrated } from "@/lib/useHydrated";
 
 interface Role {
   period: string;
@@ -49,11 +51,14 @@ const list: Variants = {
 };
 
 const node: Variants = {
-  hidden: { opacity: 0, x: 20 },
+  hidden: { opacity: 0, x: 20, transition: { duration: 0 } },
   show: { opacity: 1, x: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
 export default function Experience() {
+  const ref = useRef<HTMLDivElement>(null);
+  const hydrated = useHydrated();
+  const inView = useInView(ref, { once: true, margin: "-60px" });
   return (
     <section id="experience" aria-label="Professional experience" className="scroll-mt-24">
       <div className="flex items-center gap-3">
@@ -75,10 +80,10 @@ export default function Experience() {
         />
 
         <motion.div
+          ref={ref}
           variants={list}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
+          initial={false}
+          animate={hydrated && !inView ? "hidden" : "show"}
           className="space-y-16"
         >
           {ROLES.map((role) => (

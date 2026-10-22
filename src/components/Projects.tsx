@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useHydrated } from "@/lib/useHydrated";
 import type { ComponentType } from "react";
 import PulseDot from "./PulseDot";
 import { GithubIcon, ExternalLinkIcon } from "./Icons";
@@ -338,13 +339,19 @@ function ProjectRow({ project }: { project: Project }) {
   const { Animation, Supplement } = project;
   const [showDocs, setShowDocs] = useState(false);
   const external = project.href?.startsWith("http");
+  const ref = useRef<HTMLElement>(null);
+  const hydrated = useHydrated();
+  const inView = useInView(ref, { once: true, margin: "-80px" });
   return (
     <motion.article
+      ref={ref}
       id={projectAnchor(project.name)}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6 }}
+      initial={false}
+      animate={
+        hydrated && !inView
+          ? { opacity: 0, y: 30, transition: { duration: 0 } }
+          : { opacity: 1, y: 0, transition: { duration: 0.6 } }
+      }
       className="group relative scroll-mt-28 overflow-hidden rounded-2xl border border-zinc-800/50 bg-ink/40 backdrop-blur-xl transition-all duration-300 hover:border-ice/30 hover:shadow-[0_0_44px_-12px_rgba(103,232,249,0.4)]"
     >
       {/* Stretched link: the whole card clicks through to the project's

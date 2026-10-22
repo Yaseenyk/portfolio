@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
+import { useHydrated } from "@/lib/useHydrated";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -18,6 +20,10 @@ export interface RecentPost {
 
 export default function RecentPosts({ posts }: { posts: RecentPost[] }) {
   const RECENT = posts;
+  const ref = useRef<HTMLDivElement>(null);
+  const hydrated = useHydrated();
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const hidden = hydrated && !inView;
   return (
     <section id="writing" className="scroll-mt-24 py-24">
       <div className="flex items-center justify-between gap-4">
@@ -32,14 +38,16 @@ export default function RecentPosts({ posts }: { posts: RecentPost[] }) {
         </Link>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div ref={ref} className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
         {RECENT.map((post, i) => (
           <motion.article
             key={post.slug}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.5, ease: EASE, delay: i * 0.08 }}
+            initial={false}
+            animate={
+              hidden
+                ? { opacity: 0, y: 24, transition: { duration: 0 } }
+                : { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE, delay: i * 0.08 } }
+            }
             whileHover={{ y: -5, borderColor: "#22D3EE" }}
             className="flex flex-col rounded-2xl border border-zinc-800/50 bg-zinc-950/60 p-6 backdrop-blur-md"
           >

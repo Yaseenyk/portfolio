@@ -2,12 +2,14 @@
 
 import type { CSSProperties } from "react";
 import { useRef } from "react";
+import { useHydrated } from "@/lib/useHydrated";
 import Link from "next/link";
 import {
   motion,
   useMotionValue,
   useSpring,
   useTransform,
+  useInView,
 } from "framer-motion";
 import type { ProductMeta } from "@/lib/products";
 import { GithubIcon, ExternalLinkIcon, ArrowRightIcon } from "@/components/Icons";
@@ -27,6 +29,8 @@ export default function SpotlightCard({
   index?: number;
 }) {
   const ref = useRef<HTMLElement>(null);
+  const hydrated = useHydrated();
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
@@ -57,10 +61,12 @@ export default function SpotlightCard({
       ref={ref}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: EASE, delay: index * 0.08 }}
+      initial={false}
+      animate={
+        hydrated && !inView
+          ? { opacity: 0, y: 24, transition: { duration: 0 } }
+          : { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE, delay: index * 0.08 } }
+      }
       style={
         {
           rotateX,
