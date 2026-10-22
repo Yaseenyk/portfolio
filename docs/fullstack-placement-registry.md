@@ -184,3 +184,37 @@ are free.
 Registering is the floor, not the plan. After each upload, find the recruiter
 at that firm who posted a full-stack role in the last 30 days and email them
 from `/outreach` in agency mode. That is where the placements come from.
+
+---
+
+## 11. After you log in
+
+The same four things on every site, in this order. A half-filled profile is
+invisible to a recruiter's search filter; the filter is the whole game.
+
+1. **Profile to 100%.** Title exactly `Senior MERN Stack Developer · AI Systems`.
+   Years: 5. Skills typed the way the site's dropdown spells them: React,
+   Node.js, MongoDB, Express, Next.js, TypeScript, Python, FastAPI, RAG, LLM.
+   Add every one the dropdown offers; recruiters filter on these fields, not
+   on the PDF.
+2. **Upload the PDF** (`Resume.pdf` from the site). Where the site asks for a
+   headline or summary, paste the summary paragraph from page 1.
+3. **Preferences:** locations Hyderabad + Remote; work mode remote / hybrid /
+   on-site all ticked; notice period honest; expected CTC a range, not a
+   number. Turn on "open to opportunities" or "visible to recruiters" wherever
+   the toggle exists.
+4. **One action inside the site.** Apply to one live full-stack role, or
+   message one recruiter. Fresh activity moves you up most platforms' recruiter
+   searches; a dormant profile sinks.
+
+Platform-specific gates, so none is a surprise:
+
+| platform | what happens after sign-up |
+| --- | --- |
+| **Pesto** | profile, then a screening round (coding + AI-driven vetting). Block an evening for it; no partner sees you before it is passed |
+| **Toptal** | English/communication call, timed algorithm test, live coding, then a test project. Two to three weeks end to end; 3% pass rate they publish |
+| **Turing** | automated skills tests per stack, then a live interview; roles then appear in the dashboard to apply to |
+| **Andela** | profile and assessment, then matched to roles; no public job board to browse |
+| **Cutshort** | upload résumé, then companies invite you. The feed is public; apply to EZEU's roles directly from its company page |
+| **Talent500** | AI-matched after profile; confirm there is no candidate fee at the paywall if one appears |
+| **Big agencies (§2–§6)** | upload lands in an ATS. Nothing happens until a recruiter searches it, which is why step 4 above and the named-recruiter email matter more here than anywhere |
