@@ -9,9 +9,12 @@
  * Deploy (once, about five minutes):
  *   1. Create a new Google Sheet. Name it anything.
  *   2. Extensions → Apps Script. Delete the sample code, paste this file.
- *   3. Project Settings (gear) → Script Properties → add:
+ *   3. Project Settings (gear) → Script Properties → add two:
  *        JOBS_TOKEN = <a long random string>
- *      The worker sends the same string; a request without it is refused.
+ *          The worker sends the same string; a request without it is refused.
+ *        SHEET_ID   = <the ID from the Sheet's URL, /spreadsheets/d/<ID>/edit>
+ *          Required when the script was created at script.google.com rather
+ *          than from inside the Sheet; harmless otherwise.
  *   4. Deploy → New deployment → type "Web app":
  *        Execute as: Me        Who has access: Anyone
  *      Authorise when prompted. Copy the Web app URL.
@@ -87,12 +90,24 @@ function doPost(e) {
     ok: true,
     row: rowNumber,
     screenshotUrl: screenshotUrl,
-    sheetUrl: SpreadsheetApp.getActiveSpreadsheet().getUrl() + '#gid=' + sheet.getSheetId(),
+    sheetUrl: getSpreadsheet_().getUrl() + '#gid=' + sheet.getSheetId(),
   });
 }
 
+// A script created from script.google.com (rather than from inside a Sheet)
+// has no active spreadsheet, so the Sheet to write to is named by ID in a
+// Script Property. The ID is the long segment of the Sheet's URL:
+//   https://docs.google.com/spreadsheets/d/<SHEET_ID>/edit
+function getSpreadsheet_() {
+  var id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
+  if (id) return SpreadsheetApp.openById(id);
+  var active = SpreadsheetApp.getActiveSpreadsheet();
+  if (active) return active;
+  throw new Error('No Sheet: set Script Property SHEET_ID to the spreadsheet ID');
+}
+
 function getSheet_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = getSpreadsheet_();
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
