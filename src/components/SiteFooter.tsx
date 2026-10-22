@@ -51,7 +51,7 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
     links: [
       // The student business is its own site now; one link, not a mirror of
       // its menu, so the portfolio stays about the engineer.
-      { href: "https://campus.streamerosai.com/", label: "Final year projects" },
+      { href: "https://campus.streamerosai.com/", label: "DefendIt — final year projects" },
     ],
   },
   {

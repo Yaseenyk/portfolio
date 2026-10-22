@@ -47,7 +47,7 @@ export function GET() {
 - [For businesses — the four services and their prices](${SITE_URL}/solutions/business/)
 - [For small businesses — hosted tools from ₹800/month](${SITE_URL}/solutions/small-business/)
 
-## Final year projects for Indian students — separate site
+## DefendIt — final year projects for Indian students (separate site)
 
 > The student-projects business, its free guides, the viva question bank and
 > the 16-day AI engineering journey live on their own site, with their own
