@@ -286,3 +286,125 @@ deposit to secure a job; Quess runs `alert@quesscorp.com` purely for reports.
 on their own sites. An offer from a Gmail address claiming to be a staffing firm
 is a scam, and several of these firms say so themselves. Michael Page UAE
 specifically warns about impersonation over WhatsApp and Telegram.
+
+---
+
+# Part 2: the fast lane
+
+Added 2026-10-22. Part 1 is large agencies that keep a database. This part is
+the firms that **push you into an opening themselves**, plus the services you
+can **pay after placement** to do the applying for you. Every URL and fee here
+was read from the firm's own page on 2026-10-22; where a page would not load or
+said nothing, it says so.
+
+The model you asked for by name, EZEU, is a small Bengaluru staffing-and-
+training firm (founded 2020, under 20 people) that posts developer openings and
+takes CVs for them directly. §10 is firms that work the same way.
+
+---
+
+## 10. Boutique IT staffing firms (the EZEU pattern)
+
+Employer-paid. They hold live client mandates and place you into one; you are
+not in a database waiting to be searched. Small, so one email reaches a human.
+
+| firm | where to apply | contact | notes |
+| --- | --- | --- | --- |
+| **EZEU (OPC) India** | https://cutshort.io/company/ezeu-opc-india-pvt-ltd-42-ix0UKabI | no email published; recruiter is Lakshmi PH on LinkedIn · https://linkedin.com/company/ezeu-opc-india-pvt-limited | Bengaluru + Pune. Open roles 2–15 yrs: Java full stack ₹10–25L, SDET, UI/UX engineer ₹9–36L, DevSecOps, Azure architect. Cutshort flags the recruiter as "not active recently", so expect delays |
+| **Cybotrix Technologies** | https://cybotrix.com/signup.html | `contact@cybotrix.com` | Bengaluru primary, lists Hyderabad, Pune, Chennai and 20 more cities. Roles: full stack MERN / MEAN / Java / .NET, Python, testing. **Pay-after-placement**: fee settled after offer letter and joining; lateral band quoted ₹4–10 LPA+. Page contradicts itself ("No registration fee" banner vs "smaller registration fee if applicable"), so get the exact amount and trigger in writing before signing |
+| **WSNE Consulting** | https://wsneconsulting.com/submit-resume | `info@wsneconsulting.com` | Contract staffing, 3–24 month contracts. Full Stack, DevOps, AI/ML, Cloud, SRE. Bengaluru coverage; offices Delhi NCR and Dehradun |
+| **Bloom Solutions** | contact form, pick **I am a Job Seeker** | `info@bloomsolutions.com` · WhatsApp `+91 974 279 9038` | Bengaluru (Yelahanka). Full-stack, React / Angular, Java / .NET, DevOps, AWS / Azure, AI/ML |
+| **TeamPlus Staffing** | careers section on teamplusindia.in | `hr@teamplusindia.in` · `+91 80 6217 8320` | Offices Mumbai and Pune, Hyderabad coverage. Python, Android, PHP, app developers |
+| **SRI Tech Solutions** | https://sritechsolutions.com → Careers → Current Openings | `info@sritechsolutions.com` | Hyderabad staffing, US phone. Full Stack, AI/ML, Cloud, DevOps |
+| **Hyring** | https://hyring.com → Join as a jobseeker | none published | Platform, not an agency: free for candidates, auto-apply plus a marketplace of recruiting partners who place you for a commission the employer pays |
+
+None of these charge a candidate except Cybotrix, and Cybotrix only after you
+join.
+
+---
+
+## 11. Vetted placement into remote and GCC roles, free to you
+
+| firm | where to apply | fee | notes |
+| --- | --- | --- | --- |
+| **Pesto** | https://apps.pesto.tech/developer/registration | **Free**; "charges hiring partners, not developers" | **Requires 4+ years** on full-stack, **MERN**, frontend or backend. Places into full-time roles; past partners named on the page: Swiggy, Razorpay, Amazon, Flipkart, Clipboard Health, Pulley. `support@pesto.tech` |
+| **Talent500** (ANSR) | https://talent500.com/auth/signup | not stated on page | Roles at Global Capability Centres in India. AI-matched. The site calls itself "premium" but publishes no candidate fee; confirm at sign-up |
+
+Pesto is the strongest single entry in this document for your profile: it is
+free, it names MERN, and your experience clears the bar.
+
+Part 1 flagged Pesto for a historical income-share model. Their current
+developer page says free; the earlier flag is withdrawn.
+
+---
+
+## 12. Someone applies for you, paid after placement or per application
+
+All of these target remote US roles unless noted. **None of them states on its
+site whether an India-based candidate is accepted**, so ask before paying. Fees
+are quoted verbatim from each firm's own pricing page.
+
+| service | fee model | what you get | sign up |
+| --- | --- | --- | --- |
+| **Reverse Recruiting Agency** | `$1,500`/month + `10% of first-year salary upon job acceptance`. First month refunded when you land the job; monthly fee `fully refundable within 30 days` | `50-100 applications/week`, resume and LinkedIn rewrite, daily recruiter outreach, interview prep, negotiation. Guarantee: `9 interviews in your first 3 months or your money back` | https://www.reverserecruitingagency.com/contact |
+| **Find My Profession** | From `$1,500/month + 8% success fee`, or `$3,000/month` flat (per their own guide; the service page did not render, so confirm on a call) | Applies on your behalf; describes itself as one of the few reverse recruiters that do | https://www.findmyprofession.com/reverse-recruiting/ |
+| **My Personal Recruiter** | `$899`, `$1,499` or `$2,499` per month. No success fee. Guarantee: if no written offer within six months, service continues at no extra cost | Dedicated recruiter builds target lists, applies, contacts hiring managers, negotiates. Volume not stated. Miami, US phone `800-500-7760` | https://app.mypersonalrecruiter.com/ |
+| **Careerify** | `$150–$720 a month` for `~50–300 applications`. 5-day free trial. No success fee | A human (offshore) recruiter checks fit and submits each application with the right resume version; every submission logged to your dashboard | https://dashboard.careerify.io/signup |
+| **Scale.jobs** | One-time: `$199` / 250 applications, `$299` / 500, `$399` / 1,000, `$1,099` bundle. Unused credits refundable | Human assistants fill every form, screenshot proof per application, strategy review every 15 days. Testimonials include Indian candidates and H-1B roles | https://scale.jobs/sign-up |
+| **ApplyPass** | 100 applications free, then paid tiers (pricing page not read) | **Automated**, not human: `auto-applies to 400+ software engineering jobs weekly`. Built for software engineers | https://app.applypass.com/sign-up |
+
+Which to pick, if any:
+
+- **Scale.jobs** is the cheap volume play: a few hundred dollars once, humans
+  doing the forms, no percentage of your salary.
+- **Reverse Recruiting Agency** is the real "pay after placement" model: the
+  10% success fee is only due on acceptance and the first month comes back.
+  On a USD salary that fee is large; on an Indian salary it would be modest.
+- **Careerify** is the middle: monthly, human, no success fee, free trial.
+- Everything else here is US-priced coaching. Skip unless you are specifically
+  targeting US remote and can fund it for three months.
+
+---
+
+## 13. Overseas placement agents: the rule, not a list
+
+For Gulf and Europe you do not need a fee-charging agent for IT roles, and most
+of the ones that ask for money are the scams Part 1 warns about.
+
+- An agent recruiting Indians for jobs abroad must hold an MEA **Recruiting
+  Agent licence**. Check the licence on https://emigrate.gov.in/ before anything
+  else. Unlicensed recruitment is an offence under the Emigration Act, 1983.
+- A licensed agent may charge at most **₹30,000 + 18% GST (₹35,400)** and must
+  give a receipt. Anything above that, or any "processing fee" by WhatsApp, is
+  the signal to walk.
+- IT roles are not Emigration-Check-Required, so the Gulf agencies in Part 1 §3
+  (Halian, TASC, Michael Page UAE, Hays UAE) are the correct route, and in the
+  UAE the law forbids charging the candidate at all.
+
+---
+
+## 14. Pay-after-placement training programmes, for reference only
+
+These came up in the search and are candidate-paid after placement, but they are
+**training bundled with placement**, built for freshers and early-career
+switchers. Not a fit for five years of experience; listed so you know what they
+are when they advertise to you.
+
+Intellipaat (tuition after a 5 LPA job), AccioJob (income-share agreement),
+Placewit (pay when placed above a minimum CTC), Edufect (40% during, 60% after
+joining), Sharpener Tech (deposit refunded per terms).
+
+---
+
+## 15. Order of operations for the fast lane
+
+1. **Today, free:** Pesto registration, Talent500 sign-up, Cybotrix sign-up (ask
+   for the fee terms in writing in the same message).
+2. **Today, one email each:** WSNE, Bloom, TeamPlus, SRI Tech with the résumé
+   attached and the stack in the subject line. Draft them from `/outreach` in
+   agency mode.
+3. **This week:** apply to the EZEU Cutshort listings that fit and message
+   Lakshmi PH on LinkedIn; expect a slow reply.
+4. **Only if targeting US remote:** Scale.jobs first (cheap, humans), Reverse
+   Recruiting Agency second (success fee). Ask both whether they take
+   India-based candidates before paying.
