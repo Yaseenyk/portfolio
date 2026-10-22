@@ -63,6 +63,9 @@ const SITE = "https://yaseenkhatib.streamerosai.com";
 
 const ALLOWED_ORIGINS = new Set([
   SITE,
+  // The student-projects business, split out to its own site; its lead form,
+  // consent PDF and agreement storage still run on this worker.
+  "https://campus.streamerosai.com",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
 ]);
