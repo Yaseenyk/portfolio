@@ -105,7 +105,7 @@ if (existsSync(CAMPUS)) {
 
 const campusCount = sections.length - articleCount;
 
-const header = `Yaseen Khatib — full corpus (${articleCount} articles, ${campusCount} final-year-project pages)
+const header = `Yaseen Khatib — full corpus (${articleCount} articles${campusCount ? `, ${campusCount} final-year-project pages` : ""})
 Author canonical bio: ${SITE}/about
 Curated index: ${SITE}/llms.txt
 

@@ -1,14 +1,6 @@
 import { getAllPosts, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 import { SITE_URL, PERSON } from "@/lib/site";
-import {
-  CAMPUS_PROJECTS,
-  CUSTOM_BUILD_RANGE,
-  SESSION_POLICY,
-  formatInr,
-} from "@/lib/campus";
-import { GUIDES } from "@/lib/guides";
 import { formatInrShort } from "@/lib/solutions";
-import { VIVA_QUESTIONS } from "@/lib/vivaQuestions";
 
 export const dynamic = "force-static";
 
@@ -55,35 +47,11 @@ export function GET() {
 - [For businesses — the four services and their prices](${SITE_URL}/solutions/business/)
 - [For small businesses — hosted tools from ₹800/month](${SITE_URL}/solutions/small-business/)
 
-## Final year projects for Indian students (BCA / MCA / B.Tech)
+## Final year projects for Indian students — separate site
 
-> Final year projects built end to end for the student — code, database,
-> report, diagrams, deck and deployment. The student writes none of it. Any
-> idea can be commissioned, not only the listed ones: an approved problem
-> statement or the student's own concept, in any stack, quoted
-> ${formatInr(CUSTOM_BUILD_RANGE.min)}–${formatInr(CUSTOM_BUILD_RANGE.max)}
-> by scope.
-> After delivery there are ${SESSION_POLICY.cadence.toLowerCase()} live
-> ${SESSION_POLICY.platform} sessions after ${SESSION_POLICY.startsAfter} where
-> the code is explained line by line, ending in a mock viva, so the student can
-> defend work they did not write.
-> Payment is direct (UPI / bank transfer) in monthly installments — there is no
-> checkout, gateway or subscription. Each listing is capped to a small number of
-> students per college per year.
-
-- [Catalog — all final year projects](${SITE_URL}/final-year-projects/)
-- [Custom project built to your problem statement](${SITE_URL}/final-year-projects/custom/)
-- [For colleges — workshops and cohort mentoring](${SITE_URL}/final-year-projects/colleges/)
-- [Terms — payment, delivery, cancellation](${SITE_URL}/final-year-projects/terms/)
-- [Free tool: timeline planner — usable weeks before a submission date](${SITE_URL}/final-year-projects/planner/)
-- [Free tool: viva question bank — ${VIVA_QUESTIONS.length} questions, filterable, with what each one tests](${SITE_URL}/final-year-projects/question-bank/)
-${GUIDES.map(
-  (g) => `- [${g.meta.title}](${SITE_URL}/final-year-projects/guides/${g.meta.slug}/): ${g.meta.description}`,
-).join("\n")}
-${CAMPUS_PROJECTS.map(
-  (p) =>
-    `- [${p.title}](${SITE_URL}/final-year-projects/${p.slug}/): ${p.summary} Suits ${p.degrees.join(", ")}. Stack: ${p.stack.join(", ")}. From ${formatInr(p.prices.source)}.`,
-).join("\n")}
+> The student-projects business, its free guides, the viva question bank and
+> the 16-day AI engineering journey live on their own site, with their own
+> llms.txt: https://campus.streamerosai.com/
 
 ## Founder's Log — vision series
 

@@ -49,17 +49,9 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
   {
     heading: "For students",
     links: [
-      { href: "/final-year-projects/", label: "Final year projects" },
-      { href: "/final-year-projects/guides/", label: "Free guides" },
-      { href: "/final-year-projects/question-bank/", label: "Viva question bank" },
-      { href: "/final-year-projects/planner/", label: "Timeline planner" },
-      { href: "/final-year-projects/find-my-project/", label: "Find my project" },
-      { href: "/final-year-projects/cost-estimator/", label: "Cost estimator" },
-      { href: "/final-year-projects/templates/", label: "Report templates" },
-      { href: "/final-year-projects/colleges/", label: "For colleges" },
-      // Onboarding document — noindex, and only sent to a student once they
-      // have committed. Listed here so the link is never lost.
-      { href: "/final-year-projects/agreement/", label: "Student agreement" },
+      // The student business is its own site now; one link, not a mirror of
+      // its menu, so the portfolio stays about the engineer.
+      { href: "https://campus.streamerosai.com/", label: "Final year projects" },
     ],
   },
   {

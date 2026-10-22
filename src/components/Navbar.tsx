@@ -24,7 +24,7 @@ interface NavGroup {
 }
 
 /**
- * Five top-level entries, each opening a submenu. Keeping the island small
+ * Four top-level entries, each opening a submenu. Keeping the island small
  * matters more than exposing every route — depth lives in the dropdowns, and
  * every page stays two clicks away.
  */
@@ -72,33 +72,6 @@ const GROUPS: NavGroup[] = [
       })),
       { divider: true },
       { href: "/sandbox/", label: "Resiliency lab", desc: "FinOps + chaos sim" },
-    ],
-  },
-  {
-    label: "Students",
-    href: "/final-year-projects/",
-    items: [
-      {
-        href: "/final-year-projects/",
-        label: "Final year projects",
-        desc: "Built for you, then explained",
-      },
-      {
-        href: "/final-year-projects/custom/",
-        label: "Get your idea built",
-        desc: "Any stack, any domain",
-      },
-      {
-        href: "/final-year-projects/journey/",
-        label: "AI engineering journey",
-        desc: "16 days · 4 hours a day, live",
-      },
-      { divider: true },
-      { href: "/final-year-projects/guides/", label: "Free guides" },
-      { href: "/final-year-projects/question-bank/", label: "Viva question bank" },
-      { href: "/final-year-projects/planner/", label: "Timeline planner" },
-      { divider: true },
-      { href: "/final-year-projects/colleges/", label: "For colleges" },
     ],
   },
   {
