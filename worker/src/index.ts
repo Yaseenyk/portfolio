@@ -442,23 +442,15 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       ? "THIS IS NOT AN APPLICATION TO A VACANCY. The recipient is a staffing " +
         "consultant or recruitment agency that places engineers with client " +
         "companies. Write a short introduction asking to be considered for " +
-        "their current and future full-stack and AI mandates.
-" +
-        "- Say plainly what I am: Senior Full-Stack (MERN) moving into production AI.
-" +
+        "their current and future full-stack and AI mandates.\n" +
+        "- Say plainly what I am: Senior Full-Stack (MERN) moving into production AI.\n" +
         "- Give them what they screen on in one compact block: stack, the five " +
         "shipped products as proof, current and expected CTC, preferred " +
-        "locations, and that I am open to contract, contract-to-hire or permanent.
-" +
-        "- Ask them to add me to their candidate pool and send relevant roles.
-" +
-        "- Do NOT invent a vacancy, a client name, or a mutual connection.
-" +
-        "- Under 180 words. A consultant skims; the block matters more than prose.
-" +
-        PREFERENCES + "
-
-"
+        "locations, and that I am open to contract, contract-to-hire or permanent.\n" +
+        "- Ask them to add me to their candidate pool and send relevant roles.\n" +
+        "- Do NOT invent a vacancy, a client name, or a mutual connection.\n" +
+        "- Under 180 words. A consultant skims; the block matters more than prose.\n" +
+        PREFERENCES + "\n\n"
       : "";
     const user =
       OUTREACH_FACTS +
@@ -474,11 +466,9 @@ async function handleOutreach(request: Request, env: Env, origin: string | null)
       "\n" + rules +
       "\nSTRUCTURE:\n" +
       (agency
-        ? "- \"subject\": \"Senior Full-Stack (MERN) + AI Engineer — available for your mandates — Yaseen Khatib\".
-"
+        ? "- \"subject\": \"Senior Full-Stack (MERN) + AI Engineer — available for your mandates — Yaseen Khatib\".\n"
         : "- \"subject\": a formal application subject line: " +
-          "\"Application: <role from the JD, or 'Full-Stack (MERN) + AI Engineer'> — Yaseen Khatib\".
-") +
+          "\"Application: <role from the JD, or 'Full-Stack (MERN) + AI Engineer'> — Yaseen Khatib\".\n") +
       "- \"body\": line 1 is the greeting \"" + greeting + "\", then a blank line, " +
       "then the email, then a courteous close (e.g. \"I would welcome the chance " +
       "to discuss how I can contribute.\"), then a line \"Links:\" followed by " +
