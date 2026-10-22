@@ -36,6 +36,12 @@ export interface Env {
   OPENAI_API_KEY?: string;
   /** Optional model override (default gpt-4o-mini). */
   OUTREACH_MODEL?: string;
+  /** Job-application tracker: the Apps Script web-app URL and its shared
+   *  token (scripts/jobs-tracker.gs). Both set as secrets:
+   *    npx wrangler secret put JOBS_SHEET_URL
+   *    npx wrangler secret put JOBS_SHEET_TOKEN */
+  JOBS_SHEET_URL?: string;
+  JOBS_SHEET_TOKEN?: string;
 }
 
 /** Minimal D1 surface — hand-rolled to match the AI/VECTORIZE style above,
@@ -895,6 +901,154 @@ async function handleAgreementGet(
   }
 }
 
+/* ------------------------------ jobs tracker ------------------------------ */
+// Private, passcode-gated. Two steps: /api/jobs/extract reads an application
+// screenshot with Workers AI vision and returns the fields; /api/jobs/save
+// appends the (user-corrected) row to a Google Sheet through the Apps Script
+// web app in scripts/jobs-tracker.gs, which also files the screenshot in
+// Drive. Two steps on purpose: a wrong company name in the tracker is worse
+// than no row, so the user confirms before anything is written.
+
+const VISION_MODEL = "@cf/meta/llama-3.2-11b-vision-instruct";
+
+const VISION_PROMPT =
+  "This is a screenshot of a job application that has just been submitted, or " +
+  "of the job posting it was submitted to. Return ONLY a JSON object with these " +
+  'keys: "company" (hiring company), "role" (job title), "platform" (the site ' +
+  "it was applied on, e.g. Cutshort, LinkedIn, Naukri, Wellfound, Instahyre, " +
+  'company careers page), "location" (city or Remote), "url" (job URL if ' +
+  'visible), "applicants" (applicant count if visible, digits only), "date" ' +
+  '(application date if visible, YYYY-MM-DD). Use "" for anything not visible. ' +
+  "No prose, no markdown, just the JSON.";
+
+function dataUrlToBytes(dataUrl: string): number[] {
+  const bin = atob(dataUrl.slice(dataUrl.indexOf(",") + 1));
+  const out = new Array<number>(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+// Workers AI vision models accept {prompt, image: bytes}; some builds take
+// the OpenAI-style messages array instead. Try the documented form first and
+// fall back, so a model-side change degrades to a slower call, not a 502.
+async function runVision(env: Env, image: string): Promise<string> {
+  let out: any;
+  try {
+    out = await env.AI.run(VISION_MODEL, {
+      prompt: VISION_PROMPT,
+      image: dataUrlToBytes(image),
+      max_tokens: 400,
+    });
+  } catch {
+    out = await env.AI.run(VISION_MODEL, {
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: VISION_PROMPT },
+            { type: "image_url", image_url: { url: image } },
+          ],
+        },
+      ],
+      max_tokens: 400,
+    });
+  }
+  return String(out?.response ?? out?.description ?? out?.result?.response ?? "");
+}
+
+const JOB_FIELDS = ["company", "role", "platform", "location", "url", "applicants", "date"] as const;
+
+async function handleJobsExtract(request: Request, env: Env, origin: string | null): Promise<Response> {
+  if (!env.OUTREACH_PASSCODE) {
+    return json({ error: "jobs tracker not configured (no passcode set)" }, 503, origin);
+  }
+  let body: { passcode?: string; image?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "invalid JSON body" }, 400, origin);
+  }
+  if ((body.passcode ?? "") !== env.OUTREACH_PASSCODE) {
+    return json({ error: "wrong passcode" }, 401, origin);
+  }
+  const image = typeof body.image === "string" ? body.image : "";
+  if (!image.startsWith("data:image")) {
+    return json({ error: "upload a screenshot first" }, 400, origin);
+  }
+  // ~6 MB of base64 is a ~4.5 MB image; phone screenshots are well under.
+  if (image.length > 8_000_000) {
+    return json({ error: "screenshot too large (keep it under 4 MB)" }, 413, origin);
+  }
+  try {
+    const text = await runVision(env, image);
+    const match = text.match(/\{[\s\S]*\}/);
+    const parsed = match ? (JSON.parse(match[0]) as Record<string, unknown>) : {};
+    const fields: Record<string, string> = {};
+    for (const k of JOB_FIELDS) fields[k] = String(parsed[k] ?? "").trim().slice(0, 200);
+    return json({ fields, raw: text.slice(0, 600) }, 200, origin);
+  } catch (e) {
+    return json({ error: "could not read the screenshot", detail: String(e).slice(0, 300) }, 502, origin);
+  }
+}
+
+async function handleJobsSave(request: Request, env: Env, origin: string | null): Promise<Response> {
+  if (!env.OUTREACH_PASSCODE) {
+    return json({ error: "jobs tracker not configured (no passcode set)" }, 503, origin);
+  }
+  if (!env.JOBS_SHEET_URL || !env.JOBS_SHEET_TOKEN) {
+    return json(
+      { error: "tracker not configured (set JOBS_SHEET_URL and JOBS_SHEET_TOKEN on the worker)" },
+      503,
+      origin,
+    );
+  }
+  let body: Record<string, unknown> & { passcode?: string; image?: string; notes?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "invalid JSON body" }, 400, origin);
+  }
+  if ((body.passcode ?? "") !== env.OUTREACH_PASSCODE) {
+    return json({ error: "wrong passcode" }, 401, origin);
+  }
+  const payload: Record<string, unknown> = { token: env.JOBS_SHEET_TOKEN, status: "applied" };
+  for (const k of JOB_FIELDS) payload[k] = String(body[k] ?? "").trim().slice(0, 300);
+  payload.notes = String(body.notes ?? "").trim().slice(0, 1000);
+  if (!payload.company && !payload.role) {
+    return json({ error: "company or role is required" }, 400, origin);
+  }
+  if (typeof body.image === "string" && body.image.startsWith("data:image") && body.image.length <= 8_000_000) {
+    payload.image = body.image;
+  }
+  try {
+    // Apps Script answers a POST with a 302 to script.googleusercontent.com;
+    // fetch follows it by default and the JSON comes back from there.
+    const res = await fetch(env.JOBS_SHEET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      redirect: "follow",
+    });
+    const text = await res.text();
+    let data: { ok?: boolean; error?: string; row?: number; screenshotUrl?: string; sheetUrl?: string };
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { ok: false, error: `sheet returned non-JSON (${res.status}): ${text.slice(0, 160)}` };
+    }
+    if (!res.ok || !data.ok) {
+      return json({ error: data.error ?? `sheet responded ${res.status}` }, 502, origin);
+    }
+    return json(
+      { ok: true, row: data.row, screenshotUrl: data.screenshotUrl ?? "", sheetUrl: data.sheetUrl ?? "" },
+      200,
+      origin,
+    );
+  } catch (e) {
+    return json({ error: "could not reach the sheet", detail: String(e).slice(0, 300) }, 502, origin);
+  }
+}
+
 /* --------------------------------- router -------------------------------- */
 
 export default {
@@ -911,6 +1065,12 @@ export default {
     }
     if (pathname === "/api/outreach" && request.method === "POST") {
       return handleOutreach(request, env, origin);
+    }
+    if (pathname === "/api/jobs/extract" && request.method === "POST") {
+      return handleJobsExtract(request, env, origin);
+    }
+    if (pathname === "/api/jobs/save" && request.method === "POST") {
+      return handleJobsSave(request, env, origin);
     }
     if (pathname === "/api/lead" && request.method === "POST") {
       return handleLead(request, env, origin);

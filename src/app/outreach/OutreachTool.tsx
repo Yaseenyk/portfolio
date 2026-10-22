@@ -13,7 +13,10 @@ export default function OutreachTool() {
   // "role" tailors to a job description; "agency" introduces Yaseen to a
   // staffing consultant who has no vacancy in hand, where the JD field is
   // meaningless and the email has to answer what a recruiter screens on.
-  const [mode, setMode] = useState<"role" | "agency">("role");
+  // "jobs" logs an application you just submitted: the screenshot is read for
+  // company / role / platform, you correct the fields, one tap writes the row
+  // to the Google Sheet tracker and files the screenshot in Drive.
+  const [mode, setMode] = useState<"role" | "agency" | "jobs">("role");
   const [passcode, setPasscode] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
@@ -22,6 +25,12 @@ export default function OutreachTool() {
   const [showJd, setShowJd] = useState(false);
   const [image, setImage] = useState(""); // data URL of an uploaded job-post screenshot
   const [imageName, setImageName] = useState("");
+
+  const EMPTY_JOB = { company: "", role: "", platform: "", location: "", url: "", applicants: "", date: "", notes: "" };
+  const [job, setJob] = useState(EMPTY_JOB);
+  const [jobRead, setJobRead] = useState(false);
+  const [saved, setSaved] = useState<{ row?: number; screenshotUrl?: string; sheetUrl?: string } | null>(null);
+  const setJobField = (k: keyof typeof EMPTY_JOB, v: string) => setJob((j) => ({ ...j, [k]: v }));
 
   const [subject, setSubject] = useState("");
   const [emailBody, setEmailBody] = useState("");
@@ -81,6 +90,58 @@ export default function OutreachTool() {
     window.open(url, isMobile() ? "_self" : "_blank");
   };
 
+  const extractJob = async () => {
+    if (!CONCIERGE_URL) return setStatus("Concierge URL not configured in this build.");
+    if (!passcode) return setStatus("Enter the passcode first.");
+    if (!image) return setStatus("Upload the application screenshot first.");
+    setBusy(true);
+    setSaved(null);
+    setStatus("Reading the screenshot…");
+    try {
+      const res = await fetch(`${CONCIERGE_URL}/api/jobs/extract`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode, image }),
+      });
+      const data = (await res.json()) as { fields?: Partial<typeof EMPTY_JOB>; error?: string };
+      if (!res.ok) return setStatus(data.error ?? `Error ${res.status}`);
+      setJob((j) => ({ ...j, ...Object.fromEntries(Object.entries(data.fields ?? {}).filter(([, v]) => v)) }));
+      setJobRead(true);
+      setStatus("Check the fields, fix anything wrong, then save.");
+    } catch {
+      setStatus("Network error reading the screenshot.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const saveJob = async () => {
+    if (!CONCIERGE_URL) return setStatus("Concierge URL not configured in this build.");
+    if (!passcode) return setStatus("Enter the passcode first.");
+    if (!job.company && !job.role) return setStatus("Company or role is required.");
+    setBusy(true);
+    setStatus("Saving to the tracker…");
+    try {
+      const res = await fetch(`${CONCIERGE_URL}/api/jobs/save`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode, ...job, image }),
+      });
+      const data = (await res.json()) as { ok?: boolean; row?: number; screenshotUrl?: string; sheetUrl?: string; error?: string };
+      if (!res.ok || !data.ok) return setStatus(data.error ?? `Error ${res.status}`);
+      setSaved({ row: data.row, screenshotUrl: data.screenshotUrl, sheetUrl: data.sheetUrl });
+      setStatus(`Saved as row ${data.row ?? "?"}.`);
+      setJob(EMPTY_JOB);
+      setJobRead(false);
+      setImage("");
+      setImageName("");
+    } catch {
+      setStatus("Network error reaching the tracker.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const field =
     "w-full rounded-lg border border-zinc-800 bg-ink px-3 py-2.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-cyan/50";
 
@@ -105,6 +166,7 @@ export default function OutreachTool() {
             [
               ["role", "A specific role"],
               ["agency", "A staffing consultant"],
+              ["jobs", "Log a job"],
             ] as const
           ).map(([value, label]) => (
             <button
@@ -130,6 +192,8 @@ export default function OutreachTool() {
           className={field}
           autoComplete="off"
         />
+        {mode !== "jobs" && (
+          <>
         <input
           type="email"
           value={email}
@@ -151,14 +215,21 @@ export default function OutreachTool() {
             className={field}
           />
         </div>
+          </>
+        )}
 
-        {/* Upload a job-post screenshot — OCRs company, role, JD, and email.
+        {/* Upload a screenshot — in role mode it OCRs the job post (company,
+            role, JD, email); in jobs mode it reads the submitted application.
             Meaningless when writing to a consultant with no vacancy. */}
-        {mode === "role" && (
+        {mode !== "agency" && (
           <>
         <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-zinc-700 px-3 py-2.5 font-mono text-xs text-zinc-400 transition-colors hover:border-cyan/50 hover:text-cyan">
           <span>📎</span>
-          {imageName ? `Screenshot: ${imageName}` : "Upload a job-post screenshot (it reads company, role, JD, email)"}
+          {imageName
+            ? `Screenshot: ${imageName}`
+            : mode === "jobs"
+              ? "Upload the screenshot of the application you just submitted"
+              : "Upload a job-post screenshot (it reads company, role, JD, email)"}
           <input
             type="file"
             accept="image/*"
@@ -187,6 +258,8 @@ export default function OutreachTool() {
         )}
 
         {/* Optional JD tab (or let the screenshot fill it) */}
+        {mode === "role" && (
+          <>
         <button
           type="button"
           onClick={() => setShowJd((v) => !v)}
@@ -206,7 +279,10 @@ export default function OutreachTool() {
         )}
           </>
         )}
+          </>
+        )}
 
+        {mode !== "jobs" && (
         <button
           type="button"
           onClick={draft}
@@ -215,11 +291,71 @@ export default function OutreachTool() {
         >
           {busy ? "drafting…" : "Draft email with ChatGPT"}
         </button>
+        )}
+
+        {mode === "jobs" && (
+          <>
+            {!jobRead && (
+              <button
+                type="button"
+                onClick={extractJob}
+                disabled={busy || !image}
+                className="rounded-lg bg-cyan px-5 py-2.5 text-sm font-semibold text-ink shadow-[0_0_18px_-4px_rgba(34,211,238,0.7)] transition-shadow hover:shadow-[0_0_24px_-2px_rgba(34,211,238,0.8)] disabled:opacity-50"
+              >
+                {busy ? "reading…" : "Read screenshot"}
+              </button>
+            )}
+            {(jobRead || job.company || job.role) && (
+              <div className="space-y-3 rounded-lg border border-zinc-800 p-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <input value={job.company} onChange={(e) => setJobField("company", e.target.value)} placeholder="company *" className={field} />
+                  <input value={job.role} onChange={(e) => setJobField("role", e.target.value)} placeholder="role *" className={field} />
+                  <input value={job.platform} onChange={(e) => setJobField("platform", e.target.value)} placeholder="platform (Cutshort, LinkedIn…)" className={field} />
+                  <input value={job.location} onChange={(e) => setJobField("location", e.target.value)} placeholder="location / Remote" className={field} />
+                  <input value={job.url} onChange={(e) => setJobField("url", e.target.value)} placeholder="job URL" className={field} />
+                  <input value={job.applicants} onChange={(e) => setJobField("applicants", e.target.value)} placeholder="applicants (if shown)" className={field} inputMode="numeric" />
+                  <input value={job.date} onChange={(e) => setJobField("date", e.target.value)} placeholder="date (YYYY-MM-DD, blank = today)" className={field} />
+                  <input value={job.notes} onChange={(e) => setJobField("notes", e.target.value)} placeholder="notes" className={field} />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={saveJob}
+                    disabled={busy}
+                    className="rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-ink disabled:opacity-50"
+                  >
+                    {busy ? "saving…" : "Save to tracker"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setJob(EMPTY_JOB); setJobRead(false); }}
+                    className="rounded-lg border border-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-300 hover:border-cyan/50 hover:text-cyan"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+            )}
+            {saved && (
+              <p className="font-mono text-xs text-zinc-400">
+                {saved.sheetUrl && (
+                  <a href={saved.sheetUrl} target="_blank" rel="noreferrer" className="text-cyan hover:underline">open the sheet ↗</a>
+                )}
+                {saved.screenshotUrl && saved.screenshotUrl.startsWith("http") && (
+                  <>
+                    {" · "}
+                    <a href={saved.screenshotUrl} target="_blank" rel="noreferrer" className="text-cyan hover:underline">screenshot in Drive ↗</a>
+                  </>
+                )}
+              </p>
+            )}
+          </>
+        )}
       </div>
 
       {status && <p className="mt-4 font-mono text-xs text-zinc-500">{status}</p>}
 
-      {(subject || emailBody) && (
+      {mode !== "jobs" && (subject || emailBody) && (
         <div className="mt-8 space-y-3">
           <input
             value={subject}
