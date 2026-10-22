@@ -218,3 +218,63 @@ Platform-specific gates, so none is a surprise:
 | **Cutshort** | upload résumé, then companies invite you. The feed is public; apply to EZEU's roles directly from its company page |
 | **Talent500** | AI-matched after profile; confirm there is no candidate fee at the paywall if one appears |
 | **Big agencies (§2–§6)** | upload lands in an ATS. Nothing happens until a recruiter searches it, which is why step 4 above and the named-recruiter email matter more here than anywhere |
+
+---
+
+## 12. More agencies, added 2026-10-22
+
+Same rules: every link fetched and `200` on the date; who pays is stated where
+the firm states it; firms whose site could not be read are at the end.
+
+### India
+
+| firm | who pays | fee | register | fit |
+| --- | --- | --- | --- | --- |
+| **Avance Services** | employer | free | https://avanceservices.com/upload-resume/ · jobs: https://jobs.avanceservices.com/ | IT practice: digital, data, AI/ML, infrastructure, ERP; India office |
+| **Han Digital** | employer | free | https://www.handigital.com/careers/ · `contact@handigital.com` | HQ Bengaluru; offices **Hyderabad**, Delhi NCR, Coimbatore, Dubai; app development, AI and data, cloud, DevOps |
+| **Innova Solutions** | employer | free | https://innovasolutions.com/careers/ · `info@innovasolutions.com` | global IT services and staffing; India under APAC |
+| **Diverse Lynx** | employer | free | JobDiva portal via https://www.diverselynx.com/ · `info@diverselynx.com` · `+91-120-4604500` | US–India IT staffing; Noida office |
+| **Mastech** | employer | free | https://jobs.mastech.com/ | US–India IT consultant staffing |
+| **LanceSoft** | employer | free | https://www.lancesoft.com/jobs | 50+ countries; contract IT |
+| **NLB Services** | employer | free | https://www.nlbservices.com/careers | India–US IT staffing |
+| **Taggd** (PeopleStrong RPO) | employer | free | https://taggd.in/careers/ · `contact@taggd.in` · `+91 124 442 7070` | Gurugram; has a dedicated software-developers function |
+| **Mancer Consulting** | employer | free | https://www.mancerconsulting.com/job-openings/ · `info@mancerconsulting.com` | Technology / Digital practice |
+
+### Remote marketplaces
+
+| firm | who pays | fee | register | fit |
+| --- | --- | --- | --- | --- |
+| **Index.dev** | employer, "pay only when you hire" | free to developers | https://workspace.index.dev/register | engineers, global; Europe-weighted |
+| **Torc** (Randstad Digital's talent community) | employer | free | https://www.torc.dev/ | remote engineering roles via Randstad Digital |
+| **VanHack** | employer, `$3K/month` flat to employers | not stated for developers | https://app.vanhack.com/jobs | relocation to Canada and Europe; worth it only if relocation is on the table |
+| **Mercor** | employer | pays `$60–$102/hr` to experts | https://work.mercor.com/explore | AI-training and evaluation gigs for engineers and domain experts, not full-stack roles; a side channel, not a job search |
+
+### Gulf
+
+| firm | who pays | fee | register | fit |
+| --- | --- | --- | --- | --- |
+| **Caliberly** | employer, "we do not charge candidates for job placements" | free | https://careers-page.com/caliberly/apply · `+971 4 288 6642` | Dubai; permanent and contract, mid to senior |
+| **Han Digital** | employer | free | see India table | Dubai office |
+
+### UK, Europe, US tech specialists
+
+| firm | who pays | fee | register | fit |
+| --- | --- | --- | --- | --- |
+| **CyberCoders** | employer | free | https://www.cybercoders.com/upload-resume · remote search: https://www.cybercoders.com/search?locationKeyword=remote | US tech recruiter, strong remote filter |
+| **Harvey Nash** | employer | free | https://www.harveynash.com/candidates/overview | UK, IE, NL, BE, DE, PL, CA, US |
+| **Lorien** | employer | free | https://www.lorienglobal.com/get-hired · jobs: https://www.lorienglobal.com/jobs · `info@lorienglobal.com` | UK, US, AU |
+| **Understanding Recruitment** | employer | free | https://www.understandingrecruitment.com/candidates/upload-cv/ · `info@understandingrecruitment.com` | UK, Europe, US; software engineering specialist |
+| **Trust in SODA** | employer | free | https://www.trustinsoda.com/jobs | DE, IE, CH, UK, US; tech only |
+| **Akkodis** | employer | free | https://www.akkodis.com/en/careers | 30+ countries; engineering and IT |
+| **Randstad Digital** | employer | free | https://www.randstaddigital.com/careers/current-opportunities/ | global; talent community is Torc above |
+
+### Could not verify this round
+
+| firm | reason |
+| --- | --- |
+| Terminal.io | HTTP 403 |
+| Supersourcing | site is employer-facing only; no developer route published |
+| Kelly Services India | redirects to KellyOCG, an outsourcing brand with no candidate route |
+| **talent.io** | **TLS certificate is for `*.herokuapp.com`, not its hostname; do not upload a CV there** |
+
+Total registry after this round: **106 firms**.
