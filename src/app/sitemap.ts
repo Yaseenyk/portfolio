@@ -24,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [
+  const entries: MetadataRoute.Sitemap = [
     {
       // Trailing slash matters here: `trailingSlash: true` means every other
       // URL on this site is slash-terminated and the bare form 301s to it.
@@ -300,4 +300,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Tag archive pages are intentionally excluded — they're noindex, so
     // listing them here would only dilute crawl budget on a young domain.
   ];
+
+  // The campus portal is a separate business with a separate audience, and it
+  // is moving to its own site. Until it does, it is noindex (see
+  // app/final-year-projects/layout.tsx) so the portfolio is judged on its own
+  // content, and noindex'd URLs must not be listed here.
+  return entries.filter((e) => !e.url.includes("/final-year-projects/"));
 }
