@@ -1,198 +1,91 @@
 #!/usr/bin/env python3
-"""Autonomous AI blog writer.
+"""AI blog drafter: writes one post from a researched brief, for human review.
 
-Reads the top topic from ``topics.txt``, asks ChatGPT (OpenAI) to write a deeply
-technical, developer-focused article in strict Markdown, then writes it to
-``src/content/blog/<slug>.mdx`` with frontmatter the Next.js site understands.
-On success the used topic is removed from ``topics.txt``.
+Takes the first brief with status "ready" in ``scripts/post-briefs.json``, asks
+Claude to write the post from ONLY the facts in that brief, checks the draft
+(banned phrases, em dashes, rhetorical questions, and every number against the
+brief), and writes:
 
-After the article is written, a matching OG cover is generated to
-``public/og/<slug>.jpg`` (the blog template attaches it automatically).
-Cover generation is best-effort: any failure logs and the post still ships.
+  src/content/blog/<slug>.mdx   the post, with frontmatter the site reads
+  public/og/<slug>.jpg          a brand cover drawn with Pillow (no image API)
+  .ai-draft/pr-body.md          the review checklist for the pull request
+
+The brief is marked "drafted". The workflow opens a pull request; nothing
+reaches main until a person merges it. Auto-publishing is what cost this site
+its index in July 2026 (see .github/workflows/ai_blogger.yml).
 
 Env:
-  OPENAI_API_KEY     (required)  OpenAI API key.
-  OPENAI_MODEL       (optional)  Defaults to ``gpt-5``.
-  OPENAI_MAX_TOKENS  (optional)  Output token cap. Defaults to 16384.
-  OPENAI_IMAGE_MODEL (optional)  Cover model. Defaults to ``gpt-image-1``.
-  SKIP_COVER         (optional)  Set to "1" to skip cover generation.
+  ANTHROPIC_API_KEY  (required)  Claude API key.
+  CLAUDE_MODEL       (optional)  Defaults to claude-opus-5-5.
 """
 
 from __future__ import annotations
 
-import base64
 import datetime
-import io
 import json
 import os
 import pathlib
 import re
 import sys
+import textwrap
+import urllib.request
 
+import anthropic
 import yaml
-from openai import OpenAI
+from PIL import Image, ImageDraw, ImageFont
 
 SCRIPTS_DIR = pathlib.Path(__file__).resolve().parent
 ROOT = SCRIPTS_DIR.parent
-TOPICS_FILE = SCRIPTS_DIR / "topics.txt"
+BRIEFS_FILE = SCRIPTS_DIR / "post-briefs.json"
 OUT_DIR = ROOT / "src" / "content" / "blog"
 OG_DIR = ROOT / "public" / "og"
+PR_DIR = ROOT / ".ai-draft"
 
-# Local convenience: load OPENAI_API_KEY from a gitignored .env if present.
-# In CI the key comes from the environment (GitHub secret), so this is a no-op.
 try:
     from dotenv import load_dotenv
 
     load_dotenv(ROOT / ".env")
-    load_dotenv(SCRIPTS_DIR / ".env")
 except ImportError:
     pass
 
-AUTHOR = {"name": "Yaseen Khatib", "role": "Senior Full-Stack AI Engineer"}
+MODEL = os.environ.get("CLAUDE_MODEL", "claude-opus-5-5").strip()
+AUTHOR = {"name": "Yaseen Khatib", "role": "Full-Stack AI Engineer"}
 
+BANNED = [
+    "delve", "game-changer", "game changer", "in conclusion", "let's dive",
+    "let us dive", "in today's fast-paced", "unlock the power", "seamless",
+    "it's not just", "isn't just", "not only", "revolutionize", "elevate your",
+]
+MAX_EM_DASHES = 3
 
-def slugify(text: str) -> str:
-    text = text.lower().strip()
-    text = re.sub(r"[^a-z0-9\s-]", "", text)
-    text = re.sub(r"[\s_-]+", "-", text)
-    return text.strip("-")[:80] or "post"
+SYSTEM_PROMPT = """You write blog posts for yaseenkhatib.streamerosai.com, the site of Yaseen Khatib, a freelance full-stack and AI engineer in Hyderabad, India. The site's whole thesis is honesty: real artifacts over claims. A post that invents a fact damages the business more than no post at all.
 
+You receive a brief as JSON. Write the post from it.
 
-def read_top_topic() -> str | None:
-    if not TOPICS_FILE.exists():
-        return None
-    for line in TOPICS_FILE.read_text(encoding="utf-8").splitlines():
-        if line.strip():
-            return line.strip()
-    return None
+FACTS
+- Every number, price, percentage, date and named fact in the post must come from the brief's "facts" or "computed" entries, or from the exchange rate it gives. If a point needs a number the brief does not have, make the point without a number.
+- Never invent clients, case studies, testimonials, results, quotes or personal anecdotes. You may describe an illustrative scenario if you label it as one.
+- Name sources in the text where a reader would want them ("on Zoho's India pricing page, checked 23 October 2026").
+- Include everything in "must_say". Respect every "must_not".
 
+ANGLE AND STRUCTURE
+- Open with a bolded one or two sentence answer to the searcher's question, then explain.
+- Write for the brief's audience: a business decision-maker, not a developer, unless the brief says otherwise.
+- Be fair to the alternative. Say clearly when the reader should not buy what Yaseen sells.
+- Use H2 (##) and H3 (###) headings only. Use GitHub-flavoured Markdown tables where a comparison helps. No HTML, no JSX, no images.
+- Link only to the brief's "internal_links", with exactly those hrefs. End with one short paragraph that links to the brief's "cta". No other calls to action.
+- Length: 1,200 to 1,900 words.
 
-def remove_topic(topic: str) -> None:
-    lines = TOPICS_FILE.read_text(encoding="utf-8").splitlines()
-    remaining = [ln for ln in lines if ln.strip() != topic]
-    # Keep a trailing newline for clean diffs.
-    TOPICS_FILE.write_text(
-        "\n".join(remaining).rstrip("\n") + ("\n" if remaining else ""),
-        encoding="utf-8",
-    )
+VOICE
+- Plain, specific and calm, like a senior engineer explaining a decision to a client. Mix longer explanatory paragraphs with short ones.
+- First person is fine for opinions ("I'd pick the free edition here").
+- At most one rhetorical question in the whole post. At most three em dashes; prefer commas, colons or full stops.
+- Never use: "delve", "game-changer", "in conclusion", "let's dive in", "seamless", "unlock", "elevate", "revolutionize", "in today's fast-paced world", or the "this isn't just X, it's Y" construction.
 
+OUTPUT
+Return JSON matching the schema. body_markdown is the post body only, without the title or frontmatter. description is 140 to 160 characters and contains the main keyword. title is under 60 characters and contains the main keyword. takeaways are 3 or 4 one-sentence direct answers that use only facts from the brief."""
 
-def build_prompt(topic: str) -> str:
-    return f"""You are Yaseen Khatib, a Senior Full-Stack AI Engineer (MERN + TypeScript),
-writing a field-notes post for YOUR OWN portfolio blog. The audience is
-recruiters, engineering managers, and senior developers evaluating whether you
-can build the thing. So this is not an encyclopedia entry that happens to sit on
-a portfolio — it is a practitioner's writeup that proves hireable judgment while
-teaching something real.
-
-POSITIONING — the de-indexing lesson: generic explainer posts ("What is X",
-"A guide to Y") pull informational searchers who bounce, which got this site
-flagged as irrelevant. Every post must instead signal "an engineer who has
-actually built this is talking". Concretely:
-- Frame the topic through the lens of BUILDING production systems, not defining
-  a concept. Lead with the engineering decision, the tradeoff, or the failure
-  mode you design around — not a textbook definition.
-- The reader should finish thinking "I want this person on my team", not "nice
-  reference, now back to the docs".
-
-Write a highly technical, opinionated, practical article on this topic:
-"{topic}"
-
-VOICE — this is the most important requirement. Write like a tired senior
-engineer sharing hard-won specifics, NOT like a content writer:
-- Concrete over rhetorical: real commands, actual error messages, specific
-  version numbers. You MAY reference widely-known physical figures (e.g. a
-  typical cross-region network latency range) ONLY when clearly illustrative.
-- HONESTY (non-negotiable — it is this site's whole thesis): NEVER invent a
-  performance-improvement metric or present one as a result you achieved. No
-  "3x faster", "40% smaller", "cut latency 25%", "99.9% uptime", "65x", etc.
-  The ONLY quantified achievement you may cite is the real 94% payload
-  reduction from IntegrateX's Serialization Adapter. For everything else stay
-  qualitative ("noticeably faster", "far less memory") — a made-up number is
-  worse than no number.
-- Vary the rhythm: mix long technical paragraphs with short ones. Do NOT
-  write in a steady drumbeat of punchy two-sentence paragraphs.
-- At most ONE rhetorical question in the whole article. No "Let's dive in",
-  no "In conclusion", no "game-changer", no "delve", and never the
-  "this isn't just X — it's Y" construction.
-- Use em-dashes sparingly (a few per article, not per paragraph).
-- Include at least one honest limitation, failure mode, or "when NOT to do
-  this" — real engineering writing always has tradeoffs.
-- First person is fine for opinions ("I'd reach for X here"), but do not
-  invent personal war stories, clients, or specific past incidents.
-
-THEME — this blog's focus is production full-stack engineering (React,
-Node.js, TypeScript, Python) and the applied AI systems built on top of it.
-Treat AI as applied full-stack work, not a separate magic discipline. Stay
-concrete and practical for working senior engineers.
-
-SIGNATURE PATTERNS — available, but use with restraint. ONLY reference these
-when the topic is genuinely about frontend/state/serialization/real-time
-full-stack architecture. In most posts you will NOT mention them at all;
-never force them, and never present the coined term as an industry standard:
-- "Trinity Architecture" — the author's OWN coined term (write it as "a
-  pattern I call Trinity Architecture"). A strict three-layer split:
-  (1) Presentation — declarative reactive views (React components / React
-  Flow nodes) that only render from state and dispatch events; (2) Reactive
-  State / Orchestration — client state managers or state machines (Zustand,
-  RTK Query, event buses) holding the runtime source of truth and cross-module
-  orchestration; (3) Data / Serialization Adapter — the bridge transforming
-  rich in-memory state into lean wire payloads. Boundary rule: no layer talks
-  past its neighbor.
-- "Serialization Adapter" — stripping non-essential UI metadata from rich
-  client state before persistence to cut payload size dramatically.
-- Real shipped projects you MAY reference by name only where directly relevant
-  (invent no new incidents, metrics, or clients): IntegrateX (React Flow
-  workflow engine; a serialization adapter cut its graph payloads ~94%),
-  streamerOS (real-time streaming telemetry/chat), Path Saathi (a client LMS
-  taken from brief to live in a day).
-
-Field requirements (ALL fields are mandatory — never leave one empty):
-- title: a practitioner's title, not an encyclopedia entry (<=65 chars, plain
-  words, at most one colon, no keyword-stuffing). It must read as a working
-  engineer's writeup — an angle, a decision, a hard-won lesson, or a
-  "how I do X in production" — NOT a neutral definition. Avoid bare
-  "What is X" / "A guide to X" / "Understanding X" / "Introduction to X"
-  framings; those are the informational-intent titles that got this site
-  de-indexed. Prefer angles like "Why I ...", "How I ... in production",
-  "... the way it actually breaks", "The ... tradeoff nobody mentions".
-  IT MUST ALSO BE EYE-CATCHY — earn the click with a concrete tension or
-  payoff: a real failure it prevents, a decision it settles, or a specific
-  outcome. But NEVER clickbait: no hype words ("ultimate", "insane",
-  "game-changer", "you won't believe"), no promise the article can't cash.
-  The curiosity must be honest — specific and confident, not inflated.
-- description: one meta-description sentence, 120-160 chars, plain text, no
-  quotes. Write it as the author (a Senior Full-Stack AI Engineer) — a
-  practitioner's take that carries the search phrase but clearly frames the
-  piece as built-from-experience, not a definition. Lead with the single most
-  interesting specific so it reads as a compelling SERP snippet that makes a
-  hiring manager or senior dev want to click — still honest, never hype.
-- tags: 2-4 short topic tags (e.g. AI, Backend, RAG).
-- keywords: 5-8 specific, long-tail SEO keywords/phrases a developer would actually search.
-- takeaways: 3-4 direct, declarative TL;DR sentences.
-- body_markdown: the full article in GitHub-Flavored Markdown. Requirements:
-  - OPENING: the first paragraph must frame the topic through building/operating
-    a real system — the decision, constraint, or failure mode you engineer
-    around — NOT a definition of the concept. No "X is a technique that...".
-  - CLOSING: end with a short paragraph that connects the topic back to the kind
-    of production work the author ships (applied full-stack AI systems) and
-    leaves a subtle "this is the judgment I bring to a team" signal. Do NOT
-    invent metrics, clients, or incidents; stay honest and qualitative unless
-    referencing the documented projects/patterns below.
-  - Do NOT include an H1 (#) heading; the title is rendered separately. Use ## and ### headings.
-  - SEO/AEO: phrase at least TWO of the ## headings as the exact question a developer
-    would type into a search engine (e.g. "## How do you X without Y?"), and open each
-    with a direct 40-60 word answer before elaborating — featured-snippet style.
-  - Be technical and concrete: fenced code blocks with language hints (```ts, ```python, ```bash),
-    tables where useful, and at least two substantial, correct code examples.
-  - Do NOT wrap the whole body in a markdown code fence. No commentary before or after the article.
-  - Target 1100-1600 words — depth over volume.
-"""
-
-
-# Structured-output contract: every SEO field is required, so the model cannot
-# silently omit description/keywords/takeaways the way free-form frontmatter allowed.
-POST_SCHEMA = {
+OUTPUT_SCHEMA = {
     "type": "object",
     "properties": {
         "title": {"type": "string"},
@@ -202,198 +95,239 @@ POST_SCHEMA = {
         "takeaways": {"type": "array", "items": {"type": "string"}},
         "body_markdown": {"type": "string"},
     },
-    "required": [
-        "title",
-        "description",
-        "tags",
-        "keywords",
-        "takeaways",
-        "body_markdown",
-    ],
+    "required": ["title", "description", "tags", "keywords", "takeaways", "body_markdown"],
     "additionalProperties": False,
 }
 
 
+def load_briefs() -> dict:
+    return json.loads(BRIEFS_FILE.read_text(encoding="utf-8"))
+
+
+def next_brief(data: dict) -> dict | None:
+    return next((b for b in data["briefs"] if b.get("status") == "ready"), None)
+
+
+def usd_inr_rate() -> tuple[float, str] | None:
+    """Today's USD to INR rate, so dollar prices can be compared with rupee ones."""
+    try:
+        with urllib.request.urlopen("https://open.er-api.com/v6/latest/USD", timeout=15) as r:
+            payload = json.loads(r.read())
+        return float(payload["rates"]["INR"]), payload.get("time_last_update_utc", "")
+    except Exception as exc:  # the post can be written without it
+        print(f"Exchange rate unavailable ({exc}); dollar prices stay in dollars.")
+        return None
+
+
+def with_exchange_rate(brief: dict, today: str) -> dict:
+    brief = json.loads(json.dumps(brief))
+    rate = usd_inr_rate()
+    if rate:
+        inr, stamp = rate
+        brief.setdefault("computed", []).append(
+            f"Exchange rate on {today}: $1 = ₹{inr:.2f} (open.er-api.com, updated {stamp}). "
+            f"So $2,000 is about ₹{round(2000 * inr, -3):,.0f} and $800 is about ₹{round(800 * inr, -3):,.0f}; "
+            "say these are approximate and depend on the day's rate."
+        )
+    return brief
+
+
+def call_claude(client: anthropic.Anthropic, messages: list) -> tuple[dict, list]:
+    with client.beta.messages.stream(
+        model=MODEL,
+        max_tokens=32000,
+        betas=["server-side-fallback-2026-07-01"],
+        system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
+        messages=messages,
+        output_config={"effort": "high", "format": {"type": "json_schema", "schema": OUTPUT_SCHEMA}},
+        extra_body={"fallbacks": "default"},
+    ) as stream:
+        message = stream.get_final_message()
+
+    if message.stop_reason == "refusal":
+        sys.exit(f"ERROR: the model declined the brief ({message.stop_details}).")
+    if message.stop_reason == "max_tokens":
+        sys.exit("ERROR: the draft hit max_tokens before finishing.")
+
+    text = next(b.text for b in message.content if b.type == "text")
+    print(f"Model: {message.model} | input {message.usage.input_tokens} / output {message.usage.output_tokens} tokens")
+    return json.loads(text), message.content
+
+
+NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+
+def numbers_in(text: str) -> set[str]:
+    return {n.replace(",", "").rstrip(".") for n in NUMBER.findall(text)}
+
+
+def check_draft(draft: dict, brief: dict) -> list[str]:
+    body = draft["body_markdown"]
+    prose = re.sub(r"```[\s\S]*?```", "", body)
+    issues = []
+
+    lowered = (prose + " " + draft["title"] + " " + draft["description"]).lower()
+    for phrase in BANNED:
+        if phrase in lowered:
+            issues.append(f'Banned phrase: "{phrase}"')
+
+    dashes = prose.count("—")
+    if dashes > MAX_EM_DASHES:
+        issues.append(f"{dashes} em dashes (limit {MAX_EM_DASHES})")
+
+    questions = len(re.findall(r"\w\?", re.sub(r"^#+ .*$", "", prose, flags=re.M)))
+    if questions > 1:
+        issues.append(f"{questions} questions in the prose (limit 1, headings excluded)")
+
+    allowed = numbers_in(json.dumps(brief, ensure_ascii=False))
+    for n in sorted(numbers_in(prose + " " + " ".join(draft["takeaways"]) + " " + draft["description"])):
+        small = n.isdigit() and int(n) <= 12
+        year = n.isdigit() and 2020 <= int(n) <= 2030
+        if n not in allowed and not small and not year:
+            issues.append(f"Number not in the brief: {n}")
+
+    allowed_links = {link["href"] for link in brief.get("internal_links", [])} | {brief["cta"]["href"]}
+    for href in re.findall(r"\]\((/[^)\s]*)\)", body):
+        if href not in allowed_links:
+            issues.append(f"Internal link not in the brief: {href}")
+
+    words = len(prose.split())
+    if not 1100 <= words <= 2100:
+        issues.append(f"{words} words (target 1,200 to 1,900)")
+    if len(draft["title"]) > 65:
+        issues.append(f"Title is {len(draft['title'])} characters")
+    return issues
+
+
+FONT_CANDIDATES = [
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "C:/Windows/Fonts/segoeuib.ttf",
+]
+
+
+def font(size: int) -> ImageFont.FreeTypeFont:
+    for path in FONT_CANDIDATES:
+        if os.path.exists(path):
+            return ImageFont.truetype(path, size)
+    return ImageFont.load_default(size)
+
+
+def draw_cover(title: str, slug: str) -> pathlib.Path:
+    """Flat brand cover: ink background, cyan and violet only, no glows."""
+    w, h = 1536, 1024
+    ink, cyan, violet, text = "#05070A", "#22D3EE", "#A855F7", "#F4F4F5"
+    img = Image.new("RGB", (w, h), ink)
+    d = ImageDraw.Draw(img)
+
+    d.rectangle([96, 120, 96 + 160, 120 + 10], fill=cyan)
+    d.rectangle([96 + 176, 120, 96 + 240, 120 + 10], fill=violet)
+    for i in range(6):
+        x = w - 380 + i * 52
+        d.rectangle([x, h - 260 - i * 34, x + 30, h - 150], fill=cyan if i % 2 == 0 else violet)
+
+    title_font = font(84)
+    lines = textwrap.wrap(title, width=24)[:4]
+    y = 220
+    for line in lines:
+        d.text((96, y), line, font=title_font, fill=text)
+        y += 108
+    d.text((96, h - 140), "yaseenkhatib.streamerosai.com", font=font(34), fill=cyan)
+
+    OG_DIR.mkdir(parents=True, exist_ok=True)
+    target = OG_DIR / f"{slug}.jpg"
+    img.save(target, format="JPEG", quality=88)
+    return target
+
+
 def reading_minutes(body: str) -> int:
-    words = len(re.findall(r"\S+", body))
-    return max(1, round(words / 200))
+    return max(1, round(len(body.split()) / 200))
 
 
-def as_list(value) -> list[str]:
-    if isinstance(value, list):
-        return [str(v).strip() for v in value if str(v).strip()]
-    if isinstance(value, str) and value.strip():
-        return [p.strip() for p in value.split(",") if p.strip()]
-    return []
+def write_post(draft: dict, brief: dict, today: str) -> pathlib.Path:
+    slug = brief["slug"]
+    frontmatter = {
+        "title": draft["title"].strip(),
+        "slug": slug,
+        "date": today,
+        "description": draft["description"].strip(),
+        "tags": draft["tags"][:4],
+        "keywords": draft["keywords"],
+        "readingMinutes": reading_minutes(draft["body_markdown"]),
+        "takeaways": draft["takeaways"],
+        "author": AUTHOR,
+    }
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out = OUT_DIR / f"{slug}.mdx"
+    fm = yaml.safe_dump(frontmatter, sort_keys=False, allow_unicode=True).strip()
+    out.write_text(f"---\n{fm}\n---\n\n{draft['body_markdown'].strip()}\n", encoding="utf-8")
+    return out
 
 
-def generate(topic: str) -> dict:
-    # .strip() guards against a trailing newline/space in the key (a common
-    # paste artifact in CI secrets) that makes httpx reject the auth header.
-    api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
-    if not api_key:
-        sys.exit("ERROR: OPENAI_API_KEY is not set.")
-    model_name = os.environ.get("OPENAI_MODEL", "gpt-5").strip()
-    max_tokens = int(os.environ.get("OPENAI_MAX_TOKENS", "16384"))
-
-    client = OpenAI(api_key=api_key)
-    resp = client.responses.create(
-        model=model_name,
-        input=build_prompt(topic),
-        max_output_tokens=max_tokens,
-        text={
-            "format": {
-                "type": "json_schema",
-                "name": "blog_post",
-                "strict": True,
-                "schema": POST_SCHEMA,
-            }
-        },
-    )
-    if getattr(resp, "status", None) == "incomplete":
-        sys.exit("ERROR: response truncated — raise OPENAI_MAX_TOKENS.")
-
-    text = (resp.output_text or "").strip()
-    if not text:
-        sys.exit("ERROR: OpenAI returned an empty response.")
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError as exc:
-        sys.exit(f"ERROR: could not parse structured output: {exc}")
-
-
-# Same style contract as scripts/generate-og-images.py so every cover on the
-# site reads as one brand.
-IMAGE_STYLE_RULES = (
-    "Style: minimal, flat, 2D vector editorial illustration for a premium "
-    "developer portfolio. Background: uniform matte near-black navy ink "
-    "(#05070A), edge to edge. "
-    "PALETTE — use ONLY these: deep navy blues, cyan (#22D3EE), violet "
-    "(#A855F7), and muted slate grey. A thin off-white (#F4F1EA) line or "
-    "shape may be used sparingly as an accent. No other colours exist. "
-    "Composition: ONE clear focal geometric metaphor, clean crisp shapes, "
-    "flat fills, generous negative space, instantly readable as a small "
-    "thumbnail. "
-    "ABSOLUTELY NO TEXT: no words, letters, numbers, captions, labels, "
-    "headlines, typography, watermarks, signatures, logos, UI text, or "
-    "lettering of any kind anywhere in the image. The image must be purely "
-    "pictorial. "
-    "STRICTLY FORBIDDEN: any warm colour (orange, red, amber, gold, yellow, "
-    "brown, peach, copper), green, neon glow, bloom, light bursts, lens "
-    "flares, glowing auras or halos, gradients blowing out to white, drop "
-    "shadows, photorealism, 3D renders, clay or plastic textures, "
-    "skeuomorphism, realistic animals or creatures, busy backgrounds, "
-    "collages, and stock-photo looks."
-)
-
-
-def generate_cover(client: OpenAI, title: str, takeaways: list[str], slug: str) -> None:
-    """Best-effort OG cover → public/og/<slug>.jpg. Never blocks publishing."""
-    if os.environ.get("SKIP_COVER") == "1":
-        print("SKIP_COVER=1 — skipping cover generation.")
-        return
-    try:
-        from PIL import Image
-    except ImportError:
-        print("Pillow not installed — skipping cover generation.")
-        return
-    try:
-        brief_prompt = (
-            "You are an art director for a software engineering blog. Write ONE "
-            "vivid image-generation prompt (max 100 words) for a scroll-stopping "
-            "OpenGraph cover thumbnail.\n"
-            "- The cover is WORDLESS. Never ask for a headline, caption, label, "
-            "or any lettering — describe only what is drawn.\n"
-            "- Build the scene around ONE concrete visual metaphor specific to "
-            "THIS article, expressed in flat geometric shapes — never a generic "
-            "laptop, circuit board, or glowing cube, and never a realistic "
-            "animal or character.\n"
-            "- Flat 2D vector illustration on a uniform near-black navy "
-            "background, using only cyan and violet accents on navy/slate; one "
-            "focal subject with generous negative space, readable as a small "
-            "thumbnail. No glow, no 3D, no warm colours.\n"
-            "Return only the prompt text.\n\n"
-            f"Article title: {title}\n\nKey takeaways:\n"
-            + "\n".join(f"- {t}" for t in takeaways)
-        )
-        brief = (
-            client.responses.create(
-                model=os.environ.get("OPENAI_MODEL", "gpt-5").strip(),
-                input=brief_prompt,
-            ).output_text
-            or ""
-        ).strip()
-        print(f"Cover brief: {brief[:120]}...")
-
-        result = client.images.generate(
-            model=os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1").strip(),
-            prompt=f"{brief}\n\n{IMAGE_STYLE_RULES}",
-            size="1536x1024",
-            quality="medium",
-        )
-        png = base64.b64decode(result.data[0].b64_json)
-
-        # Re-encode to JPEG: drops every metadata chunk (incl. C2PA) and
-        # shrinks the ~2 MB PNG before it gets committed.
-        img = Image.open(io.BytesIO(png)).convert("RGB")
-        buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=85)
-
-        OG_DIR.mkdir(parents=True, exist_ok=True)
-        target = OG_DIR / f"{slug}.jpg"
-        target.write_bytes(buf.getvalue())
-        print(f"Wrote {target.relative_to(ROOT)} ({target.stat().st_size // 1024} KB)")
-    except Exception as exc:
-        print(f"Cover generation failed ({exc}) — publishing without a cover.")
+def write_pr_body(draft: dict, brief: dict, issues: list[str]) -> None:
+    lines = [
+        f"Draft written by `scripts/ai_writer.py` ({MODEL}) from the `{brief['slug']}` brief.",
+        "",
+        f"**Target keyword:** {brief['keyword']}  ",
+        f"**Research:** {brief.get('research', '')}",
+        "",
+        "## Automatic checks",
+        "",
+    ]
+    lines += [f"- [ ] {i}" for i in issues] if issues else ["- All checks passed."]
+    lines += [
+        "",
+        "## Facts the post was allowed to use",
+        "",
+        "Check each claim in the post against these before merging.",
+        "",
+    ]
+    lines += [f"- {f['claim']} ([source]({f['source'].split(' ')[0]}), checked {f['checked']})" for f in brief["facts"]]
+    lines += ["", "## Before merging", "",
+              "- [ ] Every price and number matches a fact above",
+              "- [ ] The honest counter-case (when not to buy) is in the post",
+              "- [ ] Read the cover image and the rendered page in the PR preview or `npm run dev`",
+              "", "🤖 Generated with [Claude Code](https://claude.com/claude-code)"]
+    PR_DIR.mkdir(exist_ok=True)
+    (PR_DIR / "pr-body.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (PR_DIR / "title.txt").write_text(f"content(blog): draft {draft['title'].strip()}\n", encoding="utf-8")
+    (PR_DIR / "slug.txt").write_text(brief["slug"] + "\n", encoding="utf-8")
 
 
 def main() -> None:
-    topic = read_top_topic()
-    if not topic:
-        print("No topics left in topics.txt — nothing to write.")
+    data = load_briefs()
+    brief = next_brief(data)
+    if not brief:
+        print("No brief with status 'ready' in post-briefs.json; nothing to write.")
         return
 
-    print(f"Topic: {topic}")
-    data = generate(topic)
-    body = str(data.get("body_markdown") or "").strip()
-
-    title = str(data.get("title") or topic).strip()
-    slug = slugify(title)
     today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    brief_for_model = with_exchange_rate(brief, today)
+    print(f"Brief: {brief['slug']} ({brief['keyword']})")
 
-    if not body:
-        sys.exit("ERROR: generated article body is empty.")
+    client = anthropic.Anthropic()
+    messages = [{"role": "user", "content": "Brief:\n" + json.dumps(brief_for_model, ensure_ascii=False, indent=2)}]
+    draft, content = call_claude(client, messages)
+    issues = check_draft(draft, brief_for_model)
 
-    # Build a clean, deterministic frontmatter block (we own slug/date/reading time).
-    frontmatter = {
-        "title": title,
-        "slug": slug,
-        "date": today,
-        "description": str(data.get("description") or "").strip(),
-        "tags": as_list(data.get("tags")) or ["AI", "Engineering"],
-        "keywords": as_list(data.get("keywords")) or as_list(data.get("tags")),
-        "readingMinutes": reading_minutes(body),
-        "takeaways": as_list(data.get("takeaways")),
-        "author": AUTHOR,
-    }
+    if issues:
+        print("Revising once for:", *issues, sep="\n  ")
+        messages += [
+            {"role": "assistant", "content": content},
+            {"role": "user", "content": "Fix these problems and return the full post again. Remove any number you cannot source from the brief.\n- " + "\n- ".join(issues)},
+        ]
+        draft, _ = call_claude(client, messages)
+        issues = check_draft(draft, brief_for_model)
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = OUT_DIR / f"{slug}.mdx"
-    if out_path.exists():
-        slug = f"{slug}-{today}"
-        frontmatter["slug"] = slug
-        out_path = OUT_DIR / f"{slug}.mdx"
+    post = write_post(draft, brief, today)
+    cover = draw_cover(draft["title"], brief["slug"])
+    write_pr_body(draft, brief_for_model, issues)
 
-    fm = yaml.safe_dump(frontmatter, sort_keys=False, allow_unicode=True).strip()
-    out_path.write_text(f"---\n{fm}\n---\n\n{body}\n", encoding="utf-8")
-    print(f"Wrote {out_path.relative_to(ROOT)}")
+    brief["status"] = "drafted"
+    brief["drafted"] = today
+    BRIEFS_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    remove_topic(topic)
-    print("Removed topic from topics.txt")
-
-    # Cover last: the post is already on disk, so a cover failure costs nothing.
-    api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
-    generate_cover(OpenAI(api_key=api_key), title, frontmatter["takeaways"], slug)
+    print(f"Wrote {post.relative_to(ROOT)} and {cover.relative_to(ROOT)}")
+    print("Remaining issues for the reviewer:", issues or "none")
 
 
 if __name__ == "__main__":

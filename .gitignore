@@ -57,3 +57,4 @@ gsc/
 # Local secret scratch files (Upstash/API tokens pasted for setup)
 Upstash Token
 *.token
+.ai-draft/

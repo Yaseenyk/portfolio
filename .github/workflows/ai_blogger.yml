@@ -1,42 +1,52 @@
 name: AI Blogger
 
-# Autonomous blog pipeline: ChatGPT writes a post from scripts/topics.txt and
-# commits the resulting .mdx back to main. Mondays at 10:00 UTC.
+# Drafts one post a week from a researched brief and opens a pull request.
+# It never pushes to main: a person reads the draft, checks every claim
+# against the facts listed in the PR, and merges (which deploys).
 #
-# SCHEDULE DISABLED 2026-08-08 — do not re-enable.
-#
-# Throttling this from 3×/week to weekly was the right instinct but far too
-# small a correction. The sitewide-signal reasoning below turned out to be
-# exactly what happened, and it has already cost the site its index:
+# History, kept because it is the reason for the review gate. The old version
+# auto-published ChatGPT posts from topics.txt straight to main, and it cost
+# the site its index:
 #
 #   2026-07-10   88 indexed /  86 not indexed / 178 impressions
 #   2026-07-11   25 indexed / 151 not indexed /  50 impressions
 #   2026-07-24   25 indexed / 151 not indexed /   0 impressions
 #
-# 72% of indexed pages dropped in one day. 72 URLs now sit in "Discovered –
-# currently not indexed", meaning Google saw them in the sitemap and declined
-# to spend a crawl on them at all. Publishing more cannot fix that; it is the
-# signal that caused it. Recovery requires shrinking the corpus to genuinely
-# first-hand work, not adding to it at any cadence.
+# The schedule was removed on 2026-08-08. Revived on 2026-10-23 with three
+# changes: topics come from keyword research (scripts/post-briefs.json, one
+# brief per post, every number sourced), the writer may use only the brief's
+# facts and is checked for that, and output goes to a PR, at most one a week.
 on:
-  workflow_dispatch: {} # manual only — the cron schedule is intentionally gone
+  schedule:
+    - cron: "0 10 * * 1" # Mondays 10:00 UTC
+  workflow_dispatch: {}
 
-# Needed so the workflow can push the generated post back to the repo.
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: ai-blogger
   cancel-in-progress: false
 
 jobs:
-  write-post:
+  draft-post:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Skip if a draft is already waiting for review
+        id: gate
+        run: |
+          open=$(gh pr list --label ai-draft --state open --json number --jq 'length')
+          echo "open=$open" >> "$GITHUB_OUTPUT"
+          if [ "$open" != "0" ]; then echo "A draft PR is still open; review it first."; fi
+
       - name: Set up Python
+        if: steps.gate.outputs.open == '0'
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -44,21 +54,30 @@ jobs:
           cache-dependency-path: scripts/requirements.txt
 
       - name: Install dependencies
+        if: steps.gate.outputs.open == '0'
         run: pip install -r scripts/requirements.txt
 
-      - name: Generate article
+      - name: Draft the next brief
+        if: steps.gate.outputs.open == '0'
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python scripts/ai_writer.py
 
-      - name: Commit & push new post
+      - name: Open the pull request
+        if: steps.gate.outputs.open == '0'
         run: |
-          git config user.name "ai-blogger[bot]"
-          git config user.email "ai-blogger[bot]@users.noreply.github.com"
-          git add src/content/blog scripts/topics.txt public/og
-          if git diff --cached --quiet; then
-            echo "No new content generated — nothing to commit."
+          if [ ! -f .ai-draft/slug.txt ]; then
+            echo "No draft written; nothing to open."
             exit 0
           fi
-          git commit -m "content(blog): autonomous post via ChatGPT"
-          git push
+          slug=$(cat .ai-draft/slug.txt)
+          branch="ai-draft/$slug"
+          git config user.name "ai-blogger[bot]"
+          git config user.email "ai-blogger[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add src/content/blog public/og scripts/post-briefs.json
+          git commit -m "$(cat .ai-draft/title.txt)" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+          git push -u origin "$branch"
+          gh label create ai-draft --color A855F7 --description "AI-drafted post awaiting review" --force
+          gh pr create --base main --head "$branch" --label ai-draft \
+            --title "$(cat .ai-draft/title.txt)" --body-file .ai-draft/pr-body.md

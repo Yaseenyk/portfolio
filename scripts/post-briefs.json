@@ -1,0 +1,77 @@
+{
+  "_readme": "Queue for scripts/ai_writer.py. The writer takes the first brief with status 'ready', writes the post from ONLY these facts, and marks it 'drafted' in the PR it opens. Every number a post may use must appear in facts or computed. Source: docs/keywords/ and the research in ../streameros-site/docs/keyword-research-2026-10.md.",
+  "briefs": [
+    {
+      "slug": "whatsapp-chatbot-saas-vs-owning-it",
+      "status": "published",
+      "keyword": "whatsapp chatbot",
+      "note": "Written by hand on 2026-10-23 as the reference for tone, depth and honesty. Kept here so the queue shows what is done."
+    },
+    {
+      "slug": "zoho-crm-pricing-india-3-year-cost",
+      "status": "ready",
+      "keyword": "zoho crm pricing",
+      "secondary_keywords": [
+        "zoho crm pricing india",
+        "zoho crm price per user",
+        "zoho crm vs custom crm",
+        "custom crm development cost india"
+      ],
+      "market": "India",
+      "research": "Semrush India: 4,400 searches a month, KD 38, navigational intent. Zoho's own pricing page will hold position 1; aim for 2 to 5 with an angle Zoho will not publish.",
+      "audience": "An Indian business owner or sales head comparing CRM costs before committing, usually with 5 to 25 people on the sales team.",
+      "angle": "What Zoho CRM really costs in India over three years for a real team, priced from Zoho's own figures, and the honest point at which a custom CRM becomes the cheaper or better choice. Say plainly that for most small teams with a standard sales process, Zoho is the right answer.",
+      "title_hint": "Zoho CRM Pricing in India: The 3-Year Cost for Your Team",
+      "facts": [
+        {
+          "claim": "Zoho CRM India prices, per user per month: Standard ₹800 billed yearly or ₹1,300 billed monthly; Professional ₹1,400 yearly or ₹2,100 monthly; Enterprise ₹2,400 yearly or ₹3,000 monthly; Ultimate ₹2,600 yearly or ₹3,200 monthly.",
+          "source": "https://www.zoho.com/crm/zohocrm-pricing.html (INR values read from Zoho's own pricing data file, crm-pricing-val.json)",
+          "checked": "2026-10-23"
+        },
+        {
+          "claim": "Zoho CRM has a free edition. Third-party listings describe it as free for up to 3 users.",
+          "source": "https://www.capterra.in/software/155928/zoho-crm",
+          "checked": "2026-10-23"
+        },
+        {
+          "claim": "Zoho's pricing page offers a team-user add-on at ₹400 per user per month billed yearly, or ₹500 billed monthly.",
+          "source": "https://www.zoho.com/crm/zohocrm-pricing.html (crm-pricing-val.json, zplan-teamuser)",
+          "checked": "2026-10-23"
+        },
+        {
+          "claim": "Yaseen Khatib's published starting price for an AI-integrated CRM built around a team's own sales process is $2,000, one time, with the client owning the code. Smaller work is $15 to $30 an hour.",
+          "source": "https://yaseenkhatib.streamerosai.com/solutions/ai-chatbot/",
+          "checked": "2026-10-23"
+        }
+      ],
+      "computed": [
+        "Three years of Zoho CRM at yearly-billing prices (price x users x 36 months), before GST:",
+        "Standard: 5 users ₹1,44,000; 10 users ₹2,88,000; 25 users ₹7,20,000.",
+        "Professional: 5 users ₹2,52,000; 10 users ₹5,04,000; 25 users ₹12,60,000.",
+        "Enterprise: 5 users ₹4,32,000; 10 users ₹8,64,000; 25 users ₹21,60,000.",
+        "Paying monthly instead of yearly costs 62.5% more on Standard (₹1,300 vs ₹800) and 25% more on Enterprise (₹3,000 vs ₹2,400)."
+      ],
+      "must_say": [
+        "Prices change and are shown before GST; check Zoho's page and the final invoice before deciding.",
+        "For a small team with a standard sales process, Zoho (or its free edition) is usually the better choice. Say this clearly.",
+        "A custom CRM also has running costs (hosting, maintenance, someone to own it). Do not present the build price as the whole cost."
+      ],
+      "must_not": [
+        "Do not invent implementation-partner fees, case studies, client names or results.",
+        "Do not quote any Zoho feature-by-edition detail that is not in the facts.",
+        "Do not compare with HubSpot, Salesforce or Freshsales prices; they are not in the facts."
+      ],
+      "internal_links": [
+        { "href": "/solutions/ai-chatbot/", "why": "the AI-integrated CRM offer, from $2,000 (the single call to action, at the end)" },
+        { "href": "/blog/whatsapp-chatbot-saas-vs-owning-it/", "why": "the same rent-vs-own reasoning applied to WhatsApp chatbots" }
+      ],
+      "cta": { "href": "/solutions/ai-chatbot/", "text": "AI-integrated CRM, from $2,000" }
+    },
+    {
+      "slug": "chatbot-development-what-800-buys",
+      "status": "needs-facts",
+      "keyword": "chatbot development",
+      "note": "Commercial intent, 260 a month in India, 2,100 worldwide, KD 39. Needs an itemised scope of the $800 build and sourced agency price ranges before it can be written."
+    }
+  ]
+}
