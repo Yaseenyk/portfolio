@@ -79,10 +79,11 @@ const AVAILABILITY =
   "/interview";
 
 const PRODUCTS = [
+  "FitRank — ranks people for open tasks: a 23M-parameter model distilled from Qwen3.5-9B returns a probability per option, and a manager makes every final call. https://fitrank.streamerosai.com",
   "streamerOS — Rust + Tauri desktop cockpit for streamers: on-device Twitch/YouTube chat ingestion, telemetry, OBS WebSocket automation. " + SITE + "/products/streameros",
-  "IntegrateX — React Flow workflow engine; schema-aware serialization adapter cut payloads 94%. " + SITE + "/blog/the-94-percent-decision-integratex",
+  "IntegrateX — React Flow workflow engine; schema-aware serialization adapter cut payloads 94%. " + SITE + "/blog/94-percent-payload-reduction-react-flow",
   "Sable — local-first AI finance agent: on-device SQLite, model proposes / human commits. " + SITE + "/products/sable",
-  "Zero-Cost AI Blog Writer — autonomous daily article + cover pipeline on GitHub Actions, $0 infrastructure. " + SITE + "/products/ai-blogger",
+  "Portfolio Concierge — grounded RAG API over this site's corpus that refuses below a similarity threshold, also published as this MCP server. " + SITE + "/#rag-concierge",
   "Automated LinkedIn Pipeline — turns shipped work into scheduled posts, state committed to Git. " + SITE + "/products/linkedin-pipeline",
 ].join("\n");
 
@@ -231,7 +232,7 @@ Anything not on this list is NOT my experience.`;
 
 const OUTREACH_FACTS = `About Yaseen Khatib (the sender):
 - Senior Full-Stack Developer (MERN: MongoDB, Express, React, Node.js, with TypeScript and Next.js) now building production AI systems: RAG, agents, MCP.
-- Shipped 5 products solo in ~12 months (streamerOS, IntegrateX, Sable, plus two autonomous pipelines).
+- Shipped 6 products solo in ~12 months (FitRank, streamerOS, IntegrateX, Sable, a RAG + MCP portfolio concierge, and a LinkedIn pipeline).
 - Speed proof: for a client LMS (Path Saathi), took a Monday MVP brief to a working platform live on dev the next day.
 - Unusual proof point: recruiters/clients can add his portfolio to Claude as an MCP connector and interview it from inside their own AI.
 - Open to project work and roles — remote, hybrid, or on-site (Hyderabad, IST).`;
@@ -548,7 +549,7 @@ const TOOLS = [
   {
     name: "get_products",
     description:
-      "List the five production products Yaseen Khatib built solo, with one-line summaries and links.",
+      "List the six production products Yaseen Khatib built solo, with one-line summaries and links.",
     inputSchema: { type: "object", properties: {} },
   },
   {

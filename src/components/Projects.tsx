@@ -125,13 +125,6 @@ export const PROJECTS: Project[] = [
     metrics: ["Propose/Confirm Boundary", "Zero-Cloud", "On-Device RAG"],
     tech: ["React Native", "SQLite", "Function Calling", "TypeScript"],
     Animation: SableArt,
-    links: [
-      {
-        href: "https://github.com/Yaseenyk/sable",
-        label: "Source code",
-        icon: "github",
-      },
-    ],
   },
   {
     name: "ShelfSight AI",

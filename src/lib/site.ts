@@ -15,7 +15,7 @@ export const PREFERRED_SOURCE_DOMAIN = "streamerosai.com";
 
 /** Sitewide default description — root metadata, OG, and the WebSite entity. */
 export const SITE_DESCRIPTION =
-  "Yaseen Khatib — Senior Full-Stack Developer (MERN) building production AI systems: Agentic RAG, LLM orchestration, and five solo-shipped products. Open to remote, hybrid, or on-site roles.";
+  "Yaseen Khatib — Senior Full-Stack Developer (MERN) building production AI systems: Agentic RAG, LLM orchestration, and six solo-shipped products. Open to remote, hybrid, or on-site roles.";
 
 /**
  * Search-engine site-verification codes. Paste the content value from

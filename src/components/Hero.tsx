@@ -58,7 +58,7 @@ export default function Hero() {
           I&apos;m Yaseen Khatib. Five years of building for the web end to
           end — React, Node.js, TypeScript, MongoDB — and the last few wiring
           that stack into production AI: RAG pipelines, agent orchestration,
-          and five products shipped solo, from a Rust desktop app to
+          and six products shipped solo, from a Rust desktop app to
           autonomous pipelines. Everything on this site actually runs. Scroll
           down and poke it.
         </motion.p>

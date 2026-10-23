@@ -59,8 +59,7 @@ export const PRODUCTS: ProductMeta[] = [
       "OpenAI · Function Calling",
       "Local RAG",
     ],
-    // TODO: confirm the real repository (and a live/App Store link if any).
-    repoUrl: "https://github.com/Yaseenyk/sable",
+    // Source is private; no repo link rather than a 404.
   },
   {
     slug: "streameros",

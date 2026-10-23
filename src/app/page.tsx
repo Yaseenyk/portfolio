@@ -27,16 +27,16 @@ export const metadata: Metadata = {
     absolute: "Yaseen Khatib — Senior Full-Stack AI Engineer (MERN, RAG)",
   },
   description:
-    "Senior Full-Stack AI Engineer (MERN + TypeScript) shipping production LLM systems — RAG pipelines, agents, real-time architecture. Five products built solo.",
+    "Senior Full-Stack AI Engineer (MERN + TypeScript) shipping production LLM systems — RAG pipelines, agents, real-time architecture. Six products built solo.",
   openGraph: {
     title: "Yaseen Khatib — Senior Full-Stack AI Engineer",
     description:
-      "MERN + TypeScript engineer shipping production LLM systems: RAG, agent orchestration, real-time architectures. Five products built solo. Open to senior / lead roles.",
+      "MERN + TypeScript engineer shipping production LLM systems: RAG, agent orchestration, real-time architectures. Six products built solo. Open to senior / lead roles.",
   },
   twitter: {
     title: "Yaseen Khatib — Senior Full-Stack AI Engineer",
     description:
-      "MERN + TypeScript engineer shipping production LLM systems: RAG, agents, real-time. Five products built solo. Open to senior / lead roles.",
+      "MERN + TypeScript engineer shipping production LLM systems: RAG, agents, real-time. Six products built solo. Open to senior / lead roles.",
   },
 };
 

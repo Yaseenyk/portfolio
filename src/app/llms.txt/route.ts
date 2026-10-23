@@ -15,7 +15,7 @@ export function GET() {
   const md = `# Yaseen Khatib — Senior Full-Stack AI Engineer
 
 > ${PERSON.name} builds and ships autonomous AI products solo — Agentic RAG
-> pipelines, LLM orchestration, and the MERN systems they run on. Five
+> pipelines, LLM orchestration, and the MERN systems they run on. Six
 > production products in twelve months; open to Lead/Senior roles —
 > remote, hybrid, or on-site.
 > Base: ${PERSON.locality}, ${PERSON.country} (IST). Contact: ${PERSON.email}.

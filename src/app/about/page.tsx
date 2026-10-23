@@ -20,7 +20,7 @@ import {
 } from "@/lib/seo";
 
 const DESCRIPTION =
-  "Yaseen Khatib is a Senior Full-Stack AI Engineer in Hyderabad, India, who designed, built, and shipped five production products solo — Agentic RAG pipelines, LLM orchestration, and the systems they run on. The canonical bio: who he is, what he has built, and how he works.";
+  "Yaseen Khatib is a Senior Full-Stack AI Engineer in Hyderabad, India, who designed, built, and shipped six production products solo — Agentic RAG pipelines, LLM orchestration, and the systems they run on. The canonical bio: who he is, what he has built, and how he works.";
 
 export const metadata: Metadata = {
   title: "About Yaseen Khatib",
@@ -66,7 +66,7 @@ const FAST_FACTS: [string, string][] = [
   ["name", PERSON.name],
   ["role", PERSON.jobTitle],
   ["base", `${PERSON.locality}, ${PERSON.country} (IST) · remote, hybrid, or on-site`],
-  ["products_shipped", "5 solo — FitRank, streamerOS, Sable, + 2 pipelines"],
+  ["products_shipped", "6 solo — FitRank, streamerOS, IntegrateX, Sable, Portfolio Concierge, LinkedIn pipeline"],
   ["articles_published", `${ARTICLE_COUNT} on AI systems architecture`],
   ["operating_model", "one architect directing Claude + MCP"],
   ["availability", "open to Lead / Senior Full-Stack & AI roles"],
@@ -107,12 +107,12 @@ const ABOUT_FAQ: FaqItem[] = [
   {
     question: "Who is Yaseen Khatib?",
     answer:
-      "Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer based in Hyderabad, India, who builds and ships autonomous AI products end-to-end — Agentic RAG pipelines, LLM orchestration, and the high-throughput MERN systems they run on. In the last twelve months he designed, built, and shipped five production products entirely solo.",
+      "Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer based in Hyderabad, India, who builds and ships autonomous AI products end-to-end — Agentic RAG pipelines, LLM orchestration, and the high-throughput MERN systems they run on. In the last twelve months he designed, built, and shipped six production products entirely solo.",
   },
   {
     question: "What has Yaseen Khatib built?",
     answer:
-      "Five solo products: streamerOS (a Rust + Tauri desktop cockpit for streamers), IntegrateX (a React Flow workflow engine with a 94% payload-reduction serialization adapter), Sable (a local-first AI finance agent), a zero-cost autonomous blog pipeline, and an automated LinkedIn content pipeline.",
+      "Six solo products: FitRank (a distilled AI model that ranks people for open tasks), streamerOS (a Rust + Tauri desktop cockpit for streamers), IntegrateX (a React Flow workflow engine with a 94% payload-reduction serialization adapter), Sable (a local-first AI finance agent), Portfolio Concierge (a grounded RAG API and public MCP server), and an automated LinkedIn content pipeline.",
   },
   {
     question: "How does Yaseen Khatib work?",
@@ -152,7 +152,7 @@ export default function AboutPage() {
                 The human behind <GradientText>the systems</GradientText>.
               </h1>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-zinc-400">
-                One engineer, five shipped products, {ARTICLE_COUNT} articles — and
+                One engineer, six shipped products, {ARTICLE_COUNT} articles — and
                 a conviction that vision, not syntax, is the scarce skill.
               </p>
             </div>
@@ -190,7 +190,7 @@ export default function AboutPage() {
               based in Hyderabad, India, who builds and ships autonomous AI
               products end-to-end — Agentic RAG pipelines, LLM orchestration,
               and the high-throughput MERN systems they run on. In the last
-              twelve months he designed, built, and shipped five production
+              twelve months he designed, built, and shipped six production
               products entirely solo.
             </p>
             <p className="mt-4 leading-relaxed text-zinc-400">

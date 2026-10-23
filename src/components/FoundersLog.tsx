@@ -107,7 +107,7 @@ export default function FoundersLog({
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-cyan/50 via-purple/30 to-transparent"
         />
-        <Stat value={5} label="products · solo" />
+        <Stat value={6} label="products · solo" />
         <Stat value={articleCount} label="articles" />
         <Stat value={1} suffix=" day" label="fastest client ship" />
       </div>

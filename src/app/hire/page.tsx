@@ -82,7 +82,7 @@ export default function HirePage() {
         <p className="mt-6 text-lg leading-relaxed text-zinc-400">
           I&apos;m {PERSON.name} — five years building for the web end to end,
           the last few wiring that into production AI. I ship complete systems
-          solo: five products in the last twelve months, from a Rust desktop app
+          solo: six products in the last twelve months, from a Rust desktop app
           to autonomous pipelines. Everything on this site actually runs.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-4">
