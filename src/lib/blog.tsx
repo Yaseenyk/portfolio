@@ -28,6 +28,7 @@ import { linkedinPipelineStory } from "@/content/posts/linkedin-pipeline-job-sea
 import { zeroDollarContentEngine } from "@/content/posts/zero-dollar-content-engine";
 import { sableTrustBoundary } from "@/content/posts/sable-ai-agent-never-touches-money";
 import { hireMyHead } from "@/content/posts/hire-my-head-not-my-hands";
+import { whatsappChatbotSaasVsOwning } from "@/content/posts/whatsapp-chatbot-saas-vs-owning-it";
 
 export { SITE_URL };
 
@@ -81,6 +82,7 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
+  whatsappChatbotSaasVsOwning,
   // Founder's Log — the vision series (newest).
   myJourneyPost,
   shippedFiveProductsSolo,
