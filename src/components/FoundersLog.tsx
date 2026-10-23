@@ -20,9 +20,11 @@ function Stat({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
-  const [n, setN] = useState(0);
+  const [n, setN] = useState(value);
 
   useEffect(() => {
+    // Server HTML carries the real value; the count-up replays it only for
+    // a visitor who scrolls the strip into view.
     if (!inView) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setN(value);
@@ -63,7 +65,13 @@ export interface LogEntry {
   image?: string;
 }
 
-export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
+export default function FoundersLog({
+  entries,
+  articleCount,
+}: {
+  entries: LogEntry[];
+  articleCount: number;
+}) {
   const ENTRIES = entries;
   const listRef = useRef<HTMLOListElement>(null);
   const hydrated = useHydrated();
@@ -100,7 +108,7 @@ export default function FoundersLog({ entries }: { entries: LogEntry[] }) {
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-cyan/50 via-purple/30 to-transparent"
         />
         <Stat value={5} label="products · solo" />
-        <Stat value={100} suffix="+" label="dispatches" />
+        <Stat value={articleCount} label="articles" />
         <Stat value={1} suffix=" day" label="fastest client ship" />
       </div>
 

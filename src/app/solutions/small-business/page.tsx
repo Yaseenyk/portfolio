@@ -120,7 +120,7 @@ export default function SmallBusinessPage() {
 
       <header className="mt-8">
         <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-          ~/solutions/small-business
+          Custom software for small businesses · from ₹800/month
         </span>
         <h1 className="mt-5 text-4xl font-semibold leading-[1.1] tracking-tight text-zinc-50 sm:text-5xl">
           Software for your business, for less than your phone bill
@@ -170,11 +170,6 @@ export default function SmallBusinessPage() {
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-zinc-50">{tier.name}</h3>
-                {tier.featured && (
-                  <span className="rounded-full border border-cyan/40 px-2.5 py-0.5 text-[10px] uppercase tracking-[0.15em] text-ice">
-                    Most picked
-                  </span>
-                )}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-zinc-400">{tier.best}</p>
 
@@ -254,6 +249,8 @@ export default function SmallBusinessPage() {
           messageLabel="What you want to stop doing manually"
           messagePlaceholder="What the process is today, how many staff use it, and roughly how many customers or records a month…"
           defaultInterest="Hosted tool subscription (small business)"
+          compact
+          submitLabel="Send — I reply within a day"
         />
       </div>
     </div>

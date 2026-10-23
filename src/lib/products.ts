@@ -91,9 +91,9 @@ export const PRODUCTS: ProductMeta[] = [
     slug: "ai-blogger",
     name: "Zero-Cost AI Blog Writer",
     category: "Pipeline · Content",
-    tagline: "Git-triggered article factory",
+    tagline: "A retired experiment in automated publishing",
     summary:
-      "A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles straight to this site — Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships it.",
+      "An experiment I built and then switched off: a Next.js pipeline in which an LLM drafted Markdown articles and GitHub Actions committed and deployed them for $0 of infrastructure. It worked — and taught me that automated volume is the wrong way to publish. The posts on this site are first-person now; the pipeline stays as a teardown.",
     tech: ["Next.js", "MDX", "google-genai", "GitHub Actions", "GitHub Pages"],
     repoUrl: "https://github.com/Yaseenyk/portfolio",
   },

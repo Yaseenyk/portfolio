@@ -11,7 +11,7 @@ const DESCRIPTION =
   "Hire Yaseen Khatib — a Senior Full-Stack AI Engineer (MERN + TypeScript) who ships production AI systems solo: agentic RAG, LLM orchestration, real-time and edge architectures. Open to senior/lead roles and contract work, remote or on-site.";
 
 export const metadata: Metadata = {
-  title: "Hire a Senior Full-Stack AI Engineer",
+  title: "Hire a Senior MERN + AI Engineer (India)",
   description: seoDescription(DESCRIPTION),
   keywords: [
     "hire full-stack AI engineer",
@@ -136,7 +136,7 @@ export default function HirePage() {
           (a Rust desktop cockpit plus a serverless RAG support agent on the
           edge), and the{" "}
           <Link
-            href="/blog/the-94-percent-decision-integratex/"
+            href="/blog/94-percent-payload-reduction-react-flow/"
             className="text-cyan underline-offset-4 hover:underline"
           >
             94% payload cut on IntegrateX

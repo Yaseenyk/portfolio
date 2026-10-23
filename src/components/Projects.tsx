@@ -160,7 +160,7 @@ export const PROJECTS: Project[] = [
     href: "/#rag-concierge",
     category: "AI Infrastructure · Edge",
     description:
-      "One Cloudflare Worker, two interfaces: a grounded RAG API that answers questions about my work from a Vectorize index of my 95-article corpus (refusing anything out of scope), and an MCP server — add its URL to Claude and interrogate this portfolio from inside your own AI. Corpus re-embeds automatically after every deploy.",
+      "One Cloudflare Worker, two interfaces: a grounded RAG API that answers questions about my work from a Vectorize index of every article on this site (refusing anything out of scope), and an MCP server — add its URL to Claude and interrogate this portfolio from inside your own AI. Corpus re-embeds automatically after every deploy.",
     metrics: ["Interview me via MCP", "Grounding Contract", "Auto-Reindexed"],
     tech: ["Cloudflare Workers", "Vectorize", "Workers AI", "MCP", "TypeScript"],
     Animation: RealtimeSync,
@@ -236,12 +236,12 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    name: "Zero-Cost AI Blog Writer",
+    name: "AI Blog Writer (retired)",
     href: "/products/ai-blogger/",
     category: "Pipeline · Content",
     description:
-      "A native Next.js pipeline that autonomously writes, formats, and deploys Markdown articles straight to this site. Gemini drafts the MDX, GitHub Actions commits it, and GitHub Pages ships the static export — at a steady-state cost of exactly $0.",
-    metrics: ["$0 Infra", "Self-Writing", "Static Export"],
+      "An experiment I built and then switched off: a Next.js pipeline in which an LLM drafted Markdown articles and GitHub Actions committed and deployed them for $0 of infrastructure. It worked — and taught me that automated volume is the wrong way to publish. The posts on this site are first-person now; the pipeline stays as a teardown.",
+    metrics: ["Retired experiment", "$0 Infra", "Static Export"],
     tech: ["Next.js", "MDX", "google-genai", "GitHub Actions"],
     Animation: AiBloggerArt,
     links: [
@@ -253,10 +253,10 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    name: "Police RAG Agent — POSCO Cases",
+    name: "Police RAG Agent — POCSO Cases",
     category: "Agentic AI · RAG",
     description:
-      "An autonomous agentic retrieval-augmented generation engine deployed for law enforcement workflows. Scans massive multi-format legal structures to confidently trace, evaluate, and output systematic verdict matrices directly to investigators.",
+      "A retrieval-augmented assistant for police case work under India's POCSO Act. It searches the case documents and legal texts an investigator already has, and answers with the passages it relied on, so the investigator checks the source rather than trusting the model.",
     metrics: ["Agentic AI", "Vector Retrieval", "LLM Orchestration"],
     tech: ["LLM", "Vector DB", "Prompt Orchestration", "Python"],
     Animation: DocumentScan,
@@ -278,11 +278,7 @@ export const PROJECTS: Project[] = [
     category: "Enterprise · Admin Portal",
     description:
       "A scaled administrative core engine supporting thousands of active endpoints. Hardened through structured cache rings and strict role-based authorization layers for low-latency, high-availability operation.",
-    metrics: [
-      "25% Latency Reduction",
-      "99.9% Uptime",
-      "35% Error Elimination",
-    ],
+    metrics: ["Role-based access", "Redis caching", "Real-time updates"],
     tech: ["React", "TypeScript", "Node", "Redis", "JWT", "WebSockets"],
     Animation: RealtimeSync,
   },
@@ -290,12 +286,8 @@ export const PROJECTS: Project[] = [
     name: "Hospital-API",
     category: "Backend · REST API",
     description:
-      "A high-throughput clinical workflow orchestration platform. Optimizes lookup routines through heavily cached queries and defensive server request-validation pipes for reliable patient-doctor data flow.",
-    metrics: [
-      "40% Workload Reduction",
-      "30% Query Optimization",
-      "25% Server Response Accel",
-    ],
+      "A REST API for hospital workflows — patients, doctors and appointments — with cached lookups and validation on every request.",
+    metrics: ["REST API", "Cached lookups", "Request validation"],
     tech: ["Node.js", "Express", "MongoDB"],
     Animation: DataSorting,
   },
@@ -303,8 +295,8 @@ export const PROJECTS: Project[] = [
     name: "Cross-Platform TV Suite",
     category: "Embedded · Smart TV",
     description:
-      "Embedded native smart-television systems engineered using modular vanilla abstractions for pristine execution over limited, multi-resolution, low-spec client platforms.",
-    metrics: ["30% Retention Boost", "15% Performance Tuning"],
+      "Smart-TV apps for Samsung, LG and Vizio, built in vanilla JavaScript so they stay fast on low-powered TV hardware across screen resolutions.",
+    metrics: ["Samsung · LG · Vizio", "Low-spec hardware"],
     tech: ["React", "Vanilla JS", "Samsung", "LG", "Vizio"],
     Animation: TVScreen,
   },
@@ -312,7 +304,7 @@ export const PROJECTS: Project[] = [
     name: "SANKALP",
     category: "Architecture · Refactoring",
     description:
-      "Structural system architectural optimization and deep defensive codebase translation for an enterprise core application. Implemented system type-safety definitions and refactored core data channels.",
+      "A refactor of an enterprise application's core: type definitions added across the codebase and the main data flows untangled.",
     metrics: ["System Architecture", "Deep Code Refactoring"],
     tech: ["System Design", "TypeScript", "Refactoring"],
     Animation: Untangle,

@@ -304,6 +304,15 @@ export default function Navbar() {
             ))}
           </div>
 
+          {/* Always-visible way to make contact — the form is the last
+              section on a long page, and a dropdown leaf is easy to miss. */}
+          <Link
+            href="/#contact"
+            className="ml-1 hidden whitespace-nowrap rounded-full bg-cyan px-3.5 py-1.5 text-sm font-semibold text-ink transition-shadow hover:shadow-[0_0_18px_-2px_rgba(34,211,238,0.7)] md:inline-block"
+          >
+            Talk to me
+          </Link>
+
           <MenuToggle open={menuOpen} onClick={() => setMenuOpen((o) => !o)} />
         </div>
 
@@ -410,6 +419,13 @@ export default function Navbar() {
                 </div>
               );
             })}
+            <Link
+              href="/#contact"
+              onClick={() => setMenuOpen(false)}
+              className="mt-2 block rounded-lg bg-cyan px-3 py-2.5 text-center text-sm font-semibold text-ink"
+            >
+              Talk to me
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

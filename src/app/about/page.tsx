@@ -9,6 +9,8 @@ import Navbar from "@/components/Navbar";
 import GradientText from "@/components/GradientText";
 import JsonLd from "@/components/JsonLd";
 import { SITE_URL, PERSON, SOCIALS } from "@/lib/site";
+import { getAllPosts } from "@/lib/blog";
+import { getAllMdxMeta } from "@/lib/mdx";
 import {
   PERSON_ID,
   WEBSITE_ID,
@@ -53,12 +55,19 @@ const aboutJsonLd = {
   },
 };
 
+// Counted from the real corpus at build time, so the number can never drift
+// from what /blog/ shows.
+const ARTICLE_COUNT = (() => {
+  const tsx = new Set(getAllPosts().map((p) => p.slug));
+  return tsx.size + getAllMdxMeta().filter((m) => !tsx.has(m.slug)).length;
+})();
+
 const FAST_FACTS: [string, string][] = [
   ["name", PERSON.name],
   ["role", PERSON.jobTitle],
   ["base", `${PERSON.locality}, ${PERSON.country} (IST) · remote, hybrid, or on-site`],
-  ["products_shipped", "5 solo — streamerOS, IntegrateX, Sable, + 2 pipelines"],
-  ["articles_published", "90+ on AI systems architecture"],
+  ["products_shipped", "5 solo — FitRank, streamerOS, Sable, + 2 pipelines"],
+  ["articles_published", `${ARTICLE_COUNT} on AI systems architecture`],
   ["operating_model", "one architect directing Claude + MCP"],
   ["availability", "open to Lead / Senior Full-Stack & AI roles"],
   ["email", PERSON.email],
@@ -81,9 +90,9 @@ const PRODUCTS_LINE: { name: string; href: string; line: string }[] = [
     line: "a local-first AI finance agent — all data on-device, and the model proposes while only a human commits.",
   },
   {
-    name: "The Zero-Cost AI Blog Writer",
+    name: "The AI Blog Writer (retired)",
     href: "/products/ai-blogger/",
-    line: "an autonomous pipeline that drafts, commits, and deploys articles (with covers) daily for $0 of infrastructure.",
+    line: "an experiment in automated publishing that I built, ran, and switched off — the posts here are first-person now.",
   },
   {
     name: "The LinkedIn Pipeline",
@@ -143,7 +152,7 @@ export default function AboutPage() {
                 The human behind <GradientText>the systems</GradientText>.
               </h1>
               <p className="mt-4 max-w-xl text-lg leading-relaxed text-zinc-400">
-                One engineer, five shipped products, ninety-plus articles — and
+                One engineer, five shipped products, {ARTICLE_COUNT} articles — and
                 a conviction that vision, not syntax, is the scarce skill.
               </p>
             </div>

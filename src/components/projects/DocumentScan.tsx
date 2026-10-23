@@ -9,7 +9,7 @@ export default function DocumentScan() {
   return (
     <div className="flex h-full w-full flex-col p-6">
       <span className="mb-3 font-mono text-[10px] uppercase tracking-widest text-zinc-500">
-        case://posco/analysis
+        case://pocso/analysis
       </span>
 
       <div className="relative flex-1 overflow-hidden rounded-lg border border-zinc-800 bg-ink/40">

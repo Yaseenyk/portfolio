@@ -103,7 +103,7 @@ export const ROADMAP: RoadmapLesson[] = [
   },
   {
     step: 8,
-    slug: "payload-compression-serialization-patterns",
+    slug: "94-percent-payload-reduction-react-flow",
     title: "94% Compression",
     blurb:
       "How we cut an agent-graph payload by 94% — by designing the format around the data, not gzip.",

@@ -27,7 +27,7 @@ const CONTACT_EMAIL = EMAILJS.contactEmail;
 const CONTACT_PHONE = "8208335028";
 
 const STATUS_MESSAGE: Record<Exclude<Status, "idle" | "sending">, string> = {
-  sent: "Message sent — thanks, I'll be in touch shortly.",
+  sent: "Message sent. You'll get a reply from me within one working day.",
   error: "Something went wrong. Please try again.",
 };
 

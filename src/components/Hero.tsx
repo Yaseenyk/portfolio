@@ -34,10 +34,6 @@ export default function Hero() {
           HTML visible, not faded in after hydration. */}
       <motion.div variants={container} initial={false} animate="show">
         <motion.div variants={item} className="flex flex-wrap items-center gap-2.5">
-          <span className="inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.06] px-4 py-1.5 text-xs font-medium text-emerald-300">
-            <PulseDot color="bg-emerald-400" />
-            Open to work · remote / hybrid / on-site
-          </span>
           <span className="inline-flex items-center rounded-full border border-zinc-800 bg-white/[0.03] px-4 py-1.5 text-xs text-zinc-300">
             Senior Full-Stack AI Engineer · MERN
           </span>
@@ -72,34 +68,49 @@ export default function Hero() {
           effective across global time zones.
         </motion.p>
 
-        <motion.div
-          variants={item}
-          className="mt-12 flex flex-wrap items-center gap-4"
-        >
-          <motion.a
-            href="#contact"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="group inline-flex items-center gap-2 rounded-lg bg-cyan px-6 py-3 text-sm font-semibold text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.6)] transition-shadow duration-300 hover:shadow-[0_0_30px_-2px_rgba(34,211,238,0.7)]"
+        {/* Two doors: a business buyer and a recruiter both find their path
+            in the first screen. The business door carries the query people
+            actually search; "open to work" lives on the hiring door only, so
+            a client never reads it as "will leave my project halfway". */}
+        <motion.div variants={item} className="mt-10 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
+          <a
+            href="/solutions/"
+            className="group rounded-xl border border-cyan/40 bg-cyan/[0.06] p-4 transition-colors hover:border-cyan/70 hover:bg-cyan/[0.1]"
           >
-            Get in touch
-            <ArrowRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-          </motion.a>
-          <motion.a
+            <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">Need it built?</span>
+            <span className="mt-1.5 block text-sm font-semibold text-zinc-50">
+              Freelance full-stack &amp; AI developer in Hyderabad — fixed-price builds from ₹25k
+            </span>
+            <span className="mt-2 inline-flex items-center gap-1 text-xs text-ice">
+              See services and prices <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </a>
+          <a
+            href="/hire/"
+            className="group rounded-xl border border-emerald-500/30 bg-emerald-500/[0.05] p-4 transition-colors hover:border-emerald-500/60"
+          >
+            <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-300">
+              <PulseDot color="bg-emerald-400" /> Hiring?
+            </span>
+            <span className="mt-1.5 block text-sm font-semibold text-zinc-50">
+              Open to senior full-stack &amp; AI roles — remote, hybrid or on-site
+            </span>
+            <span className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-300">
+              CV and interview brief <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </a>
+        </motion.div>
+
+        <motion.div variants={item} className="mt-6 flex flex-wrap items-center gap-5 text-sm">
+          <a href="#contact" className="font-medium text-zinc-300 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-cyan">
+            Or just get in touch
+          </a>
+          <a
             href={RESUME_URL}
             download="Yaseen-Khatib-Resume.pdf"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-200 transition-colors duration-300 hover:border-ice/60 hover:text-ice"
+            className="inline-flex items-center gap-1.5 font-medium text-zinc-400 transition-colors hover:text-ice"
           >
-            <DownloadIcon className="h-4 w-4" />
-            Download CV
-          </motion.a>
-          <a
-            href="#dashboard"
-            className="text-sm font-medium text-zinc-400 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-cyan"
-          >
-            View live architecture
+            <DownloadIcon className="h-4 w-4" /> Download CV
           </a>
         </motion.div>
       </motion.div>

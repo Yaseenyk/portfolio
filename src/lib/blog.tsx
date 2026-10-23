@@ -5,7 +5,6 @@ import { payloadReductionReactFlow } from "@/content/posts/94-percent-payload-re
 import { realTimeTelemetry } from "@/content/posts/real-time-telemetry-websockets-react";
 import { chatgptChangedEngineering } from "@/content/posts/chatgpt-changed-full-stack-engineering";
 // Advanced MERN + AI architecture series.
-import { customSerializationAdapters } from "@/content/posts/custom-serialization-adapters";
 import { websocketTelemetryAtScale } from "@/content/posts/websocket-telemetry-at-scale";
 import { optimizingMongoAggregation } from "@/content/posts/optimizing-mongodb-aggregation";
 // streamerOS AI Support Agent — serverless RAG + agentic architecture series.
@@ -13,7 +12,6 @@ import { reactFlowAgentCanvas } from "@/content/posts/react-flow-agent-orchestra
 import { compilingReactFlowAgent } from "@/content/posts/compiling-react-flow-graph-agent-pipeline";
 import { semanticCachingEdge } from "@/content/posts/semantic-caching-edge-rag";
 // The AI Systems Architect Roadmap — 15-part masterclass series (see lib/roadmap.ts).
-import { payloadCompression } from "@/content/posts/payload-compression-serialization-patterns";
 import { llmObservability } from "@/content/posts/llm-observability-opentelemetry-tracing";
 import { aiNativePortfolio } from "@/content/posts/ai-native-portfolio-landing-lead-roles";
 // Mastering Claude Code: The 90% Efficiency Roadmap (see lib/claude-code-roadmap.ts).
@@ -29,7 +27,6 @@ import { aiFinopsPlaybook } from "@/content/posts/ai-finops-playbook-stop-burnin
 import { linkedinPipelineStory } from "@/content/posts/linkedin-pipeline-job-search-runs-itself";
 import { zeroDollarContentEngine } from "@/content/posts/zero-dollar-content-engine";
 import { sableTrustBoundary } from "@/content/posts/sable-ai-agent-never-touches-money";
-import { ninetyFourPercentDecision } from "@/content/posts/the-94-percent-decision-integratex";
 import { hireMyHead } from "@/content/posts/hire-my-head-not-my-hands";
 
 export { SITE_URL };
@@ -44,7 +41,7 @@ export const FOUNDERS_LOG_SLUGS = [
   "linkedin-pipeline-job-search-runs-itself",
   "zero-dollar-content-engine",
   "sable-ai-agent-never-touches-money",
-  "the-94-percent-decision-integratex",
+  "94-percent-payload-reduction-react-flow",
   "hire-my-head-not-my-hands",
 ] as const;
 
@@ -93,14 +90,12 @@ const POSTS: BlogPost[] = [
   linkedinPipelineStory,
   zeroDollarContentEngine,
   sableTrustBoundary,
-  ninetyFourPercentDecision,
   hireMyHead,
   // Claude/Anthropic — the two lessons that earned impressions; the rest of the
   // 15-part 'masterclass' was commodity explainer content and was removed.
   masteringClaudeArchitecture,
   promptCachingDeepDive,
   // AI systems architecture — the pieces backed by first-hand measurement.
-  payloadCompression,
   llmObservability,
   aiNativePortfolio,
   // streamerOS AI Support Agent — serverless RAG + agentic architecture.
@@ -108,7 +103,6 @@ const POSTS: BlogPost[] = [
   compilingReactFlowAgent,
   semanticCachingEdge,
   // Advanced MERN + AI architecture.
-  customSerializationAdapters,
   websocketTelemetryAtScale,
   optimizingMongoAggregation,
   realTimeTelemetry,

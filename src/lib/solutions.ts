@@ -157,8 +157,8 @@ export const CASE_STUDIES: CaseStudy[] = [
     outcome:
       "Workflow payloads shrank by 94%, round-trip lossless. Saves and loads became effectively instant, and the state-sync churn disappeared — an architecture call, not a bigger server.",
     proof: [
-      { label: "The 94% decision, in full", href: "/blog/the-94-percent-decision-integratex/" },
-      { label: "The adapter pattern itself", href: "/blog/custom-serialization-adapters/" },
+      { label: "The 94% decision, in full", href: "/blog/94-percent-payload-reduction-react-flow/" },
+      { label: "The adapter pattern itself", href: "/blog/94-percent-payload-reduction-react-flow/" },
     ],
     stack: ["React Flow", "Zustand", "TypeScript", "Node.js"],
   },

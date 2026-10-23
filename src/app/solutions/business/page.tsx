@@ -18,7 +18,7 @@ const DESCRIPTION =
   "Architecture review, AI integration, fixed-scope custom systems and ERP replacement for Indian and remote businesses. Fixed prices published, code delivered into your repository, no licence and no per-seat fee.";
 
 export const metadata: Metadata = {
-  title: "Architecture, AI Integration and ERP",
+  title: "RAG Chatbots, AI Integration & Custom CRM",
   description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/solutions/business/` },
   openGraph: {
@@ -80,7 +80,7 @@ export default function BusinessPage() {
 
       <header className="mt-8">
         <span className="font-mono text-xs uppercase tracking-[0.25em] text-cyan">
-          ~/solutions/business
+          RAG chatbots · AI integration · custom CRM &amp; ERP · India
         </span>
         <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-zinc-50 sm:text-5xl">
           Four ways in. Start with the cheapest one.
@@ -223,7 +223,7 @@ export default function BusinessPage() {
 
       <div className="mt-20">
         <SolutionsLeadForm
-          heading="Book the free call"
+          heading="Ask for the free call"
           intro="Thirty minutes, no charge, no pitch. Bring the problem and any quote you are weighing up. You leave with an honest read on what it should cost and whether it is worth building at all."
           messageLabel="What you're trying to solve"
           messagePlaceholder="The problem, the systems you already run, any proposal you're evaluating, and your timeline…"

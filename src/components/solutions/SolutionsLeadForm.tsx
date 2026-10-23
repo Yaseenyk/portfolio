@@ -33,6 +33,7 @@ const EMAILJS_SERVICE = EMAILJS.service;
 const EMAILJS_TEMPLATE = EMAILJS.template;
 const EMAILJS_PUBLIC_KEY = EMAILJS.publicKey;
 const CONTACT_EMAIL = EMAILJS.contactEmail;
+const WHATSAPP = "918208335028";
 
 const INTERESTS = [
   "Architecture review / advisory",
@@ -65,6 +66,10 @@ interface Props {
   messagePlaceholder: string;
   /** Pre-selects the interest dropdown when a page is about one service. */
   defaultInterest?: string;
+  /** Shop and clinic owners: name, phone/WhatsApp and the problem — no
+   *  work email, company or budget bands — plus a WhatsApp button. */
+  compact?: boolean;
+  submitLabel?: string;
 }
 
 export default function SolutionsLeadForm({
@@ -73,6 +78,8 @@ export default function SolutionsLeadForm({
   messageLabel,
   messagePlaceholder,
   defaultInterest = "",
+  compact = false,
+  submitLabel = "Send — reply within one working day",
 }: Props) {
   const [form, setForm] = useState<FormState>({
     ...EMPTY_FORM,
@@ -132,7 +139,7 @@ export default function SolutionsLeadForm({
           name: form.name,
           from_name: form.name,
           to_name: OWNER_NAME,
-          email: form.email,
+          email: form.email || CONTACT_EMAIL,
           message: body,
           to_email: CONTACT_EMAIL,
           reply_to: form.email,
@@ -171,6 +178,12 @@ export default function SolutionsLeadForm({
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">{intro}</p>
 
       <form onSubmit={handleSubmit} className="mt-8">
+        {compact ? (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <Field label="Name" name="name" value={form.name} onChange={handleChange} disabled={isSending} />
+          <Field label="Phone or WhatsApp" name="phone" type="tel" value={form.phone} onChange={handleChange} disabled={isSending} />
+        </div>
+        ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Field
             label="Name"
@@ -220,6 +233,7 @@ export default function SolutionsLeadForm({
             options={BUDGETS}
           />
         </div>
+        )}
 
         <div className="mt-5">
           <label
@@ -249,9 +263,20 @@ export default function SolutionsLeadForm({
             whileTap={isSending ? undefined : { scale: 0.97 }}
             className="rounded-xl bg-gradient-to-r from-cyan to-purple px-6 py-3.5 text-sm font-medium text-ink shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)] transition-shadow duration-300 hover:shadow-[0_0_32px_0_rgba(168,85,247,0.5)] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSending ? "Sending…" : status === "sent" ? "Sent" : "Book the free call"}
+            {isSending ? "Sending…" : status === "sent" ? "Sent" : submitLabel}
           </motion.button>
 
+          {compact && (
+            <a
+              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi Yaseen, I run a small business and want to stop doing this manually: ")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => track("solutions-whatsapp")}
+              className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/40 px-5 py-3 text-sm font-medium text-emerald-300 transition-colors hover:bg-emerald-500/10"
+            >
+              Message on WhatsApp
+            </a>
+          )}
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className="text-sm text-zinc-400 underline-offset-4 transition-colors hover:text-ice hover:underline"
