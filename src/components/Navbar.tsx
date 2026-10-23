@@ -39,6 +39,11 @@ const GROUPS: NavGroup[] = [
         desc: "Fixed prices, you own the code",
       },
       {
+        href: "/solutions/ai-chatbot/",
+        label: "AI chatbot on your documents",
+        desc: "Website or WhatsApp, from $800",
+      },
+      {
         href: "/solutions/small-business/",
         label: "For small businesses",
         desc: "Hosted tools from ₹800/month",

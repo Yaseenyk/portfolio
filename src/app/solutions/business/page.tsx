@@ -96,6 +96,13 @@ export default function BusinessPage() {
           number is fixed in writing before work starts and does not move unless you
           change the scope.
         </p>
+        <p className="mt-4 max-w-2xl leading-relaxed text-zinc-400">
+          Only need a chatbot that answers from your own documents, on your website
+          or WhatsApp?{" "}
+          <Link href="/solutions/ai-chatbot/" className="text-ice underline-offset-4 hover:underline">
+            That has its own page, from $800 →
+          </Link>
+        </p>
       </header>
 
       <div className="mt-16 space-y-6">

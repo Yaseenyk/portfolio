@@ -138,6 +138,19 @@ export default function SolutionsPage() {
         </dl>
       </header>
 
+      <Link
+        href="/solutions/ai-chatbot/"
+        className="mt-16 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-cyan/30 bg-cyan/[0.04] p-6 transition-colors hover:border-cyan/60"
+      >
+        <span>
+          <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">AI chatbot</span>
+          <span className="mt-2 block text-lg font-semibold text-zinc-50">
+            A chatbot that answers from your own documents — website or WhatsApp
+          </span>
+        </span>
+        <span className="font-mono text-sm text-zinc-300">from $800 →</span>
+      </Link>
+
       {/* Two audiences, one proof base — split them immediately. */}
       <section className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-2">
         <Link

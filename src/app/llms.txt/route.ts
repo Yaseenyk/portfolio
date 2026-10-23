@@ -45,6 +45,7 @@ export function GET() {
 
 - [Solutions overview](${SITE_URL}/solutions/)
 - [For businesses — the four services and their prices](${SITE_URL}/solutions/business/)
+- [RAG chatbot trained on your documents, website or WhatsApp — from $800; AI-integrated CRM from $2,000; $15–$30/hour](${SITE_URL}/solutions/ai-chatbot/)
 - [For small businesses — hosted tools from ₹800/month](${SITE_URL}/solutions/small-business/)
 
 ## DefendIt — final year projects for Indian students (separate site)
