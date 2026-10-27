@@ -7,6 +7,9 @@ import { routeDate } from "@/lib/lastmod";
 
 export const dynamic = "force-static";
 
+/** The day every page's HTML stopped shipping hidden content. */
+const RENDER_FIX = "2026-10-22";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const tsxSlugs = new Set(getAllPosts().map((p) => p.slug));
   const posts = [
@@ -128,5 +131,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // listing them here would only dilute crawl budget on a young domain.
   ];
 
-  return entries;
+  // Every page's served HTML changed on 22 Oct 2026: entrance animations had
+  // rendered their opacity-0 initial state into the static HTML since June,
+  // so Google snapshotted blank pages and filed them as duplicates of empty
+  // pages elsewhere (commit f285c2b). A lastmod older than the fix tells
+  // Google nothing changed, and it will not re-fetch a page it already
+  // rejected. Floor every date at the fix so the sitemap is truthful about
+  // when the page it describes last changed.
+  return entries.map((e) => ({
+    ...e,
+    lastModified:
+      String(e.lastModified ?? RENDER_FIX) < RENDER_FIX ? RENDER_FIX : e.lastModified,
+  }));
 }

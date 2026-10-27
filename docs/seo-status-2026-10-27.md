@@ -254,3 +254,49 @@ a zero-authority subdomain is a thin-content risk rather than coverage.
   rewrite.
 - GoatCounter counts pageviews from humans with JavaScript; it undercounts but
   does not invent, so "zero search referrals" means zero.
+
+---
+
+## Addendum, 27 October evening: the API read changes the portfolio diagnosis
+
+A service account now reads all four Search Console properties
+(`scripts/gsc-pull.py`, `scripts/gsc-index-status.py`; key and output in the
+gitignored `gsc/`). The URL Inspection API was run over every sitemap URL.
+
+| property | sitemap URLs | indexed | crawled, not indexed | discovered, not crawled | unknown | other |
+| --- | --- | --- | --- | --- | --- | --- |
+| portfolio | 52 | **0** | 30 | 11 | 8 | 3 duplicate |
+| streamerOS | 78 | 57 | 5 | 6 | 8 | 2 gone |
+| campus | 56 | 51 | 0 | 0 | 0 | 4 stale noindex, 1 duplicate |
+| FitRank | 39 | 36 | 0 | 2 | 1 | |
+
+**The portfolio has zero indexed pages**, and it has had zero impressions since
+7 September. The earlier verdict of "stuck" understated it.
+
+**Section 3 above gave the wrong root cause.** Campus and FitRank are new
+subdomains with no links, the same templates, and in campus's case the same
+content that was on the portfolio, and both were indexed within five days of
+verification. Authority is not what kept the portfolio out.
+
+What did: from the 6 June rebuild until the 22 October fix (commit f285c2b),
+every entrance animation rendered its initial `opacity: 0` into the static
+HTML, including the container around the h1. Google's renderer snapshotted
+blank pages. The proof is in the three "duplicate" rows: Google's chosen
+canonical for the Sable post and the optimistic-UI post is the 403 page of a
+cinema chain's website, and for the 94% post it is a casino's 404 page.
+Google filed the portfolio's pages as copies of unrelated empty pages, marked
+the rest "crawled, currently not indexed" for the same reason, and then stopped
+coming back: 20 pages were last crawled in July, 19 never.
+
+The fix has been live since 10:09 UTC on 22 October and every page now ships
+with no hidden elements. Since then Google has re-fetched exactly two of the
+52 pages (home on 23 Oct, the WebSocket post on 27 Oct), and their verdicts
+have not yet been refreshed. Nothing on-site is left to fix. The job is to get
+Google to re-fetch 52 pages it has decided are not worth re-fetching, which is
+what Request Indexing and Validate Fix are for, and what a truthful sitemap
+`lastmod` of 22 October on every page supports.
+
+Minor, self-correcting: campus's four "noindex" rows were crawled on 22–23 Oct
+before the deep dives opened them; they are `index, follow` live now. Its
+`/journey/rag/` was clustered with a Russian calorie calculator on 22 Oct, the
+same blank-snapshot signature, and the page is full-length live.
