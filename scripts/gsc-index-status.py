@@ -34,16 +34,18 @@ def sitemap_urls(site: str) -> list[str]:
     return re.findall(r"<loc>(.*?)</loc>", xml)
 
 
-def inspect(tok: str, site: str, url: str) -> dict:
+def inspect(tok: str, site: str, url: str, tries: int = 0) -> dict:
     r = requests.post(
         INSPECT,
         headers={"Authorization": f"Bearer {tok}"},
         json={"inspectionUrl": url, "siteUrl": site},
         timeout=60,
     )
-    if r.status_code == 429:
-        time.sleep(10)
-        return inspect(tok, site, url)
+    if r.status_code == 429 or r.status_code >= 500:
+        if tries >= 5:
+            r.raise_for_status()
+        time.sleep(10 * (tries + 1))
+        return inspect(tok, site, url, tries + 1)
     r.raise_for_status()
     res = r.json().get("inspectionResult", {}).get("indexStatusResult", {})
     return {
