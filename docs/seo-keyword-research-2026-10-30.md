@@ -127,7 +127,7 @@ position 11.6 with no page targeting it.
 | obs replay | 110 | 0 | informational | none | no page |
 | obs chat dock / obs chat dock missing | 70 + 50 | 0 | navigational | none | troubleshooting post |
 | streamlabs alternative | GSC: 18 impr | – | commercial | 11.6 | no page, we are already on page 2 |
-| combine twitch and youtube chat | low | – | – | none | SERP has 4 results; our unified chat does exactly this |
+| combine twitch and youtube chat | low | – | – | none | SERP has 4 results, but streamerOS monitors one chat source at a time (verified in the product repo, 30 Oct), so no page was built |
 | adaptive quantization obs on or off | GSC: 45 impr | – | – | 9.3 | existing post, push to top 5 with an answer box |
 | best obs settings for low end pc | GSC: 2 impr | – | – | 9.0 | existing post, same |
 
@@ -147,7 +147,7 @@ instreamly at 13 to 22), "twitch banned words" (5,400, KD 4), "how to get more v
    The two softest keywords with real volume in this whole research (2,780 combined, KD 0 to 7).
 2. `/compare/streamlabs-alternative/`. Already at 11.6 without a page.
 3. `/features/scene-switcher/` plus a post "streamerOS vs OBS Advanced Scene Switcher plugin".
-4. "Combine Twitch and YouTube chat in OBS" feature page; four-result SERP.
+4. Dropped: "Combine Twitch and YouTube chat" is not a real feature (one source at a time), and the product renders no chat overlay either, so item 1 shipped as a how-to guide at /blog/twitch-chat-overlay-obs rather than a feature page.
 5. Troubleshooting posts at KD 0: "OBS chat dock missing", "OBS replay buffer", "OBS timer plugin
    options", "OBS scripts: what they are and five to install".
 6. A streamer glossary section, one page per term, starting with the KD 0 to 4 terms above. This is
@@ -291,3 +291,7 @@ Tools used and prices paid: `dataforseo.google.keywords.ideas` ($0.012 to $0.015
 `treg.web.url.metrics` (SE Ranking, $0.003). The token is the signed-in treg CLI on this machine,
 team connectmazjid. Search Console figures came from `scripts/gsc-pull.py` and
 `scripts/gsc-index-status.py`.
+
+## Shipped, 30 October 2026
+
+Portfolio a63d472, streamerOS 8a567d4, campus 9dbcf26 and 4415190, FitRank 013c58a. Items not built and why are recorded in the per-site sections above.
