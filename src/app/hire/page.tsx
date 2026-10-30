@@ -11,10 +11,12 @@ const DESCRIPTION =
   "Hire Yaseen Khatib — a Senior Full-Stack AI Engineer (MERN + TypeScript) who ships production AI systems solo: agentic RAG, LLM orchestration, real-time and edge architectures. Open to senior/lead roles and contract work, remote or on-site.";
 
 export const metadata: Metadata = {
-  title: "Hire a Senior MERN + AI Engineer (India)",
+  title: "Hire a Senior Full-Stack AI Engineer (MERN, RAG)",
   description: seoDescription(DESCRIPTION),
   keywords: [
+    "hire ai engineer",
     "hire full-stack AI engineer",
+    "hire rag developer",
     "senior AI engineer for hire",
     "RAG engineer for hire",
     "LLM engineer freelance",
@@ -150,6 +152,42 @@ export default function HirePage() {
             the writing
           </Link>{" "}
           behind the decisions.
+        </p>
+      </section>
+
+      <section className="mt-20" id="rag-developer">
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
+          Hire a RAG developer
+        </h2>
+        <p className="mt-4 max-w-3xl leading-relaxed text-zinc-400">
+          Most of the AI work I am hired for is retrieval-augmented generation:
+          getting a model to answer from a company&apos;s own documents, cite the
+          passage it used, and refuse when the documents do not cover the
+          question. The assistant on this site is that system in production. It
+          runs on a Cloudflare Worker, embeds the query with Workers AI,
+          retrieves from a Vectorize index of every article here, and declines
+          below a confidence threshold. The same index is published as an MCP
+          server, so it can be queried from inside Claude.
+        </p>
+        <p className="mt-4 max-w-3xl leading-relaxed text-zinc-400">
+          If you need that built for your documents, the{" "}
+          <Link href="/solutions/ai-chatbot/" className="text-cyan underline-offset-4 hover:underline">
+            AI chatbot page
+          </Link>{" "}
+          has fixed prices. If you need an agent that also acts on your systems
+          behind a human confirm step, see{" "}
+          <Link href="/solutions/ai-agents/" className="text-cyan underline-offset-4 hover:underline">
+            custom AI agents
+          </Link>
+          . The design decisions are written up in{" "}
+          <Link href="/blog/semantic-caching-edge-rag/" className="text-cyan underline-offset-4 hover:underline">
+            semantic caching for edge RAG
+          </Link>{" "}
+          and{" "}
+          <Link href="/blog/llm-observability-opentelemetry-tracing/" className="text-cyan underline-offset-4 hover:underline">
+            LLM observability with OpenTelemetry
+          </Link>
+          .
         </p>
       </section>
 

@@ -44,6 +44,11 @@ const GROUPS: NavGroup[] = [
         desc: "Website or WhatsApp, from $800",
       },
       {
+        href: "/solutions/ai-agents/",
+        label: "Custom AI agents",
+        desc: "Propose-and-confirm agents, MCP servers",
+      },
+      {
         href: "/solutions/small-business/",
         label: "For small businesses",
         desc: "Hosted tools from ₹800/month",

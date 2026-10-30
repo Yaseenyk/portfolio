@@ -19,12 +19,12 @@ const DESCRIPTION =
   "Solution architecture and software builds for businesses that were quoted enterprise prices for a problem that does not need one — AI integration, custom internal systems, and ERP replacement. Plus hosted tools for small businesses from ₹800 a month. Fixed prices, you own the code.";
 
 export const metadata: Metadata = {
-  title: "Freelance Full-Stack & AI Developer, Hyderabad",
+  title: "AI Development Services for Small Business, Fixed Price",
   description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/solutions/` },
   openGraph: {
     type: "website",
-    title: "Solutions | Yaseen Khatib",
+    title: "AI Development Services | Yaseen Khatib",
     description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/solutions/`,
     siteName: "Yaseen Khatib",
@@ -149,6 +149,19 @@ export default function SolutionsPage() {
           </span>
         </span>
         <span className="font-mono text-sm text-zinc-300">from $800 →</span>
+      </Link>
+
+      <Link
+        href="/solutions/ai-agents/"
+        className="mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-colors hover:border-cyan/40"
+      >
+        <span>
+          <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">Custom AI agents</span>
+          <span className="mt-2 block text-lg font-semibold text-zinc-50">
+            Agents that read your systems, propose actions, and wait for a person to confirm
+          </span>
+        </span>
+        <span className="font-mono text-sm text-zinc-300">fixed price →</span>
       </Link>
 
       {/* Two audiences, one proof base — split them immediately. */}

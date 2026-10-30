@@ -23,7 +23,7 @@ const DESCRIPTION =
   "Yaseen Khatib is a Senior Full-Stack AI Engineer in Hyderabad, India, who designed, built, and shipped six production products solo — Agentic RAG pipelines, LLM orchestration, and the systems they run on. The canonical bio: who he is, what he has built, and how he works.";
 
 export const metadata: Metadata = {
-  title: "About Yaseen Khatib",
+  title: "About Yaseen Khatib, MERN Developer Turned AI Engineer",
   description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/about/` },
   openGraph: {

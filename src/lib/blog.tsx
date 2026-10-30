@@ -29,6 +29,9 @@ import { zeroDollarContentEngine } from "@/content/posts/zero-dollar-content-eng
 import { sableTrustBoundary } from "@/content/posts/sable-ai-agent-never-touches-money";
 import { hireMyHead } from "@/content/posts/hire-my-head-not-my-hands";
 import { whatsappChatbotSaasVsOwning } from "@/content/posts/whatsapp-chatbot-saas-vs-owning-it";
+// Hiring-intent pieces from the 30 Oct 2026 keyword research (docs/seo-keyword-research-2026-10-30.md).
+import { aiEngineerPortfolioExamples } from "@/content/posts/ai-engineer-portfolio-examples";
+import { mernVsFullStack } from "@/content/posts/mern-stack-developer-vs-full-stack-developer";
 
 export { SITE_URL };
 
@@ -82,6 +85,8 @@ export interface BlogPost {
 
 // Registry — add new posts here.
 const POSTS: BlogPost[] = [
+  aiEngineerPortfolioExamples,
+  mernVsFullStack,
   whatsappChatbotSaasVsOwning,
   // Founder's Log — the vision series (newest).
   myJourneyPost,

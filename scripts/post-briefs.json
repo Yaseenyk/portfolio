@@ -62,16 +62,178 @@
         "Do not compare with HubSpot, Salesforce or Freshsales prices; they are not in the facts."
       ],
       "internal_links": [
-        { "href": "/solutions/ai-chatbot/", "why": "the AI-integrated CRM offer, from $2,000 (the single call to action, at the end)" },
-        { "href": "/blog/whatsapp-chatbot-saas-vs-owning-it/", "why": "the same rent-vs-own reasoning applied to WhatsApp chatbots" }
+        {
+          "href": "/solutions/ai-chatbot/",
+          "why": "the AI-integrated CRM offer, from $2,000 (the single call to action, at the end)"
+        },
+        {
+          "href": "/blog/whatsapp-chatbot-saas-vs-owning-it/",
+          "why": "the same rent-vs-own reasoning applied to WhatsApp chatbots"
+        }
       ],
-      "cta": { "href": "/solutions/ai-chatbot/", "text": "AI-integrated CRM, from $2,000" }
+      "cta": {
+        "href": "/solutions/ai-chatbot/",
+        "text": "AI-integrated CRM, from $2,000"
+      }
     },
     {
       "slug": "chatbot-development-what-800-buys",
       "status": "needs-facts",
       "keyword": "chatbot development",
       "note": "Commercial intent, 260 a month in India, 2,100 worldwide, KD 39. Needs an itemised scope of the $800 build and sourced agency price ranges before it can be written."
+    },
+    {
+      "slug": "ollama-vs-lm-studio-for-developers",
+      "status": "ready",
+      "keyword": "ollama vs lm studio",
+      "secondary_keywords": [
+        "lm studio vs ollama",
+        "lmstudio vs ollama",
+        "local llm windows",
+        "run llm locally"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 30 Oct 2026: 'lm studio vs ollama' 2,900 searches a month, KD 0; 'ollama vs lm studio' 1,600, KD 0; 'lmstudio vs ollama' 2,900, KD 0. A solo AI engineer's blog (zenvanriel.com) holds positions 7 to 9 with a plain comparison, so a first-hand, developer-angle comparison can reach the top 10.",
+      "audience": "A developer or technical founder who wants to run an open model on their own machine and is choosing between the two most common tools.",
+      "angle": "Which one a working developer should pick, decided by how you will talk to the model: a GUI for trying models versus a server other code calls. Draw on the author's own experience running Ollama on Windows for streamerOS (the linked streamerosai.com guide) and wiring local models into the local-first products on this site.",
+      "title_hint": "Ollama vs LM Studio: Which One a Developer Should Run",
+      "facts": [
+        {
+          "claim": "Ollama is available for macOS, Windows and Linux, and as the official ollama/ollama Docker image.",
+          "source": "https://github.com/ollama/ollama/blob/main/README.md",
+          "checked": "2026-10-30"
+        },
+        {
+          "claim": "Ollama runs a model with a single command, for example `ollama run gemma4`, and exposes a REST API on localhost port 11434 (for example http://localhost:11434/api/chat).",
+          "source": "https://github.com/ollama/ollama/blob/main/README.md",
+          "checked": "2026-10-30"
+        },
+        {
+          "claim": "Ollama exposes an OpenAI-compatible API at http://localhost:11434/v1/ supporting a subset of the OpenAI API, including /v1/chat/completions, /v1/completions, /v1/embeddings and /v1/models.",
+          "source": "https://docs.ollama.com/api/openai-compatibility",
+          "checked": "2026-10-30"
+        },
+        {
+          "claim": "LM Studio is available for macOS, Windows and Linux; it generally supports Apple Silicon Macs, x64/ARM64 Windows PCs and x64 Linux PCs.",
+          "source": "https://lmstudio.ai/docs/app",
+          "checked": "2026-10-30"
+        },
+        {
+          "claim": "LM Studio runs llama.cpp (GGUF) models on Mac, Windows and Linux, and MLX models on Apple Silicon Macs.",
+          "source": "https://lmstudio.ai/docs/app",
+          "checked": "2026-10-30"
+        },
+        {
+          "claim": "LM Studio can serve local models on OpenAI-like endpoints, locally and on the network, and ships a CLI named `lms` for chat, model downloads, daemon management, server control and publishing.",
+          "source": "https://lmstudio.ai/docs/app",
+          "checked": "2026-10-30"
+        },
+        {
+          "claim": "LM Studio has been free to use both at home and at work since 8 July 2025; company use previously required contacting LM Studio for a commercial licence, and that requirement was removed. Paid Teams and Enterprise plans exist for private sharing, SSO and gating.",
+          "source": "https://lmstudio.ai/blog/free-for-work",
+          "checked": "2026-10-30"
+        },
+        {
+          "claim": "The author has published a step-by-step guide to running Ollama on Windows on streamerosai.com.",
+          "source": "https://streamerosai.com/blog/run-ollama-on-windows-guide",
+          "checked": "2026-10-30"
+        }
+      ],
+      "computed": [],
+      "must_say": [
+        "Both are free for a developer; LM Studio's licence changed in July 2025, so older comparisons that call it non-commercial are out of date.",
+        "The practical difference is the entry point: LM Studio is a desktop app with a model browser and an optional server; Ollama is a server and CLI first, with no bundled chat window in the facts above.",
+        "Both expose OpenAI-compatible endpoints, so application code written against one can usually be pointed at the other."
+      ],
+      "must_not": [
+        "Do not quote benchmark numbers, token speeds, memory usage or model sizes; none are in the facts.",
+        "Do not state LM Studio's server port or Ollama's licence; neither is in the facts.",
+        "Do not invent feature lists beyond the sourced ones."
+      ],
+      "internal_links": [
+        {
+          "href": "/products/sable/",
+          "why": "a local-first product where the model runs on the device"
+        },
+        {
+          "href": "/solutions/ai-agents/",
+          "why": "local models as one option for custom agents (the single call to action, at the end)"
+        }
+      ],
+      "cta": {
+        "href": "/solutions/ai-agents/",
+        "text": "Custom AI agents, local or hosted"
+      }
+    },
+    {
+      "slug": "what-ai-inference-costs-in-production",
+      "status": "needs-facts",
+      "keyword": "what is ai inference",
+      "secondary_keywords": [
+        "ai inference",
+        "ai inference cost",
+        "what is inference in ai"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 30 Oct 2026: 2,900 a month US, KD 18 to 34. Engineer-facing explainer track; zenvanriel.com ranks for these from a solo portfolio blog.",
+      "angle": "Explain inference from the point of view of someone paying for it: tokens in, tokens out, caching, and what the bill looks like, grounded in the author's prompt-caching and FinOps posts. Needs sourced current per-token prices before it is ready.",
+      "facts": [],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source URL in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire a senior full-stack AI engineer"
+      }
+    },
+    {
+      "slug": "claude-code-workflow-for-a-solo-engineer",
+      "status": "needs-facts",
+      "keyword": "claude code workflow",
+      "secondary_keywords": [
+        "claude code tips",
+        "claude code best practices"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 30 Oct 2026: 1,900 a month US, KD 27. Engineer-facing explainer track; zenvanriel.com ranks for these from a solo portfolio blog.",
+      "angle": "The exact workflow used to run this site and its pipelines: constitutions, MCP read-only first, review gates. Needs facts pulled from the repository's CLAUDE.md files and Anthropic's Claude Code docs with URLs.",
+      "facts": [],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source URL in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire a senior full-stack AI engineer"
+      }
+    },
+    {
+      "slug": "building-ai-agents-that-cannot-spend-money",
+      "status": "needs-facts",
+      "keyword": "building ai agents",
+      "secondary_keywords": [
+        "how to build ai agents",
+        "ai agent architecture"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 30 Oct 2026: 2,400 plus 1,600 a month US, KD 20 to 41. Engineer-facing explainer track; zenvanriel.com ranks for these from a solo portfolio blog.",
+      "angle": "The propose-and-confirm pattern from Sable, generalised into a build guide. Needs the Sable post's claims restated as facts with the post URL as source.",
+      "facts": [],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source URL in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire a senior full-stack AI engineer"
+      }
     }
   ]
 }

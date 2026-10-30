@@ -115,6 +115,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/solutions/ai-agents/`,
+      lastModified: routeDate("src/app/solutions/ai-agents", lastBlogUpdate),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/solutions/small-business/`,
       lastModified: routeDate("src/app/solutions/small-business", lastBlogUpdate),
       changeFrequency: "monthly",

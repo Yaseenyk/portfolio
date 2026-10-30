@@ -79,12 +79,12 @@ const FAQ: FaqItem[] = [
 ];
 
 export const metadata: Metadata = {
-  title: "RAG Chatbot for Your Documents, From $800",
+  title: "AI Chatbot Development for Business, From $800",
   description: seoDescription(DESCRIPTION),
   alternates: { canonical: URL },
   openGraph: {
     type: "website",
-    title: "RAG Chatbot Trained on Your Documents | Yaseen Khatib",
+    title: "AI Chatbot Development, Trained on Your Documents | Yaseen Khatib",
     description: seoDescription(DESCRIPTION),
     url: URL,
     siteName: "Yaseen Khatib",
