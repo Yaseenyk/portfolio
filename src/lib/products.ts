@@ -3,6 +3,7 @@
 import { SITE_URL } from "@/lib/site";
 
 export type ProductSlug =
+  | "spotai"
   | "fitrank"
   | "sable"
   | "streameros"
@@ -27,6 +28,25 @@ export interface ProductMeta {
 }
 
 export const PRODUCTS: ProductMeta[] = [
+  {
+    slug: "spotai",
+    name: "SpotAI",
+    category: "Mobile + Web · On-device AI",
+    tagline: "An AI gym buddy for members and a management console for Indian gym owners",
+    summary:
+      "A gym app with two sides. Members get a squat coach that runs MediaPipe pose on the phone and never uploads a frame, a workout log, an opt-in leaderboard and buddies. Owners get live arrivals with dues flagged, UPI payments, busy hours and a trainer console that reviews the AI's tips. Consent per purpose, built to the shape of India's DPDP Act.",
+    tech: [
+      "Vue 3 + Capacitor",
+      "NestJS",
+      "PostgreSQL RLS",
+      "MediaPipe",
+      "NATS",
+      "Astro + GSAP",
+    ],
+    // The app repo is private; this is the public marketing site.
+    repoUrl: "https://github.com/Yaseenyk/spotai-website",
+    liveUrl: "https://yaseenyk.github.io/spotai-website/",
+  },
   {
     slug: "fitrank",
     name: "FitRank",

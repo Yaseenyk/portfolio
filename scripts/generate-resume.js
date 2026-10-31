@@ -22,6 +22,12 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
     // seven seconds. One hard fact each; the full write-ups live on page 2.
     const HIGHLIGHTS = [
       {
+        name: 'SpotAI',
+        kicker: 'Mobile + Web · On-device AI',
+        fact: 'AI gym buddy for Indian gyms. Squat form check runs on the phone, frames never uploaded; owner dashboard with dues and UPI. Postgres row-level security per gym, 179 API tests.',
+        link: { label: 'Site', url: 'https://yaseenyk.github.io/spotai-website/' },
+      },
+      {
         name: 'FitRank',
         kicker: 'Applied ML · Live',
         fact: '23M MiniLM student distilled from a 9B teacher. Beats a rules-only baseline on hit@5 and pairwise ordering, served on CPU at $0 per decision.',
@@ -37,6 +43,21 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
 
     // Page 2: products designed, built and shipped solo.
     const PRODUCTS = [
+      {
+        name: 'SpotAI',
+        sub: 'AI gym buddy for Indian gyms',
+        badge: 'Mobile + Web · On-device AI',
+        desc:
+          'One product, two sides. Members get a squat coach that runs MediaPipe pose on the phone and sends only rep counts and per-rep flags to the API, never a frame, plus a workout log, an opt-in gym leaderboard and buddy matching. Owners get live arrivals with dues flagged, UPI payments, busy hours and a trainer console that reviews every AI tip. Each purpose is a separate consent with its notice version stored.',
+        proof:
+          'Vue 3 + Capacitor app, two Vue 3 consoles, NestJS on PostgreSQL with <b>row-level security per gym</b> (two gyms asserted side by side in tests), NATS outbox, model gateway with identity redaction. <b>179 API tests</b>, browser tests with WCAG AA checks on every screen.',
+        tags: ['Vue 3 · Capacitor', 'NestJS', 'PostgreSQL RLS', 'MediaPipe', 'NATS', 'Astro + GSAP'],
+        links: [
+          { label: 'Site', url: 'https://yaseenyk.github.io/spotai-website/' },
+          { label: 'Case study', url: `${SITE}/products/spotai/` },
+          { label: 'Site source', url: `${GH}/spotai-website` },
+        ],
+      },
       {
         name: 'FitRank',
         sub: 'Typed AI decisions for staffing',
@@ -245,16 +266,16 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       `<span class="text-[9px] font-semibold text-[#7F1D3A] bg-[#FBF3F5] border border-[#EED3DA] px-2 py-[2px] rounded-full whitespace-nowrap">${t}</span>`;
 
     const card = (p) => `
-      <div class="break-inside-avoid rounded-lg border border-stone-200 bg-white px-4 py-3 border-l-[3px] border-l-[#7F1D3A]">
+      <div class="break-inside-avoid rounded-lg border border-stone-200 bg-white px-4 py-2.5 border-l-[3px] border-l-[#7F1D3A]">
         <div class="flex items-start justify-between gap-4">
           <div>
             <h3 class="font-bold text-[13px] text-stone-900 leading-tight">${p.name} <span class="font-normal text-stone-500">· ${p.sub}</span></h3>
           </div>
           <div class="flex items-center gap-2 shrink-0">${badge(p.badge)}</div>
         </div>
-        <p class="text-[11px] text-stone-600 mt-1.5 leading-[1.55]">${p.desc}</p>
-        ${p.proof ? `<div class="mt-2 rounded-md bg-stone-50 border border-stone-100 px-3 py-2 text-[10.5px] text-stone-700 leading-[1.5]"><span class="font-bold uppercase tracking-wider text-[8.5px] text-[#7F1D3A] mr-1.5">Proof</span>${p.proof}</div>` : ''}
-        <div class="flex items-center justify-between gap-4 mt-2.5">
+        <p class="text-[10px] text-stone-600 mt-1 leading-[1.45]">${p.desc}</p>
+        ${p.proof ? `<div class="mt-2 rounded-md bg-stone-50 border border-stone-100 px-3 py-1.5 text-[9.5px] text-stone-700 leading-[1.4]"><span class="font-bold uppercase tracking-wider text-[8.5px] text-[#7F1D3A] mr-1.5">Proof</span>${p.proof}</div>` : ''}
+        <div class="flex items-center justify-between gap-4 mt-2">
           <div class="flex flex-wrap gap-1.5">${p.tags.map(pill).join('')}</div>
           <div class="text-[9.5px] shrink-0 space-x-3">${p.links.map(a).join('')}</div>
         </div>
@@ -333,7 +354,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       <div>
         <h1 class="text-[32px] font-extrabold tracking-tight leading-none">Yaseen Khatib</h1>
         <p class="mt-2 text-[13px] font-semibold text-[#C9A227]">Senior MERN Stack Developer <span class="text-stone-500">·</span> AI Systems</p>
-        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build MERN products end to end, then put the AI inside them. Six shipped solo, each one you can open.</p>
+        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build MERN products end to end, then put the AI inside them. Seven shipped solo, each one you can open.</p>
       </div>
       <div class="text-right text-[10px] text-stone-400 leading-[1.7] shrink-0 pt-1">
         <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-stone-200">yaseenkhatib04@gmail.com</a></div>
@@ -347,7 +368,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
     <div class="relative mt-3.5 grid grid-cols-5 divide-x divide-white/10 border-t border-white/10 pt-3">
       ${[
         ['5+', 'years full-stack', 'React · Node.js · MongoDB'],
-        ['6', 'products shipped solo', 'in twelve months, each live'],
+        ['7', 'products shipped solo', 'in twelve months, each one open'],
         ['94%', 'smaller API payloads', 'React Flow + MongoDB serialization'],
         ['2x', 'faster dashboards', 'MongoDB pipeline profiling'],
         ['34', 'articles published', '+35 syndicated on DEV.to'],
@@ -363,13 +384,13 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
   <section class="mt-3">
     ${h2('Summary')}
     <p class="text-[10.5px] text-stone-700 leading-[1.55]">
-      I build full-stack products on <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and for the last year I have been building the AI inside them. I started in 2021 on hospital information systems that clinical staff used every day. In 2023 I joined MSA Software as a full-stack developer, profiled slow MongoDB pipelines until dashboards ran <b>1.5–2x faster</b>, and moved the team to TypeScript and Next.js. Since 2025 I own the <b>LLM and agentic layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents, MCP servers</b>. On the side I have shipped <b>six products solo</b>: a React Flow workflow engine that cut payloads <b>94%</b>, a React Native finance agent, a distilled AI decision model, and three more, each with a public link. I own a system from database schema to deployed UI, and I am open to senior remote, hybrid or on-site roles.
+      I build full-stack products on <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and for the last year I have been building the AI inside them. I started in 2021 on hospital information systems that clinical staff used every day. In 2023 I joined MSA Software as a full-stack developer, profiled slow MongoDB pipelines until dashboards ran <b>1.5–2x faster</b>, and moved the team to TypeScript and Next.js. Since 2025 I own the <b>LLM and agentic layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents, MCP servers</b>. On the side I have shipped <b>seven products solo</b>: an AI gym app with on-device form check, a React Flow workflow engine that cut payloads <b>94%</b>, a distilled AI decision model, and four more, each with a public link. I own a system from database schema to deployed UI, and I am open to senior remote, hybrid or on-site roles.
     </p>
   </section>
 
   <section class="mt-3">
     ${h2('Selected work', 'full write-ups on pages 2–3')}
-    <div class="grid grid-cols-2 gap-3">${HIGHLIGHTS.map(highlight).join('')}</div>
+    <div class="grid grid-cols-3 gap-3">${HIGHLIGHTS.map(highlight).join('')}</div>
   </section>
 
   <div class="grid grid-cols-12 gap-x-6 mt-3">
@@ -393,9 +414,9 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
   </div>
 
   <!-- ============================ PAGE 2: PRODUCTS ============================ -->
-  <div class="pt-[12mm]" style="page-break-before: always;">
+  <div class="pt-[9mm]" style="page-break-before: always;">
     ${running('Products: designed, built and shipped solo')}
-    <div class="space-y-3">${PRODUCTS.map(card).join('')}</div>
+    <div class="space-y-2">${PRODUCTS.map(card).join('')}</div>
   </div>
 
   <!-- ============================ PAGE 3: APPLIED WORK, WRITING ============================ -->

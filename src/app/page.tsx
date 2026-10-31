@@ -71,6 +71,18 @@ const projectsJsonLd = [
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
+    name: "SpotAI",
+    applicationCategory: "HealthApplication",
+    operatingSystem: "Android, iOS, Web",
+    description:
+      "An AI gym buddy for Indian gyms: a squat coach that runs MediaPipe pose on the phone and never uploads a frame, workout logging, an opt-in gym leaderboard and buddies for members; live arrivals, dues, UPI payments and a trainer console for owners. Consent per purpose, PostgreSQL row-level security per gym.",
+    keywords:
+      "gym app, on-device AI, MediaPipe, Vue 3, Capacitor, NestJS, PostgreSQL RLS, DPDP consent, India",
+    author,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
     name: "Sable",
     applicationCategory: "FinanceApplication",
     operatingSystem: "iOS, Android",
