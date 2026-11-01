@@ -25,7 +25,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         name: 'SpotAI',
         kicker: 'Mobile + Web · On-device AI',
         fact: 'AI gym buddy for Indian gyms. Squat form check runs on the phone, frames never uploaded; owner dashboard with dues and UPI. Postgres row-level security per gym, 179 API tests.',
-        link: { label: 'Site', url: 'https://yaseenyk.github.io/spotai-website/' },
+        link: { label: 'Site', url: 'https://spotai.streamerosai.com/' },
       },
       {
         name: 'FitRank',
@@ -53,7 +53,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
           'Vue 3 + Capacitor app, two Vue 3 consoles, NestJS on PostgreSQL with <b>row-level security per gym</b> (two gyms asserted side by side in tests), NATS outbox, model gateway with identity redaction. <b>179 API tests</b>, browser tests with WCAG AA checks on every screen.',
         tags: ['Vue 3 · Capacitor', 'NestJS', 'PostgreSQL RLS', 'MediaPipe', 'NATS', 'Astro + GSAP'],
         links: [
-          { label: 'Site', url: 'https://yaseenyk.github.io/spotai-website/' },
+          { label: 'Site', url: 'https://spotai.streamerosai.com/' },
           { label: 'Case study', url: `${SITE}/products/spotai/` },
           { label: 'Site source', url: `${GH}/spotai-website` },
         ],

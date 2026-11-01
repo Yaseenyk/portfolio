@@ -45,7 +45,7 @@ export const PRODUCTS: ProductMeta[] = [
     ],
     // The app repo is private; this is the public marketing site.
     repoUrl: "https://github.com/Yaseenyk/spotai-website",
-    liveUrl: "https://yaseenyk.github.io/spotai-website/",
+    liveUrl: "https://spotai.streamerosai.com/",
   },
   {
     slug: "fitrank",
