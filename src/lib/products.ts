@@ -36,7 +36,7 @@ export const PRODUCTS: ProductMeta[] = [
     category: "Mobile + Web · On-device AI",
     tagline: "An AI gym buddy for members and a management console for Indian gym owners",
     summary:
-      "A gym app with two sides. Members get a squat coach that runs MediaPipe pose on the phone and never uploads a frame, a workout log, an opt-in leaderboard and buddies. Owners get live arrivals with dues flagged, UPI payments, busy hours and a trainer console that reviews the AI's tips. Consent per purpose, built to the shape of India's DPDP Act.",
+      "A gym app with two sides. Members get a squat coach that runs MediaPipe pose on the phone and never uploads a frame, a workout log, a diet plan built from Indian dishes, an opt-in leaderboard and buddies. Owners get live arrivals with dues flagged, UPI payments, busy hours and a trainer console that reviews the AI's tips. Consent per purpose, built to the shape of India's DPDP Act.",
     tech: [
       "Vue 3 + Capacitor",
       "NestJS",

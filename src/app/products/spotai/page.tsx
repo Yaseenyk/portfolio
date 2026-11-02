@@ -84,7 +84,8 @@ export default function SpotAiPage() {
             <p>
               <strong>SpotAI</strong> is one product with two sides. Members get a
               coach that watches their squat through the phone camera and gives
-              one tip per set, a workout log, an opt-in gym leaderboard and buddies
+              one tip per set, a workout log, a diet plan sized to their body numbers from
+              Indian dishes, an opt-in gym leaderboard and buddies
               to train with. Owners get live arrivals with dues flagged, UPI
               payments inside the member app, busy hours, a front-desk console
               and a trainer console that reviews what the AI says before members
@@ -170,7 +171,7 @@ export default function SpotAiPage() {
 
             <h4>Evidence</h4>
             <ul>
-              <li>188 API tests across auth, tenancy, training, consent, clips, connect, owner and load.</li>
+              <li>190 API tests across auth, tenancy, training, consent, clips, connect, diet, owner and load.</li>
               <li>Browser tests for members and staff, against the API and fully offline, with WCAG AA checks on every main screen.</li>
               <li>~40k lines of TypeScript, Vue and Python across three apps, the API, a model gateway and an edge agent.</li>
               <li>Marketing site with JSON-LD, sitemap, <code>llms.txt</code> and real app screenshots, built in Astro + GSAP.</li>
