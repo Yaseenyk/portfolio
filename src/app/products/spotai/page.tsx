@@ -52,6 +52,8 @@ const jsonLd = [
     name: product.name,
     applicationCategory: "HealthApplication",
     operatingSystem: "Android, iOS, Web",
+    downloadUrl: product.downloads?.[0]?.url,
+    installUrl: product.downloads?.[1]?.url,
     description: seoDescription(product.summary),
     keywords: product.tech.join(", "),
     author: personRef,
@@ -102,8 +104,8 @@ export default function SpotAiPage() {
       <Section label="02 · The Stack">
         <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
-            ["Member app", "Vue 3 + Vite, packaged with Capacitor 8 for Android and iOS; TanStack Query cache persisted to storage so screens paint before the network answers."],
-            ["Owner and staff", "Two Vue 3 web consoles: owner dashboard, and a staff console for the front desk and trainers."],
+            ["Member app", "Vue 3 + Vite, packaged with Capacitor 8 for Android and iOS, in 7 Indian languages; TanStack Query cache persisted to storage so screens paint before the network answers."],
+            ["Owner and staff", "One app for everyone: owners, trainers and the front desk sign in to a staff console under /staff in the same Vue 3 app, with its own token and role-gated screens."],
             ["API", "NestJS on PostgreSQL with row-level security per gym, NATS events with an outbox, S3-compatible clip storage."],
             ["Pose", "MediaPipe in the WebView: landmarks, rep counting and per-rep flags on device at 30 fps."],
             ["Language models", "Only through a gateway (Ollama, Groq, OpenRouter or Gemini) behind identity redaction, a consent check and an output guard, with template fallback."],
@@ -168,8 +170,8 @@ export default function SpotAiPage() {
 
             <h4>Evidence</h4>
             <ul>
-              <li>179 API tests across auth, tenancy, training, consent, clips, connect, owner and load.</li>
-              <li>Browser tests across member, staff and owner apps with WCAG AA checks on every main screen.</li>
+              <li>188 API tests across auth, tenancy, training, consent, clips, connect, owner and load.</li>
+              <li>Browser tests for members and staff, against the API and fully offline, with WCAG AA checks on every main screen.</li>
               <li>~40k lines of TypeScript, Vue and Python across three apps, the API, a model gateway and an edge agent.</li>
               <li>Marketing site with JSON-LD, sitemap, <code>llms.txt</code> and real app screenshots, built in Astro + GSAP.</li>
             </ul>

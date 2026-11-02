@@ -24,8 +24,8 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
       {
         name: 'SpotAI',
         kicker: 'Mobile + Web · On-device AI',
-        fact: 'AI gym buddy for Indian gyms. Squat form check runs on the phone, frames never uploaded; owner dashboard with dues and UPI. Postgres row-level security per gym, 179 API tests.',
-        link: { label: 'Site', url: 'https://spotai.streamerosai.com/' },
+        fact: 'AI gym buddy for Indian gyms. Squat form check runs on the phone, frames never uploaded; members and staff in one app. Postgres row-level security per gym, 188 API tests.',
+        link: { label: 'Site · Android and iPhone apps', url: 'https://spotai.streamerosai.com/#download' },
       },
       {
         name: 'FitRank',
@@ -50,12 +50,12 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         desc:
           'One product, two sides. Members get a squat coach that runs MediaPipe pose on the phone and sends only rep counts and per-rep flags to the API, never a frame, plus a workout log, an opt-in gym leaderboard and buddy matching. Owners get live arrivals with dues flagged, UPI payments, busy hours and a trainer console that reviews every AI tip. Each purpose is a separate consent with its notice version stored.',
         proof:
-          'Vue 3 + Capacitor app, two Vue 3 consoles, NestJS on PostgreSQL with <b>row-level security per gym</b> (two gyms asserted side by side in tests), NATS outbox, model gateway with identity redaction. <b>179 API tests</b>, browser tests with WCAG AA checks on every screen.',
+          'One Vue 3 + Capacitor app for members and staff, NestJS on PostgreSQL with <b>row-level security per gym</b> (two gyms asserted side by side in tests), NATS outbox, model gateway with identity redaction. <b>188 API tests</b>, browser tests with WCAG AA checks on every screen.',
         tags: ['Vue 3 · Capacitor', 'NestJS', 'PostgreSQL RLS', 'MediaPipe', 'NATS', 'Astro + GSAP'],
         links: [
-          { label: 'Site', url: 'https://spotai.streamerosai.com/' },
+          { label: 'Android app', url: 'https://spotai.streamerosai.com/downloads/spotai-demo.apk' },
+          { label: 'iPhone app', url: 'https://spotai.streamerosai.com/demo/' },
           { label: 'Case study', url: `${SITE}/products/spotai/` },
-          { label: 'Site source', url: `${GH}/spotai-website` },
         ],
       },
       {

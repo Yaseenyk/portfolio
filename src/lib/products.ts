@@ -25,6 +25,8 @@ export interface ProductMeta {
   repoUrl?: string;
   /** Optional live deployment. */
   liveUrl?: string;
+  /** Installable builds and demos, shown as buttons on the product page. */
+  downloads?: { label: string; url: string; note: string }[];
 }
 
 export const PRODUCTS: ProductMeta[] = [
@@ -46,6 +48,23 @@ export const PRODUCTS: ProductMeta[] = [
     // The app repo is private; this is the public marketing site.
     repoUrl: "https://github.com/Yaseenyk/spotai-website",
     liveUrl: "https://spotai.streamerosai.com/",
+    downloads: [
+      {
+        label: "Android app",
+        url: "https://spotai.streamerosai.com/downloads/spotai-demo.apk",
+        note: "APK · v1.6 · Android 7+",
+      },
+      {
+        label: "iPhone web app",
+        url: "https://spotai.streamerosai.com/demo/",
+        note: "Safari → Add to Home Screen",
+      },
+      {
+        label: "iOS build",
+        url: "https://spotai.streamerosai.com/downloads/spotai-ios.ipa",
+        note: "Unsigned .ipa · AltStore or Sideloadly",
+      },
+    ],
   },
   {
     slug: "fitrank",

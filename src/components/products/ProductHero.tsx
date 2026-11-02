@@ -58,6 +58,24 @@ export default function ProductHero({
             )}
           </div>
 
+          {product.downloads && (
+            <ul className="mt-5 grid gap-2 sm:grid-cols-3" aria-label={`Try ${product.name}`}>
+              {product.downloads.map((d) => (
+                <li key={d.url}>
+                  <a
+                    href={d.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-full flex-col rounded-xl border border-zinc-800 px-4 py-3 transition-colors duration-200 hover:border-ice/40"
+                  >
+                    <span className="text-sm font-semibold text-zinc-100">{d.label}</span>
+                    <span className="mt-1 text-[11px] leading-snug text-zinc-400">{d.note}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+
           <div className="mt-7 flex flex-wrap gap-2">
             {product.tech.map((t) => (
               <span
