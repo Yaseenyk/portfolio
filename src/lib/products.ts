@@ -52,7 +52,7 @@ export const PRODUCTS: ProductMeta[] = [
       {
         label: "Android app",
         url: "https://spotai.streamerosai.com/downloads/spotai-demo.apk",
-        note: "APK · v1.6 · Android 7+",
+        note: "APK · Android 7+ · latest version",
       },
       {
         label: "iPhone web app",
