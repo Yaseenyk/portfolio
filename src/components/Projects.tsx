@@ -21,6 +21,7 @@ import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
 import AiBloggerArt from "./products/art/AiBloggerArt";
 import SableArt from "./products/art/SableArt";
 import FitRankArt from "./products/art/FitRankArt";
+import AnalyticsDashboardArt from "./products/art/AnalyticsDashboardArt";
 
 interface ProjectLink {
   href: string;
@@ -240,6 +241,28 @@ export const PROJECTS: Project[] = [
     links: [
       {
         href: "https://github.com/Yaseenyk/portfolio",
+        label: "Source code",
+        icon: "github",
+      },
+    ],
+  },
+  {
+    name: "Analytics Dashboard",
+    href: "/products/analytics-dashboard/",
+    category: "Dashboard · Analytics",
+    description:
+      "One page for Google Analytics and Search Console across my five sites: tagged clicks and leads, first-touch attribution, sources grouped into search, social and AI assistants, and live visitors. A GitHub Action builds the data every two hours and a free Cloudflare Worker fetches live numbers when the page opens.",
+    metrics: ["5 sites, 1 page", "GA4 + Search Console", "Free-tier infra"],
+    tech: ["GA4 Data API", "GitHub Actions", "Cloudflare Workers", "Vanilla JS"],
+    Animation: AnalyticsDashboardArt,
+    links: [
+      {
+        href: "https://analytics.streamerosai.com/",
+        label: "Live dashboard",
+        icon: "external",
+      },
+      {
+        href: "https://github.com/Yaseenyk/analytics-dashboard",
         label: "Source code",
         icon: "github",
       },

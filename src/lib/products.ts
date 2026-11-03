@@ -8,7 +8,8 @@ export type ProductSlug =
   | "sable"
   | "streameros"
   | "linkedin-pipeline"
-  | "ai-blogger";
+  | "ai-blogger"
+  | "analytics-dashboard";
 
 export interface ProductMeta {
   slug: ProductSlug;
@@ -134,6 +135,24 @@ export const PRODUCTS: ProductMeta[] = [
       "An experiment I built and then switched off: a Next.js pipeline in which an LLM drafted Markdown articles and GitHub Actions committed and deployed them for $0 of infrastructure. It worked — and taught me that automated volume is the wrong way to publish. The posts on this site are first-person now; the pipeline stays as a teardown.",
     tech: ["Next.js", "MDX", "google-genai", "GitHub Actions", "GitHub Pages"],
     repoUrl: "https://github.com/Yaseenyk/portfolio",
+  },
+  {
+    slug: "analytics-dashboard",
+    name: "Analytics Dashboard",
+    category: "Dashboard · Analytics",
+    tagline: "One page for Google Analytics and Search Console across five sites",
+    summary:
+      "A tracking and reporting system for my five sites: one GA4 property with five streams, tagged events for clicks and leads, first-touch attribution on every lead, and a dashboard that shows traffic, sources (search, social, AI assistants), Search Console queries and live visitors. A GitHub Action builds the data every two hours, and a free Cloudflare Worker fetches live numbers when the page opens.",
+    tech: [
+      "GA4 Data API",
+      "Search Console API",
+      "GitHub Actions",
+      "GitHub Pages",
+      "Cloudflare Workers",
+      "Vanilla JS",
+    ],
+    repoUrl: "https://github.com/Yaseenyk/analytics-dashboard",
+    liveUrl: "https://analytics.streamerosai.com/",
   },
 ];
 
