@@ -44,9 +44,10 @@ Interactive exhibits that prove the site's claims instead of stating them:
 
 ## ⚙️ The autonomous content machine
 
-- **AI Blogger** (`scripts/ai_writer.py` + Actions cron) — writes a technical
-  article weekly under a strict human-voice contract, generates a
-  brand-locked cover with gpt-image-1, commits, and deploys.
+- **Scheduled posts** — written ahead in Claude Code sessions from sourced
+  briefs, each with a brand-locked cover and a future `date:`. A daily Actions
+  run releases each post on its date. No API key; `npm run check:schedule`
+  enforces the voice rules, sourced numbers and a two-a-week cadence.
 - **Corpus loop** — every deploy regenerates `llms.txt` / `llms-full.txt` and
   re-embeds the corpus into Vectorize, so the concierge knows each new post
   the day it ships. IndexNow pings Bing on every deploy.

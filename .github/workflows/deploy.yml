@@ -3,11 +3,12 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # Auto-publish after the autonomous blogger commits a post. Its push uses
-  # GITHUB_TOKEN, which does not trigger `on: push`, so chain off its run instead.
-  workflow_run:
-    workflows: ["AI Blogger"]
-    types: [completed]
+  # Scheduled posts (src/content/blog, `date:` in the future) are written ahead
+  # in Claude Code sessions and go live on their own date. Building daily means
+  # a delayed or dropped scheduled run is caught up the next day. 00:17 UTC
+  # avoids the busy top of the hour, when GitHub delays scheduled runs.
+  schedule:
+    - cron: "17 0 * * *"
   workflow_dispatch: # allow manual runs from the Actions tab
 
 # Required for the GitHub Pages deployment to authenticate via OIDC.
@@ -24,9 +25,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # On the workflow_run trigger only deploy if AI Blogger succeeded; push and
-    # manual runs are unaffected.
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -53,6 +51,14 @@ jobs:
           # puppeteer is local-tooling only (resume PDF) — don't download
           # Chromium on every deploy.
           PUPPETEER_SKIP_DOWNLOAD: "true"
+
+      # On pushes, fail early if any scheduled post would not build on its day.
+      # Skipped on the daily run so a release can never be blocked by a lint.
+      - name: Check every scheduled post
+        if: github.event_name != 'schedule'
+        run: npm run check:schedule
+        env:
+          NEXT_PUBLIC_SITE_URL: https://yaseenkhatib.streamerosai.com
 
       - name: Build (static export)
         run: npm run build
@@ -102,6 +108,11 @@ jobs:
       - name: Submit changed URLs to IndexNow
         run: |
           urls=("$SITE/" "$SITE/blog/")
+          # Posts that went live today by schedule have no diff to find.
+          today=$(date -u +%F)
+          for f in $(grep -lE "^date: ['\"]?$today" src/content/blog/*.mdx 2>/dev/null); do
+            urls+=("$SITE/blog/$(basename "${f%.*}")/")
+          done
           for f in $(git diff --name-only HEAD^ HEAD -- src/content 2>/dev/null); do
             [ -f "$f" ] || continue
             slug=$(grep -oP 'slug:\s*"?\K[^",]+' "$f" | head -1)
@@ -114,3 +125,26 @@ jobs:
             -H "Content-Type: application/json; charset=utf-8" \
             -d "{\"host\":\"yaseenkhatib.streamerosai.com\",\"key\":\"$KEY\",\"keyLocation\":\"$SITE/$KEY.txt\",\"urlList\":$json}" \
             -w "\nHTTP %{http_code}\n" || true
+
+  # GitHub disables scheduled workflows in public repositories after 60 days
+  # without activity. If nothing has been committed for 45 days, a scheduled run
+  # records an empty commit so the schedule keeps running. Pushes made with
+  # GITHUB_TOKEN do not start another deploy.
+  keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Commit if the repository has been quiet for 45 days
+        run: |
+          last=$(git log -1 --format=%ct)
+          age=$(( ($(date +%s) - last) / 86400 ))
+          echo "Last commit was $age days ago."
+          if [ "$age" -ge 45 ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit --allow-empty -m "Keep the post schedule active"
+            git push
+          fi

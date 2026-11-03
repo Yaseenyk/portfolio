@@ -1,0 +1,84 @@
+---
+title: 'Ollama vs LM Studio: Which One a Developer Should Run'
+slug: ollama-vs-lm-studio-for-developers
+date: '2026-11-09'
+description: 'Ollama vs LM Studio for developers: both are free, both run on Mac, Windows and Linux, and both expose OpenAI-style endpoints. Here is how to pick.'
+tags:
+  - Local LLMs
+  - Tooling
+  - Developer workflow
+keywords:
+  - ollama vs lm studio
+  - lm studio vs ollama
+  - lmstudio vs ollama
+  - local llm windows
+  - run llm locally
+readingMinutes: 6
+takeaways:
+  - 'Both tools are free for a developer, and LM Studio has been free at work as well as at home since 8 July 2025.'
+  - 'Pick LM Studio if you want a desktop app with a model browser, and Ollama if you want a command and a server your code calls.'
+  - 'Both expose OpenAI-compatible endpoints, so application code written against one can usually be pointed at the other.'
+  - 'Ollama serves a REST API on localhost port 11434; LM Studio ships a CLI called lms for server control and downloads.'
+author:
+  name: Yaseen Khatib
+  role: Full-Stack AI Engineer
+---
+**If you want to try models in a desktop app, use LM Studio. If you want a command and a local server that your own code calls, use Ollama. Both are free for a developer, and because both speak an OpenAI-style API, the choice is easier to undo than it feels.** This post compares them using their own documentation, checked on 30 October 2026, and sticks to what the documentation says. I am not going to quote benchmark numbers, token speeds or memory figures, because none of those are in the sources and they vary too much by machine to be worth repeating.
+
+## The one difference that decides it
+
+The practical difference is the entry point, meaning how you first talk to a model.
+
+LM Studio is a desktop app. Its [documentation](https://lmstudio.ai/docs/app) describes it as running models on Mac, Windows and Linux, with a way to browse and download models, and an optional server you can switch on when you want other programs to use the model. You start with a window and graduate to the server.
+
+Ollama starts from the other end. Its [README](https://github.com/ollama/ollama/blob/main/README.md) leads with a command: `ollama run gemma4` runs a model with that one command. It is a command line tool and a server first. Your code talks to it over a REST API on localhost, port 11434, for example at `http://localhost:11434/api/chat`.
+
+Neither approach is better. They suit different people on different days. If you are exploring which model you like, a window with a model list is friendlier. If you already know you are wiring a model into an application, a server that is simply running in the background is exactly what you want.
+
+## Side by side
+
+| | Ollama | LM Studio |
+|---|---|---|
+| Platforms | macOS, Windows, Linux, plus an official Docker image | macOS (Apple Silicon), Windows (x64 and ARM64), Linux (x64) |
+| How you start | A single command, for example `ollama run gemma4` | A desktop app with a model browser |
+| Model formats | Not covered in the sources I used | llama.cpp (GGUF) on all three systems, MLX on Apple Silicon Macs |
+| Local API | REST on localhost, port 11434 | OpenAI-like endpoints, locally and on the network |
+| Command line | The `ollama` command | A CLI named `lms` for chat, downloads, daemon and server control, and publishing |
+| Cost | Free | Free at home and at work |
+
+Where the documentation I read does not say something, the table says so instead of guessing.
+
+## Both are free, and the licence story changed
+
+A lot of older comparisons say LM Studio is not for commercial use. That was true once and is out of date. Since 8 July 2025, LM Studio has been free to use at home and at work. Company use previously required contacting LM Studio for a commercial licence, and that requirement was removed. Paid Teams and Enterprise plans still exist for private sharing, single sign-on and gating, which matters to an organisation and not to one developer on a laptop.
+
+If a comparison you are reading calls LM Studio non-commercial, check its date. For a freelancer or a small company, cost is not the deciding factor between these two.
+
+## The API is the part that makes the choice cheap
+
+Both tools expose OpenAI-compatible endpoints. Ollama documents this at `http://localhost:11434/v1/` and supports a subset of the OpenAI API, including `/v1/chat/completions`, `/v1/completions`, `/v1/embeddings` and `/v1/models`. LM Studio serves local models on OpenAI-like endpoints too, locally and across your network.
+
+For a developer that has a concrete consequence. If you write your application against an OpenAI-style client and make the base URL a setting, you can point it at Ollama today and at LM Studio tomorrow by changing one value. Keep the base URL and the model name in configuration, not in code, and the tool you choose now stops being a commitment.
+
+One caution: Ollama supports a subset of the OpenAI API, which means a feature you rely on may not be there. Test the exact calls your application makes, on the exact model you plan to use, before you assume two OpenAI-style servers behave the same.
+
+## Which one should you run
+
+Here is how I would decide, in order.
+
+1. **You need it on a server or in a container.** Ollama has an official Docker image, which LM Studio's documentation does not mention. Pick Ollama.
+2. **You are exploring models and want to see them listed, downloaded and tried in a window.** Pick LM Studio, then turn its server on when you are ready to connect code.
+3. **You work on an Apple Silicon Mac and care about MLX models.** LM Studio's documentation says it runs MLX models on those machines, so that is a point in its favour.
+4. **None of the above.** Install whichever you reach for first. Because the APIs are both OpenAI-style, you can install the other later without rewriting anything.
+
+You can also run both. They are separate programs, and there is no rule that says a developer machine can have only one local model server.
+
+## If you are on Windows
+
+I have written a step-by-step guide to [running Ollama on Windows](https://streamerosai.com/blog/run-ollama-on-windows-guide). If you want to judge the Ollama half of this comparison first-hand, that is the place to start.
+
+## Where local models fit
+
+Running a model on your own machine is a real option for anything where the data should not leave the device, or where you want to avoid a per-request bill. I build around that idea in [Sable](/products/sable/), a local-first product in which the model runs on the device and the person confirms what it proposes.
+
+If you are deciding whether a project of yours should use a local model, a hosted one, or a mix, that decision is a design question before it is a tooling question. I help teams make it, and the work is described on the [custom AI agents page](/solutions/ai-agents/).

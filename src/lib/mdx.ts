@@ -92,6 +92,24 @@ function toMeta(fileName: string, raw: string): MdxMeta {
   };
 }
 
+/**
+ * Scheduled publishing. A post goes live on its `date` (UTC) and not before:
+ * posts are written ahead in batches by a Claude Code session, committed, and
+ * a daily scheduled deploy (deploy.yml) releases each one on its day. Until
+ * then the page is not built, listed, in the sitemap, the feed or llms-full.
+ *
+ * POSTS_NOW=YYYY-MM-DD overrides "today". `npm run check:schedule` builds as of
+ * the last scheduled date to prove every post renders on its day; preview
+ * locally with `POSTS_NOW=2099-01-01 npm run dev`.
+ */
+function liveCutoff(): string {
+  return process.env.POSTS_NOW?.slice(0, 10) || new Date().toISOString().slice(0, 10);
+}
+
+function isLive(publishedAt: string): boolean {
+  return publishedAt.slice(0, 10) <= liveCutoff();
+}
+
 function listFiles(): string[] {
   if (!fs.existsSync(BLOG_DIR)) return [];
   return fs.readdirSync(BLOG_DIR).filter((f) => /\.mdx?$/.test(f));
@@ -101,7 +119,7 @@ function listFiles(): string[] {
 export function getAllMdxMeta(): MdxMeta[] {
   return listFiles()
     .map((file) => toMeta(file, fs.readFileSync(path.join(BLOG_DIR, file), "utf8")))
-    .filter((m) => m.publishedAt) // skip drafts missing a date
+    .filter((m) => m.publishedAt && isLive(m.publishedAt)) // skip drafts and not-yet-due posts
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
@@ -121,7 +139,7 @@ export async function getMdxPostBySlug(
     .map(({ file, raw }) => ({ meta: toMeta(file, raw), raw }))
     .find(({ meta }) => meta.slug === slug);
 
-  if (!match) return null;
+  if (!match || !isLive(match.meta.publishedAt)) return null;
 
   const { content } = matter(match.raw);
   const processed = await unified()

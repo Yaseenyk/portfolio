@@ -1,5 +1,5 @@
 {
-  "_readme": "Queue for scripts/ai_writer.py. The writer takes the first brief with status 'ready', writes the post from ONLY these facts, and marks it 'drafted' in the PR it opens. Every number a post may use must appear in facts or computed. Source: docs/keywords/ and the research in ../streameros-site/docs/keyword-research-2026-10.md.",
+  "_readme": "Facts queue for scheduled posts (no API key). A Claude Code session writes each post from ONLY a brief's facts into src/content/blog/<slug>.mdx with a future date; scripts/check-schedule.mjs checks every number in the prose against this file. Statuses: needs-facts (research first), ready (can be written), scheduled (written, goes live on 'scheduled'), published. Source: docs/keywords/, docs/seo-keyword-research-2026-10-30.md.",
   "briefs": [
     {
       "slug": "whatsapp-chatbot-saas-vs-owning-it",
@@ -9,7 +9,7 @@
     },
     {
       "slug": "zoho-crm-pricing-india-3-year-cost",
-      "status": "ready",
+      "status": "scheduled",
       "keyword": "zoho crm pricing",
       "secondary_keywords": [
         "zoho crm pricing india",
@@ -74,7 +74,8 @@
       "cta": {
         "href": "/solutions/ai-chatbot/",
         "text": "AI-integrated CRM, from $2,000"
-      }
+      },
+      "scheduled": "2026-11-05"
     },
     {
       "slug": "chatbot-development-what-800-buys",
@@ -84,7 +85,7 @@
     },
     {
       "slug": "ollama-vs-lm-studio-for-developers",
-      "status": "ready",
+      "status": "scheduled",
       "keyword": "ollama vs lm studio",
       "secondary_keywords": [
         "lm studio vs ollama",
@@ -163,7 +164,8 @@
       "cta": {
         "href": "/solutions/ai-agents/",
         "text": "Custom AI agents, local or hosted"
-      }
+      },
+      "scheduled": "2026-11-09"
     },
     {
       "slug": "what-ai-inference-costs-in-production",
