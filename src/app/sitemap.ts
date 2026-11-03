@@ -4,6 +4,7 @@ import { getAllPosts } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
 import { PRODUCTS } from "@/lib/products";
 import { routeDate } from "@/lib/lastmod";
+import { getLiveUseCases } from "@/lib/usecases";
 
 export const dynamic = "force-static";
 
@@ -126,6 +127,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+    {
+      url: `${SITE_URL}/solutions/use-cases/`,
+      lastModified: routeDate("src/lib/usecases.ts", lastBlogUpdate),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...getLiveUseCases().map((u) => ({
+      url: `${SITE_URL}/solutions/${u.slug}/`,
+      lastModified: u.releaseOn,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
     {
       url: `${SITE_URL}/interview/`,
       lastModified: routeDate("src/app/interview", lastBlogUpdate),

@@ -214,6 +214,14 @@ export default function SolutionsPage() {
         </Link>
       </section>
 
+      <p className="mt-8 text-center text-sm text-zinc-400">
+        Looking for a specific kind of app or website?{" "}
+        <Link href="/solutions/use-cases/" className="text-zinc-200 underline decoration-cyan/40 underline-offset-4 hover:text-cyan">
+          See what people ask me to build
+        </Link>
+        .
+      </p>
+
       <div className="mt-24">
         <EvidenceGrid />
       </div>

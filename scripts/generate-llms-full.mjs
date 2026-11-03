@@ -105,7 +105,30 @@ if (existsSync(CAMPUS)) {
 
 const campusCount = sections.length - articleCount;
 
-const header = `Yaseen Khatib — full corpus (${articleCount} articles${campusCount ? `, ${campusCount} final-year-project pages` : ""})
+// Use-case pages under /solutions/: what each kind of app or website includes, what it costs and what has not
+// been built. Grounding on them lets an answer engine (and the concierge) answer a service question with the
+// real prices instead of guessing. Only released pages exist in out/, so unreleased ones never appear here.
+const SOLUTIONS = join(OUT, "solutions");
+let useCaseCount = 0;
+if (existsSync(SOLUTIONS)) {
+  const STATIC = new Set(["ai-agents", "ai-chatbot", "business", "small-business", "use-cases"]);
+  for (const dir of readdirSync(SOLUTIONS, { withFileTypes: true })) {
+    if (!dir.isDirectory() || STATIC.has(dir.name)) continue;
+    const file = join(SOLUTIONS, dir.name, "index.html");
+    if (!existsSync(file)) continue;
+    const { title, desc, body } = extractMain(readFileSync(file, "utf-8"));
+    if (!title || !body) continue;
+    sections.push(`# ${title}
+
+URL: ${SITE}/solutions/${dir.name}/
+Summary: ${desc}
+
+${body}`);
+    useCaseCount += 1;
+  }
+}
+
+const header = `Yaseen Khatib — full corpus (${articleCount} articles${campusCount ? `, ${campusCount} final-year-project pages` : ""}${useCaseCount ? `, ${useCaseCount} service use-case pages` : ""})
 Author canonical bio: ${SITE}/about
 Curated index: ${SITE}/llms.txt
 
@@ -113,5 +136,5 @@ Curated index: ${SITE}/llms.txt
 
 writeFileSync(join(OUT, "llms-full.txt"), header + sections.join("\n\n---\n\n") + "\n");
 console.log(
-  `llms-full.txt: ${articleCount} articles + ${campusCount} campus pages written`,
+  `llms-full.txt: ${articleCount} articles + ${campusCount} campus pages + ${useCaseCount} use-case pages written`,
 );

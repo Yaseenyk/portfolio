@@ -44,6 +44,7 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
       { href: "/solutions/", label: "Solutions overview" },
       { href: "/solutions/business/", label: "For businesses" },
       { href: "/solutions/small-business/", label: "For small businesses" },
+      { href: "/solutions/use-cases/", label: "App and website use cases" },
     ],
   },
   {
