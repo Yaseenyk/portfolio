@@ -24,7 +24,8 @@ const stub = (target) => `<!doctype html><html lang="en"><head><meta charset="ut
 <title>Moved to ${CAMPUS.replace("https://", "")}</title>
 <link rel="canonical" href="${target}">
 <meta name="robots" content="noindex, follow">
-<meta http-equiv="refresh" content="0; url=${target}">
+<noscript><meta http-equiv="refresh" content="0; url=${target}"></noscript>
+<script>var t="${target}";location.replace(t+(location.search||"")+(location.hash||""))</script>
 </head><body><p>This page has moved to <a href="${target}">${target}</a>.</p></body></html>
 `;
 
