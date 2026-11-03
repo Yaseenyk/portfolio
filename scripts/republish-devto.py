@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE_FILE = ROOT / "scripts" / "devto-published.json"
-SITE = "https://yaseenkhatib.streamerosai.com"
+SITE = "https://yk.streamerosai.com"
 
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT / "scripts" / ".env")

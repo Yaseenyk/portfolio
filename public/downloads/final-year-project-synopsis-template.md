@@ -52,4 +52,4 @@ guide-requested changes and the things that break.]
 
 [Papers, systems and docs in your department's citation style.]
 
-*Template by Yaseen Khatib · yaseenkhatib.streamerosai.com/final-year-projects*
+*Template by Yaseen Khatib · yk.streamerosai.com/final-year-projects*

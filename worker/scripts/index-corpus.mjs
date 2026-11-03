@@ -11,7 +11,7 @@
 
 const TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const ACCOUNT = process.env.CLOUDFLARE_ACCOUNT_ID;
-const SITE = process.env.SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
+const SITE = process.env.SITE_URL ?? "https://yk.streamerosai.com";
 const INDEX = "portfolio-corpus";
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
 const API = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT}`;

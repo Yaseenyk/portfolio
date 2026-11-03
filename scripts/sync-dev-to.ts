@@ -20,7 +20,7 @@ import path from "node:path";
 import matter from "gray-matter";
 
 const DEV_TO_BASE = "https://dev.to/api";
-const SITE_BLOG_BASE = "https://yaseenkhatib.streamerosai.com/blog";
+const SITE_BLOG_BASE = "https://yk.streamerosai.com/blog";
 const CONTENT_DIR = "src/content/blog"; // where the .mdx posts live
 const PER_PAGE = 100;
 const MAX_PAGES = 100; // safety stop (~10k articles) — never loop forever

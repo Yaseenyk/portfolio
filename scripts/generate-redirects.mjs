@@ -16,7 +16,7 @@ import { join } from "node:path";
 
 const ROOT = process.cwd();
 const OUT = join(ROOT, "out");
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://yk.streamerosai.com";
 
 // Parse the "old": "new" pairs out of the TS source (avoids a TS import step).
 const src = readFileSync(join(ROOT, "src", "lib", "redirects.ts"), "utf-8");

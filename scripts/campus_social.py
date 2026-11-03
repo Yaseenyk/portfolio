@@ -41,7 +41,7 @@ TEXT_MODEL = "gpt-5.5"
 IMAGE_MODEL = "gpt-image-1"
 IMAGE_QUALITY = "medium"
 JPEG_QUALITY = 85
-SITE = "https://yaseenkhatib.streamerosai.com"
+SITE = "https://yk.streamerosai.com"
 
 # Keep in sync with src/lib/guides.ts and src/lib/campus.ts. The generator is
 # deliberately manifest-driven rather than parsing TypeScript — a wrong slug

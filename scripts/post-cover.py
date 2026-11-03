@@ -48,7 +48,7 @@ def draw_cover(title: str, slug: str) -> pathlib.Path:
     for line in textwrap.wrap(title, width=24)[:4]:
         d.text((96, y), line, font=title_font, fill=text)
         y += 108
-    d.text((96, h - 140), "yaseenkhatib.streamerosai.com", font=font(34), fill=cyan)
+    d.text((96, h - 140), "yk.streamerosai.com", font=font(34), fill=cyan)
 
     OG_DIR.mkdir(parents=True, exist_ok=True)
     target = OG_DIR / f"{slug}.jpg"

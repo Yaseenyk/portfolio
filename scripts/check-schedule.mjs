@@ -16,7 +16,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import matter from "gray-matter";
 
 const DIR = "src/content/blog";
-const SITE = "https://yaseenkhatib.streamerosai.com";
+const SITE = "https://yk.streamerosai.com";
 const CADENCE_FROM = "2026-11-03";
 const MAX_PER_WEEK = 2;
 const BANNED = [

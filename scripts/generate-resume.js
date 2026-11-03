@@ -8,7 +8,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
-const SITE = 'https://yaseenkhatib.streamerosai.com';
+const SITE = 'https://yk.streamerosai.com';
 const GH = 'https://github.com/Yaseenyk';
 const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
 
@@ -361,7 +361,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
         <div><a href="tel:+918208335028" class="text-stone-200">+91 8208335028</a></div>
         <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-[#C9A227]">linkedin.com/in/yaseen-yk</a></div>
         <div><a href="${GH}" class="text-[#C9A227]">github.com/Yaseenyk</a></div>
-        <div><a href="${SITE}/" class="text-[#C9A227]">yaseenkhatib.streamerosai.com</a></div>
+        <div><a href="${SITE}/" class="text-[#C9A227]">yk.streamerosai.com</a></div>
         <div class="mt-1 text-stone-500">Hyderabad, India · Remote / Hybrid / On-site</div>
       </div>
     </div>

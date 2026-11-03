@@ -119,7 +119,7 @@ export default function RootLayout({
           src="https://gc.zgo.at/count.js"
         />
         {/* Ahrefs Web Analytics — cookieless, and the key is per-site, so this
-            tag belongs to yaseenkhatib.streamerosai.com alone. Pairs with
+            tag belongs to yk.streamerosai.com alone. Pairs with
             Ahrefs Webmaster Tools, which is where the backlink profile lives. */}
         <script
           src="https://analytics.ahrefs.com/analytics.js"

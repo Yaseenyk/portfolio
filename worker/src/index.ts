@@ -59,7 +59,7 @@ interface D1Like {
 const EMBED_MODEL = "@cf/baai/bge-base-en-v1.5";
 const GEN_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const MIN_SCORE = 0.55;
-const SITE = "https://yaseenkhatib.streamerosai.com";
+const SITE = "https://yk.streamerosai.com";
 
 const ALLOWED_ORIGINS = new Set([
   SITE,

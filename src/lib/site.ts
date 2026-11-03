@@ -1,6 +1,6 @@
 /** Production base URL — used for canonical links, OpenGraph, JSON-LD, sitemap. */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://yk.streamerosai.com";
 
 /**
  * The domain Google Preferred Sources actually recognises.

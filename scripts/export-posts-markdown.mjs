@@ -40,7 +40,7 @@ const decode = (s = "") =>
     .replace(/&gt;/g, ">")
     .replace(/&#x2F;/g, "/");
 
-const SITE = "https://yaseenkhatib.streamerosai.com";
+const SITE = "https://yk.streamerosai.com";
 
 /** Cut the first <tag>...</tag> block out of a string. Not nested on these pages. */
 function dropBlock(html, tag) {
@@ -188,7 +188,7 @@ async function main() {
 ---
 
 *Originally published at ` +
-      `[yaseenkhatib.streamerosai.com/blog/${slug}/](${SITE}/blog/${slug}/).*
+      `[yk.streamerosai.com/blog/${slug}/](${SITE}/blog/${slug}/).*
 `;
 
     order.push({

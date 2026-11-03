@@ -11,7 +11,7 @@ import { join } from "node:path";
 const OUT = join(process.cwd(), "out");
 const BLOG = join(OUT, "blog");
 const CAMPUS = join(OUT, "final-year-projects");
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://yaseenkhatib.streamerosai.com";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://yk.streamerosai.com";
 
 function htmlToText(html) {
   return html

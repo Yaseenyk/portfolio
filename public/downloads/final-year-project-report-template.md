@@ -97,4 +97,4 @@
 submitting. Every diagram must match the database and modules on your laptop —
 panels check, and a mismatch reads as evidence neither was made by you.
 
-*Template by Yaseen Khatib · yaseenkhatib.streamerosai.com/final-year-projects*
+*Template by Yaseen Khatib · yk.streamerosai.com/final-year-projects*

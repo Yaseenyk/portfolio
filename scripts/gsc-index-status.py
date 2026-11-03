@@ -1,7 +1,7 @@
 # Index status for every URL in a property's live sitemap, via the URL
 # Inspection API (2,000 calls/day per property).
 #
-#   python scripts/gsc-index-status.py https://yaseenkhatib.streamerosai.com/
+#   python scripts/gsc-index-status.py https://yk.streamerosai.com/
 #
 # Writes gsc/out/<property>/inspection.csv and prints a verdict table.
 # Read-only: this API cannot request indexing. Never commit gsc/.

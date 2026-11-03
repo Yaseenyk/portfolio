@@ -3,7 +3,7 @@
 Portfolio + AI systems lab for Yaseen Khatib (Senior Full-Stack AI Engineer).
 Next.js 14 App Router, **static export** (`output: "export"`), strict
 TypeScript, Tailwind, Framer Motion. Deployed to GitHub Pages at
-https://yaseenkhatib.streamerosai.com (custom domain, no basePath; DNS on
+https://yk.streamerosai.com (custom domain, no basePath; DNS on
 GoDaddy — Cloudflare is compute-only).
 
 ## Commands
