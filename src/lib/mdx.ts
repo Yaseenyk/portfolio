@@ -33,6 +33,22 @@ export interface MdxMeta {
   tags: string[];
   takeaways: string[];
   ogImage?: string;
+  faq: { question: string; answer: string }[];
+}
+
+/** Q&A pairs from a trailing "## FAQ" section (### question, paragraph answer). */
+function parseFaq(body: string): { question: string; answer: string }[] {
+  const m = body.match(/^## FAQ\s*$([\s\S]*)$/m);
+  if (!m) return [];
+  return m[1]
+    .split(/^### /m)
+    .slice(1)
+    .map((blk) => {
+      const [q, ...rest] = blk.split(/\r?\n/);
+      const answer = rest.join(" ").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/[*_`]/g, "").replace(/\s+/g, " ").trim();
+      return { question: q.replace(/[*_`]/g, "").trim(), answer };
+    })
+    .filter((f) => f.question && f.answer);
 }
 
 function readingTimeFromMarkdown(body: string): number {
@@ -89,6 +105,7 @@ function toMeta(fileName: string, raw: string): MdxMeta {
     tags,
     takeaways: toStringArray(data.takeaways),
     ogImage: data.ogImage ? String(data.ogImage) : undefined,
+    faq: parseFaq(content),
   };
 }
 

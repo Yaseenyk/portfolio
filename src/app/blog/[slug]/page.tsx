@@ -16,7 +16,7 @@ import {
 } from "@/lib/blog";
 import { getMdxSlugs, getMdxPostBySlug, getAllMdxMeta } from "@/lib/mdx";
 import { resolveLesson } from "@/lib/series";
-import { PERSON_ID, personRef, breadcrumbJsonLd } from "@/lib/seo";
+import { PERSON_ID, personRef, breadcrumbJsonLd, faqPageJsonLd } from "@/lib/seo";
 import { tagSlug } from "@/lib/tags";
 import JsonLd from "@/components/JsonLd";
 import ReadDepth from "@/components/ReadDepth";
@@ -42,6 +42,8 @@ interface ResolvedPost {
   takeaways: string[];
   ogImage?: string;
   noindex?: boolean;
+  /** Q&A parsed from a trailing "## FAQ" section in MDX posts. */
+  faq?: { question: string; answer: string }[];
   body: ReactNode;
 }
 
@@ -218,6 +220,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       { name: "Blog", path: "/blog" },
       { name: post.title, path: `/blog/${post.slug}` },
     ]),
+    ...(post.faq && post.faq.length > 0 ? [faqPageJsonLd(post.faq)] : []),
   ];
 
   return (
