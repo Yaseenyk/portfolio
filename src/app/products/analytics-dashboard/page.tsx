@@ -41,7 +41,7 @@ const FLOW: FlowStep[] = [
   { label: "Static JSON files", detail: "Each range becomes its own small file (ga-28d.json, gsc-28d.json, live.json), published to GitHub Pages with the page." },
   { label: "Page opens", detail: "The browser draws the published copy straight away and loads only the date range you picked." },
   { label: "Live Worker", detail: "A free Cloudflare Worker answers the same files fresh from Google, cached for 45 seconds to 15 minutes." },
-  { label: "One swap", detail: "Live answers are batched and swapped in once, and only when something changed. If the Worker is down, the published copy stays." },
+  { label: "Block by block", detail: "Each card reads one data file and redraws only when its own numbers change. If the Worker is down, the published copy stays." },
 ];
 
 const jsonLd = [
@@ -119,10 +119,10 @@ export default function AnalyticsDashboardPage() {
         <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
             ["Data sources", "GA4 Data and Admin APIs, and the Search Console API, through a read-only Google service account."],
-            ["Build", "A GitHub Actions workflow runs a dependency-free Node script every two hours."],
+            ["Build", "A GitHub Actions workflow runs a dependency-free Node script every two hours, then builds the Next.js app and deploys it."],
             ["Hosting", "GitHub Pages on analytics.streamerosai.com. Only aggregate numbers are published; the Google key stays in repository secrets."],
             ["Live layer", "One Cloudflare Worker (free plan) that holds the key as a secret, answers only the dashboard's own origin, and caches for 45 seconds to 15 minutes."],
-            ["Front end", "One HTML file, vanilla JavaScript, no framework and no build step. Charts are SVG drawn at the real width, so text stays readable on phones."],
+            ["Front end", "Next.js (static export), TypeScript and Tailwind. Every card loads its own data and shows its own skeleton. Charts are SVG drawn at the real width, so text stays readable on phones."],
             ["Cost", "$0 a month at this volume. Everything runs on free tiers."],
           ].map(([term, desc]) => (
             <div key={term} className="rounded-xl border border-zinc-800/60 bg-zinc-950/60 p-5 backdrop-blur-md">
@@ -165,21 +165,24 @@ window.gaEvent = function (name, p) {
 };`}</code>
             </pre>
 
-            <h4>Two copies of the data, one swap</h4>
+            <h4>Two copies of the data, one block at a time</h4>
             <p>
               The Action publishes the data every two hours, so the page can draw something
               immediately from GitHub&apos;s CDN. The Worker then fetches the same files fresh from
-              Google. Early on, each live answer rebuilt the page on its own, so the Overview redrew
-              five times while loading. Now the answers are collected, compared with what is already
-              on screen, and swapped in once after 600 ms, only if something changed.
+              Google. My first version rebuilt the whole page each time a live answer arrived, so
+              the Overview redrew five times while loading. I first batched the answers into one
+              swap, then rewrote the page in Next.js so the problem cannot come back: every card
+              subscribes to just the file it reads, and a live answer that matches what is on screen
+              causes no render at all.
             </p>
             <pre>
-              <code>{`function sig(j) {                       // ignore the timestamp when comparing
-  return JSON.stringify(j, (k, v) => k === 'generatedAt' ? undefined : v);
+              <code>{`// one store entry per data file; a card re-renders only when its file changes
+export function useGA(range: string) {
+  return useSource<GAFile>(\`ga-\${range}.json\`);
 }
-function scheduleSwap() {
-  clearTimeout(swapT);
-  swapT = setTimeout(() => render(true), 600);
+function applyLive(file: string, j: unknown) {
+  const cur = store.get(file);
+  if (!cur?.data || sig(cur.data) !== sig(j)) put(file, { data: j, error: false });
 }`}</code>
             </pre>
 
@@ -207,8 +210,8 @@ function scheduleSwap() {
             <ul>
               <li>
                 <strong>The page redrew itself four or five times while loading.</strong> Published
-                data, live visitors, live Analytics and live Search Console each rebuilt it. I now
-                batch them into one swap and skip it when nothing changed.
+                data, live visitors, live Analytics and live Search Console each rebuilt it. Each card now loads and
+                redraws on its own, so a slow answer never touches the others.
               </li>
               <li>
                 <strong>Google&apos;s tag checker could not find the tag.</strong> It was injected with
