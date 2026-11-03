@@ -4,7 +4,7 @@ One Cloudflare Worker, two interfaces:
 
 | Endpoint | What it does |
 | --- | --- |
-| `POST /api/chat` | Grounded RAG for the site's terminal concierge: embeds the query (Workers AI), retrieves from a Vectorize index of the 95-article corpus, generates an answer constrained to that context — and **refuses** when retrieval confidence is below threshold. |
+| `POST /api/chat` | Grounded RAG for the site's terminal concierge: embeds the query (Workers AI), retrieves from a Vectorize index of the article corpus, generates an answer constrained to that context — and **refuses** when retrieval confidence is below threshold. |
 | `POST /mcp` | An MCP server (Streamable HTTP). Add the URL to Claude as a custom connector and interrogate the portfolio from inside your own AI: `search_portfolio`, `get_products`, `get_availability`. |
 
 The corpus is the site's own `/llms-full.txt`; `scripts/index-corpus.mjs`

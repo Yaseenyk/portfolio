@@ -539,7 +539,7 @@ const TOOLS = [
   {
     name: "search_portfolio",
     description:
-      "Semantic search over Yaseen Khatib's 95-article portfolio corpus (architecture decisions, products, AI systems, career). Returns the most relevant excerpts with source URLs.",
+      "Semantic search over Yaseen Khatib's portfolio articles and product pages (architecture decisions, products, AI systems, career). Returns the most relevant excerpts with source URLs.",
     inputSchema: {
       type: "object",
       properties: { query: { type: "string", description: "What to look up" } },

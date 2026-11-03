@@ -18,7 +18,7 @@ portfolio from inside your own AI:
 https://yaseen-concierge.yaseenyk.workers.dev/mcp
 ```
 
-Tools: `search_portfolio` (semantic search over the 95-article corpus),
+Tools: `search_portfolio` (semantic search over the article corpus),
 `get_products`, `get_availability`. The same Worker powers the homepage's
 terminal concierge — grounded RAG over Cloudflare Vectorize + Workers AI,
 with a hard refusal below the similarity threshold. Source in

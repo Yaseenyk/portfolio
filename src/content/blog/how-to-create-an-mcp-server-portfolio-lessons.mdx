@@ -71,7 +71,7 @@ I fixed all three in one commit and made the pages, the concierge facts and the 
 
 I read the tool definitions again while writing this, and found one more. The `search_portfolio` description still says "95-article portfolio corpus". On 8 August I cut the site from 100 posts to 52, so that number has been stale since then. The assistant that reads that description will quote it.
 
-I have not changed it, and I am leaving this paragraph in on purpose. It shows the real workflow: the facts in an MCP server are code, and code drifts unless something checks it. The cheap fix is to stop hard-coding counts in descriptions at all. The better one is a test that compares the tool text with the live site.
+I took the cheap fix the same day: the description no longer carries a count at all, so it cannot drift again. I am leaving this paragraph in on purpose. It shows the real workflow: the facts in an MCP server are code, and code drifts unless something checks it. The better fix, which I have not built, is a test that compares the tool text with the live site.
 
 ## What I would do again
 

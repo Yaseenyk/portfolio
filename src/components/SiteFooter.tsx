@@ -132,6 +132,11 @@ export default function SiteFooter() {
             © {new Date().getFullYear()} {PERSON.name} — everything linked
             above is real and running.
           </p>
+          <p>
+            <Link href="/privacy/" className="transition-colors hover:text-cyan">
+              Privacy
+            </Link>
+          </p>
           <p className="font-mono">
             built at AI-speed · Hyderabad (IST) · remote / hybrid / on-site
           </p>
