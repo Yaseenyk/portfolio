@@ -1,0 +1,99 @@
+---
+title: 'Crawled, Currently Not Indexed: How opacity 0 Hid My Site'
+slug: crawled-currently-not-indexed-blank-render-bug
+date: '2026-11-12'
+description: 'Google filed my pages as duplicates of a cinema chain error page. The cause was one Framer Motion default, opacity 0 in the server HTML. The fix and the proof.'
+tags:
+  - SEO
+  - Next.js
+  - Debugging
+keywords:
+  - crawled currently not indexed
+  - crawled currently not indexed fix
+  - framer motion seo
+  - nextjs page not indexed
+  - google chose different canonical
+readingMinutes: 7
+takeaways:
+  - 'If good pages show Crawled, currently not indexed, read the server HTML before the content.'
+  - 'Framer Motion wrote opacity 0 into mine, so Google snapshotted blank pages and filed them as duplicates of unrelated sites.'
+  - 'Starting them visible fixed the HTML.'
+author:
+  name: Yaseen Khatib
+  role: Full-Stack AI Engineer
+---
+
+The clue was in three rows of the Search Console report, filed under "Duplicate, Google chose different canonical than user". Each row names the page Google decided my page was a copy of.
+
+For two of my posts, that page was the 403 error page of a cinema chain's website. For a third, it was a casino's 404 page.
+
+Not a competitor, not a scraped copy, not a page about the same topic. That is the moment this stopped being a content problem and became a question about what my HTML actually contained.
+
+This post is about a page that Search Console reports as "Crawled, currently not indexed", with the kind of cause that no amount of rewriting could fix.
+
+## The symptom: crawled, currently not indexed, on good pages
+
+By late October the portfolio had zero indexed pages and had had zero impressions since 7 September. I had already been through a de-indexing event earlier in the summer, which I describe in [the post about publishing AI content](/blog/website-deindexed-after-publishing-ai-content/), and I had cut the site from 100 posts to 52 first-hand ones. The remaining pages were the ones I was proudest of.
+
+Google was still saying no. Twenty pages had last been crawled in July. Nineteen had never been crawled at all. The rest were sitting under "Crawled, currently not indexed", which is Google's polite way of saying it fetched the page, looked, and shrugged.
+
+## A control I did not plan
+
+My first diagnosis, in the status doc I wrote on 27 October, was authority: no one links to this site, so Google does not care. The same doc then contradicted it.
+
+Two newer sites of mine, a student portal and a product site for FitRank, are subdomains of the same domain. Neither had inbound links. Both used the same templates. One of them even carried content that used to live on the portfolio. Both were indexed within five days of being verified in Search Console.
+
+So authority was not what kept the portfolio out. Same domain, same templates, no links on either side, different result. The portfolio had something the others did not, and the duplicate rows pointed at it.
+
+## What was in the server HTML
+
+The built HTML of the home page contained 21 elements with `opacity: 0`. One was the container around the main heading.
+
+The cause is a default in Framer Motion. When you write an entrance animation that starts from `opacity: 0`, the library renders that initial state into the server HTML. The browser then hydrates, JavaScript runs, and the element fades in. A human sees an animation. A crawler that snapshots the page before the animation runs sees an empty page. From the 6 June rebuild until 22 October, every page on my site shipped like that.
+
+Google's renderer took its snapshot on 30 August, per my commit notes, and what it saw was a blank page. A blank page looks like every other blank page, which is how my post got filed as a copy of a cinema chain's 403 error.
+
+## The fix: start visible, arm the animation after hydration
+
+The commit is `f285c2b`, dated 22 October. It went live at 10:09 UTC.
+
+The change was small in idea and wide in files, 13 of them. Entrance animations now start from the visible state with `initial={false}`. A small hook called `useHydrated` arms the hidden state only after hydration, and only for elements that are not already in view. The hero, the navbar and the roadmap list render visible with no entrance at all. The scroll-in animations on the lower sections still work.
+
+I verified it the boring way, in the built output. The count of `opacity: 0` on the home page went from 21 to 0. It was also 0 on the products, blog, about, hire, solutions and final-year-projects pages, and on the post about the 94% payload reduction. I also made the sitemap's `lastmod` floor at 22 October, because a truthful date is the only honest nudge you can give a crawler.
+
+Two related rules went into the project notes after this. The hero heading must be visible at first paint, because it is the largest-contentful-paint element. And motion components write an inline `transform`, which overwrites Tailwind's translate classes, so I position with a plain wrapper div instead.
+
+## What has happened since, which is not much
+
+Here is the honest part. After the fix, Google re-fetched exactly two of the 52 pages: the home page on 23 October and the WebSocket post on 27 October. As of my keyword check on 3 November, the portfolio still ranked for zero keywords.
+
+I cannot tell you the fix worked in the sense of rankings. I can tell you the HTML is correct, and I can tell you what is left: asking Google to re-fetch 52 pages it has already decided are not worth re-fetching. That is what Request Indexing and Validate Fix are for, and I am doing about ten a day.
+
+## What I would do again
+
+1. When pages are good but "crawled, currently not indexed", run `curl` on your own URL and read the HTML before you rewrite anything.
+2. Search the built output for `opacity: 0` and `visibility:hidden`. Zero is the target.
+3. Click through the "duplicate, Google chose different canonical" rows. The page Google picked tells you what Google saw.
+4. Look for a control. A sibling site with the same templates and no links told me more than any checklist.
+5. Make entrance animations start visible. Hide an element only after hydration, and only if it is off screen.
+6. Verify in `out/`, not in your browser. Your browser runs the JavaScript, and the crawler may not wait for it.
+
+If a technical audit like this is the kind of work your team needs, the [hire page](/hire/) lists how I work.
+
+## FAQ
+
+### What does "Crawled, currently not indexed" mean?
+
+Google fetched the page and decided not to add it to the index, for now. It is not an error. The causes range from thin content to a page that looks empty to the renderer, as mine did.
+
+### Can Framer Motion hurt SEO?
+
+It can, in one specific way: an animation that starts at opacity 0 can ship that hidden state in the server-rendered HTML. In my case Google snapshotted it that way. Starting from the visible state avoids it.
+
+### How do I check what Google sees?
+
+Fetch the raw HTML with `curl` and search it for hidden styles, then compare it with the rendered page in Search Console's URL Inspection tool. I checked the built `out/` folder.
+
+### Did fixing it get my pages indexed?
+
+Not yet, as of 3 November. The fix went live on 22 October, Google had re-fetched 2 of 52 pages by 27 October, and I have no ranking data to report.

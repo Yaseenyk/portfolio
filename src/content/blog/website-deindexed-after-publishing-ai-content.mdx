@@ -1,0 +1,99 @@
+---
+title: 'My Website Was De-Indexed After Publishing AI Content'
+slug: website-deindexed-after-publishing-ai-content
+date: '2026-11-06'
+description: 'My portfolio lost 72% of its indexed pages in one day after an AI auto-publisher ran for weeks. What the Search Console numbers said, what failed, what worked.'
+tags:
+  - SEO
+  - AI content
+  - Case study
+keywords:
+  - website deindexed after publishing ai content
+  - google deindexed my site
+  - ai content deindexed
+  - scaled content abuse
+  - recover from google deindexing
+readingMinutes: 7
+takeaways:
+  - 'My site lost 72% of its indexed pages in one day after 71 files in five days and a daily AI publisher.'
+  - 'Rewriting the same posts changed nothing.'
+  - 'Stopping the publisher, deleting 48 commodity explainers and keeping first-hand work did.'
+author:
+  name: Yaseen Khatib
+  role: Full-Stack AI Engineer
+---
+
+On 10 July 2026 my portfolio had 88 pages in Google's index. On 11 July it had 25.
+
+That is the Search Console chart for this site's subdomain. Seventy-two percent of the indexed pages were gone overnight. Impressions on the subdomain went from 178 on 10 July to 50 on 11 July, and to 0 by 24 July. The site was still serving the same pages, and Google had changed its mind about them.
+
+This is the story of how a site that was publishing "helpful" AI-assisted posts got de-indexed, what I tried that did not work, and what I did instead. It is also a story with an ending I cannot fully verify yet, and I will say where.
+
+## How a site gets de-indexed after publishing AI content
+
+The cause is in my own git history, which is the only honest witness here.
+
+I rebuilt this portfolio on 6 June 2026. In the first five days, 71 content files landed on a hostname Google had never seen. After that, a scheduled job committed a post with the message "autonomous post via ChatGPT". I counted 28 of those commits between 27 June and 3 August. Another 31 pages landed on 27 and 28 July. By the end there were 130 content files.
+
+Nothing was broken in the technical sense. Every sitemap URL returned 200. The robots file was permissive. The sitemap was valid. I checked all of that first, because "it must be a bug" is a more comfortable theory than "it is the content".
+
+## Reading the not-indexed buckets
+
+Search Console tells you why a page is not indexed, and the buckets were blunt. Of roughly 165 URLs, 72 were "Discovered, currently not indexed", meaning Google read the URL in my sitemap and declined to spend a crawl on it at all. Another 66 were "Crawled, currently not indexed", meaning it fetched the page, read it, and rejected it. That is 138 of about 165 URLs, around 90% of the site.
+
+The shape of the timeline mattered too. There was a burst of indexing and an impression spike on 8 to 10 July, then a hard cut on 11 July. My reading, which is an inference and not something Google confirmed, is that Google indexed the corpus, tried it in live results for three days, judged it, and dropped it.
+
+There was one useful control. My other site, streamerosai.com, ran the same publishing pipeline at three posts a week. It kept its indexed pages (39 went to 41) but its rankings collapsed, from about 188 impressions a day to about 22. So the same signal hurt both sites. It cost the newer one its index, and the older one its rankings.
+
+## The fixes that did not work
+
+I did what most people do. I rewrote.
+
+I ran a pass to humanise the 20 AI-written posts. I did three "senior-voice" rewrites. I repositioned 40 posts across five waves for hiring intent. Then I stamped fresh update dates on those 40 posts to force a recrawl.
+
+Impressions were 0 before that work started and 0 after it finished. Rewriting the same corpus did not change how Google classified it, and pushing recrawls at a host that Google had already decided not to crawl spent effort that was not there to spend. If you are in this position, I would save you the effort.
+
+## The turning point: shrink the site
+
+The fix was a subtraction. On 8 to 9 August I disabled both AI publishing schedules, with a commit message that said the throttle from three posts a week to one had been "the right instinct and far too small a correction". The reasoning in the commit was simple: publishing more cannot fix a problem that publishing more caused.
+
+Then I cut the corpus from 100 posts to 52. I kept the 26 first-hand engineering posts, the 21 posts about work I had actually shipped, and 5 posts that earned at least 10 impressions. I deleted 48 commodity explainers, the "what is X" kind. Between them those 48 had earned 91 impressions and zero clicks in three months. Their URLs now return 404 on purpose, which is the correct signal for content retired deliberately.
+
+I wrote one rule into the recovery doc and I still follow it: a post ships only if it contains something that cannot be looked up, such as my own measurements, my own architecture decisions or my own failures.
+
+## What I did not know yet
+
+Here is the part I owe you. On 22 October I found a second problem that had been sitting under the first. Every entrance animation on the site shipped its hidden state into the HTML, so Google's renderer snapshotted blank pages for months. I wrote that up separately, in the post about the blank-render bug that follows this one.
+
+That means I cannot tell you which cause did what. The content flood is real and documented. The blank render is real and documented. Both were present, and I have no experiment that separates them. If someone tells you they know exactly why their site was de-indexed, ask what they used as a control.
+
+As of my 3 November keyword check, the portfolio still ranked for zero keywords. I am not going to pretend the story ended with a recovery chart. It ended with a cleaner site and a waiting period.
+
+## What I would do again
+
+1. Publish slowly on a new hostname. Seventy-one files in five days looks like a machine because it was one.
+2. Open the not-indexed buckets before you theorise. "Discovered" and "Crawled" are different diseases.
+3. Stop the publisher first. Do not rewrite while it is still running.
+4. Delete commodity explainers instead of polishing them. A 404 you chose is not a penalty.
+5. Put a human review gate on any AI drafting. Mine now opens a pull request each week and never pushes to main.
+6. View the rendered HTML of your own pages before you blame the content.
+
+That fifth item is the one I rebuilt after the crash. The new drafter writes only from sourced facts in a brief, checks every number against the brief, and waits for me to merge. If you want to see how I think about that kind of system, the [hire page](/hire/) has the short version.
+
+## FAQ
+
+### Is AI content against Google's rules?
+
+I am not claiming Google penalised me for using AI. My own records point to volume: a flood of similar posts on a new host. I cannot see Google's reasoning, so treat that as my best reading, not a ruling.
+
+### Should I rewrite or delete de-indexed posts?
+
+In my case rewriting did nothing and deleting the commodity explainers changed the corpus. I kept first-hand posts and removed the rest. Your content may differ, so check what each page earned first.
+
+### How long does recovery take?
+
+I do not know yet. My own docs describe site-level quality recovery as a months-long cycle, and as of 3 November my portfolio still ranked for no keywords.
+
+### Can I still use AI to write posts?
+
+Yes, with a gate. Mine drafts only from a sourced brief, rejects numbers that are not in the brief, and opens a pull request that a person must merge.

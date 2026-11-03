@@ -236,6 +236,341 @@
         "href": "/hire/",
         "text": "Hire a senior full-stack AI engineer"
       }
+    },
+    {
+      "slug": "website-deindexed-after-publishing-ai-content",
+      "status": "scheduled",
+      "keyword": "website deindexed after publishing ai content",
+      "secondary_keywords": [
+        "google deindexed my site",
+        "ai content deindexed",
+        "scaled content abuse",
+        "recover from google deindexing"
+      ],
+      "market": "US",
+      "research": "SERP check 4 Nov 2026 (treg.google.serp.organic, US): first-person LinkedIn, Reddit and Google support-forum threads rank on page one; no incumbent owns the story format.",
+      "audience": "A US hiring manager, founder or engineer who found the post by searching the keyword.",
+      "angle": "First-person story of the July 2026 de-indexing: the Search Console numbers, the publishing history, the failed rewrites, the prune, and the honest admission that a second cause (blank render) was found later.",
+      "facts": [
+        {
+          "claim": "Subdomain property: 88 indexed and 86 not indexed on 10 Jul 2026; 25 indexed and 151 not indexed on 11 Jul; impressions 178 on 10 Jul, 50 on 11 Jul, 0 on 24 Jul. 72% of indexed pages lost in a day.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Site rebuilt 6 Jun 2026; 71 content files landed in the first five days; 31 more pages landed 27 and 28 Jul; 130 content files in total.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "28 commits titled 'autonomous post via ChatGPT' between 27 Jun and 3 Aug 2026.",
+          "source": "git log --grep 'autonomous post via ChatGPT'",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Of about 165 URLs, 72 were Discovered - currently not indexed and 66 were Crawled - currently not indexed: 138 URLs, about 90% of the site. Impression spike 8 to 10 Jul, hard cut 11 Jul.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "streamerosai.com ran the same pipeline at 3 posts a week; indexed pages went 39 to 41 but impressions fell from about 188 a day to about 22.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Remediation that did not work: humanise 20 AI-written posts, three senior-voice rewrites, five waves repositioning 40 posts, then stamping updatedAt on those 40 posts. Impressions were 0 before and after.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "8 Aug 2026 prune: 100 posts to 52. Kept 26 mdx posts, 21 tsx posts and 5 posts with at least 10 impressions; deleted 48 commodity explainers that earned 91 impressions and 0 clicks in three months.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Commit 620c8a4 stopped the AI blogger cron (stamped 9 Aug 2026 00:17 IST): throttling from 3 posts a week to weekly was 'the right instinct and far too small a correction'.",
+          "source": "git show 620c8a4",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Commit 260761e (23 Oct 2026) revived the blogger as a weekly drafter that opens a pull request labelled ai-draft, checks every number against a brief, and skips while a draft PR is open.",
+          "source": "git show 260761e",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Later finding (docs/seo-status-2026-10-27.md): from 6 Jun until 22 Oct every page shipped entrance animations at opacity 0, so Google snapshotted blank pages. The two causes cannot be separated.",
+          "source": "docs/seo-status-2026-10-27.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "3 Nov 2026 keyword re-check: the portfolio ranked for 0 keywords.",
+          "source": "docs/seo-keyword-research-2026-11-03.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Technical checks passed in the July investigation: every sitemap URL returned 200, robots.txt was permissive, the sitemap was valid. The 48 deleted explainers now return 404 on purpose.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        }
+      ],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire a senior full-stack AI engineer"
+      }
+    },
+    {
+      "slug": "crawled-currently-not-indexed-blank-render-bug",
+      "status": "scheduled",
+      "keyword": "crawled currently not indexed",
+      "secondary_keywords": [
+        "crawled currently not indexed fix",
+        "framer motion seo",
+        "nextjs page not indexed",
+        "google chose different canonical"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 4 Nov 2026: 'crawled currently not indexed' 320 searches a month, KD 20, informational. SERP page one is Google support-forum threads.",
+      "audience": "A US hiring manager, founder or engineer who found the post by searching the keyword.",
+      "angle": "Story of finding opacity 0 in the server HTML, the cinema-chain canonical, the sibling-site control, the fix, and the honest lack of ranking proof.",
+      "facts": [
+        {
+          "claim": "Portfolio had zero indexed pages and zero impressions since 7 Sep 2026 (status as of 27 Oct).",
+          "source": "docs/seo-status-2026-10-27.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Google's chosen canonical for two posts was a cinema chain's 403 page and for a third a casino's 404 page.",
+          "source": "docs/seo-status-2026-10-27.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "20 pages last crawled in July, 19 never crawled.",
+          "source": "docs/seo-status-2026-10-27.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "The campus and FitRank subdomains, same domain and templates and no links, were indexed within five days of verification.",
+          "source": "docs/seo-status-2026-10-27.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Home page carried 21 elements with opacity 0 in static HTML, including the container around the h1; the count after the fix was 0, also 0 on products, blog, about, hire, solutions, final-year-projects and the 94% post. Google's renderer snapshotted that state on 30 Aug.",
+          "source": "git show f285c2b",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Fix f285c2b changed 13 files and went live at 10:09 UTC on 22 Oct 2026: initial={false} plus a useHydrated hook arming hidden state after hydration for elements not yet in view.",
+          "source": "git show f285c2b; docs/seo-status-2026-10-27.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "After the fix Google re-fetched exactly 2 of the 52 pages: home on 23 Oct and the WebSocket post on 27 Oct.",
+          "source": "docs/seo-status-2026-10-27.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "3 Nov 2026 re-check: 0 ranked keywords. 30 Oct plan: about ten Request Indexing a day.",
+          "source": "docs/seo-keyword-research-2026-11-03.md; docs/seo-keyword-research-2026-10-30.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Sitemap lastmod floors at 22 Oct 2026 (commit e7b2d94).",
+          "source": "git show e7b2d94",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "The corpus was cut from 100 posts to 52 on 8 Aug 2026.",
+          "source": "docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        }
+      ],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire a senior full-stack AI engineer"
+      }
+    },
+    {
+      "slug": "rag-chatbot-cloudflare-workers-where-it-broke",
+      "status": "scheduled",
+      "keyword": "rag chatbot",
+      "secondary_keywords": [
+        "rag chatbot cloudflare workers",
+        "cloudflare vectorize rag",
+        "workers ai rag chatbot",
+        "grounded rag chatbot"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 4 Nov 2026: 'rag chatbot' 2,900 searches a month, KD 12. SERP shows tutorials and a first-person Medium story.",
+      "audience": "A US hiring manager, founder or engineer who found the post by searching the keyword.",
+      "angle": "Story of building the concierge in one night and where it broke: deprecated model, free-tier cap, stale index; plus a live test on 4 Nov 2026.",
+      "facts": [
+        {
+          "claim": "Commits on 10 Jul 2026 IST: 8a4b06d at 00:32 (real RAG + MCP on Workers), a61fee8 at 00:47 (point the terminal at the worker), 6d4349f at 00:51 (current generation model).",
+          "source": "git log",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Embeddings @cf/baai/bge-base-en-v1.5; generation @cf/meta/llama-3.3-70b-instruct-fp8-fast; MIN_SCORE 0.55; top 5 chunks; context capped at 6000 characters; max_tokens 320; answer 2 to 4 sentences.",
+          "source": "worker/src/index.ts",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Corpus chunked on paragraph boundaries at 1400 characters, upserted to the Vectorize index portfolio-corpus with stable ids.",
+          "source": "worker/scripts/index-corpus.mjs",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "llama-3.1-8b-instruct was deprecated on 2026-05-30 (AiError 5028), so generation moved to llama-3.3-70b.",
+          "source": "git show 6d4349f",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "22 Jul 2026: re-embedding on every Pages deploy exhausted the Workers AI free-tier daily neuron cap (429s); reindex moved to a daily 11:30 UTC schedule.",
+          "source": "git show ff617a8; .github/workflows/worker.yml",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Computed from commit timestamps: 00:32 to 00:51 is 19 minutes. Computed from scores: threshold 0.55 minus top score 0.54 is 0.01.",
+          "source": "git log; curl 4 Nov 2026",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Live test 4 Nov 2026 via curl: out-of-corpus question refused in 1944 ms with top score 0.54; Sable question top score 0.68; de-indexing question top score 0.63, passed the gate, model said the context lacked the answer, response carried grounded true.",
+          "source": "curl https://yaseen-concierge.yaseenyk.workers.dev/api/chat, 4 Nov 2026",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "In the last two answers one source of three was on the old hostname yaseenkhatib.streamerosai.com; the final-year-project guide returned HTTP 404 when checked on 4 Nov 2026. The index script has no delete step. Corpus cut from 100 to 52 posts in Aug 2026.",
+          "source": "curl 4 Nov 2026; worker/scripts/index-corpus.mjs; docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        }
+      ],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/solutions/ai-chatbot/",
+        "text": "AI chatbot solutions"
+      }
+    },
+    {
+      "slug": "how-to-create-an-mcp-server-portfolio-lessons",
+      "status": "scheduled",
+      "keyword": "how to create mcp server",
+      "secondary_keywords": [
+        "mcp server example",
+        "remote mcp server",
+        "mcp server cloudflare workers",
+        "build mcp server typescript"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 4 Nov 2026: 'how to create mcp server' 210 searches a month, KD 7; 'mcp server' 60,500, KD 34. SERP page one has Reddit and Medium first-person build stories.",
+      "audience": "A US hiring manager, founder or engineer who found the post by searching the keyword.",
+      "angle": "Story of the MCP endpoint plus the 23 Oct 2026 fact-drift fix, and the stale 95-article description still present.",
+      "facts": [
+        {
+          "claim": "MCP endpoint is POST /mcp in the worker: initialize (echoes client protocolVersion, default 2025-03-26), ping, tools/list, tools/call; method not found is -32601; notifications get an empty 202; GET returns 405.",
+          "source": "worker/src/index.ts",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Three tools: search_portfolio, get_products, get_availability. search_portfolio refuses below the 0.55 similarity score.",
+          "source": "worker/src/index.ts",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Created in commit 8a4b06d at 00:32 on 10 Jul 2026 IST, zero-dependency TypeScript.",
+          "source": "git show 8a4b06d",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Commit 4ee1949 on 23 Oct 2026: resume said six products and site five; MCP get_products IntegrateX link pointed at a merged post; a Sable source link returned 404 because the repo is private. Now six products: FitRank, streamerOS, IntegrateX, Sable, Portfolio Concierge, LinkedIn pipeline.",
+          "source": "git show 4ee1949",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Live curl test 4 Nov 2026: tools/list returned three tools; a notification returned HTTP 202. The search_portfolio description still says 95-article corpus; site cut from 100 to 52 posts on 8 Aug 2026.",
+          "source": "curl 4 Nov 2026; docs/seo-recovery.md",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "README says add the URL to Claude as a custom connector.",
+          "source": "worker/README.md",
+          "checked": "2026-11-04"
+        }
+      ],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/solutions/ai-agents/",
+        "text": "Custom AI agents"
+      }
+    },
+    {
+      "slug": "custom-ai-agent-development-agent-that-never-touches-money",
+      "status": "scheduled",
+      "keyword": "custom ai agent development",
+      "secondary_keywords": [
+        "human in the loop ai agent",
+        "ai agent consultant",
+        "ai agent guardrails",
+        "local-first ai agent"
+      ],
+      "market": "US",
+      "research": "DataForSEO US, 4 Nov 2026: 'custom ai agent development' 90 searches a month, KD 17, CPC $42; 'ai agent consultant' 140, KD 2, CPC $35.",
+      "audience": "A US hiring manager, founder or engineer who found the post by searching the keyword.",
+      "angle": "Story built on Sable's propose-and-confirm boundary and the same gate pattern in the AI drafter and the chatbot.",
+      "facts": [
+        {
+          "claim": "Commit 4ee1949 (23 Oct 2026) removed Sable's source link because it returned 404; the repo is private.",
+          "source": "git show 4ee1949",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Sable product page added 6 Jul 2026 (b8a5575); write-up published 2026-07-07.",
+          "source": "git log; src/content/posts/sable-ai-agent-never-touches-money.tsx",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Sable: React Native app, no cloud backend, on-device SQLite, OpenAI function calling where every call is a dry run rendered as a Review and Confirm card, serialised writes, daily local RAG morning briefing, offline-first. Illustrative example: log a 5,000 rupee payment against a car loan.",
+          "source": "src/content/posts/sable-ai-agent-never-touches-money.tsx",
+          "checked": "2026-11-04"
+        },
+        {
+          "claim": "Weekly AI drafter opens a PR labelled ai-draft, never pushes to main, skips while a draft is open (commit 260761e). Chatbot refuses below 0.55.",
+          "source": "git show 260761e; worker/src/index.ts",
+          "checked": "2026-11-04"
+        }
+      ],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts."
+      ],
+      "internal_links": [],
+      "cta": {
+        "href": "/solutions/ai-agents/",
+        "text": "Custom AI agents"
+      }
     }
   ]
 }

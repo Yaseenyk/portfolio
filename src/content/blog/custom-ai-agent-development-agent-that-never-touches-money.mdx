@@ -1,0 +1,107 @@
+---
+title: 'Custom AI Agent Development: One That Never Touches Money'
+slug: custom-ai-agent-development-agent-that-never-touches-money
+date: '2026-11-24'
+description: 'A custom AI agent lesson from Sable, my finance agent: the model proposes, a person confirms, and the worst output is one dismissed card.'
+tags:
+  - AI agents
+  - Architecture
+  - Case study
+keywords:
+  - custom ai agent development
+  - human in the loop ai agent
+  - ai agent consultant
+  - ai agent guardrails
+  - local-first ai agent
+readingMinutes: 7
+takeaways:
+  - 'When you commission a custom AI agent, decide its blast radius before its features.'
+  - 'In Sable, my finance agent, the model only proposes an action as a review card and a person commits it.'
+  - 'The worst output is one dismissed card, by architecture, not prompt.'
+author:
+  name: Yaseen Khatib
+  role: Full-Stack AI Engineer
+---
+
+The smallest bug I fixed on 23 October was a link that returned a 404.
+
+It was the source link for Sable, a personal finance agent I built. The link promised the code. The repository is private, so anyone who clicked it landed on an error page. My commit message says it flatly: "Sable's source link returned 404 (the repo is private), so it is removed."
+
+I mention it because that dead link is a tiny version of the question that shaped the whole product. The real question is what happens when the thing I show you is wrong. For a broken link the answer is a bad afternoon for a visitor. For an AI agent that handles money, the answer had better not depend on the model having a good day.
+
+This is a story about custom AI agent development from the builder's side, and the one design decision I would insist on if you hired me to build you an agent.
+
+## The question that comes before the features
+
+Sable is a local-first AI financial agent. It is a React Native app with no cloud backend. Debts, payments and balances live in on-device SQLite. I added the product page on 6 July 2026 and wrote up the design the next day.
+
+The usual brief for an agent is a list of things it should be able to do: log payments, answer questions about spending, remind you of dues. Sable's design starts from a different list. Name the worst thing the model could output, and what it would cost.
+
+That is the blast radius, and for a finance agent it is the whole product. If a language model can write directly to a ledger, then a hallucination is a wrong number in someone's real accounts. Sable is built so that this is not possible, however rare the hallucination.
+
+## Chapter one: the model gets read access, not write access
+
+The first boundary is data. Sable does not ship your ledger to a model provider. When the agent needs context for a question such as how spending is pacing this month, it queries the local database and sends a distilled, minimal summary. The full record stays on the phone.
+
+I call that privacy as topology rather than policy. There is no server to breach because there is no server. It also limits what the model can see, which limits what it can get wrong.
+
+## Chapter two: every function call is a dry run
+
+The second boundary is the one that matters most. Sable uses OpenAI function calling, but no function call changes data. Each call produces a proposal object, and the app renders it as a Review and Confirm card. Only when a person taps confirm does the database mutation run.
+
+To make that concrete, here is an illustration, not a transcript. Suppose you tell the agent to log a payment of 5,000 rupees against a car loan. The model turns that into a structured proposal. You see a card with the amount and the loan. If the model misread the number, the card shows it, and you dismiss it.
+
+In the worst case, the model produces nonsense, and the result is one card you dismiss. The ledger is never touched. That sentence is the guarantee, and it comes from where the commit happens, not from how carefully the prompt is written.
+
+## Chapter three: the boring parts that make it hold
+
+Two other pieces keep the boundary honest. Writes go through a queue that serialises every SQLite mutation, one at a time, which removes the write-lock contention that on-device databases are prone to. And the app works fully offline. The AI layer is an enhancement, not a dependency, so a failed model call degrades to a normal app.
+
+There is also a daily local retrieval job. Each morning the agent reads the on-device ledger and produces a briefing for the lock screen, covering spending pace, upcoming obligations and anomalies, without any financial data leaving the phone.
+
+## The turning point: the pattern was not about money
+
+The same shape shows up in three of my unrelated projects.
+
+- Sable: the model proposes, a person commits.
+- This site's weekly AI drafter: it writes a post from sourced facts, opens a pull request labelled `ai-draft`, and cannot push to main. It also skips a week if an earlier draft is still open.
+- The portfolio chatbot: below a similarity score of 0.55 it refuses, and the language model is never called.
+
+Three systems, one rule. Give the model a narrow place to be wrong, and put a deterministic gate or a person between its output and the thing that matters. The weekly drafter exists because an earlier version of my blog automation published straight to main, and I describe what that cost in [the post about my de-indexed site](/blog/website-deindexed-after-publishing-ai-content/).
+
+## What I would tell a client
+
+Picture a founder who wants an agent that reconciles supplier invoices and pays the ones that match. The feature list writes itself. I would still start with the blast radius.
+
+Ask what the worst outcome is if the agent mis-reads an invoice. If the answer is "a payment goes out", then payment should be a proposal that a named person approves, or a rule so narrow that you can state it in one sentence. That does not make the agent less useful. It moves the risk to the place where a person can see it.
+
+I am describing a design stance, not a guarantee. Sable's boundary holds because the code structure enforces it, and I would still want it reviewed and tested before any real money depended on it.
+
+## What I would do again
+
+1. Write the worst-output list before the feature list.
+2. Give the model read access to distilled context, not to the raw data store.
+3. Make every model action a proposal object, and keep the commit in code that a person triggers.
+4. Show the proposal in plain language, with the numbers, so a wrong one is obvious at a glance.
+5. Keep the AI layer optional, so the product works when the model does not.
+6. Reuse the gate pattern: a similarity threshold, a pull request or a confirm card between model and consequence.
+
+If you are scoping an agent and want a second opinion on its blast radius, the [custom AI agents page](/solutions/ai-agents/) is where to start.
+
+## FAQ
+
+### What is a human-in-the-loop AI agent?
+
+It is an agent whose actions are proposals that a person approves before anything changes. In Sable, every model function call renders as a review card, and only a confirmation commits it.
+
+### Can an AI agent be safe with financial data?
+
+It can be safer if the design limits what it sees and what it can do. Sable keeps the ledger on the device and gives the model only a distilled summary. That reduces risk and does not remove it.
+
+### What should I ask before commissioning a custom AI agent?
+
+Ask what the worst model output is, who sees it before it takes effect, and what happens if the model service is down. If the answers are vague, the architecture is not ready.
+
+### Is the Sable code public?
+
+No. The repository is private, which is why I removed the source link from the product page.

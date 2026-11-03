@@ -1,0 +1,109 @@
+---
+title: 'I Built a RAG Chatbot on Cloudflare Workers. It Broke 3 Ways'
+slug: rag-chatbot-cloudflare-workers-where-it-broke
+date: '2026-11-17'
+description: 'A RAG chatbot on Cloudflare Workers, Workers AI and Vectorize, built in one night, then broken by a deprecated model, a free-tier cap and a stale index.'
+tags:
+  - RAG
+  - Cloudflare
+  - Case study
+keywords:
+  - rag chatbot
+  - rag chatbot cloudflare workers
+  - cloudflare vectorize rag
+  - workers ai rag chatbot
+  - grounded rag chatbot
+readingMinutes: 8
+takeaways:
+  - 'A RAG chatbot on Cloudflare Workers needs Workers AI embeddings, a Vectorize index and a similarity gate that refuses before generating.'
+  - 'Mine shipped in one night, then broke on a deprecated model, a free-tier cap from re-indexing, and stale vectors for deleted posts.'
+  - 'The gate is a coarse filter, not a truth test.'
+author:
+  name: Yaseen Khatib
+  role: Full-Stack AI Engineer
+---
+
+The commit timestamps on 10 July 2026 read 00:32, 00:47 and 00:51.
+
+Nineteen minutes, three commits, one chatbot. The first commit created a RAG service and an MCP server on Cloudflare Workers. The second pointed my site's terminal widget at it. The third was a fix, because the model the first commit used had been switched off six weeks earlier.
+
+This post is about building a RAG chatbot on Cloudflare Workers and then finding out, over the following months, where it actually breaks. I will give you the architecture, the three breakages in the order they happened, and a test I ran on 4 November that the chatbot only half passed.
+
+## What I built: a RAG chatbot on Workers AI and Vectorize
+
+Before 10 July my home page had a terminal widget that answered from an offline mock. It looked like a RAG chatbot and behaved like a script. I wanted the real thing, with a rule: it answers only from my own articles, and when it does not know, it says so.
+
+The worker, in `worker/src/index.ts`, does this on each question:
+
+1. Embeds the question with `@cf/baai/bge-base-en-v1.5` on Workers AI.
+2. Queries a Vectorize index called `portfolio-corpus` for the top five chunks.
+3. If the best similarity score is below 0.55, it returns a fixed refusal and never calls the language model.
+4. Otherwise it passes up to 6,000 characters of context to `llama-3.3-70b-instruct-fp8-fast`, with an instruction to answer only from that context in two to four sentences.
+5. Returns the answer, up to three source URLs, and "traces" that the terminal renders: search time, top score, guard result.
+
+The corpus is my site's own `/llms-full.txt`. A script chunks each article on paragraph boundaries at about 1,400 characters, embeds the chunks and upserts them with stable ids, so re-running it overwrites rather than duplicates. If the worker is unreachable, the terminal falls back to its mock instead of showing an error.
+
+There is no server to run. The whole thing is one worker, one index and a GitHub Actions workflow.
+
+## Breakage one: the model was already gone
+
+The first commit used a small Llama 3.1 model. It threw an error. The fix commit, 19 minutes later, says why: `llama-3.1-8b-instruct` was deprecated on 30 May 2026, and the call returned AiError 5028. I switched to the 3.3 70B model.
+
+The lesson is dull and worth having: a model name in a constant is a dependency with an expiry date. A fallback in the UI meant visitors would have seen the mock, not a stack trace, but I would still rather find out from a test than a commit message at 00:51.
+
+## Breakage two: my own re-indexing ate the free tier
+
+My README says the free allowances "comfortably cover portfolio traffic". That sentence is true and irrelevant, because traffic was not what used them up.
+
+I had set the workflow to re-embed the whole corpus after every Pages deploy, so that the chatbot would know each new post. On 22 July the re-index job started returning 429s. The commit that fixed it explains: every deploy was re-embedding everything, which exhausted the daily Workers AI allowance on the free tier. The cap was spent on me, not on visitors.
+
+The fix was to move re-indexing to one scheduled run a day at 11:30 UTC, with manual dispatch for emergencies. The chatbot serves from the existing index in between, and a day of staleness is fine for a portfolio.
+
+## The test I ran on 4 November
+
+I wrote this post partly to check my own claims, so I ran three questions against the live worker with `curl`.
+
+**A question the corpus cannot answer.** I asked about the best pizza topping. The refusal came back in 1,944 ms with a top score of 0.54. The threshold is 0.55. The gate held, by 0.01.
+
+**A question the corpus should answer.** I asked about Sable, my local-first finance agent. The top score was 0.68, and the answer was accurate and matched the article.
+
+**A question the corpus should not answer well.** I asked why the site got de-indexed by Google. The top score was 0.63, so the gate let it through, and the model replied that the context did not contain the answer. The response still carried `grounded: true`.
+
+That third result taught me what the gate is. It measures whether retrieval found something nearby, not whether the answer is right. A score of 0.63 on a de-indexing question meant the index held something vaguely related, and the model then behaved well by declining. I would not have caught that with a single threshold, and I have not published an evaluation of 0.55. It is a constant I chose, not a number I measured.
+
+## Breakage three: the index remembers what I deleted
+
+Look at the sources the last two answers returned. In each, one of the three links was on `yaseenkhatib.streamerosai.com`, the hostname the site used before it moved. In the de-indexing answer it was a final-year-project guide that returns a 404 today, which I checked. In the Sable answer it was an article that my August prune commit touched.
+
+I read the indexing script to see why. It upserts every chunk it finds in the corpus. It has no step that deletes vectors for articles that are no longer there. So when I cut the site from 100 posts to 52, the old chunks stayed in Vectorize and the chatbot could still retrieve them.
+
+I have not fixed this yet. I am telling you because a RAG chatbot that cites pages you removed is a small, real version of the problem every company has when its knowledge base drifts from its documents.
+
+## What I would do again
+
+1. Build the refusal path first, and show the similarity score in the UI. It is the part that earns trust.
+2. Gate on similarity before generation, and treat the gate as a coarse filter. Log the score so you can see near-misses like 0.54.
+3. Re-index on a schedule, not on every deploy, with stable ids so runs are idempotent.
+4. Treat a model name as a dependency. Check deprecation notices, and keep a fallback so the UI degrades gracefully.
+5. Delete vectors for content you remove. Add that step on day one, not after a test.
+6. Keep five questions you know the answers to and run them after every re-index.
+
+If you need a retrieval system with a refusal path and an audit trail rather than a demo, the [AI chatbot solutions page](/solutions/ai-chatbot/) shows what I build.
+
+## FAQ
+
+### Can you build a RAG chatbot on Cloudflare Workers?
+
+Yes. Mine uses Workers AI for embeddings and generation, Vectorize for retrieval and a single worker for the API. It also exposes the same retrieval as an MCP server.
+
+### How do you stop a RAG chatbot from making things up?
+
+Gate on retrieval similarity before calling the model, and tell the model to answer only from the supplied context. Mine refuses below a score of 0.55. It is a coarse filter and does not guarantee a correct answer.
+
+### Does it run on the Cloudflare free tier?
+
+Mine does, with a caveat. Visitor traffic was never the problem. Re-embedding the corpus on every deploy hit the daily Workers AI cap, so I moved re-indexing to once a day.
+
+### Why does my RAG chatbot cite deleted pages?
+
+If your indexing script only upserts, deleted articles stay in the vector store. Mine did exactly that until I read the script. Add a delete step for removed content.

@@ -1,0 +1,103 @@
+---
+title: 'How to Create an MCP Server: Lessons From My Portfolio'
+slug: how-to-create-an-mcp-server-portfolio-lessons
+date: '2026-11-20'
+description: 'How to create an MCP server as one TypeScript endpoint on Cloudflare Workers, plus the part no tutorial covers: keeping the facts it serves true.'
+tags:
+  - MCP
+  - Cloudflare
+  - Case study
+keywords:
+  - how to create mcp server
+  - mcp server example
+  - remote mcp server
+  - mcp server cloudflare workers
+  - build mcp server typescript
+readingMinutes: 8
+takeaways:
+  - 'An MCP server can be one POST endpoint answering four JSON-RPC methods: initialize, ping, tools/list and tools/call.'
+  - 'Mine runs on Cloudflare Workers with three tools and no dependencies.'
+  - 'The hard part was keeping the facts it serves true, because AI assistants repeat them as yours.'
+author:
+  name: Yaseen Khatib
+  role: Full-Stack AI Engineer
+---
+
+On 23 October my resume said I had shipped six products, and my website said five.
+
+That would have been a small embarrassment, except that a third place also had a list: the MCP server I run for this portfolio. Its `get_products` tool had been telling any AI assistant that connected to it which products I had built, and one of its links pointed at a post that no longer existed. The commit that fixed all three is titled "align the product count to six everywhere".
+
+I built that MCP server in the same late-night session as my RAG chatbot, in the first commit at 00:32 on 10 July. This post is how to create an MCP server the small way, and then the lesson that came after.
+
+## How to create an MCP server in one endpoint
+
+The Model Context Protocol is JSON-RPC over HTTP. You do not need an SDK to start. My server is a single `POST /mcp` route in a Cloudflare Worker, written in plain TypeScript with no dependencies. It handles these methods:
+
+- `initialize` returns the protocol version (it echoes the client's, with a default of `2025-03-26`), a `tools` capability, a server name and a short instructions string.
+- `ping` returns an empty result.
+- `tools/list` returns the tool definitions.
+- `tools/call` runs a tool and returns its output as text content.
+- Anything else returns the JSON-RPC "method not found" error, code -32601.
+
+Two details that cost me time to find. Notifications, which are messages with no `id`, expect no body, so the server answers them with an empty `202`. And because the server is stateless, a `GET` to `/mcp` returns `405`, since there is no event stream to offer.
+
+On 4 November I tested the live endpoint with `curl`. A `tools/list` call returned my three tools, and a notification came back with status 202. The 405 is straight from the code. You can test yours the same way before you ever open an AI client.
+
+## Pick tools by what a visitor would ask
+
+I wrote three tools, each aimed at the person who would use them, a hiring manager's AI assistant:
+
+- `search_portfolio` runs a semantic search over my articles and returns excerpts with source URLs.
+- `get_products` lists the products I built solo, with a one-line summary and link each.
+- `get_availability` returns the roles I am open to, my location and my contact channels.
+
+The README tells a reader to add the URL as a custom connector in Claude and "interrogate the portfolio from inside your own AI". I have not published a transcript of that, so I will not describe what it looks like in a particular client. What I can tell you is what the endpoint returns, because I called it.
+
+`search_portfolio` shares the retrieval code with my chatbot, including the refusal. If the best match scores below 0.55, the tool returns a sentence saying the corpus has nothing relevant and that it refuses rather than guesses. I did this deliberately. A tool that returns something for every query teaches an assistant to trust noise.
+
+## The part that is not protocol: tools serve facts
+
+Here is what I missed. A web page with a wrong number is read by a human, who may notice. A tool with a wrong number is read by an AI model, which will state it fluently to someone who is deciding whether to hire me.
+
+The 23 October commit fixed three separate drifts:
+
+- The resume said six products and the site said five. The about page counted a retired blog writer and left out FitRank.
+- The MCP `get_products` list linked to an article that had since been merged into another.
+- One product's source link returned a 404, because the repository is private. I removed it.
+
+I fixed all three in one commit and made the pages, the concierge facts and the MCP list name the same six products: FitRank, streamerOS, IntegrateX, Sable, Portfolio Concierge and the LinkedIn pipeline. Dated blog posts keep the count that was true on the day they were published.
+
+## Where it is still wrong
+
+I read the tool definitions again while writing this, and found one more. The `search_portfolio` description still says "95-article portfolio corpus". On 8 August I cut the site from 100 posts to 52, so that number has been stale since then. The assistant that reads that description will quote it.
+
+I have not changed it, and I am leaving this paragraph in on purpose. It shows the real workflow: the facts in an MCP server are code, and code drifts unless something checks it. The cheap fix is to stop hard-coding counts in descriptions at all. The better one is a test that compares the tool text with the live site.
+
+## What I would do again
+
+1. Start with one POST route and four methods. Add an SDK later if you need streaming or sessions.
+2. Test with `curl` first. Call `tools/list`, then a tool, then a notification, and read the status codes.
+3. Write tools for the question a visitor would ask, not for the data model you happen to have.
+4. Give search tools a refusal path, so an assistant is told "nothing relevant" instead of getting noise.
+5. Keep product lists and availability in one place that the site, the resume and the server all read.
+6. Never hard-code counts in tool descriptions. They will be wrong within a month.
+
+If you want an MCP server built around your own product or knowledge base, the [custom AI agents page](/solutions/ai-agents/) describes what I take on.
+
+## FAQ
+
+### Do I need an SDK to create an MCP server?
+
+No. A minimal remote server is one HTTP POST endpoint that answers `initialize`, `ping`, `tools/list` and `tools/call` in JSON-RPC. An SDK helps when you need streaming or session state.
+
+### Can I run an MCP server on Cloudflare Workers?
+
+Yes. Mine is a single worker with no dependencies. It is stateless, so a `GET` returns 405 and notifications get an empty 202.
+
+### How do I test an MCP server?
+
+Send JSON-RPC with `curl`. Call `tools/list`, then `tools/call` for a tool, then a notification with no `id`, and check the responses and status codes before connecting an AI client.
+
+### What is the biggest risk of a public MCP server?
+
+Stale or wrong facts. Assistants repeat what the tools return as if you had said it, so a count or link that drifts out of date is a public mistake.
