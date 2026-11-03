@@ -99,6 +99,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
+      <head>
+        {/* Google tag (GA4). A plain tag in the server-rendered head so Google's tag checker finds it
+            in the HTML; next/script would inject it client-side and the checker misses it. Unlike
+            GoatCounter and Ahrefs below, GA4 sets cookies. */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XNCMTGDG3N" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XNCMTGDG3N');",
+          }}
+        />
+      </head>
       <body className="font-sans">
         {/* AEO: sitewide entity graph — Person + WebSite with stable @ids
             that every page-level schema block references instead of

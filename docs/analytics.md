@@ -3,6 +3,9 @@
 Everything reports to **GoatCounter** (dashboard: https://yaseen.goatcounter.com —
 cookieless, no consent banner needed). Four signal layers, one Excel report.
 
+Google Analytics 4 (stream `G-XNCMTGDG3N`, property "Yaseen Khatib") also runs on the site, as a plain
+tag in the layout head. It is the one tool here that sets cookies; GoatCounter and Ahrefs stay cookieless.
+
 ## The four layers
 
 | Layer | What it answers | Where it lives |
