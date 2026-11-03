@@ -30,8 +30,24 @@ def token() -> str:
 
 
 def sitemap_urls(site: str) -> list[str]:
-    xml = requests.get(f"{site.rstrip('/')}/sitemap.xml", timeout=30).text
-    return re.findall(r"<loc>(.*?)</loc>", xml)
+    """URLs from /sitemap.xml, falling back to /sitemap-index.xml, following sitemap indexes."""
+    base = site.rstrip("/")
+    seen: set[str] = set()
+
+    def walk(url: str) -> list[str]:
+        if url in seen:
+            return []
+        seen.add(url)
+        r = requests.get(url, timeout=30)
+        if r.status_code != 200:
+            return []
+        locs = re.findall(r"<loc>(.*?)</loc>", r.text)
+        if "<sitemapindex" in r.text:
+            return [u for child in locs for u in walk(child)]
+        return locs
+
+    urls = walk(f"{base}/sitemap.xml") or walk(f"{base}/sitemap-index.xml")
+    return urls
 
 
 def inspect(tok: str, site: str, url: str, tries: int = 0) -> dict:
