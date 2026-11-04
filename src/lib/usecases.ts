@@ -458,7 +458,7 @@ export const USE_CASES: UseCase[] = [
 
   {
     slug: "ecommerce-website-development-india",
-    releaseOn: "2026-11-09",
+    releaseOn: "2026-11-03",
     keyword: "ecommerce website development india",
     eyebrow: "Online store · India",
     h1: "An ecommerce website for India: when to use a platform and when to build",
@@ -555,7 +555,7 @@ export const USE_CASES: UseCase[] = [
 
   {
     slug: "food-delivery-app-development",
-    releaseOn: "2026-11-09",
+    releaseOn: "2026-11-03",
     keyword: "food delivery app development",
     eyebrow: "Restaurants · cloud kitchens",
     h1: "Your own food ordering app, so orders stop going through someone else's",
@@ -654,7 +654,7 @@ export const USE_CASES: UseCase[] = [
 
   {
     slug: "billing-software-for-small-business",
-    releaseOn: "2026-11-09",
+    releaseOn: "2026-11-03",
     keyword: "billing software for small business",
     eyebrow: "Billing · invoicing · India",
     h1: "Billing software for a small business: when to buy it and when to build it",
@@ -756,7 +756,7 @@ export const USE_CASES: UseCase[] = [
 
   {
     slug: "clinic-management-software",
-    releaseOn: "2026-11-13",
+    releaseOn: "2026-11-03",
     keyword: "clinic management software",
     eyebrow: "Clinics · appointments · records",
     h1: "Clinic appointment and records software, built around how your clinic works",
@@ -853,7 +853,7 @@ export const USE_CASES: UseCase[] = [
 
   {
     slug: "ngo-website-development",
-    releaseOn: "2026-11-13",
+    releaseOn: "2026-11-03",
     keyword: "ngo website development",
     eyebrow: "NGOs · trusts · non-profits",
     h1: "A website for your NGO that earns trust, takes donations and is easy to update",
@@ -951,7 +951,7 @@ export const USE_CASES: UseCase[] = [
 
   {
     slug: "taxi-booking-app-development",
-    releaseOn: "2026-11-13",
+    releaseOn: "2026-11-03",
     keyword: "taxi booking app development",
     eyebrow: "Cab · taxi · fleet apps",
     h1: "A taxi or cab booking app for a fleet or a city, scoped to launch",

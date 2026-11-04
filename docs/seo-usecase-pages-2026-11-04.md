@@ -52,20 +52,13 @@ consumers) are candidates for a later batch.
   write-up, IntegrateX, Sable).
 - Where a ready-made product is the better answer (billing, standard online stores, clinics), the page says to buy it.
 
-## Release schedule
+## Release
 
-Pages release through the same daily deploy as scheduled blog posts (`releaseOn`, UTC; `POSTS_NOW` overrides). An
-unreleased page is not built, listed, in the sitemap or in `llms-full.txt`.
-
-| Release | Pages |
-|---|---|
-| 3 Nov (live on the next deploy) | hire-app-developer-india, freelance-website-developer, app-development-cost-india, grocery-app-development |
-| 9 Nov | ecommerce-website-development-india, food-delivery-app-development, billing-software-for-small-business |
-| 13 Nov | clinic-management-software, ngo-website-development, taxi-booking-app-development |
-
-Why not all ten at once: the portfolio has 3 of its 56 pages indexed and lost its index in July after an auto-publishing
-flood. Four, then three, then three is what the site can absorb. To release everything now, set every `releaseOn` in
-`src/lib/usecases.ts` to today. At least one page must always have a release date in the past, or the static export
+All ten pages were released together on 4 Nov (dated 3 Nov UTC) at the user's request. The staged plan was four now,
+three on 9 Nov and three on 13 Nov, because the portfolio has 3 of its 56 pages indexed and lost its index in July after
+an auto-publishing flood. If Search Console later shows these sitting in "Discovered, currently not indexed", the
+fallback is to move later pages' `releaseOn` forward in `src/lib/usecases.ts`; unreleased pages are not built, listed or
+in the sitemap or `llms-full.txt`. At least one page must always have a release date in the past, or the static export
 fails (Next treats an empty parameter list as missing).
 
 ## After release

@@ -28,7 +28,7 @@ load_dotenv(ROOT / ".env")
 load_dotenv(ROOT.parent / "linkedin-bot" / ".env")
 
 TEXT_MODEL = "gpt-5.5"
-IMAGE_MODEL = "gpt-image-1"
+IMAGE_MODEL = "gpt-image-1.5"
 IMAGE_SIZE = "1536x1024"
 IMAGE_QUALITY = "medium"
 JPEG_QUALITY = 85
