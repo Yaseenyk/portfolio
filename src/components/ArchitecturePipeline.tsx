@@ -355,8 +355,7 @@ export default function ArchitecturePipeline() {
                   key={`${engaged ? "ai" : "m"}-${pi}-${i}`}
                   r={2.4}
                   fill="#67E8F9"
-                  cx={p.xs[0]}
-                  cy={p.ys[0]}
+                  initial={{ cx: p.xs[0], cy: p.ys[0] }}
                   animate={{ cx: p.xs, cy: p.ys, opacity: [0, 1, 1, 0] }}
                   transition={{
                     cx: {
