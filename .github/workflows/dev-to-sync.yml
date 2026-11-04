@@ -112,6 +112,8 @@ jobs:
       - name: Install dependencies
         if: steps.gate.outputs.run == 'true'
         run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: "true"
 
       - name: Cross-post to DEV.to
         if: steps.gate.outputs.run == 'true'
