@@ -135,7 +135,7 @@ export default function LeadsInbox() {
           Durable record of every enquiry — the copy that survives an EmailJS
           failure.
         </p>
-        <form onSubmit={submit} className="mt-8">
+        <form onSubmit={submit} data-clarity-mask="true" className="mt-8">
           <input
             type="password"
             value={passcode}

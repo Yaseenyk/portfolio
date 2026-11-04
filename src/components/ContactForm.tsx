@@ -118,7 +118,7 @@ export default function ContactForm() {
           </a>
         </div>
 
-        <form onSubmit={handleSubmit} className="mx-auto mt-12 max-w-2xl text-left">
+        <form onSubmit={handleSubmit} data-clarity-mask="true" className="mx-auto mt-12 max-w-2xl text-left">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Field
               label="Name"

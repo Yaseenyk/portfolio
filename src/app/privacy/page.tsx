@@ -37,8 +37,8 @@ export default function PrivacyPage() {
                 visitors arrive. Google Analytics sets first-party cookies and sends usage data, such
                 as pages viewed, approximate location and the source of the visit, to Google. It also
                 keeps your first source (for example a search engine or a shared link) in your
-                browser so a later message can be tied to where you first came from. The data is not
-                used for advertising. You can block it with a browser extension or by disabling
+                browser so a later message can be tied to where you first came from. The site also uses Microsoft Clarity, a free tool that records anonymised heatmaps and session replays so I can see where visitors get stuck. Text typed into forms is masked and is not recorded. None of it is used
+                for advertising. You can block it with a browser extension or by disabling
                 cookies.
               </p>
               <h2>What I use it for</h2>

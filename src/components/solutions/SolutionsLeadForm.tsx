@@ -177,7 +177,7 @@ export default function SolutionsLeadForm({
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-400">{intro}</p>
 
-      <form onSubmit={handleSubmit} className="mt-8">
+      <form onSubmit={handleSubmit} data-clarity-mask="true" className="mt-8">
         {compact ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Field label="Name" name="name" value={form.name} onChange={handleChange} disabled={isSending} />
