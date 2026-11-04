@@ -21,6 +21,19 @@ import matter from "gray-matter";
 
 const DEV_TO_BASE = "https://dev.to/api";
 const SITE_BLOG_BASE = "https://yk.streamerosai.com/blog";
+const UTM = "utm_source=devto&utm_medium=referral&utm_campaign=crosspost";
+
+/** Tag a link back to the site so dev.to visits are named in analytics even when the referrer is stripped.
+ *  Never used for canonical_url: the canonical must stay the clean address. */
+function tagLink(link: string): string {
+  return link + (link.includes("?") ? "&" : "?") + UTM;
+}
+
+/** Tag every in-body link to the site, and end with a tagged "originally published" line. */
+function withBacklinks(body: string, canonicalUrl: string): string {
+  const tagged = body.replace(/\]\((https:\/\/yk\.streamerosai\.com[^)\s]*)\)/g, (_m, url: string) => `](${tagLink(url)})`);
+  return `${tagged}\n\n---\n\n*Originally published on [my portfolio](${tagLink(canonicalUrl)}).*`;
+}
 const CONTENT_DIR = "src/content/blog"; // where the .mdx posts live
 const PER_PAGE = 100;
 const MAX_PAGES = 100; // safety stop (~10k articles) — never loop forever
@@ -221,7 +234,7 @@ async function parseLocalPost(file: string): Promise<LocalPost> {
     payload: {
       article: {
         title,
-        body_markdown: body,
+        body_markdown: withBacklinks(body, canonicalUrl),
         published: true, // fully automated — goes live on sync
         canonical_url: canonicalUrl,
         ...(fm.description?.trim()

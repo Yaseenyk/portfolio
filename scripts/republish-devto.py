@@ -25,6 +25,13 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 STATE_FILE = ROOT / "scripts" / "devto-published.json"
 SITE = "https://yk.streamerosai.com"
+UTM = "utm_source=devto&utm_medium=referral&utm_campaign=crosspost"
+
+
+def tag(link: str) -> str:
+    """Tag a link back to the site so dev.to visits are named in analytics even when the referrer is stripped.
+    Never used for canonical_url: the canonical must stay the clean address."""
+    return link + ("&" if "?" in link else "?") + UTM
 
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT / "scripts" / ".env")
@@ -103,10 +110,12 @@ def fetch_post(slug: str) -> dict:
     article = soup.find("div", class_=re.compile(r"prose"))
     body_md = html_to_markdown(article)
 
+    # In-body links to the site get the tag too.
+    body_md = re.sub(r"\]\((" + re.escape(SITE) + r"[^)\s]*)\)", lambda m: "](" + tag(m.group(1)) + ")", body_md)
     footer = (
-        f"\n\n---\n\n*Originally published on [my portfolio]({url}) — "
+        f"\n\n---\n\n*Originally published on [my portfolio]({tag(url)}) — "
         f"where you can also query my experience through a RAG terminal, "
-        f"or explore the [product teardowns]({SITE}/products).*"
+        f"or explore the [product teardowns]({tag(SITE + '/products')}).*"
     )
     return {
         "title": title,

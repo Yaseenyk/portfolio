@@ -149,11 +149,11 @@ export const USE_CASES: UseCase[] = [
     keyword: "website developer freelancer",
     eyebrow: "Freelance website developer · India",
     h1: "A freelance website developer who builds for search and for enquiries",
-    title: "Freelance Website Developer in India",
+    title: "Website Developer Freelancer in India (Fixed Price)",
     description:
-      "A freelance website developer in India: fast mobile sites built to get found on Google and turn visits into enquiries, at a fixed price.",
+      "A website developer freelancer in India: fast mobile sites built to get found on Google and turn visits into enquiries, at a fixed price.",
     answer:
-      "A freelance website developer builds your site directly, without an agency in between. A good small-business site loads fast on a phone, says what you do in the first screen, gives people one clear way to enquire, and is set up so Google can find and index every page. I build to a written scope at a fixed price.",
+      "A website developer freelancer builds your site directly, without an agency in between. A good small-business site loads fast on a phone, says what you do in the first screen, gives people one clear way to enquire, and is set up so Google can find and index every page. I build to a written scope at a fixed price.",
     intro: [
       "Most small-business websites fail in the same two places: they are slow on a phone, and visitors cannot tell what to do next. Both are fixable, and neither needs a large budget.",
       "I build websites with Next.js and Astro, the same tools behind this portfolio and the DefendIt, streamerOS and SpotAI sites. Each of those is built to be crawled, fast on mobile and measurable.",
