@@ -67,6 +67,8 @@ const ALLOWED_ORIGINS = new Set([
   // The student-projects business, split out to its own site; its lead form,
   // consent PDF and agreement storage still run on this worker.
   "https://campus.streamerosai.com",
+  // The PM Surya Ghar guide; its second-opinion form posts leads here with source "solar".
+  "https://solar.streamerosai.com",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
 ]);
