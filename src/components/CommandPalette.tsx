@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m as motion } from "framer-motion";
 import { RESUME_URL } from "@/lib/site";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;

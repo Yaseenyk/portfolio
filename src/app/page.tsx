@@ -124,12 +124,13 @@ export default function Home() {
     const p = getPostBySlug(slug);
     if (!p) return [];
     const cover = path.join(process.cwd(), "public", "og", `${p.slug}.jpg`);
+    const thumb = path.join(process.cwd(), "public", "og", "thumb", `${p.slug}.webp`);
     return [
       {
         slug: p.slug,
         title: p.title,
         description: p.description,
-        image: fs.existsSync(cover) ? `/og/${p.slug}.jpg` : undefined,
+        image: fs.existsSync(cover) && fs.existsSync(thumb) ? `/og/thumb/${p.slug}.webp` : undefined,
       },
     ];
   });
@@ -149,9 +150,9 @@ export default function Home() {
           {/* Recruiter-first: the vision series headlines read in the first scroll. */}
           <FoundersLog entries={logEntries} articleCount={ARTICLE_COUNT} />
 
-          <Products />
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 900px" }}><Products /></div>
 
-          <section id="rag-concierge" className="py-10 sm:py-16">
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 700px" }}><section id="rag-concierge" className="py-10 sm:py-16">
             <h2 className="text-2xl font-semibold text-zinc-100">
               RAG Terminal Concierge
             </h2>
@@ -163,12 +164,12 @@ export default function Home() {
             <div className="mt-6">
               <TerminalAgent />
             </div>
-          </section>
+          </section></div>
 
-          <Dashboard />
-          <RoadmapSection />
-          <Testimonials />
-          <ContactForm />
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 2600px" }}><Dashboard /></div>
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 700px" }}><RoadmapSection /></div>
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 500px" }}><Testimonials /></div>
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 900px" }}><ContactForm /></div>
         </main>
 
       </div>

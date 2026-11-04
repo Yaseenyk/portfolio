@@ -299,3 +299,31 @@
 .present-slide--title .present-body:has(img) > figure,
 .present-slide--title .present-body:has(img) > div { grid-row: span 3; }
 .present-slide--title .present-body img { max-height: 52vh; border-radius: 14px; }
+
+/* NeuralCore: CSS-only loops (transform/opacity), paused off-screen and under reduced motion */
+.nc { animation: nc-float 8s ease-in-out infinite; }
+.nc svg * { transform-box: fill-box; transform-origin: center; }
+.nc .nc-spin { transform-box: view-box; transform-origin: 200px 200px; animation: nc-rot 20s linear infinite; }
+.nc .nc-breathe { animation: nc-breathe 6s ease-in-out infinite; }
+.nc .nc-halo { animation: nc-halo 2.8s ease-out infinite; }
+.nc .nc-ripple { animation: nc-ripple 4.8s ease-out infinite; opacity: 0; }
+.nc .nc-pulse { animation: nc-pulse 3.2s ease-in-out infinite; }
+.nc .nc-pulse2 { animation: nc-pulse2 1.6s ease-in-out infinite; }
+.nc .nc-flow { animation: nc-flow 3.4s linear infinite; }
+.nc[data-paused="1"], .nc[data-paused="1"] * { animation-play-state: paused !important; }
+@keyframes nc-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
+@keyframes nc-rot { to { transform: rotate(360deg) } }
+@keyframes nc-breathe { 0%,100% { opacity: .4; transform: scale(1) } 50% { opacity: .7; transform: scale(1.06) } }
+@keyframes nc-halo { 0%,100% { transform: scale(1); opacity: .18 } 50% { transform: scale(1.8); opacity: 0 } }
+@keyframes nc-ripple { 0% { transform: scale(1); opacity: .45 } 100% { transform: scale(3.7); opacity: 0 } }
+@keyframes nc-pulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.1) } }
+@keyframes nc-pulse2 { 0%,100% { transform: scale(1); opacity: .8 } 50% { transform: scale(1.15); opacity: 1 } }
+@keyframes nc-flow { to { stroke-dashoffset: -76 } }
+@media (max-width: 767px) { .nc .nc-flow { animation: none } .nc .nc-halo { animation: none } }
+@media (prefers-reduced-motion: reduce) { .nc, .nc * { animation: none !important } }
+
+/* Below-the-fold home sections: skip style/layout/paint until near the viewport. */
+.cv-auto { content-visibility: auto; }
+
+/* The rupee sign is the only glyph on the home page outside Inter's latin subset; a system font avoids an 86 KB latin-ext download. */
+.rupee { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif; }

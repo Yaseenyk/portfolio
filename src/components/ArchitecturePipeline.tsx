@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import Reveal from "./Reveal";
 
 /* ----------------------------- curve sampling ----------------------------- */

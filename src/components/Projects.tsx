@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { m as motion, AnimatePresence, useInView } from "framer-motion";
 import { useHydrated } from "@/lib/useHydrated";
 import type { ComponentType } from "react";
+import OnScreen from "./OnScreen";
 import PulseDot from "./PulseDot";
 import { GithubIcon, ExternalLinkIcon } from "./Icons";
 import SystemTelemetry from "./projects/SystemTelemetry";
@@ -462,7 +463,9 @@ function ProjectRow({ project }: { project: Project }) {
           Stacked (below lg) it has no sibling to match, so it keeps an explicit ratio.
         */}
         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-zinc-800 bg-ink/40 lg:aspect-auto lg:h-full lg:min-h-[300px]">
-          <Animation />
+          <OnScreen>
+            <Animation />
+          </OnScreen>
         </div>
       </div>
 

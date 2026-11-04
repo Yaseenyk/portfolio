@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "framer-motion";
+import { m as motion, useScroll, useSpring } from "framer-motion";
 
 /**
  * A fixed reading-progress bar pinned to the very top of the viewport, tracking

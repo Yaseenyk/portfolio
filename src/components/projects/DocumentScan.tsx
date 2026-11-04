@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 const LINE_WIDTHS = [90, 70, 80, 60, 85, 75, 65, 88, 72, 82];
 

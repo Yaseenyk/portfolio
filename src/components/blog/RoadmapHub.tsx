@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import type { RoadmapLesson, SeriesMeta } from "@/lib/series";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;

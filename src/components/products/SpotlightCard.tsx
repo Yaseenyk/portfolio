@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { useHydrated } from "@/lib/useHydrated";
 import Link from "next/link";
 import {
-  motion,
+  m as motion,
   useMotionValue,
   useSpring,
   useTransform,

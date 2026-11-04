@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Transition } from "framer-motion";
+import { m as motion, type Transition } from "framer-motion";
 
 interface UNode {
   messy: { x: number; y: number };

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
+import { m as motion, useInView } from "framer-motion";
 import { useHydrated } from "@/lib/useHydrated";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
@@ -132,8 +132,10 @@ export default function FoundersLog({
                   <Image
                     src={post.image}
                     alt=""
-                    width={1536}
-                    height={1024}
+                    width={640}
+                    height={427}
+                    loading="lazy"
+                    decoding="async"
                     className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { m as motion, AnimatePresence } from "framer-motion";
 import PulseDot from "./PulseDot";
 import { RESUME_URL } from "@/lib/site";
 import { PRODUCTS } from "@/lib/products";
@@ -182,7 +182,7 @@ function LeafLink({
       </span>
       {leaf.desc && (
         <span className="mt-0.5 block text-xs leading-snug text-zinc-500">
-          {leaf.desc}
+          {leaf.desc.split("₹").flatMap((t, i) => (i ? [<span key={i} className="rupee">₹</span>, t] : [t]))}
         </span>
       )}
     </>

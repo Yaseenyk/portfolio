@@ -59,4 +59,7 @@ def draw_cover(title: str, slug: str) -> pathlib.Path:
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         sys.exit('usage: python scripts/post-cover.py "<title>" <slug>')
-    print(draw_cover(sys.argv[1], sys.argv[2]))
+    cover = draw_cover(sys.argv[1], sys.argv[2])
+    print(cover)
+    import runpy
+    print(runpy.run_path(str(pathlib.Path(__file__).resolve().parent / "make-thumbs.py"))["make_thumb"](cover))

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
 import SectionLabel from "./SectionLabel";

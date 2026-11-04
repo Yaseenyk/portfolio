@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 /** Four shelves, drawn as the rack they represent — front of shelf at the left. */
 const ROWS = [

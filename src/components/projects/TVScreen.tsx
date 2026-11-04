@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 /** Cross-Platform TV — a wireframe TV whose skeleton resolves into a dashboard UI. */
 export default function TVScreen() {

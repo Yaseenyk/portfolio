@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 const GATE = { x: 150, y: 120 };
 const DBS = [

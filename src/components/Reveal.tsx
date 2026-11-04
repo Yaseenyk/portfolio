@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, type Variants } from "framer-motion";
+import { m as motion, useInView, type Variants } from "framer-motion";
 import { useRef, type ReactNode } from "react";
 import { useHydrated } from "@/lib/useHydrated";
 

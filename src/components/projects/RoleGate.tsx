@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m as motion } from "framer-motion";
 
 /**
  * AISA — a bearer token arriving at the gate and being routed to one of three lanes.
