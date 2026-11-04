@@ -1,5 +1,5 @@
 # Portfolio Concierge — grounded RAG API + MCP server on Cloudflare Workers.
-# Deployed by .github/workflows/worker.yml on push to main (worker/** paths).
+# Deployed by .github/workflows/worker.yml on push to main (worker/** paths), or by hand: npx wrangler deploy.
 name = "yaseen-concierge"
 main = "src/index.ts"
 compatibility_date = "2026-06-01"
@@ -23,6 +23,10 @@ database_id = "22fc602e-3dd0-4974-8a1f-835185633208"
 # method on the account even for the free tier, and these documents are a few
 # KB each. If volume ever justifies R2, the URL shape (/agreements/<uuid>.pdf)
 # is already what R2 would have served, so only the worker changes.
+
+# Daily corpus re-index (replaces the GitHub Actions job): 11:30 UTC, after the portfolio's daily deploy has settled.
+[triggers]
+crons = ["30 11 * * *"]
 
 [observability]
 enabled = true

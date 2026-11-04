@@ -1,24 +1,17 @@
 name: Concierge Worker
 
-# Two jobs, one worker:
-#   deploy  — pushes worker/** changes to Cloudflare (wrangler).
-#   reindex — re-embeds the live llms-full.txt corpus into Vectorize. Runs
-#             once daily (not after every Pages deploy) to stay under the
-#             Workers-AI free-tier neuron cap; trigger manually for an
-#             immediate refresh after big content changes.
-# Both no-op gracefully until CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID
-# repo secrets are configured.
+# Deploys worker/** changes to Cloudflare (wrangler) on push, or by hand from the Actions tab (or run `npx wrangler deploy`
+# in worker/). The daily corpus re-index no longer runs here: it is a Cloudflare cron inside the Worker itself
+# (see scheduled() in worker/src/index.ts and [triggers] in worker/wrangler.toml), so it works when GitHub Actions does not.
+# Needs the CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID repo secrets; it no-ops gracefully until they are set.
 on:
   push:
     branches: [main]
     paths: ["worker/**", ".github/workflows/worker.yml"]
-  schedule:
-    - cron: "30 11 * * *" # daily 11:30 UTC — after the blogger + deploy settle
   workflow_dispatch: {}
 
 jobs:
   deploy:
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -36,17 +29,3 @@ jobs:
             exit 0
           fi
           npx wrangler@4 deploy
-
-  reindex:
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-latest
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 20
-      - name: Re-embed the live corpus into Vectorize
-        run: node worker/scripts/index-corpus.mjs

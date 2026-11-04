@@ -15,6 +15,7 @@ export interface Env {
     run(model: string, input: Record<string, unknown>): Promise<any>;
   };
   VECTORIZE: {
+    upsert(vectors: { id: string; values: number[]; metadata?: Record<string, unknown> }[]): Promise<unknown>;
     query(
       vector: number[],
       options: Record<string, unknown>,
@@ -1045,7 +1046,65 @@ async function handleJobsSave(request: Request, env: Env, origin: string | null)
 
 /* --------------------------------- router -------------------------------- */
 
+/* ------------------------------------------------------------------------- */
+/* Corpus re-index — runs on a Cloudflare cron (see wrangler.toml), not GitHub.   */
+/* ------------------------------------------------------------------------- */
+
+const CORPUS_URL = "https://yk.streamerosai.com/llms-full.txt";
+
+/** Split one article of llms-full.txt into ~1400-character chunks on paragraph boundaries. */
+function chunkArticle(section: string) {
+  const lines = section.trim().split("\n");
+  const title = (lines[0] ?? "").replace(/^#\s*/, "").trim();
+  const url = (lines.find((l) => l.startsWith("URL: ")) ?? "").slice(5).trim();
+  const body = lines.filter((l) => !l.startsWith("URL: ") && !l.startsWith("Summary: ") && !l.startsWith("# ")).join("\n");
+  const paragraphs = body.split(/\n\n+/).filter((p) => p.trim().length > 0);
+  const chunks: string[] = [];
+  let current = "";
+  for (const p of paragraphs) {
+    if (current.length + p.length > 1400 && current) {
+      chunks.push(current.trim());
+      current = "";
+    }
+    current += p + "\n\n";
+  }
+  if (current.trim()) chunks.push(current.trim());
+  return { title, url, chunks };
+}
+
+/**
+ * Re-embed the live corpus into Vectorize. Idempotent: vector ids are stable (slug + chunk index), so a re-run overwrites
+ * in place. (Like the script it replaces, it does not delete vectors for articles that no longer exist.)
+ */
+async function reindexCorpus(env: Env): Promise<number> {
+  const res = await fetch(CORPUS_URL);
+  if (!res.ok) throw new Error(`could not fetch the corpus (${res.status})`);
+  const sections = (await res.text()).split(/\n---\n/);
+  const pending: { id: string; title: string; url: string; text: string }[] = [];
+  for (const section of sections) {
+    const { title, url, chunks } = chunkArticle(section);
+    if (!title || !url || chunks.length === 0) continue;
+    const slug = url.split("/blog/")[1]?.replaceAll("/", "") ?? title.slice(0, 40);
+    chunks.forEach((text, i) => pending.push({ id: `${slug}-${i}`.slice(0, 64), title, url, text: `${title}\n${text}`.slice(0, 8000) }));
+  }
+  // 100 chunks per embedding call and per upsert keeps a whole run to a handful of outgoing calls.
+  for (let i = 0; i < pending.length; i += 100) {
+    const batch = pending.slice(i, i + 100);
+    const emb = await env.AI.run(EMBED_MODEL, { text: batch.map((b) => b.text) });
+    await env.VECTORIZE.upsert(batch.map((b, j) => ({ id: b.id, values: emb.data[j], metadata: { title: b.title, url: b.url, text: b.text } })));
+  }
+  return pending.length;
+}
+
 export default {
+  async scheduled(_event: { scheduledTime: number }, env: Env, ctx: { waitUntil(p: Promise<unknown>): void }): Promise<void> {
+    ctx.waitUntil(
+      reindexCorpus(env).then(
+        (n) => console.log(`reindex: ${n} chunks embedded`),
+        (e) => console.log(`reindex failed: ${String((e && e.message) || e)}`),
+      ),
+    );
+  },
   async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get("Origin");
     const { pathname } = new URL(request.url);
