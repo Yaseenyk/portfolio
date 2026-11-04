@@ -1,7 +1,8 @@
 name: Cross-post new posts to DEV.to
 
-# Publishing cadence is a slow, steady DRIP — at most one NEW article every two
-# days — so DEV.to and its followers never see a batch dump.
+# Cadence: at most 2 NEW articles per rolling 7 days (enforced in
+# scripts/sync-dev-to.ts against DEV.to's own published_at), oldest first.
+# Edits to live articles are unlimited.
 #
 #   • schedule (every 2 days): scan all local posts, publish the next one that
 #     isn't on DEV.to yet. One create per run (SCAN_ALL + CREATE_ONLY + MAX_WRITES=1).
@@ -11,9 +12,8 @@ name: Cross-post new posts to DEV.to
 #     wait for the drip.
 #   • workflow_dispatch: manual one-off (publish a named post, or the drip).
 on:
-  schedule:
-    # ~00:00 UTC on odd days of the month ≈ one post every two days.
-    - cron: "0 0 */2 * *"
+  # No schedule: new articles are posted only by the backfill workflow
+  # (Tuesday and Friday), so there is a single poster and a single weekly cap.
   push:
     branches: [main]
     paths:
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Full history so we can diff the whole push range for changed files.
           fetch-depth: 0
@@ -104,7 +104,7 @@ jobs:
 
       - name: Set up Node.js
         if: steps.gate.outputs.run == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -125,7 +125,7 @@ jobs:
           # the next post that isn't on DEV.to, at most one per run.
           SCAN_ALL: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.file == '')) && 'true' || '' }}
           CREATE_ONLY: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.file == '')) && 'true' || '' }}
-          MAX_WRITES: ${{ (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.file == '')) && '1' || '' }}
+          MAX_NEW_PER_RUN: ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.file == '') && '1' || '' }}
           # Push: only propagate edits to live posts; new posts wait for the drip.
           UPDATE_ONLY: ${{ github.event_name == 'push' && 'true' || '' }}
         run: npx tsx scripts/sync-dev-to.ts

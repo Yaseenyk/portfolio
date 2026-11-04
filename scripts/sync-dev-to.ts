@@ -38,6 +38,11 @@ const CONTENT_DIR = "src/content/blog"; // where the .mdx posts live
 const PER_PAGE = 100;
 const MAX_PAGES = 100; // safety stop (~10k articles) — never loop forever
 const RATE_LIMIT_PAUSE_MS = 1000; // DEV.to rate-limits article writes
+/** Weekly cadence for NEW articles: at most this many in any rolling 7 days (updates do not count). */
+const WEEKLY_NEW_CAP = Number(process.env.WEEKLY_NEW_CAP ?? 2) || 2;
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+/** Gap between two creates inside one run, so they never land in the same minute. */
+const CREATE_GAP_MS = 90_000;
 
 /* ---------------------------------- types --------------------------------- */
 
@@ -48,6 +53,8 @@ interface PostFrontmatter {
   tags?: string[] | string;
   /** Absolute URL of the cover image; DEV.to renders it above the title. */
   cover?: string;
+  /** Publication date; drives the oldest-first order of new cross-posts. */
+  date?: string | Date;
 }
 
 /** Exact request body shared by POST /articles and PUT /articles/{id}. */
@@ -69,6 +76,8 @@ interface DevToArticle {
   title: string;
   url: string;
   canonical_url: string | null;
+  published?: boolean;
+  published_at?: string | null;
 }
 
 /** A local post, parsed and ready to sync. */
@@ -76,6 +85,8 @@ interface LocalPost {
   file: string;
   title: string;
   canonicalUrl: string;
+  /** Epoch ms of the post date (0 when unknown). */
+  dateMs: number;
   payload: ArticlePayload;
 }
 
@@ -109,6 +120,22 @@ class DevToApiError extends Error {
 
 /* ------------------------------ http helpers ------------------------------ */
 
+/** Thrown when DEV.to still answers 429 after one wait-and-retry: the run stops cleanly. */
+class RateLimitedError extends Error {}
+
+/** fetch with one 429 retry: waits the Retry-After seconds DEV.to asks for (capped at 60). */
+async function devFetch(url: string, init: RequestInit): Promise<Response> {
+  let res = await fetch(url, init);
+  if (res.status !== 429) return res;
+  const asked = Number(res.headers.get("retry-after"));
+  const waitS = Math.min(Number.isFinite(asked) && asked > 0 ? asked : 30, 60);
+  console.log(`  429 from DEV.to - waiting ${waitS}s, then retrying once`);
+  await sleep(waitS * 1000);
+  res = await fetch(url, init);
+  if (res.status === 429) throw new RateLimitedError(`DEV.to is still rate-limiting (429) for ${url}`);
+  return res;
+}
+
 function authHeaders(apiKey: string): Record<string, string> {
   return {
     Accept: "application/vnd.forem.api-v1+json",
@@ -126,7 +153,7 @@ async function fetchArticlePage(
   page: number,
 ): Promise<DevToArticle[]> {
   const url = `${DEV_TO_BASE}/articles/me/all?per_page=${PER_PAGE}&page=${page}`;
-  const res = await fetch(url, { headers: authHeaders(apiKey) });
+  const res = await devFetch(url, { headers: authHeaders(apiKey) });
   const text = await res.text();
   if (!res.ok) throw new DevToApiError(res.status, text, `GET ${url}`);
   return JSON.parse(text) as DevToArticle[];
@@ -148,7 +175,7 @@ async function createArticle(
   payload: ArticlePayload,
   apiKey: string,
 ): Promise<DevToArticle> {
-  const res = await fetch(`${DEV_TO_BASE}/articles`, {
+  const res = await devFetch(`${DEV_TO_BASE}/articles`, {
     method: "POST",
     headers: jsonHeaders(apiKey),
     body: JSON.stringify(payload),
@@ -164,7 +191,7 @@ async function updateArticle(
   payload: ArticlePayload,
   apiKey: string,
 ): Promise<DevToArticle> {
-  const res = await fetch(`${DEV_TO_BASE}/articles/${id}`, {
+  const res = await devFetch(`${DEV_TO_BASE}/articles/${id}`, {
     method: "PUT",
     headers: jsonHeaders(apiKey),
     body: JSON.stringify(payload),
@@ -180,7 +207,7 @@ async function updateArticle(
  * a post is removed from the repo so it stops being live on DEV.to too.
  */
 async function unpublishArticle(id: number, apiKey: string): Promise<void> {
-  const res = await fetch(`${DEV_TO_BASE}/articles/${id}`, {
+  const res = await devFetch(`${DEV_TO_BASE}/articles/${id}`, {
     method: "PUT",
     headers: jsonHeaders(apiKey),
     body: JSON.stringify({ article: { published: false } }),
@@ -231,6 +258,7 @@ async function parseLocalPost(file: string): Promise<LocalPost> {
     file,
     title,
     canonicalUrl,
+    dateMs: fm.date ? new Date(fm.date).getTime() || 0 : 0,
     payload: {
       article: {
         title,
@@ -267,8 +295,9 @@ function findMatch(post: LocalPost, index: ArticleIndex): DevToArticle | undefin
   );
 }
 
-const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 /**
  * Which files to consider this run.
@@ -332,48 +361,83 @@ async function main(): Promise<void> {
 
   const failures: string[] = [];
 
-  // A backfill of fifty posts in one run reads as a dump to DEV.to and to its
-  // readers. MAX_WRITES lets the backlog drip out over several runs; unset, it
-  // is unlimited, so the normal per-push sync is unaffected.
+  // Cadence: at most WEEKLY_NEW_CAP NEW articles per rolling 7 days, counting
+  // everything already published on DEV.to in that window. Updates are exempt.
+  const now = Date.now();
+  const recent = new Set(
+    [...index.byCanonical.values(), ...index.byTitle.values()].filter(
+      (a) =>
+        a.published !== false &&
+        a.published_at &&
+        now - new Date(a.published_at).getTime() < WEEK_MS,
+    ),
+  ).size;
+  let newAllowed = Math.max(0, WEEKLY_NEW_CAP - recent);
+  const perRun = Number(process.env.MAX_NEW_PER_RUN ?? 0) || Infinity;
+  newAllowed = Math.min(newAllowed, perRun);
+
   const maxWrites = Number(process.env.MAX_WRITES ?? 0) || Infinity;
   const dryRun = process.env.DRY_RUN === "true";
-  // A scheduled backfill must make progress. Counting updates against
-  // MAX_WRITES would re-push the same first few articles every night and
-  // never reach the backlog, so the drip only ever creates what is missing.
   const createOnly = process.env.CREATE_ONLY === "true";
-  // Push path: propagate EDITS to already-live articles but never publish a
-  // brand-new post on a push — new posts are left for the scheduled drip, so a
-  // batch push (or the AI blogger) can never dump several onto DEV.to at once.
   const updateOnly = process.env.UPDATE_ONLY === "true";
-  let writes = 0;
 
+  // Parse everything first so new posts can be ordered oldest-first.
+  const parsed: { file: string; post: LocalPost; match?: DevToArticle }[] = [];
   for (const file of files) {
-    // A dry run is a diagnostic — it should list the whole backlog, not the
-    // first few. Only real writes are rationed.
-    if (!dryRun && writes >= maxWrites) {
-      console.log(`· reached MAX_WRITES=${maxWrites} — ${files.length - writes} file(s) left for the next run`);
-      break;
-    }
     try {
       const post = await parseLocalPost(file);
-      const match = findMatch(post, index);
-      if (match && createOnly) continue; // drip: only create what's missing
-      if (!match && updateOnly) continue; // push: only update, never burst-create
-      if (dryRun) {
-        console.log(`· would ${match ? `update #${match.id}` : "create"}: ${post.title}`);
-        continue;
-      }
+      parsed.push({ file, post, match: findMatch(post, index) });
+    } catch (err) {
+      console.error(`✗ ${file}: ${(err as Error).message}`);
+      failures.push(file);
+    }
+  }
+  const missing = parsed.filter((p) => !p.match);
+  console.log(
+    `DEV.to cadence: ${recent} published in the last 7 days, cap ${WEEKLY_NEW_CAP}/week -> ${newAllowed} new article(s) due this run; ${missing.length} of ${parsed.length} not on DEV.to yet.`,
+  );
+  // Creates first, oldest post date first; updates after.
+  parsed.sort((a, b) => {
+    if (!a.match && !b.match) return a.post.dateMs - b.post.dateMs;
+    return (a.match ? 1 : 0) - (b.match ? 1 : 0);
+  });
+
+  let writes = 0;
+  let created = 0;
+  let stop = false;
+  for (const { file, post, match } of parsed) {
+    if (stop) break;
+    if (match && createOnly) continue; // drip: only create what's missing
+    if (!match && updateOnly) continue; // push: only update, never burst-create
+    if (!match && created >= newAllowed) continue; // weekly cap reached
+    if (!dryRun && writes >= maxWrites) {
+      console.log(`· reached MAX_WRITES=${maxWrites}`);
+      break;
+    }
+    if (dryRun) {
+      console.log(`· would ${match ? `update #${match.id}` : "create"}: ${post.title}`);
+      if (!match) created += 1;
+      continue;
+    }
+    try {
       if (match) {
         const updated = await updateArticle(match.id, post.payload, apiKey);
         console.log(`↻ updated #${match.id}: ${updated.url}  (${file})`);
       } else {
-        const created = await createArticle(post.payload, apiKey);
-        console.log(`＋ created #${created.id}: ${created.url}  (${file})`);
+        if (created > 0) await sleep(CREATE_GAP_MS);
+        const made = await createArticle(post.payload, apiKey);
+        console.log(`＋ created #${made.id}: ${made.url}  (${file})`);
+        created += 1;
       }
       writes += 1;
     } catch (err) {
-      console.error(`✗ ${file}: ${(err as Error).message}`);
-      failures.push(file);
+      if (err instanceof RateLimitedError) {
+        console.log(`· ${err.message} - stopping cleanly; the next scheduled run continues.`);
+        stop = true;
+      } else {
+        console.error(`✗ ${file}: ${(err as Error).message}`);
+        failures.push(file);
+      }
     }
     if (!dryRun) await sleep(RATE_LIMIT_PAUSE_MS);
   }
@@ -393,6 +457,10 @@ async function main(): Promise<void> {
       await unpublishArticle(match.id, apiKey);
       console.log(`⊘ unpublished #${match.id}: ${slug} (removed from repo)`);
     } catch (err) {
+      if (err instanceof RateLimitedError) {
+        console.log(`· ${err.message} - stopping cleanly.`);
+        break;
+      }
       console.error(`✗ ${file} (unpublish): ${(err as Error).message}`);
       failures.push(file);
     }
@@ -405,7 +473,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
   console.log(
-    `\nDone: ${files.length} upserted, ${deleted.length} unpublished on DEV.to.`,
+    `\nDone: ${files.length} considered, ${deleted.length} unpublished on DEV.to.`,
   );
 }
 

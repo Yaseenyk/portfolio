@@ -4,21 +4,21 @@ name: Backfill DEV.to from the whole blog
 # watches `src/content/blog/**.mdx`. This builds the site, converts every
 # published post from its built HTML to Markdown, and syncs them.
 #
-# Manual on purpose. MAX_WRITES drips the backlog out over several runs
-# instead of dumping fifty articles onto DEV.to in one go.
+# The weekly cap (2 new per rolling 7 days) drips the backlog out instead of
+# dumping articles onto DEV.to in one go.
 on:
-  # Drains the backlog on its own, three a night, then quietly no-ops once
-  # every post exists on DEV.to — including any new one, picked up within a
-  # day. Three rather than fifty because a burst reads as a dump to DEV's
-  # spam heuristics and to anyone following the feed.
+  # Drains the backlog at most 2 new articles per rolling 7 days (the cap is
+  # enforced in scripts/sync-dev-to.ts from DEV.to's own published_at), oldest
+  # first. Runs Tuesday and Friday, one new article per run, then no-ops once
+  # every post exists on DEV.to.
   schedule:
-    - cron: '30 4 * * *'
+    - cron: '30 4 * * 2,5'
   workflow_dispatch:
     inputs:
       limit:
-        description: "How many articles to create/update this run"
+        description: "Max new articles this run (the 2-per-7-days cap still applies)"
         required: false
-        default: "15"
+        default: "1"
         type: string
       dry_run:
         description: "List what would be posted without writing to DEV.to"
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # The sitemap reads each page's lastmod from git history.
           fetch-depth: 0
@@ -61,7 +61,8 @@ jobs:
       - name: Sync to DEV.to
         env:
           DEV_TO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
-          MAX_WRITES: ${{ inputs.limit || '15' }}
+          MAX_NEW_PER_RUN: ${{ inputs.limit || '1' }}
+          WEEKLY_NEW_CAP: '2'
           DRY_RUN: ${{ inputs.dry_run || 'false' }}
           # The nightly run only fills gaps. Editing a post still updates its
           # DEV.to copy through the push-triggered workflow.

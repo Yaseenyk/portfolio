@@ -169,6 +169,7 @@ async function main() {
       attr(html, /<meta name="description" content="([^"]*)"/) ?? "",
     );
     const tags = tagsFrom(html, title);
+    const published = attr(html, /<meta property="article:published_time" content="([^"]*)"/) ?? "";
 
     const frontMatter = [
       "---",
@@ -177,6 +178,7 @@ async function main() {
       ...(description ? [`description: ${JSON.stringify(description)}`] : []),
       ...(tags.length ? [`tags: ${JSON.stringify(tags)}`] : []),
       ...(cover ? [`cover: ${JSON.stringify(cover)}`] : []),
+      ...(published ? [`date: ${JSON.stringify(published)}`] : []),
       "---",
       "",
     ].join("\n");
@@ -205,33 +207,16 @@ async function main() {
     written += 1;
   }
 
-  // Newest first within a topic, then round-robin across topics. Sorting by
-  // date alone front-loads whatever was written most recently — right now
-  // that is a run of React posts, so a night's batch would look like a
-  // single-subject feed and the Rust and Tauri work would wait weeks.
-  order.sort((a, b) => b.date.localeCompare(a.date));
-  const byTopic = new Map();
-  for (const item of order) {
-    if (!byTopic.has(item.topic)) byTopic.set(item.topic, []);
-    byTopic.get(item.topic).push(item);
-  }
-  const queues = [...byTopic.values()];
-  const interleaved = [];
-  while (interleaved.length < order.length) {
-    for (const q of queues) {
-      const next = q.shift();
-      if (next) interleaved.push(next);
-    }
-  }
-  order.length = 0;
-  order.push(...interleaved);
+  // Oldest first: the weekly DEV.to cap drains the backlog from the oldest
+  // unposted article, so the feed grows in the order the work happened.
+  order.sort((a, b) => a.date.localeCompare(b.date));
   await writeFile(
     path.join(DEST, "_order.txt"),
     order.map((o) => `.devto/${o.slug}.md`).join("\n") + "\n",
     "utf8",
   );
 
-  console.log(`devto export: ${written} posts written to .devto/ (newest first in _order.txt)`);
+  console.log(`devto export: ${written} posts written to .devto/ (oldest first in _order.txt)`);
   if (skipped.length) console.log(`devto export: skipped ${skipped.length} — ${skipped.join(", ")}`);
 }
 
