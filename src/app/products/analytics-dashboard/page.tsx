@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 };
 
 const FLOW: FlowStep[] = [
-  { label: "Tag on every page", detail: "A plain Google tag in the head of all five sites sends page views and tagged clicks and leads to one GA4 property." },
+  { label: "Tag on every page", detail: "A plain Google tag in the head of every site sends page views and tagged clicks and leads to one GA4 property." },
   { label: "GitHub Action", detail: "Every two hours a Node script signs in with a read-only service account and pulls GA4 and Search Console for six date ranges." },
   { label: "Static JSON files", detail: "Each range becomes its own small file (ga-28d.json, gsc-28d.json, live.json), published to GitHub Pages with the page." },
   { label: "Page opens", detail: "The browser draws the published copy straight away and loads only the date range you picked." },
@@ -74,7 +74,8 @@ export default function AnalyticsDashboardPage() {
         <div className="max-w-3xl">
           <Prose>
             <p>
-              I run five sites: this portfolio, streamerOS, FitRank, DefendIt and SpotAI. Each has a
+              I run twelve sites: this portfolio, streamerOS, FitRank, DefendIt, SpotAI, Esports Hub, a
+              solar subsidy guide, an exam dates site and four free tool sites. Each has a
               different audience and a different goal, and I could not answer the plain questions
               about any of them. Who visited, and from where? Did anyone come from ChatGPT or
               LinkedIn? Which button turned into a lead? What do people type into Google before they
@@ -82,7 +83,7 @@ export default function AnalyticsDashboardPage() {
             </p>
             <p>
               Google Analytics and Search Console can answer all of it, but in two products, one site
-              at a time. So I built a single page that reads both for all five sites, shows the answer
+              at a time. So I built a single page that reads both for every site, shows the answer
               in plain words, and works on a phone. Along with it came the tracking that makes the
               numbers worth reading: tagged events, first-touch attribution on every lead, and a
               UTM link builder.
@@ -98,7 +99,7 @@ export default function AnalyticsDashboardPage() {
       <Section label="02 · What It Does">
         <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
-            ["Tracking", "One GA4 property with five streams. Eight key events (WhatsApp, email, phone, app download, template download, lead, calculator, agreement) and seven custom fields, created through the Admin API."],
+            ["Tracking", "One GA4 property with a stream for each site. Eight key events (WhatsApp, email, phone, app download, template download, lead, calculator, agreement) and seven custom fields, created through the Admin API."],
             ["First-touch attribution", "Every lead carries where that person first arrived from: source, medium and campaign. Old ?ref= tags become real campaigns."],
             ["Sources in plain words", "Visits grouped into search engines, social, AI assistants (ChatGPT, Perplexity, Claude, Gemini), communities, email and direct, with the exact pages that linked."],
             ["Search Console", "Queries, pages, countries and devices with clicks, impressions, CTR and position, plus a Google-style chart and compare-to-previous-period."],
@@ -119,7 +120,7 @@ export default function AnalyticsDashboardPage() {
         <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {[
             ["Data sources", "GA4 Data and Admin APIs, and the Search Console API, through a read-only Google service account."],
-            ["Build", "A GitHub Actions workflow runs a dependency-free Node script every two hours, then builds the Next.js app and deploys it."],
+            ["Build", "A GitHub Actions workflow builds and deploys the app every two hours. It makes no Google Analytics or Search Console calls: those results are saved in the Worker's database and refreshed only from the Refresh button, one screen and one site at a time."],
             ["Hosting", "GitHub Pages on analytics.streamerosai.com. Only aggregate numbers are published; the Google key stays in repository secrets."],
             ["Live layer", "One Cloudflare Worker (free plan) that holds the key as a secret, answers only the dashboard's own origin, and caches for 45 seconds to 15 minutes."],
             ["Front end", "Next.js (static export), TypeScript and Tailwind. Every card loads its own data and shows its own skeleton. Charts are SVG drawn at the real width, so text stays readable on phones."],
@@ -165,6 +166,16 @@ window.gaEvent = function (name, p) {
 };`}</code>
             </pre>
 
+            <h4>The day Google said no</h4>
+            <p>
+              In November 2026 every Google Analytics number on the page went blank. The build
+              was pulling about 180 reports every two hours, a slow day made it retry, and the
+              failed retries used up an hourly error allowance that Google applies to each
+              project. The answer was not a bigger retry loop. The Worker now saves each good
+              result in its key-value store, opening the page only reads that saved copy, and a
+              refresh asks Google for just the reports the current screen shows, for one site.
+              When Google refuses, the last good numbers stay on screen with their age.
+            </p>
             <h4>Two copies of the data, one block at a time</h4>
             <p>
               The Action publishes the data every two hours, so the page can draw something
@@ -216,7 +227,7 @@ function applyLive(file: string, j: unknown) {
               <li>
                 <strong>Google&apos;s tag checker could not find the tag.</strong> It was injected with
                 JavaScript after the page loaded. A plain script tag in the page head fixed it on
-                all five sites.
+                every site.
               </li>
               <li>
                 <strong>Old links lost their tracking.</strong> Redirect pages from earlier site moves

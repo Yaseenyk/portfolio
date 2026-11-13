@@ -3,6 +3,7 @@ import { SITE_URL } from "@/lib/site";
 import { getAllPosts } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
 import { PRODUCTS } from "@/lib/products";
+import { studies } from "@/lib/work";
 import { routeDate } from "@/lib/lastmod";
 import { getLiveUseCases } from "@/lib/usecases";
 
@@ -94,6 +95,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...PRODUCTS.map((p) => ({
       url: `${SITE_URL}/products/${p.slug}/`,
       lastModified: routeDate("src/app/products/${p.slug}", lastBlogUpdate),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    // Case studies generated from lib/work.ts (products that had no hand-written page).
+    ...studies().map((w) => ({
+      url: `${SITE_URL}/products/${w.slug}/`,
+      lastModified: routeDate("src/lib/work.ts", lastBlogUpdate),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),

@@ -26,6 +26,8 @@ export interface ProductMeta {
   repoUrl?: string;
   /** Optional live deployment. */
   liveUrl?: string;
+  /** Real screenshots in public/shots/: desktop ids (1280x800, with a -sm copy) and phone ids (520x1125). */
+  shots?: { desktop?: string[]; phone?: string[] };
   /** Installable builds and demos, shown as buttons on the product page. */
   downloads?: { label: string; url: string; note: string }[];
 }
@@ -49,6 +51,7 @@ export const PRODUCTS: ProductMeta[] = [
     // The app repo is private; this is the public marketing site.
     repoUrl: "https://github.com/Yaseenyk/spotai-website",
     liveUrl: "https://spotai.streamerosai.com/",
+    shots: { desktop: ["spotai"], phone: ["spotai-app-m", "spotai-m"] },
     downloads: [
       {
         label: "Android app",
@@ -82,7 +85,9 @@ export const PRODUCTS: ProductMeta[] = [
       "Postgres + pgvector",
       "React + TypeScript",
     ],
-    // Source is private; the page links nothing rather than a 404.
+    // Source is private; the page links the live site, not a repository that would 404.
+    liveUrl: "https://fitrank.streamerosai.com/",
+    shots: { desktop: ["fitrank"], phone: ["fitrank-m"] },
   },
   {
     slug: "sable",
@@ -115,6 +120,7 @@ export const PRODUCTS: ProductMeta[] = [
     // mirror was the only address this site ever pointed at, so the canonical
     // one got none of the association.
     liveUrl: "https://streamerosai.com",
+    shots: { desktop: ["streameros"], phone: ["streameros-m"] },
   },
   {
     slug: "linkedin-pipeline",
@@ -140,9 +146,9 @@ export const PRODUCTS: ProductMeta[] = [
     slug: "analytics-dashboard",
     name: "Analytics Dashboard",
     category: "Dashboard · Analytics",
-    tagline: "One page for Google Analytics and Search Console across five sites",
+    tagline: "One page for Google Analytics and Search Console across twelve sites",
     summary:
-      "A tracking and reporting system for my five sites: one GA4 property with five streams, tagged events for clicks and leads, first-touch attribution on every lead, and a dashboard that shows traffic, sources (search, social, AI assistants), Search Console queries and live visitors. A GitHub Action builds the data every two hours, and a free Cloudflare Worker fetches live numbers when the page opens.",
+      "A tracking and reporting system for my twelve sites: one GA4 property with a stream per site, tagged events for clicks and leads, first-touch attribution on every lead, and a dashboard that shows traffic, sources (search, social, AI assistants), Search Console queries and live visitors. A GitHub Action builds the data every two hours, and a free Cloudflare Worker fetches live numbers when the page opens.",
     tech: [
       "GA4 Data API",
       "Search Console API",
@@ -153,6 +159,7 @@ export const PRODUCTS: ProductMeta[] = [
     ],
     repoUrl: "https://github.com/Yaseenyk/analytics-dashboard",
     liveUrl: "https://analytics.streamerosai.com/",
+    shots: { desktop: ["analytics"], phone: ["analytics-m"] },
   },
 ];
 

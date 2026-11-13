@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { m as motion, AnimatePresence, useInView } from "framer-motion";
 import { useHydrated } from "@/lib/useHydrated";
 import type { ComponentType } from "react";
+import Image from "next/image";
 import OnScreen from "./OnScreen";
 import PulseDot from "./PulseDot";
 import { GithubIcon, ExternalLinkIcon } from "./Icons";
@@ -39,7 +40,10 @@ export interface Project {
   roi?: string;
   metrics: string[];
   tech: string[];
-  Animation: ComponentType;
+  /** A diagram, used when there is no real screenshot. */
+  Animation?: ComponentType;
+  /** A real screenshot of the live thing (public/shots/<id>.webp, 1280x800). Shown instead of the diagram. */
+  shot?: string;
   /** Optional expandable visual rendered below the card (e.g. ShadowDocs). */
   Supplement?: ComponentType;
   links?: ProjectLink[];
@@ -49,6 +53,8 @@ export interface Project {
 // should meet the strongest work, not all of it. The rest of the entries
 // below are retained as data (deep dives live in /products and the blog).
 const FLAGSHIP_NAMES = new Set([
+  "Esports Hub",
+  "SpotAI",
   "FitRank",
   "streamerOS",
   "Sable",
@@ -63,7 +69,38 @@ export function projectAnchor(name: string): string {
 
 export const PROJECTS: Project[] = [
   {
+    name: "Esports Hub",
+    shot: "esports",
+    href: "https://esports.streamerosai.com/",
+    category: "Full-Stack Product · Live",
+    description:
+      "A tournament platform for organisers: sign-ups, brackets, points tables, ID cards, live TV screens and gate check-in, with 14 free tools that need no account. Google sign-in is verified against Google's public keys, email is confirmed before first use, and organisations have roles. Built with Claude Code, reviewed and tested by me.",
+    roi: "About 640 browser tests on desktop and phone, and about 600 API tests, on every push",
+    metrics: ["14 Free Tools", "Google Sign-In", "Orgs and Roles"],
+    tech: ["Next.js 14", "React", "TypeScript", "Hono", "Cloudflare Workers", "D1 (SQL)", "Playwright"],
+    links: [
+      { href: "https://esports.streamerosai.com/", label: "Live site", icon: "external" },
+      { href: "https://github.com/Yaseenyk/esports-frontend", label: "Frontend", icon: "github" },
+      { href: "https://github.com/Yaseenyk/esports-backend", label: "API", icon: "github" },
+    ],
+  },
+  {
+    name: "SpotAI",
+    shot: "spotai",
+    href: "/products/spotai/",
+    category: "Flagship · Mobile + Web",
+    description:
+      "An AI gym app for Indian gyms with two sides. Members get a squat coach that runs on the phone camera and never uploads a frame, a workout log and a diet plan built from Indian dishes. Owners get live arrivals with dues flagged, UPI payments and a trainer console that reviews the AI's tips.",
+    roi: "No video leaves the phone · each gym's data is walled off · 190 API tests",
+    metrics: ["On-Device AI", "Row-Level Security", "190 API Tests"],
+    tech: ["Vue 3", "Capacitor", "NestJS", "PostgreSQL", "MediaPipe"],
+    links: [
+      { href: "https://spotai.streamerosai.com/", label: "Live site", icon: "external" },
+    ],
+  },
+  {
     name: "FitRank",
+    shot: "fitrank",
     href: "/products/fitrank/",
     category: "Flagship · Decision Model",
     description:
@@ -75,6 +112,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "streamerOS",
+    shot: "streameros",
     href: "/products/streameros/",
     category: "Flagship · Desktop Cockpit",
     description:
@@ -84,7 +122,7 @@ export const PROJECTS: Project[] = [
     Animation: SystemTelemetry,
     links: [
       {
-        href: "https://yaseenyk.github.io/streamer-os-website/",
+        href: "https://streamerosai.com/",
         label: "Live demo",
         icon: "external",
       },
@@ -97,7 +135,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "streamerOS AI Support Agent",
-    href: "https://yaseenyk.github.io/streamer-os-website/",
+    href: "https://streamerosai.com/",
     category: "RAG · Tier-1 Support",
     description:
       "A Tier-1 support assistant for streamerOS built on a grounded RAG architecture. A Hono router on Cloudflare Workers embeds the product knowledge base into Upstash Vector, retrieves the relevant passages per question, and streams a gemini-flash answer constrained strictly to that context — refusing anything out of scope.",
@@ -107,7 +145,7 @@ export const PROJECTS: Project[] = [
     Supplement: SupportAgentDocs,
     links: [
       {
-        href: "https://yaseenyk.github.io/streamer-os-website/",
+        href: "https://streamerosai.com/",
         label: "Live demo",
         icon: "external",
       },
@@ -169,6 +207,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "Path Saathi LMS",
+    shot: "pathsaathi",
     href: "https://devlms.pathsaathi.in/login",
     category: "Client Delivery · EdTech",
     description:
@@ -187,6 +226,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "AISA — Student Association Platform",
+    shot: "aisa",
     href: "https://yaseenyk.github.io/SIT-FE/",
     category: "Full-Stack · Campus Platform",
     description:
@@ -249,6 +289,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "Analytics Dashboard",
+    shot: "analytics",
     href: "/products/analytics-dashboard/",
     category: "Dashboard · Analytics",
     description:
@@ -280,6 +321,7 @@ export const PROJECTS: Project[] = [
   },
   {
     name: "IntegrateX",
+    shot: "integratex",
     href: "/sandbox/",
     category: "Workflow Automation",
     description:
@@ -463,9 +505,13 @@ function ProjectRow({ project }: { project: Project }) {
           Stacked (below lg) it has no sibling to match, so it keeps an explicit ratio.
         */}
         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-zinc-800 bg-ink/40 lg:aspect-auto lg:h-full lg:min-h-[300px]">
-          <OnScreen>
-            <Animation />
-          </OnScreen>
+          {project.shot ? (
+            <Image src={`/shots/${project.shot}.webp`} alt={`${project.name}, live screenshot`} width={1280} height={800} loading="lazy" decoding="async" sizes="(min-width: 1024px) 50vw, 100vw" className="h-full w-full object-cover object-top" />
+          ) : Animation ? (
+            <OnScreen>
+              <Animation />
+            </OnScreen>
+          ) : null}
         </div>
       </div>
 

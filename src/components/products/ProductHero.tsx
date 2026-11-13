@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ProductMeta } from "@/lib/products";
 import RepoButton from "@/components/products/RepoButton";
 import { ExternalLinkIcon } from "@/components/Icons";
+import ProductShots from "@/components/products/ProductShots";
 
 /** Shared deep-dive header: breadcrumb, title, repo/live CTAs, and inline art. */
 export default function ProductHero({
@@ -53,7 +54,7 @@ export default function ProductHero({
                 className="inline-flex items-center gap-2 rounded-xl border border-zinc-800 px-5 py-2.5 text-sm font-semibold text-zinc-200 transition-colors duration-200 hover:border-ice/40 hover:text-ice"
               >
                 <ExternalLinkIcon className="h-[18px] w-[18px]" />
-                Live demo
+                Visit the live site
               </a>
             )}
           </div>
@@ -97,6 +98,8 @@ export default function ProductHero({
           {art}
         </div>
       </div>
+
+      <ProductShots product={product} />
     </header>
   );
 }

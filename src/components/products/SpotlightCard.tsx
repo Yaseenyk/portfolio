@@ -1,5 +1,6 @@
 "use client";
 
+import { ShotImage } from "@/components/home/Shots";
 import type { CSSProperties } from "react";
 import { useRef } from "react";
 import { useHydrated } from "@/lib/useHydrated";
@@ -102,6 +103,10 @@ export default function SpotlightCard({
           </span>
           <span className="h-1.5 w-1.5 rounded-full bg-ice shadow-[0_0_6px_1px_rgba(103,232,249,0.7)]" />
         </div>
+
+        {product.shots?.desktop?.[0] && (
+          <ShotImage id={product.shots.desktop[0]} alt={`${product.name}, live screenshot`} className="mt-5" />
+        )}
 
         <h3 className="mt-5 text-xl font-semibold tracking-tight text-zinc-50 transition-colors duration-200 group-hover:text-cyan">
           {product.name}

@@ -133,8 +133,8 @@ const PROOFS: Proof[] = [
 ];
 
 const ALSO: [string, string, string][] = [
-  ["Esports Hub", "Tournament platform: sign-ups, brackets, ID cards and live screens. About 640 browser tests.", "https://esports.streamerosai.com"],
-  ["Path Saathi LMS", "Client project. A working learning platform was live one day after the brief.", "/projects/"],
+  ["Esports Hub", "Tournament platform: sign-ups, brackets, ID cards and live screens. About 640 browser tests.", "/products/esports-hub/"],
+  ["Path Saathi LMS", "Client project. A working learning platform was live one day after the brief.", "/projects/#path-saathi"],
   ["Sable", "AI finance agent. The model proposes, and only a person can commit a change.", "/products/sable/"],
   ["Analytics dashboard", "Google Analytics and Search Console for all my sites on one page.", "https://analytics.streamerosai.com"],
 ];
