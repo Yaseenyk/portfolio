@@ -1,457 +1,177 @@
 // scripts/generate-resume.js
 //
-// Every number and link in this file was verified against the repo, the live
-// site, or GitHub on 2026-10-21. Private repositories get no "Code" link —
-// a 404 on a résumé costs more than the link is worth. Metrics that could not
-// be verified (the old CMZ / Hospital-API / TV-suite percentages) are left out.
+// Main résumé: two pages, single column, plain headings, aimed at "Senior Full-Stack AI Engineer (MERN)". Page 1 is what a recruiter
+// reads in seven seconds (title, summary, skills, the three jobs); page 2 is proof (projects) and education.
+//
+// Every fact here is on the previous résumé (verified against the repo, the live site and GitHub on 2026-10-21) or on the live site.
+// Nothing new is claimed. Private repositories get no "Code" link, and numbers that could not be verified are left out.
+// The skills order follows what 71 live MERN-plus-AI postings asked for most on 2026-11-13 (system design, REST, React, testing,
+// TypeScript, Python, CI/CD), but only skills that are true are listed: no cloud-provider, code-review or mentoring claims.
+// A one-page plain version for application portals is scripts/generate-resume-ats.js.
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
 const SITE = 'https://yk.streamerosai.com';
 const GH = 'https://github.com/Yaseenyk';
-const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
+const a = (url, label) => `<a href="${url}">${label}</a>`;
+
+const SKILLS = [
+  ['MERN and web', 'MongoDB, Express, React, Node.js, TypeScript, JavaScript (ES2023), Next.js, Redux Toolkit, Zustand, REST APIs, WebSockets, JWT auth, Tailwind CSS, HTML and CSS'],
+  ['AI engineering', 'LLM integration (OpenAI, Gemini, Claude APIs), RAG, embeddings and vector search (pgvector, Vectorize, Upstash Vector), function calling, agents, MCP servers, prompt engineering, LLM evals, fine-tuning and distillation (PyTorch), Ollama'],
+  ['Backend and data', 'Python and FastAPI, NestJS, Java and Spring Boot, ASP.NET, PostgreSQL, SQL Server, Redis, SQLite, Firestore'],
+  ['Delivery', 'System design, unit and integration testing, Git, GitHub Actions CI/CD, Docker, Cloudflare Workers, Agile delivery'],
+];
+
+const JOBS = [
+  {
+    title: 'Senior Software Developer', org: 'Sparity', meta: 'Hyderabad · Hybrid', dates: '06/2025 – Present',
+    bullets: [
+      'Own the LLM and agent layer of production MERN systems end to end: architecture, orchestration and deployment.',
+      'Build agentic RAG services with schema-validated outputs, guardrails and cost-aware routing between models; build MCP servers.',
+    ],
+    stack: 'Node.js, React, TypeScript, MongoDB, LLM APIs, RAG, MCP',
+  },
+  {
+    title: 'Full Stack Developer', org: 'MSA Software', meta: 'Remote', dates: '01/2023 – 05/2025',
+    bullets: [
+      'Cut dashboard response times 1.5 to 2x by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.',
+      'Moved the team’s legacy JavaScript to TypeScript and Next.js, removing a class of type-related production bugs.',
+      'Migrated shared state from hand-rolled Redux to Redux Toolkit slices.',
+    ],
+    stack: 'React, Node.js, TypeScript, Next.js, MongoDB, Redux Toolkit',
+  },
+  {
+    title: 'Software Developer (SDE 1)', org: 'Manorama Infosolutions', meta: 'Healthcare software · Remote', dates: '09/2021 – 01/2023',
+    bullets: [
+      'Built REST routing layers for hospital information systems on ASP.NET and React; 2x payload throughput on the hot paths.',
+      'Moved tangled request handling into MVC and hardened it for concurrent user sessions.',
+    ],
+    stack: 'ASP.NET, MVC, React, REST APIs',
+  },
+];
+
+const PROJECTS = [
+  {
+    name: 'Portfolio Concierge', what: 'Grounded RAG API and public MCP server', stack: 'Cloudflare Workers, Vectorize, Workers AI, MCP, TypeScript',
+    text: 'Answers questions about my work from a vector index of this site and refuses to answer below a similarity threshold instead of guessing. A public MCP server exposes search, products and availability tools, so a recruiter can interview this résumé from inside Claude. The index rebuilds automatically after every deploy.',
+    links: [a(`${SITE}/#rag-concierge`, 'Try it'), a(`${GH}/portfolio/tree/main/worker`, 'Code')],
+  },
+  {
+    name: 'IntegrateX', what: 'Workflow automation engine', stack: 'React Flow, Zustand, TypeScript, MongoDB',
+    text: 'A node-based workflow canvas. The first design stored the React Flow render model; a custom serialization adapter separates the view from the stored record and cut payloads by 94%, round-trip lossless. Runs live in the browser.',
+    links: [a(`${SITE}/sandbox/`, 'Live sandbox'), a(`${SITE}/blog/94-percent-payload-reduction-react-flow/`, 'Write-up')],
+  },
+  {
+    name: 'SpotAI', what: 'AI gym app for Indian gyms, members and owners in one app', stack: 'Vue 3, Capacitor, NestJS, PostgreSQL, MediaPipe, NATS',
+    text: 'Squat form check runs on the phone: frames never leave it, only rep counts and flags reach the API. Row-level security per gym, tested with two gyms side by side. 190 API tests and browser tests with accessibility checks on every screen.',
+    links: [a('https://spotai.streamerosai.com/#download', 'Android and iPhone apps'), a(`${SITE}/products/spotai/`, 'Case study')],
+  },
+  {
+    name: 'FitRank', what: 'Typed AI decisions for staffing', stack: 'FastAPI, PostgreSQL and pgvector, PyTorch, React, Docker',
+    text: 'A 23M-parameter MiniLM model, distilled from a 9B teacher, returns a probability for every option; a manager makes every final call. Against a rules-only baseline on 35 held-out tasks: hit@5 94% vs 91%, and hit@1 54% vs 74%, which is why it shortlists rather than assigns. 93.5% backend test coverage, GitHub Actions CI.',
+    links: [a('https://fitrank.streamerosai.com', 'Live'), a(`${SITE}/products/fitrank/`, 'Case study')],
+  },
+  {
+    name: 'Sable', what: 'Local-first AI finance agent', stack: 'React Native (Expo), SQLite, OpenAI function calling, TypeScript',
+    text: 'The model proposes and only a person commits: every database change appears as a Review and Confirm card. All financial data stays on the device, with no cloud backend.',
+    links: [a(`${SITE}/products/sable/`, 'Case study')],
+  },
+  {
+    name: 'Path Saathi LMS', what: 'Client project, free vocational-skilling platform', stack: 'Next.js, React, Tailwind CSS, TypeScript',
+    text: 'The brief and an MVP sketch arrived on a Monday; auth, course delivery for the client’s videos and PDFs, and a self-paced flow were live on the dev environment the next day.',
+    links: [a('https://devlms.pathsaathi.in/login', 'Live (dev)')],
+  },
+  {
+    name: 'streamerOS', what: 'Rust and Tauri 2 streaming cockpit, built with Claude Code', stack: 'Rust, Tauri 2, OBS WebSocket, Next.js, Hono, Upstash Vector',
+    text: '187 commits since May 2026, 306 Rust tests, reviewed and tested by me. The Next.js site and its support agent (Hono on Cloudflare Workers, Upstash Vector, Gemini) are public; the app repository is private. Launching November 2026.',
+    links: [a('https://streamerosai.com', 'Website'), a(`${GH}/streamer-os-website`, 'Site and agent source')],
+  },
+];
+
+const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Yaseen Khatib - Senior Full-Stack AI Engineer (MERN)</title>
+<style>
+  @page { size: A4; margin: 12mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 10.1pt; line-height: 1.4; color: #15171c; margin: 0; }
+  a { color: #0b5d70; text-decoration: none; }
+  h1 { font-size: 22pt; line-height: 1.05; margin: 0; letter-spacing: 0.2px; color: #0b2f3a; }
+  .title { font-size: 11pt; font-weight: 700; color: #0b5d70; margin: 3px 0 4px; }
+  .contact { font-size: 9.2pt; color: #2a2f38; line-height: 1.5; }
+  .contact span { white-space: nowrap; }
+  .open { margin-top: 5px; font-size: 9.2pt; color: #2a2f38; }
+  h2 { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #0b2f3a; border-bottom: 1.2px solid #0b5d70; margin: 13px 0 6px; padding-bottom: 2px; }
+  p { margin: 0 0 4px; }
+  .skill { margin: 0 0 3px; }
+  .skill b { color: #0b2f3a; }
+  .job { margin-top: 10px; page-break-inside: avoid; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .row .t { font-size: 10.9pt; font-weight: 700; color: #111; }
+  .row .t i { font-style: normal; font-weight: 600; color: #0b5d70; }
+  .dates { white-space: nowrap; font-size: 9.4pt; color: #2a2f38; }
+  .meta { font-size: 9.2pt; color: #4a505b; margin-top: 0; }
+  ul { margin: 3px 0 2px; padding-left: 15px; }
+  li { margin-bottom: 2px; }
+  .stack { font-size: 9.2pt; color: #4a505b; }
+  .stack b { color: #2a2f38; }
+  .proj { margin-top: 9px; page-break-inside: avoid; }
+  .proj .t { font-size: 10.6pt; font-weight: 700; color: #111; }
+  .proj .t span { font-weight: 500; color: #3b414c; }
+  .links { font-size: 9.2pt; white-space: nowrap; }
+  .more { margin-top: 6px; }
+  .page2 { break-before: page; }
+</style></head><body>
+
+<h1>Yaseen Khatib</h1>
+<div class="title">Senior Full-Stack AI Engineer · MERN (MongoDB, Express, React, Node.js) · LLM, RAG and agents</div>
+<div class="contact">
+  <span>Hyderabad, India</span> · <span>${a('mailto:yaseenkhatib04@gmail.com', 'yaseenkhatib04@gmail.com')}</span> · <span>${a('tel:+918208335028', '+91 8208335028')}</span> ·
+  <span>${a('https://www.linkedin.com/in/yaseen-yk', 'linkedin.com/in/yaseen-yk')}</span> · <span>${a(GH, 'github.com/Yaseenyk')}</span> · <span>${a(SITE, 'yk.streamerosai.com')}</span>
+</div>
+<div class="open"><b>Open to:</b> senior full-stack, GenAI and forward-deployed roles · remote, hybrid or Hyderabad · fixed-price builds</div>
+
+<h2>Summary</h2>
+<p>Senior full-stack developer on the MERN stack with TypeScript and Next.js, five years shipping production web systems: hospital information systems, analytics dashboards and, since 2025, the AI layer of production MERN systems at Sparity. I build the parts around the model that make AI usable: RAG pipelines, function-calling agents where a person approves every change, MCP servers, evals, and cost-aware routing between models. Cut dashboard response times 1.5 to 2x by profiling MongoDB aggregation pipelines; moved a team from JavaScript to TypeScript and Next.js. Six products shipped solo, each live and open, and a client learning platform live one day after the brief.</p>
+
+<h2>Skills</h2>
+${SKILLS.map(([k, v]) => `<p class="skill"><b>${k}:</b> ${v}</p>`).join('\n')}
+
+<h2>Experience</h2>
+${JOBS.map((j) => `<div class="job">
+  <div class="row"><div class="t">${j.title}, <i>${j.org}</i></div><div class="dates">${j.dates}</div></div>
+  <div class="meta">${j.meta}</div>
+  <ul>${j.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>
+  <div class="stack"><b>Stack:</b> ${j.stack}</div>
+</div>`).join('\n')}
+
+<div class="page2"></div>
+<h2 style="margin-top:0">Selected projects</h2>
+<p style="font-size:9.2pt;color:#4a505b">Built and shipped solo unless marked client. Links checked on 13 Nov 2026.</p>
+${PROJECTS.map((p) => `<div class="proj">
+  <div class="row"><div class="t">${p.name} <span>· ${p.what}</span></div><div class="links">${p.links.join(' · ')}</div></div>
+  <p style="margin:1px 0 1px">${p.text}</p>
+  <div class="stack"><b>Stack:</b> ${p.stack}</div>
+</div>`).join('\n')}
+<p class="more"><b>Also:</b> ShelfSight AI, retail vision on FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). AISA, a student platform rebuilt from a single 4,019-line HTML file with an exposed Firebase key into Next.js and Spring Boot, 29 tests (${a('https://yaseenyk.github.io/SIT-FE/', 'live')}).</p>
+
+<h2>Open source and writing</h2>
+<p>Public code at ${a(GH, 'github.com/Yaseenyk')}, including this portfolio, its RAG and MCP worker and the content pipelines. Engineering write-ups at ${a(`${SITE}/blog/`, 'yk.streamerosai.com/blog')} and ${a('https://dev.to/yaseenyk04', 'dev.to/yaseenyk04')}.</p>
+
+<h2>Education</h2>
+<p><b>B.E. Computer Science</b>, D. Y. Patil College of Engineering, 2021 · <b>Diploma, Computer Science</b>, D. Y. Patil Polytechnic, 2018<br>
+Certifications (Coding Ninjas): Front End Architecture, React Production Development, Advanced Backend Systems</p>
+</body></html>`;
 
 (async () => {
   try {
-    console.log('Generating 3-page résumé…');
+    console.log('Generating 2-page résumé…');
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-
-    // Page 1 strip: the four pieces of work a reader must meet in the first
-    // seven seconds. One hard fact each; the full write-ups live on page 2.
-    const HIGHLIGHTS = [
-      {
-        name: 'SpotAI',
-        kicker: 'Mobile + Web · On-device AI',
-        fact: 'AI gym buddy for Indian gyms. Squat form check runs on the phone, frames never uploaded; members and staff in one app, Indian diet plans. Row-level security per gym, 190 API tests.',
-        link: { label: 'Site · Android and iPhone apps', url: 'https://spotai.streamerosai.com/#download' },
-      },
-      {
-        name: 'FitRank',
-        kicker: 'Applied ML · Live',
-        fact: '23M MiniLM student distilled from a 9B teacher. Beats a rules-only baseline on hit@5 and pairwise ordering, served on CPU at $0 per decision.',
-        link: { label: 'fitrank.streamerosai.com', url: 'https://fitrank.streamerosai.com' },
-      },
-      {
-        name: 'streamerOS',
-        kicker: 'Desktop · Rust',
-        fact: 'Rust + Tauri 2 desktop cockpit for streamers, written with Claude Code. 24k lines of Rust, 306 Rust tests, OBS automation, local LLM. Launching November 2026.',
-        link: { label: 'streamerosai.com', url: 'https://streamerosai.com' },
-      },
-    ];
-
-    // Page 2: products designed, built and shipped solo.
-    const PRODUCTS = [
-      {
-        name: 'SpotAI',
-        sub: 'AI gym buddy for Indian gyms',
-        badge: 'Mobile + Web · On-device AI',
-        desc:
-          'One product, two sides. Members get a squat coach that runs MediaPipe pose on the phone and sends only rep counts and per-rep flags to the API, never a frame, plus a workout log, an opt-in gym leaderboard and buddy matching. Owners get live arrivals with dues flagged, UPI payments, busy hours and a trainer console that reviews every AI tip. Each purpose is a separate consent with its notice version stored.',
-        proof:
-          'One Vue 3 + Capacitor app for members and staff, NestJS on PostgreSQL with <b>row-level security per gym</b> (two gyms asserted side by side in tests), NATS outbox, model gateway with identity redaction. <b>190 API tests</b>, browser tests with WCAG AA checks on every screen.',
-        tags: ['Vue 3 · Capacitor', 'NestJS', 'PostgreSQL RLS', 'MediaPipe', 'NATS', 'Astro + GSAP'],
-        links: [
-          { label: 'Android app', url: 'https://spotai.streamerosai.com/downloads/spotai-demo.apk' },
-          { label: 'iPhone app', url: 'https://spotai.streamerosai.com/demo/' },
-          { label: 'Case study', url: `${SITE}/products/spotai/` },
-        ],
-      },
-      {
-        name: 'FitRank',
-        sub: 'Typed AI decisions for staffing',
-        badge: 'Applied ML · Live',
-        desc:
-          'Ranks people for open tasks with typed decisions instead of a chatbot\'s opinion. Code applies the hard rules; a 23M-parameter MiniLM-L6 student with five linear heads, distilled from Qwen3.5-9B with a KL loss against the teacher\'s full distributions, returns a probability for every option; thresholds band each person shortlist / review / hidden, and a manager makes every final call. Managers\' accepts and rejects become the next model\'s training data.',
-        proof:
-          'Evaluated against a code-only baseline on every release (35 held-out tasks, synthetic data): <b>hit@5 94% vs 91%</b>, <b>pairwise 0.88 vs 0.86</b>, NDCG@10 0.89 vs 0.89, and <b>hit@1 54% vs 74%</b>, which is why it shortlists rather than assigns. FastAPI router → service → repository, Postgres + pgvector, Alembic, JWT + refresh-cookie auth with roles, rate limits, a budget guard, Docker, GitHub Actions CI, <b>93.5% backend test coverage</b>.',
-        tags: ['Knowledge Distillation', 'MiniLM / PyTorch', 'FastAPI', 'Postgres + pgvector', 'React + TypeScript', 'Docker · CI'],
-        links: [
-          { label: 'Live', url: 'https://fitrank.streamerosai.com' },
-          { label: 'Case study', url: `${SITE}/products/fitrank/` },
-        ],
-      },
-      {
-        name: 'streamerOS',
-        sub: 'Local-first streaming cockpit',
-        badge: 'Desktop · Rust',
-        desc:
-          'A Rust + Tauri 2 desktop app for Twitch and YouTube streamers. Chat is read locally, velocity and sentiment are scored in Rust off the UI thread against the channel\'s own baseline, and scene automation drives OBS over WebSocket v5. No account, no cloud; pull the network cable and it keeps working. Rust-core-to-webview IPC is batched MessagePack rather than per-event JSON; the assistant runs on Ollama at 127.0.0.1.',
-        proof:
-          'Rust written with Claude Code, reviewed and tested by me. <b>187 commits</b> since May 2026, 70 Rust files / <b>24,292 lines of Rust</b>, 42,733 lines of TypeScript, <b>306 Rust tests</b>. The app repository is private; the marketing site and its Tier-1 support agent (a Hono router on Cloudflare Workers that embeds the product docs into Upstash Vector and streams a gemini-flash answer constrained to that context) are public.',
-        tags: ['Rust', 'Tauri 2', 'OBS WebSocket v5', 'MessagePack IPC', 'Ollama', 'Next.js'],
-        links: [
-          { label: 'Website', url: 'https://streamerosai.com' },
-          { label: 'Case study', url: `${SITE}/products/streameros/` },
-          { label: 'Site + agent source', url: `${GH}/streamer-os-website` },
-        ],
-      },
-      {
-        name: 'Portfolio Concierge',
-        sub: 'Grounded RAG API + MCP server',
-        badge: 'AI Infrastructure · Live',
-        desc:
-          'One zero-dependency Cloudflare Worker, two interfaces. A grounded RAG API answers questions about my work from a Vectorize index of the site\'s 80-document corpus (34 articles, 46 project pages) and refuses below a similarity threshold rather than guess. A public MCP server exposes search_portfolio, get_products and get_availability, so any recruiter can add the URL to Claude and interview this résumé from inside their own AI. The corpus re-embeds automatically after every deploy.',
-        tags: ['Cloudflare Workers', 'Vectorize', 'Workers AI', 'MCP', 'Grounded RAG', 'TypeScript'],
-        links: [
-          { label: 'Try it', url: `${SITE}/#rag-concierge` },
-          { label: 'MCP', url: MCP },
-          { label: 'Code', url: `${GH}/portfolio/tree/main/worker` },
-        ],
-      },
-      {
-        name: 'IntegrateX',
-        sub: 'Workflow automation engine',
-        badge: 'React Flow · Live Sandbox',
-        desc:
-          'A node-based workflow canvas (triggers, processing layers, directional edge bindings) backed by a Zustand store. The naive design stored the React Flow render model; a custom Serialization Adapter separates the view from the transport record and cut stored payloads by <b>94%</b>, round-trip lossless. The architecture runs live in the browser: drag nodes, rewire the graph, watch the serialization bench.',
-        tags: ['React Flow', 'Zustand', 'TypeScript', 'Serialization Adapter', 'MongoDB'],
-        links: [
-          { label: 'Live sandbox', url: `${SITE}/sandbox/` },
-          { label: 'Write-up', url: `${SITE}/blog/94-percent-payload-reduction-react-flow/` },
-        ],
-      },
-      {
-        name: 'Sable',
-        sub: 'Local-first AI financial agent',
-        badge: 'Mobile · AI Agent',
-        desc:
-          'A React Native / Expo personal-finance agent where the model is structurally incapable of touching the money. 100% of financial data stays on-device in SQLite with no cloud backend; an OpenAI function-calling agent tracks peer-to-peer debts and pushes proactive briefings, and every database mutation renders as a Review & Confirm card: it proposes, only a human commits. Bank-SMS ingestion uses the Adapter pattern with a p-queue serialising SQLite writes.',
-        tags: ['React Native / Expo', 'SQLite', 'OpenAI Function Calling', 'Local RAG', 'TypeScript'],
-        links: [{ label: 'Case study', url: `${SITE}/products/sable/` }],
-      },
-    ];
-
-    // Page 3: applied, client and open-source work with public artefacts.
-    const APPLIED = [
-      {
-        name: 'ShelfSight AI',
-        sub: 'Retail vision for a kirana shop',
-        badge: 'Computer Vision · Open Source',
-        desc:
-          'Four retail vision problems in one on-premise system: phantom stock, planogram compliance, produce freshness and expiry-date OCR. A manager lays out a rack once; after that a photo counts every facing and staff are told which shelf to walk to. Its most useful property is what it refuses to claim: the detector localises products without naming them, so the planogram endpoint returns 409 rather than a score it cannot support. <b>650 tests</b>.',
-        tags: ['FastAPI', 'YOLOv8', 'MobileNetV2', 'Next.js 14', 'Docker', 'Ollama'],
-        links: [
-          { label: 'Backend', url: `${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be` },
-          { label: 'Dashboard', url: `${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence` },
-        ],
-      },
-      {
-        name: 'AISA',
-        sub: 'Student association platform',
-        badge: 'Full-Stack · Live',
-        desc:
-          'Arrived as one 4,019-line HTML file with a live Firebase key in the source and every permission decided in the browser. Rebuilt as a Next.js static export on GitHub Pages and a Spring Boot 3 / Java 25 API on Render, both on Firestore. Firebase Auth answers who you are; the server decides what you may do, the half the original had backwards. Five auth states, <b>29 tests</b>.',
-        tags: ['Next.js', 'Java 25', 'Spring Boot 3', 'Firestore', 'Firebase Auth'],
-        links: [
-          { label: 'Live', url: 'https://yaseenyk.github.io/SIT-FE/' },
-          { label: 'Frontend', url: `${GH}/SIT-FE` },
-          { label: 'Backend', url: `${GH}/SIT-BE` },
-        ],
-      },
-      {
-        name: 'Path Saathi LMS',
-        sub: 'Vocational-skilling platform',
-        badge: 'Client · 1-Day Delivery',
-        desc:
-          'A free vocational-skilling LMS for a client sitting on a library of course videos and PDFs. Brief and MVP sketch arrived on a Monday; a working platform with auth, course delivery and a self-paced flow was live on the dev environment the next day.',
-        tags: ['Next.js', 'React', 'Tailwind', 'TypeScript'],
-        links: [{ label: 'Live (dev)', url: 'https://devlms.pathsaathi.in/login' }],
-      },
-      {
-        name: 'Autonomous Content Machine',
-        sub: 'Three pipelines, zero servers',
-        badge: 'Pipelines · $0 Infra',
-        desc:
-          'Three cooperating pipelines on GitHub Actions, running unattended at no cost: an AI writer that drafts a technical article with a brand-locked cover on Mon/Wed/Fri, commits it and deploys the static site; a LinkedIn agent that turns each post into scheduled, UTM-tracked content Tue–Thu with its state ledger committed to Git; and a nightly DEV.to syndicator that cross-posts with canonical URLs pointing home.',
-        tags: ['GitHub Actions', 'Python', 'Next.js', 'DEV.to API', 'Zero-Cost Infra'],
-        links: [
-          { label: 'Case study', url: `${SITE}/products/ai-blogger/` },
-          { label: 'LinkedIn agent', url: `${GH}/linkedin-bot` },
-        ],
-      },
-    ];
-
-    const WRITING = [
-      {
-        label: 'Engineering blog',
-        stat: '34 articles',
-        text: 'First-person write-ups of the systems above: serialization adapters, grounded RAG, agent tracing with OpenTelemetry, prompt caching, WebSocket telemetry at scale.',
-        link: { label: 'Read the blog', url: `${SITE}/blog/` },
-      },
-      {
-        label: 'DEV.to',
-        stat: '35 articles',
-        text: 'Syndicated automatically every night with canonical URLs pointing home.',
-        link: { label: 'dev.to/yaseenyk04', url: 'https://dev.to/yaseenyk04' },
-      },
-      {
-        label: 'AI Engineering Journey',
-        stat: '16 days · 64 hours',
-        text: 'A curriculum I authored, from embeddings and vector search through RAG, agents, evaluation and fine-tuning to production, as 16 interactive chapters with diagrams and a built-in presentation mode.',
-        link: { label: 'Open the curriculum', url: `${SITE}/final-year-projects/journey/` },
-      },
-      {
-        label: 'Open source',
-        stat: '54 public repos',
-        text: 'Since 2022, including the full source of this portfolio, its RAG/MCP worker, the content pipelines, ShelfSight and AISA.',
-        link: { label: 'github.com/Yaseenyk', url: GH },
-      },
-    ];
-
-    // Every term here is backed by something in the repos or the roles above —
-    // these are the keywords an ATS matches on, so they are spelled the way
-    // job descriptions spell them.
-    const SKILLS = [
-      ['Frontend', ['React', 'Next.js', 'TypeScript', 'JavaScript (ES2023)', 'Redux Toolkit', 'Zustand', 'React Flow', 'React Native / Expo', 'Tailwind CSS', 'HTML / CSS']],
-      ['Backend', ['Node.js', 'Express', 'REST APIs', 'WebSockets', 'JWT auth', 'Python / FastAPI', 'Java / Spring Boot', 'ASP.NET']],
-      ['Databases', ['MongoDB', 'PostgreSQL', 'SQL Server', 'SQLite', 'Redis', 'Firestore', 'pgvector']],
-      ['AI engineering', ['LLM integration', 'RAG', 'Embeddings & vector search', 'Function calling', 'Agentic workflows', 'MCP', 'Prompt engineering', 'Fine-tuning / distillation', 'LLM evals', 'OpenAI · Gemini · Claude APIs', 'PyTorch', 'Ollama']],
-      ['Tools & delivery', ['Git', 'GitHub Actions', 'CI/CD', 'Docker', 'Cloudflare Workers', 'Unit & integration testing', 'System design', 'Agile delivery', 'Rust / Tauri 2 (using Claude Code)']],
-    ];
-
-    const EXPERIENCE = [
-      {
-        role: 'Senior Software Developer',
-        company: 'Sparity',
-        where: 'Hyderabad · Hybrid',
-        period: '06/2025 – Present',
-        bullets: [
-          'Own the <b>LLM and agentic layer</b> of production MERN systems end to end: architecture, orchestration, deployment.',
-          'Ship <b>Agentic RAG services</b> with schema-validated outputs, guardrails, and cost-aware routing between models.',
-        ],
-      },
-      {
-        role: 'Full Stack Developer',
-        company: 'MSA Software',
-        where: 'Remote',
-        period: '01/2023 – 05/2025',
-        bullets: [
-          'Cut dashboard response times <b>1.5–2x</b> by profiling slow MongoDB aggregation pipelines, adding a caching layer, and lazy-loading heavy panels.',
-          'Moved the team\'s legacy JavaScript to <b>TypeScript and Next.js</b>, removing a whole class of type-related production bugs.',
-          'Migrated shared state from hand-rolled Redux to <b>Redux Toolkit slices</b>.',
-        ],
-      },
-      {
-        role: 'Software Developer (SDE 1)',
-        company: 'Manorama Infosolutions',
-        where: 'Healthcare software · Remote',
-        period: '09/2021 – 01/2023',
-        bullets: [
-          'Built REST routing layers for hospital information systems on <b>ASP.NET + React</b>; <b>2x</b> payload throughput on the hot paths.',
-          'Moved tangled request handling into MVC and hardened it for concurrent user sessions.',
-        ],
-      },
-    ];
-
-    // ---- rendering helpers -------------------------------------------------
-    const ICON = {
-      mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
-      phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z"/></svg>',
-      linkedin: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5a2.5 2.5 0 0 1-.02-5zM3 9h4v12H3zM10 9h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.4c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9V21h-4z"/></svg>',
-      github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.9 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>',
-      globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
-      pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-    };
-    const contact = (icon, label, url, accent) =>
-      `<span class="inline-flex items-center gap-1.5 ${accent ? 'text-[#7F1D3A]' : 'text-stone-600'}"><span class="w-[11px] h-[11px] text-stone-400">${ICON[icon]}</span>${url ? `<a href="${url}">${label}</a>` : label}</span>`;
-
-    const a = (l) => `<a href="${l.url}" class="text-[#7F1D3A] font-semibold whitespace-nowrap">${l.label}&nbsp;↗</a>`;
-    const pill = (t) =>
-      `<span class="inline-block bg-stone-100 text-stone-700 border border-stone-200 px-1.5 py-[1px] rounded text-[9px] font-medium leading-[1.5]">${t}</span>`;
-    const h2 = (t, extra = '') =>
-      `<div class="flex items-center gap-2.5 mb-3"><span class="w-1.5 h-1.5 rounded-sm bg-[#7F1D3A]"></span><h2 class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-800">${t}</h2>${extra ? `<span class="text-[9.5px] text-stone-400">${extra}</span>` : ''}<span class="flex-1 h-px bg-stone-200"></span></div>`;
-    const badge = (t) =>
-      `<span class="text-[9px] font-semibold text-[#7F1D3A] bg-[#FBF3F5] border border-[#EED3DA] px-2 py-[2px] rounded-full whitespace-nowrap">${t}</span>`;
-
-    const card = (p) => `
-      <div class="break-inside-avoid rounded-lg border border-stone-200 bg-white px-4 py-2.5 border-l-[3px] border-l-[#7F1D3A]">
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <h3 class="font-bold text-[13px] text-stone-900 leading-tight">${p.name} <span class="font-normal text-stone-500">· ${p.sub}</span></h3>
-          </div>
-          <div class="flex items-center gap-2 shrink-0">${badge(p.badge)}</div>
-        </div>
-        <p class="text-[10px] text-stone-600 mt-1 leading-[1.45]">${p.desc}</p>
-        ${p.proof ? `<div class="mt-2 rounded-md bg-stone-50 border border-stone-100 px-3 py-1.5 text-[9.5px] text-stone-700 leading-[1.4]"><span class="font-bold uppercase tracking-wider text-[8.5px] text-[#7F1D3A] mr-1.5">Proof</span>${p.proof}</div>` : ''}
-        <div class="flex items-center justify-between gap-4 mt-2">
-          <div class="flex flex-wrap gap-1.5">${p.tags.map(pill).join('')}</div>
-          <div class="text-[9.5px] shrink-0 space-x-3">${p.links.map(a).join('')}</div>
-        </div>
-      </div>`;
-
-    const highlight = (h) => `
-      <div class="rounded-lg border border-stone-200 bg-stone-50/70 px-3.5 py-2">
-        <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12px] text-stone-900">${h.name}</h3>
-          <span class="text-[8.5px] font-semibold uppercase tracking-wider text-[#7F1D3A]">${h.kicker}</span>
-        </div>
-        <p class="text-[10px] text-stone-600 mt-0.5 leading-[1.45]">${h.fact}</p>
-        <p class="text-[9.5px] mt-1">${a(h.link)}</p>
-      </div>`;
-
-    const job = (j, last) => `
-      <div class="relative pl-5 ${last ? '' : 'pb-2.5'}">
-        <span class="absolute left-0 top-[5px] w-[9px] h-[9px] rounded-full bg-white border-2 border-[#7F1D3A]"></span>
-        ${last ? '' : '<span class="absolute left-[4px] top-[14px] bottom-0 w-px bg-stone-200"></span>'}
-        <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12.5px] text-stone-900">${j.role}</h3>
-          <span class="text-[9.5px] font-medium text-stone-500 whitespace-nowrap">${j.period}</span>
-        </div>
-        <p class="text-[10.5px] text-[#7F1D3A] font-semibold">${j.company} <span class="font-normal text-stone-400">· ${j.where}</span></p>
-        <ul class="mt-1 space-y-0.5 text-[10.5px] text-stone-600 leading-[1.45]">${j.bullets.map((b) => `<li class="flex gap-2"><span class="mt-[7px] w-1 h-1 rounded-full bg-stone-400 shrink-0"></span><span>${b}</span></li>`).join('')}</ul>
-      </div>`;
-
-    // One boxed list, a row per group: the ATS reads every term, the human
-    // sees four labelled lines instead of a tag cloud.
-    const skillRow = ([group, items], i) => `
-      <div class="${i ? 'mt-2' : ''}">
-        <div class="flex items-center gap-1.5 mb-0.5"><span class="w-1.5 h-1.5 rounded-sm bg-[#7F1D3A]"></span><span class="text-[9px] font-bold uppercase tracking-[0.14em] text-stone-800">${group}</span></div>
-        <p class="text-[9px] text-stone-700 leading-[1.5]">${items.map((t) => `<span class="whitespace-nowrap">${t}</span>`).join('&nbsp;<span class="text-stone-300">·</span> ')}</p>
-      </div>`;
-
-    const writingCard = (w) => `
-      <div class="rounded-lg border border-stone-200 px-3.5 py-3">
-        <div class="flex items-baseline justify-between gap-3">
-          <h3 class="font-bold text-[12px] text-stone-900">${w.label}</h3>
-          <span class="text-[9px] font-semibold text-[#7F1D3A] bg-[#FBF3F5] border border-[#EED3DA] px-2 py-[2px] rounded-full whitespace-nowrap">${w.stat}</span>
-        </div>
-        <p class="text-[10.5px] text-stone-600 mt-1 leading-[1.5]">${w.text}</p>
-        <p class="text-[9.5px] mt-1.5">${a(w.link)}</p>
-      </div>`;
-
-    const running = (label) => `
-      <div class="flex items-baseline justify-between border-b border-stone-200 pb-2 mb-4">
-        <span class="text-[13px] font-bold tracking-tight text-stone-900">Yaseen Khatib <span class="font-normal text-stone-400">· Senior Full-Stack AI Engineer</span></span>
-        <span class="text-[9px] uppercase tracking-[0.2em] text-stone-400 font-semibold">${label}</span>
-      </div>`;
-
-    const htmlContent = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Yaseen Khatib - Resume</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    b { font-weight: 600; color: #1c1917; }
-    svg { width: 100%; height: 100%; }
-  </style>
-</head>
-<body class="bg-white text-stone-900 antialiased w-[210mm] mx-auto px-[13mm]">
-
-  <!-- ============================ PAGE 1 ============================ -->
-  <!-- Hero band bleeds to the page edges: negative margins undo the PDF
-       margins, matching padding puts the content back on the grid. -->
-  <header class="-mx-[13mm] px-[13mm] pt-[7mm] pb-3 bg-[#4A1527] text-white relative overflow-hidden">
-    <div class="absolute inset-x-0 top-0 h-[5px] bg-gradient-to-r from-[#C9A227] via-[#E0C25A] to-[#7F1D3A]"></div>
-    <div class="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-[#C9A227]/10 blur-3xl"></div>
-    <div class="absolute -left-16 bottom-0 w-56 h-56 rounded-full bg-stone-400/10 blur-3xl"></div>
-    <div class="relative flex items-start justify-between gap-8">
-      <div>
-        <h1 class="text-[32px] font-extrabold tracking-tight leading-none">Yaseen Khatib</h1>
-        <p class="mt-2 text-[13px] font-semibold text-[#C9A227]">Senior Full-Stack AI Engineer <span class="text-stone-500">·</span> React, Node.js, TypeScript</p>
-        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build full-stack products end to end, then put the AI inside them. Six shipped solo, each one you can open.</p>
-      </div>
-      <div class="text-right text-[10px] text-stone-400 leading-[1.7] shrink-0 pt-1">
-        <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-stone-200">yaseenkhatib04@gmail.com</a></div>
-        <div><a href="tel:+918208335028" class="text-stone-200">+91 8208335028</a></div>
-        <div><a href="https://www.linkedin.com/in/yaseen-yk" class="text-[#C9A227]">linkedin.com/in/yaseen-yk</a></div>
-        <div><a href="${GH}" class="text-[#C9A227]">github.com/Yaseenyk</a></div>
-        <div><a href="${SITE}/" class="text-[#C9A227]">yk.streamerosai.com</a></div>
-        <div class="mt-1 text-stone-500">Hyderabad, India · Remote / Hybrid / On-site</div>
-      </div>
-    </div>
-    <div class="relative mt-3.5 grid grid-cols-5 divide-x divide-white/10 border-t border-white/10 pt-3">
-      ${[
-        ['5+', 'years full-stack', 'React · Node.js · MongoDB'],
-        ['6', 'products shipped solo', 'each one live and open'],
-        ['94%', 'smaller API payloads', 'React Flow + MongoDB serialization'],
-        ['2x', 'faster dashboards', 'MongoDB pipeline profiling'],
-        ['1 day', 'client MVP live', 'Path Saathi LMS, brief to dev URL'],
-      ].map(([n, l, s], i) => `
-        <div class="${i ? 'pl-4' : ''} pr-3">
-          <div class="text-[22px] font-extrabold leading-none text-white tracking-tight">${n}</div>
-          <div class="mt-1 min-h-[24px] text-[9.5px] font-semibold text-[#C9A227] uppercase tracking-wider leading-[1.25]">${l}</div>
-          <div class="text-[9px] text-stone-500 leading-snug mt-0.5">${s}</div>
-        </div>`).join('')}
-    </div>
-  </header>
-
-  <section class="mt-3">
-    ${h2('Summary')}
-    <p class="text-[10.5px] text-stone-700 leading-[1.55]">
-      I build full-stack products on <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and for the last year I have been building the AI inside them. I started in 2021 on hospital information systems that clinical staff used every day. In 2023 I joined MSA Software as a full-stack developer, profiled slow MongoDB pipelines until dashboards ran <b>1.5–2x faster</b>, and moved the team to TypeScript and Next.js. Since 2025 I own the <b>LLM and agentic layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents, MCP servers</b>. On the side I have shipped <b>six products solo</b>: an AI gym app with on-device form check, a React Flow workflow engine that cut payloads <b>94%</b>, a distilled AI decision model, and three more, each with a public link. I own a system from database schema to deployed UI, and I am open to senior remote, hybrid or on-site roles.
-    </p>
-  </section>
-
-  <section class="mt-3">
-    ${h2('Selected work', 'full write-ups on pages 2–3')}
-    <div class="grid grid-cols-3 gap-3">${HIGHLIGHTS.map(highlight).join('')}</div>
-  </section>
-
-  <div class="grid grid-cols-12 gap-x-6 mt-3">
-    <section class="col-span-7">
-      ${h2('Experience')}
-      <div>${EXPERIENCE.map((j, i) => job(j, i === EXPERIENCE.length - 1)).join('')}</div>
-    </section>
-
-    <aside class="col-span-5">
-      ${h2('Skills')}
-      <div class="rounded-lg border border-stone-200 bg-stone-50/60 px-3 py-2.5">${SKILLS.map(skillRow).join('')}</div>
-      <div class="mt-3">
-        ${h2('Education')}
-        <div class="text-[10.5px] leading-[1.45] space-y-1.5">
-          <div><p class="font-bold text-stone-900">B.E. Computer Science <span class="font-medium text-stone-400">· 2021</span></p><p class="text-stone-600">D. Y. Patil College of Engineering</p></div>
-          <div><p class="font-bold text-stone-900">Diploma, Computer Science <span class="font-medium text-stone-400">· 2018</span></p><p class="text-stone-600">D. Y. Patil Polytechnic</p></div>
-          <div class="pt-1 text-[9.5px] text-stone-500 leading-[1.45]"><span class="font-bold text-stone-700">Certifications</span> (Coding Ninjas): Front End Architecture · React Production Development · Advanced Backend Systems</div>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <!-- ============================ PAGE 2: PRODUCTS ============================ -->
-  <div class="pt-[9mm]" style="page-break-before: always;">
-    ${running('Products: designed, built and shipped solo')}
-    <div class="space-y-2">${PRODUCTS.map(card).join('')}</div>
-  </div>
-
-  <!-- ============================ PAGE 3: APPLIED WORK, WRITING ============================ -->
-  <div class="pt-[12mm]" style="page-break-before: always;">
-    ${running('Applied & client work · Writing & teaching')}
-    ${h2('Applied & client work')}
-    <div class="space-y-3">${APPLIED.map(card).join('')}</div>
-    <section class="mt-6">
-      ${h2('Writing & teaching')}
-      <div class="grid grid-cols-2 gap-3">${WRITING.map(writingCard).join('')}</div>
-    </section>
-    <p class="mt-6 text-[8.5px] text-stone-400 leading-snug text-center">Every link in this document was checked on the date of generation. Repositories not linked are private. Metrics are the latest published evaluation, including where the model loses.</p>
-  </div>
-
-</body>
-</html>
-    `;
-
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-
-    const outputDirectory = path.join(__dirname, '../public');
-    if (!fs.existsSync(outputDirectory)) fs.mkdirSync(outputDirectory, { recursive: true });
-
-    const outputPdfPath = path.join(outputDirectory, 'Resume.pdf');
-    await page.pdf({
-      path: outputPdfPath,
-      format: 'A4',
-      printBackground: true,
-      // Top and sides are zero so the hero band can bleed to the page edge;
-      // the body carries the horizontal gutter and each page its top space.
-      margin: { top: '0', bottom: '12mm', left: '0', right: '0' },
-    });
-
+    await page.setContent(html, { waitUntil: 'load' });
+    const out = path.join(__dirname, '../public/Resume.pdf');
+    await page.pdf({ path: out, format: 'A4', printBackground: true, preferCSSPageSize: true });
     await browser.close();
-    console.log('Success! Resume generated at: ' + outputPdfPath);
+    console.log('Success! Resume generated at: ' + out + ' (' + fs.statSync(out).size + ' bytes)');
   } catch (error) {
     console.error('Error generating resume:', error);
     process.exit(1);

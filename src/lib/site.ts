@@ -36,7 +36,7 @@ export const VERIFICATION = {
  * server has, so a regenerated PDF is invisible to anyone who downloaded a
  * previous one. Bump this every time scripts/generate-resume.js is re-run.
  */
-const RESUME_VERSION = 5;
+const RESUME_VERSION = 6;
 
 export const RESUME_URL = `${
   process.env.NEXT_PUBLIC_BASE_PATH ?? ""

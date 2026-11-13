@@ -193,6 +193,12 @@ repos) are best made private or archived. That is your call, so I did not touch 
 Done in the repo:
 - `public/Resume.pdf` regenerated (the old file still showed an outdated domain). Title is now "Senior Full-Stack AI Engineer", the
   product count is six everywhere, and the "34 articles" stat is replaced by "client MVP live in 1 day".
+- **Main resume rebuilt (later the same day):** exactly two pages, single column, MERN-and-AI focus. Page 1 is the 7-second read
+  (headline, summary, skills, the three jobs); page 2 is proof (7 projects, education). Skills are ordered by what 71 live MERN-plus-AI
+  postings asked for most (system design 61%, REST 49%, React 47%, testing 42%, TypeScript 39%, Python 38%, CI/CD 36%), and only
+  skills that are true are listed. Not in the postings-driven list because they are not on your record: AWS/Azure/GCP (29% of
+  postings), code review (25%), mentoring (18%), Kubernetes (18%). If any is true for you, say so and it goes in. All links checked
+  live on 13 Nov 2026.
 - New `public/Resume-ATS.pdf`: one page, single column, plain text, experience first. Linked from the hero and /hire/ as "Plain CV for
   application forms".
 - Home hero and /hire/ rewritten in plain words, buyer-first ("AI chatbots, agents and web apps for your business"), price shown as
