@@ -2,7 +2,7 @@ import GradientText from "./GradientText";
 import PulseDot from "./PulseDot";
 import NeuralCore from "./NeuralCore";
 import { ArrowRightIcon, DownloadIcon } from "./Icons";
-import { RESUME_ATS_URL, RESUME_URL } from "@/lib/site";
+import { RESUME_URL } from "@/lib/site";
 
 export default function Hero() {
   return (
@@ -21,10 +21,11 @@ export default function Hero() {
         >
           Senior full-stack AI engineer.
           <br />
-          MERN, wired into{" "}
+          MERN apps with{" "}
           <GradientText className="whitespace-nowrap">
-            LLM systems.
-          </GradientText>
+            real AI
+          </GradientText>{" "}
+          inside.
         </h1>
 
         <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400"
@@ -86,19 +87,11 @@ export default function Hero() {
           >
             <DownloadIcon className="h-4 w-4" /> Download CV
           </a>
-          <a
-            href={RESUME_ATS_URL}
-            download="Yaseen-Khatib-Resume-Plain.pdf"
-            className="font-medium text-zinc-400 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-ice"
-          >
-            Plain CV for application forms
-          </a>
         </div>
       </div>
 
-      {/* Right: AI core animation — constrained on mobile so it doesn't
-          dominate the first screen */}
-      <div className="mx-auto w-full max-w-[260px] sm:max-w-[400px] md:max-w-none"
+      {/* Right: AI core animation. Decorative, so it is not shown on a phone: there it cost a whole screen before any content. */}
+      <div className="mx-auto hidden w-full md:block md:max-w-none"
       >
         <NeuralCore />
       </div>

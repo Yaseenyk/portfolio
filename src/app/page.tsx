@@ -3,14 +3,11 @@ import Link from "next/link";
 import fs from "node:fs";
 import path from "node:path";
 import Hero from "@/components/Hero";
-import FoundersLog from "@/components/FoundersLog";
 import { getAllPosts, getPostBySlug, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
 import TerminalAgent from "@/components/widgets/TerminalAgent";
-import Products from "@/components/Products";
-import Dashboard from "@/components/Dashboard";
+import { ExperienceTimeline, HowIWork, OneMinute, Proofs, WritingPicks } from "@/components/home/Recruiter";
 import ContactForm from "@/components/ContactForm";
-import RoadmapSection from "@/components/RoadmapSection";
 import Testimonials from "@/components/Testimonials";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
@@ -117,22 +114,11 @@ const projectsJsonLd = [
 ];
 
 export default function Home() {
-  // Server-side mapping to plain props — keeps the blog registry (and every
-  // post body) out of the client JS bundle. Top 6 (a full 3×2 card grid);
-  // the full list lives at /blog. Covers resolve from public/og/ at build.
-  const logEntries = FOUNDERS_LOG_SLUGS.slice(0, 6).flatMap((slug) => {
+  // Three articles a hiring reader would pick: the career story, a measured engineering result, and a cost argument.
+  // Mapped to plain props on the server, so the blog registry (and every post body) stays out of the client bundle.
+  const picks = ["my-journey-web-developer-to-ai-engineer", "94-percent-payload-reduction-react-flow", "ai-finops-playbook-stop-burning-money"].flatMap((slug) => {
     const p = getPostBySlug(slug);
-    if (!p) return [];
-    const cover = path.join(process.cwd(), "public", "og", `${p.slug}.jpg`);
-    const thumb = path.join(process.cwd(), "public", "og", "thumb", `${p.slug}.webp`);
-    return [
-      {
-        slug: p.slug,
-        title: p.title,
-        description: p.description,
-        image: fs.existsSync(cover) && fs.existsSync(thumb) ? `/og/thumb/${p.slug}.webp` : undefined,
-      },
-    ];
+    return p ? [{ slug: p.slug, title: p.title, description: p.description }] : [];
   });
 
   return (
@@ -145,29 +131,30 @@ export default function Home() {
 
       <div className="mx-auto w-full max-w-[1400px] px-6 md:px-12 lg:px-24">
         <main className="pt-16 sm:pt-20">
+          {/* One-minute order for a recruiter: who, the short version, where I worked, three proofs, a live demo, how I work. */}
           <Hero />
+          <OneMinute />
+          <ExperienceTimeline />
+          <Proofs />
 
-          {/* Recruiter-first: the vision series headlines read in the first scroll. */}
-          <FoundersLog entries={logEntries} articleCount={ARTICLE_COUNT} />
-
-          <div className="cv-auto" style={{ containIntrinsicSize: "auto 900px" }}><Products /></div>
-
-          <div className="cv-auto" style={{ containIntrinsicSize: "auto 700px" }}><section id="rag-concierge" className="py-10 sm:py-16">
-            <h2 className="text-2xl font-semibold text-zinc-100">
-              RAG Terminal Concierge
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 700px" }}><section id="rag-concierge" className="scroll-mt-24 py-10 sm:py-14">
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-cyan">Do not take my word for it</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+              Ask my portfolio a question
             </h2>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-              Query my experience through a context-grounded RAG pipeline — live
-              execution traces, structured outputs, and no answers outside the
-              indexed corpus.
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-zinc-400">
+              This is the concierge from the list above, running live. It answers
+              only from what is written on this site, shows its steps, and tells
+              you when it does not know. Try &ldquo;What did he do at
+              Sparity?&rdquo; or &ldquo;Does he know PostgreSQL?&rdquo;
             </p>
             <div className="mt-6">
               <TerminalAgent />
             </div>
           </section></div>
 
-          <div className="cv-auto" style={{ containIntrinsicSize: "auto 2600px" }}><Dashboard /></div>
-          <div className="cv-auto" style={{ containIntrinsicSize: "auto 700px" }}><RoadmapSection /></div>
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 700px" }}><HowIWork /></div>
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 500px" }}><WritingPicks posts={picks} /></div>
           <div className="cv-auto" style={{ containIntrinsicSize: "auto 500px" }}><Testimonials /></div>
           <div className="cv-auto" style={{ containIntrinsicSize: "auto 900px" }}><ContactForm /></div>
         </main>
