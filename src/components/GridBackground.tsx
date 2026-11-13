@@ -1,10 +1,4 @@
-/** The faint fixed CSS grid used across the site over the ink background. */
+/** The site used to draw a faint grid over the ink background. Dark, but clean (13 Nov 2026) removed it; the component stays so pages need no edits. */
 export default function GridBackground() {
-  return (
-    <div
-      aria-hidden="true"
-      data-print="hide"
-      className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:40px_40px]"
-    />
-  );
+  return null;
 }

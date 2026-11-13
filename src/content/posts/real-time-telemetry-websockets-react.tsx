@@ -148,7 +148,7 @@ export const realTimeTelemetry: BlogPost = {
   publishedAt: "2026-05-31",
   updatedAt: "2026-07-28",
   readingMinutes: 8,
-  author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["WebSockets", "React", "Real-Time"],
   takeaways: [
     "Polling can't be both fresh and cheap; a push model has the server speak only when state actually changes.",

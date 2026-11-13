@@ -198,7 +198,7 @@ export const compilingReactFlowAgent: BlogPost = {
   publishedAt: "2026-06-03",
   updatedAt: "2026-07-28",
   readingMinutes: 8,
-  author: { name: "Yaseen Khatib", role: "AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["React Flow", "Agentic AI", "Algorithms"],
   takeaways: [
     "Running a visual graph is a compilation problem: reduce the canvas to a dependency map, not the rendered nodes.",

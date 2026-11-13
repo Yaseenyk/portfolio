@@ -114,7 +114,7 @@ export const oneArchitectFullSquad: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["Founder's Log", "Claude", "MCP"],
   takeaways: [
     "The operating model has three layers: an architect owning contracts and review, Claude Code running against the real repo, and MCP servers giving the model governed access to Postgres, the browser, and Git.",

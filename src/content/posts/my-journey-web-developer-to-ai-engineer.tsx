@@ -121,7 +121,7 @@ export const myJourneyPost: BlogPost = {
   ],
   publishedAt: "2026-07-20",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["Founder's Log", "Career", "Journey"],
   takeaways: [
     "Started September 2021 at a healthcare software company on ASP.NET + React; the unglamorous fundamentals became the foundation for everything after.",

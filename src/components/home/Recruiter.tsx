@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { RESUME_ATS_URL, RESUME_URL } from "@/lib/site";
-import { ArrowRightIcon, DownloadIcon } from "@/components/Icons";
+import { RESUME_ATS_URL } from "@/lib/site";
+import { ArrowRightIcon } from "@/components/Icons";
 
 /**
  * The home page below the hero, written for a recruiter with one minute: who, where, three proofs with results, how I work.
@@ -8,7 +8,8 @@ import { ArrowRightIcon, DownloadIcon } from "@/components/Icons";
  * Plain headings on purpose: a recruiter scans for "Experience", not for a clever label.
  */
 
-const card = "rounded-2xl border border-zinc-800/60 bg-zinc-950/60 p-6 backdrop-blur-md";
+// No boxes: a thin line above each block, and space.
+const card = "border-t border-white/10 pt-5 pb-1";
 const eyebrow = "font-mono text-[11px] uppercase tracking-[0.22em] text-cyan";
 const h2 = "mt-3 text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl";
 const lead = "mt-3 max-w-2xl text-[15px] leading-relaxed text-zinc-400";
@@ -25,10 +26,10 @@ const FACTS: { k: string; v: string; d: string }[] = [
 
 export function OneMinute() {
   return (
-    <section aria-labelledby="one-minute" className="py-10 sm:py-14">
+    <section aria-labelledby="one-minute" className="py-14 sm:py-20">
       <p className={eyebrow}>If you have one minute</p>
       <h2 id="one-minute" className={h2}>The short version</h2>
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         {FACTS.map((f) => (
           <div key={f.k} className={card}>
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-zinc-500">{f.k}</p>
@@ -38,14 +39,8 @@ export function OneMinute() {
         ))}
       </div>
       <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
-        <a href={RESUME_URL} download="Yaseen-Khatib-Resume.pdf" className="inline-flex items-center gap-2 rounded-lg bg-cyan px-5 py-2.5 font-semibold text-ink">
-          <DownloadIcon className="h-4 w-4" /> Download CV (2 pages)
-        </a>
         <a href={RESUME_ATS_URL} download="Yaseen-Khatib-Resume-Plain.pdf" className="font-medium text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-ice">
-          One-page plain CV
-        </a>
-        <a href="#contact" className="font-medium text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-ice">
-          Contact me
+          Prefer one page? Plain CV for application forms
         </a>
       </div>
     </section>
@@ -83,10 +78,10 @@ const JOBS: { role: string; org: string; when: string; where: string; points: st
 
 export function ExperienceTimeline() {
   return (
-    <section id="experience" aria-labelledby="experience-h" className="scroll-mt-24 py-10 sm:py-14">
+    <section id="experience" aria-labelledby="experience-h" className="scroll-mt-24 py-14 sm:py-20">
       <p className={eyebrow}>Where I have worked</p>
       <h2 id="experience-h" className={h2}>Experience</h2>
-      <ol className="mt-8 space-y-4">
+      <ol className="mt-10 space-y-8">
         {JOBS.map((j) => (
           <li key={j.org} className={card}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
@@ -147,11 +142,11 @@ const isExternal = (h: string) => h.startsWith("http");
 
 export function Proofs() {
   return (
-    <section id="work" aria-labelledby="work-h" className="scroll-mt-24 py-10 sm:py-14">
+    <section id="work" aria-labelledby="work-h" className="scroll-mt-24 py-14 sm:py-20">
       <p className={eyebrow}>Proof, not adjectives</p>
       <h2 id="work-h" className={h2}>Three things I built, and what each one shows</h2>
       <p className={lead}>Each one is live. Open it, break it, read the code.</p>
-      <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 lg:grid-cols-3">
         {PROOFS.map((p) => (
           <article key={p.name} className={`${card} flex flex-col`}>
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">{p.kind}</p>
@@ -162,9 +157,9 @@ export function Proofs() {
               <div><dt className="font-semibold text-cyan">The result</dt><dd className="mt-0.5 text-zinc-200">{p.result}</dd></div>
             </dl>
             <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Skills this shows">
-              {p.proves.map((s) => <li key={s} className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-[11px] text-zinc-400">{s}</li>)}
+              {p.proves.map((s) => <li key={s} className="text-[12px] text-zinc-500 after:ml-1.5 after:content-['·'] last:after:content-none">{s}</li>)}
             </ul>
-            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-zinc-800/60 pt-4">
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
               {p.links.map(([label, href]) =>
                 isExternal(href) ? (
                   <a key={href} href={href} target="_blank" rel="noopener noreferrer" className={link}>{label} <ArrowRightIcon className="h-3.5 w-3.5" /></a>
@@ -178,10 +173,10 @@ export function Proofs() {
       </div>
 
       <h3 className="mt-10 text-sm font-semibold uppercase tracking-[0.14em] text-zinc-400">Also shipped</h3>
-      <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <ul className="mt-4 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
         {ALSO.map(([name, text, href]) => (
           <li key={name}>
-            <Link href={href} className="group flex h-full items-start gap-3 rounded-xl border border-zinc-800/60 bg-zinc-950/40 p-4 transition-colors hover:border-cyan/40">
+            <Link href={href} className="group flex h-full items-start gap-3 border-t border-white/10 py-4">
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-zinc-100">{name}</span>
                 <span className="mt-0.5 block text-sm leading-relaxed text-zinc-400">{text}</span>
@@ -207,11 +202,11 @@ const RULES: [string, string, string][] = [
 
 export function HowIWork() {
   return (
-    <section aria-labelledby="how-h" className="py-10 sm:py-14">
+    <section aria-labelledby="how-h" className="py-14 sm:py-20">
       <p className={eyebrow}>What you get on your team</p>
       <h2 id="how-h" className={h2}>How I build AI into real products</h2>
       <p className={lead}>Four habits, each with the project that shows it.</p>
-      <ol className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <ol className="mt-10 grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-2">
         {RULES.map(([title, text, why], i) => (
           <li key={title} className={card}>
             <p className="font-mono text-xs text-cyan">0{i + 1}</p>
@@ -230,13 +225,13 @@ export function HowIWork() {
 export function WritingPicks({ posts }: { posts: { slug: string; title: string; description: string }[] }) {
   if (!posts.length) return null;
   return (
-    <section aria-labelledby="writing-h" className="py-10 sm:py-14">
+    <section aria-labelledby="writing-h" className="py-14 sm:py-20">
       <p className={eyebrow}>If you want to go deeper</p>
       <h2 id="writing-h" className={h2}>Three things I wrote</h2>
-      <ul className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <ul className="mt-10 grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-3">
         {posts.map((p) => (
           <li key={p.slug}>
-            <Link href={`/blog/${p.slug}/`} className={`${card} group block h-full transition-colors hover:border-cyan/40`}>
+            <Link href={`/blog/${p.slug}/`} className={`${card} group block h-full`}>
               <span className="block text-base font-semibold leading-snug text-zinc-50 group-hover:text-cyan">{p.title}</span>
               <span className="mt-2 block text-sm leading-relaxed text-zinc-400">{p.description}</span>
             </Link>

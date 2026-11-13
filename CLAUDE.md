@@ -35,6 +35,10 @@ JSON-LD, and OG tags only exist post-build.
   (one-time, image API) and `scripts/post-cover.py` (per new post, drawn with
   Pillow, no image API: `python scripts/post-cover.py "<title>" <slug>`). Style contract is brand-locked: flat vector on ink
   #05070A, cyan/violet only, NO glows or warm hues — keep both in line.
+- **UI style (owner's choice, 13 Nov 2026): dark, but clean.** Flat ink background, no grid, no glow, no card boxes, one
+  accent (cyan). Blocks are separated by a thin top line and space. `globals.css` redraws the old `rounded-2xl border` card
+  pattern that way site-wide; add class `keep-box` only where a real box is needed. Home page order is built for a
+  one-minute recruiter read (`components/home/Recruiter.tsx`): short version, experience, three proofs, live demo.
 - **Headings**: solid near-white; gradient (`GradientText`) is for 1–2 accent
   words only, never a full title (washes out, hurts readability).
 - **Framer + Tailwind transforms conflict**: motion components write inline

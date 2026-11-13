@@ -87,7 +87,7 @@ export const linkedinPipelineStory: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["Founder's Log", "Automation", "Products"],
   takeaways: [
     "Consistency is a systems property: a cron-driven GitHub Actions pipeline publishes to LinkedIn and commits its own state ledger back to Git.",

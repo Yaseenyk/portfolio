@@ -152,7 +152,7 @@ export const mernVsFullStack: BlogPost = {
   ],
   publishedAt: "2026-10-30",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["MERN", "Hiring", "Career"],
   takeaways: [
     "A MERN stack developer is a full-stack developer who works in MongoDB, Express, React and Node; full stack is the range, MERN is one choice of tools.",

@@ -14,18 +14,7 @@
        inside its own container instead. */
     overflow-x: hidden;
     background-color: #05070a;
-    background-image:
-      radial-gradient(
-        55rem 40rem at 50% -12%,
-        rgba(34, 211, 238, 0.08),
-        transparent 60%
-      ),
-      radial-gradient(
-        48rem 38rem at 100% 8%,
-        rgba(168, 85, 247, 0.07),
-        transparent 60%
-      );
-    background-attachment: fixed;
+    /* Dark, but clean: a flat ink background, no coloured glow. */
   }
 
   ::selection {
@@ -327,3 +316,17 @@
 
 /* The rupee sign is the only glyph on the home page outside Inter's latin subset; a system font avoids an 86 KB latin-ext download. */
 .rupee { font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif; }
+
+/* ---- Dark, but clean (13 Nov 2026): no card boxes, no grid, no glow, one accent colour ----
+   The site had about 125 bordered, blurred cards. Instead of editing every page, the card pattern is redrawn here:
+   a thin line above the block, no box, no side padding. Add class "keep-box" to an element that must stay a box. */
+.text-gradient { background: none !important; -webkit-text-fill-color: currentColor !important; color: #22d3ee !important; animation: none !important; }
+[class*="shadow-[0_0"] { box-shadow: none !important; }
+[class*="backdrop-blur"]:not(nav):not(header) { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+:where(.rounded-2xl, .rounded-3xl).border:not(img):not(.keep-box) {
+  background-color: transparent !important; background-image: none !important; border-color: transparent !important; border-top-color: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0 !important; padding-left: 0 !important; padding-right: 0 !important; box-shadow: none !important;
+}
+.rounded-xl.border:not(img):not(input):not(textarea):not(select):not([class*="bg-cyan "]):not(.keep-box) {
+  background-color: transparent !important; background-image: none !important; border-color: rgba(255, 255, 255, 0.12) !important; box-shadow: none !important;
+}

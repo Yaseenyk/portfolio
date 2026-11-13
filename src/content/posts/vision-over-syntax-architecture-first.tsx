@@ -105,7 +105,7 @@ export const visionOverSyntax: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["Founder's Log", "Vision", "Architecture"],
   takeaways: [
     "Every shipped product started as a complete mental model — data flow, trust boundaries, failure modes, cost curve — before any code.",

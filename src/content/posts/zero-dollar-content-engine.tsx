@@ -90,7 +90,7 @@ export const zeroDollarContentEngine: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["Founder's Log", "Automation", "Products"],
   takeaways: [
     "The pipeline's entire stack is a Git repository: topics.txt is the queue, the Git history is the database, a push is the deploy hook.",

@@ -131,7 +131,7 @@ export const tenXReality: BlogPost = {
   ],
   publishedAt: "2026-06-06",
   readingMinutes: 8,
-  author: { name: "Yaseen Khatib", role: "MERN + AI Architect" },
+  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
   tags: ["AI Orchestration", "MERN", "Architecture"],
   takeaways: [
     "AI has moved the developer's role from writing syntax to directing architectural flow.",
