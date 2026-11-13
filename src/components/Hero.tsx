@@ -1,18 +1,21 @@
 import { ArrowRightIcon, DownloadIcon } from "./Icons";
 import { RESUME_URL } from "@/lib/site";
+import { HeroShots } from "./home/Shots";
 
 /**
- * First screen. One column, no decoration: a recruiter should read the title, one paragraph and the two ways in.
+ * First screen: the title, one paragraph and the two ways in on the left; four real product screenshots on the right
+ * (a swipeable strip on a phone). No decoration.
  * The h1 is the LCP element and must be in the server HTML, visible, not faded in after hydration.
  */
 export default function Hero() {
   return (
-    <section className="py-14 sm:py-20 lg:py-28">
+    <section className="grid grid-cols-1 items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.1fr_1fr] lg:gap-14 lg:py-24">
+      <div>
       <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-cyan">
         Yaseen Khatib · Hyderabad, India
       </p>
 
-      <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-[1.06] tracking-tight text-zinc-50 sm:text-6xl lg:text-7xl">
+      <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-[1.06] tracking-tight text-zinc-50 sm:text-5xl xl:text-6xl">
         Senior full-stack AI engineer.
         <br />
         MERN apps with <span className="text-cyan">real AI</span> inside.
@@ -54,6 +57,9 @@ export default function Hero() {
           Contact me
         </a>
       </div>
+      </div>
+
+      <HeroShots />
     </section>
   );
 }

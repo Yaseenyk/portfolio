@@ -7,6 +7,7 @@ import { getAllPosts, getPostBySlug, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 import { getAllMdxMeta } from "@/lib/mdx";
 import TerminalAgent from "@/components/widgets/TerminalAgent";
 import { ExperienceTimeline, HowIWork, OneMinute, Proofs, WritingPicks } from "@/components/home/Recruiter";
+import { Gallery } from "@/components/home/Shots";
 import ContactForm from "@/components/ContactForm";
 import Testimonials from "@/components/Testimonials";
 import GridBackground from "@/components/GridBackground";
@@ -136,6 +137,7 @@ export default function Home() {
           <OneMinute />
           <ExperienceTimeline />
           <Proofs />
+          <div className="cv-auto" style={{ containIntrinsicSize: "auto 1800px" }}><Gallery /></div>
 
           <div className="cv-auto" style={{ containIntrinsicSize: "auto 700px" }}><section id="rag-concierge" className="scroll-mt-24 py-10 sm:py-14">
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-cyan">Do not take my word for it</p>

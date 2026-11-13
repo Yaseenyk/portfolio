@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { RESUME_ATS_URL } from "@/lib/site";
 import { ArrowRightIcon } from "@/components/Icons";
+import Image from "next/image";
+import { ShotImage } from "./Shots";
 
 /**
  * The home page below the hero, written for a recruiter with one minute: who, where, three proofs with results, how I work.
@@ -103,10 +105,10 @@ export function ExperienceTimeline() {
 
 /* ------------------------------------------------------------------ 3. three proofs */
 
-interface Proof { name: string; kind: string; problem: string; built: string; result: string; proves: string[]; links: [string, string][] }
+interface Proof { name: string; shot: string; kind: string; problem: string; built: string; result: string; proves: string[]; links: [string, string][] }
 const PROOFS: Proof[] = [
   {
-    name: "IntegrateX", kind: "Workflow engine · React Flow, MongoDB",
+    name: "IntegrateX", shot: "integratex", kind: "Workflow engine · React Flow, MongoDB",
     problem: "A drag-and-drop workflow canvas was saving its whole screen state to the database, so every save was huge.",
     built: "A serialization adapter that separates what the screen needs from what the database should store.",
     result: "Stored payloads cut by 94%, with nothing lost on reload. You can run it in your browser.",
@@ -114,7 +116,7 @@ const PROOFS: Proof[] = [
     links: [["Open the live sandbox", "/sandbox/"], ["Read how", "/blog/94-percent-payload-reduction-react-flow/"]],
   },
   {
-    name: "Portfolio Concierge", kind: "RAG API and MCP server · Cloudflare Workers",
+    name: "Portfolio Concierge", shot: "concierge", kind: "RAG API and MCP server · Cloudflare Workers",
     problem: "AI chatbots guess when they do not know. On a company's own documents, a confident wrong answer is worse than none.",
     built: "A question-answering service over this site that answers only from what it finds, and refuses below a confidence threshold.",
     result: "It runs on this page. It also works as an MCP server, so you can question my work from inside Claude.",
@@ -122,7 +124,7 @@ const PROOFS: Proof[] = [
     links: [["Ask it something", "#rag-concierge"], ["Read the code", "https://github.com/Yaseenyk/portfolio/tree/main/worker"]],
   },
   {
-    name: "FitRank", kind: "AI decision model · FastAPI, PostgreSQL",
+    name: "FitRank", shot: "fitrank", kind: "AI decision model · FastAPI, PostgreSQL",
     problem: "Asking a chatbot who should take a shift gives an opinion nobody can check or measure.",
     built: "A small model I trained from a larger one. It scores every option, and a manager makes every final decision.",
     result: "Beats a rules-only baseline on shortlists (94% vs 91%) and publishes where it loses. 93.5% backend test coverage.",
@@ -149,6 +151,13 @@ export function Proofs() {
       <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 lg:grid-cols-3">
         {PROOFS.map((p) => (
           <article key={p.name} className={`${card} flex flex-col`}>
+            {p.shot === "concierge" ? (
+              <span className="mb-5 block overflow-hidden rounded-lg border border-white/10 bg-black">
+                <Image src="/shots/concierge.webp" alt="The portfolio concierge terminal, live screenshot" width={1100} height={676} loading="lazy" decoding="async" sizes="(min-width: 1024px) 33vw, 100vw" className="aspect-[16/10] h-auto w-full object-cover object-bottom" />
+              </span>
+            ) : (
+              <ShotImage id={p.shot} alt={`${p.name}, live screenshot`} className="mb-5" />
+            )}
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">{p.kind}</p>
             <h3 className="mt-2 text-xl font-semibold text-zinc-50">{p.name}</h3>
             <dl className="mt-4 flex-1 space-y-3 text-sm leading-relaxed">

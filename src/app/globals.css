@@ -330,3 +330,6 @@
 .rounded-xl.border:not(img):not(input):not(textarea):not(select):not([class*="bg-cyan "]):not(.keep-box) {
   background-color: transparent !important; background-image: none !important; border-color: rgba(255, 255, 255, 0.12) !important; box-shadow: none !important;
 }
+
+/* One accent: buttons that used a cyan-to-violet gradient are solid cyan. */
+button[class*="bg-gradient-to-"], a[class*="bg-gradient-to-"] { background-image: none !important; background-color: #22d3ee !important; }

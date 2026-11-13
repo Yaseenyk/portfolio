@@ -18,7 +18,6 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
     heading: "Writing",
     links: [
       { href: "/blog/", label: "Field Notes (blog)" },
-      { href: "/#founders-log", label: "Founder's Log" },
       { href: "/roadmap/", label: "AI Systems Roadmap" },
       { href: "/anthropic-roadmap/", label: "Anthropic Roadmap" },
     ],
@@ -32,10 +31,6 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
       { href: "/#contact", label: "Contact" },
       { href: SOCIALS.linkedin, label: "LinkedIn", external: true },
       { href: SOCIALS.github, label: "GitHub", external: true },
-      // The shipped product these notes are written about. This site pointed
-      // only at the github.io mirror, so the live product domain and the
-      // write-ups explaining it were never connected for a reader or a crawler.
-      { href: "https://streamerosai.com", label: "streamerOS (live product)", external: true },
     ],
   },
   {
@@ -47,12 +42,27 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
       { href: "/solutions/use-cases/", label: "App and website use cases" },
     ],
   },
+  // Every live product and site, so a reader (and a crawler) can reach each one from any page.
   {
-    heading: "For students",
+    heading: "Live products",
     links: [
-      // The student business is its own site now; one link, not a mirror of
-      // its menu, so the portfolio stays about the engineer.
-      { href: "https://campus.streamerosai.com/", label: "DefendIt — final year projects" },
+      { href: "https://streamerosai.com", label: "streamerOS", external: true },
+      { href: "https://spotai.streamerosai.com/", label: "SpotAI", external: true },
+      { href: "https://fitrank.streamerosai.com/", label: "FitRank", external: true },
+      { href: "https://esports.streamerosai.com/", label: "Esports Hub", external: true },
+      { href: "https://campus.streamerosai.com/", label: "DefendIt", external: true },
+      { href: "https://analytics.streamerosai.com/", label: "Analytics dashboard", external: true },
+    ],
+  },
+  {
+    heading: "Free tools and guides",
+    links: [
+      { href: "https://solar.streamerosai.com/", label: "Solar subsidy guide", external: true },
+      { href: "https://exams.streamerosai.com/", label: "Exam dates India", external: true },
+      { href: "https://tools.streamerosai.com/", label: "Developer tools", external: true },
+      { href: "https://calc.streamerosai.com/", label: "Money calculators", external: true },
+      { href: "https://images.streamerosai.com/", label: "Image tools", external: true },
+      { href: "https://math.streamerosai.com/", label: "Math calculators", external: true },
     ],
   },
   {
@@ -90,7 +100,7 @@ export default function SiteFooter() {
           <PreferredSource />
         </div>
 
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
           {COLUMNS.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
               <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">

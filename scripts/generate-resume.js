@@ -51,7 +51,14 @@ const JOBS = [
   },
 ];
 
+// Projects are chosen for a full-stack MERN-and-AI hire and ordered by how much each one proves: a large full-stack product,
+// the two AI systems, the MERN performance result, a complete product with tests, and a client delivery.
 const PROJECTS = [
+  {
+    name: 'Esports Hub', what: 'Tournament platform for organisers, built with Claude Code', stack: 'Next.js 14, React, TypeScript, Hono on Cloudflare Workers, D1 (SQL), Playwright',
+    text: 'Sign-ups, brackets, points tables, ID cards, live TV screens and gate check-in, with 14 free tools. Google sign-in verified against Google’s public keys, email confirmation before first use, and organisations with roles. About 640 browser tests on desktop and phone and about 600 API tests, run on every push.',
+    links: [a('https://esports.streamerosai.com', 'Live'), a(`${GH}/esports-frontend`, 'Frontend'), a(`${GH}/esports-backend`, 'API')],
+  },
   {
     name: 'Portfolio Concierge', what: 'Grounded RAG API and public MCP server', stack: 'Cloudflare Workers, Vectorize, Workers AI, MCP, TypeScript',
     text: 'Answers questions about my work from a vector index of this site and refuses to answer below a similarity threshold instead of guessing. A public MCP server exposes search, products and availability tools, so a recruiter can interview this résumé from inside Claude. The index rebuilds automatically after every deploy.',
@@ -63,29 +70,19 @@ const PROJECTS = [
     links: [a(`${SITE}/sandbox/`, 'Live sandbox'), a(`${SITE}/blog/94-percent-payload-reduction-react-flow/`, 'Write-up')],
   },
   {
-    name: 'SpotAI', what: 'AI gym app for Indian gyms, members and owners in one app', stack: 'Vue 3, Capacitor, NestJS, PostgreSQL, MediaPipe, NATS',
-    text: 'Squat form check runs on the phone: frames never leave it, only rep counts and flags reach the API. Row-level security per gym, tested with two gyms side by side. 190 API tests and browser tests with accessibility checks on every screen.',
-    links: [a('https://spotai.streamerosai.com/#download', 'Android and iPhone apps'), a(`${SITE}/products/spotai/`, 'Case study')],
-  },
-  {
     name: 'FitRank', what: 'Typed AI decisions for staffing', stack: 'FastAPI, PostgreSQL and pgvector, PyTorch, React, Docker',
     text: 'A 23M-parameter MiniLM model, distilled from a 9B teacher, returns a probability for every option; a manager makes every final call. Against a rules-only baseline on 35 held-out tasks: hit@5 94% vs 91%, and hit@1 54% vs 74%, which is why it shortlists rather than assigns. 93.5% backend test coverage, GitHub Actions CI.',
     links: [a('https://fitrank.streamerosai.com', 'Live'), a(`${SITE}/products/fitrank/`, 'Case study')],
   },
   {
-    name: 'Sable', what: 'Local-first AI finance agent', stack: 'React Native (Expo), SQLite, OpenAI function calling, TypeScript',
-    text: 'The model proposes and only a person commits: every database change appears as a Review and Confirm card. All financial data stays on the device, with no cloud backend.',
-    links: [a(`${SITE}/products/sable/`, 'Case study')],
+    name: 'SpotAI', what: 'AI gym app for Indian gyms, members and owners in one app', stack: 'Vue 3, Capacitor, NestJS, PostgreSQL, MediaPipe, NATS',
+    text: 'Squat form check runs on the phone: frames never leave it, only rep counts and flags reach the API. Row-level security per gym, tested with two gyms side by side. 190 API tests and browser tests with accessibility checks on every screen.',
+    links: [a('https://spotai.streamerosai.com/#download', 'Android and iPhone apps'), a(`${SITE}/products/spotai/`, 'Case study')],
   },
   {
     name: 'Path Saathi LMS', what: 'Client project, free vocational-skilling platform', stack: 'Next.js, React, Tailwind CSS, TypeScript',
     text: 'The brief and an MVP sketch arrived on a Monday; auth, course delivery for the client’s videos and PDFs, and a self-paced flow were live on the dev environment the next day.',
     links: [a('https://devlms.pathsaathi.in/login', 'Live (dev)')],
-  },
-  {
-    name: 'streamerOS', what: 'Rust and Tauri 2 streaming cockpit, built with Claude Code', stack: 'Rust, Tauri 2, OBS WebSocket, Next.js, Hono, Upstash Vector',
-    text: '187 commits since May 2026, 306 Rust tests, reviewed and tested by me. The Next.js site and its support agent (Hono on Cloudflare Workers, Upstash Vector, Gemini) are public; the app repository is private. Launching November 2026.',
-    links: [a('https://streamerosai.com', 'Website'), a(`${GH}/streamer-os-website`, 'Site and agent source')],
   },
 ];
 
@@ -146,13 +143,13 @@ ${JOBS.map((j) => `<div class="job">
 
 <div class="page2"></div>
 <h2 style="margin-top:0">Selected projects</h2>
-<p style="font-size:9.2pt;color:#4a505b">Built and shipped solo unless marked client. Links checked on 13 Nov 2026.</p>
+<p style="font-size:9.2pt;color:#4a505b">Built and shipped solo unless marked client. Links checked on 14 Nov 2026.</p>
 ${PROJECTS.map((p) => `<div class="proj">
   <div class="row"><div class="t">${p.name} <span>· ${p.what}</span></div><div class="links">${p.links.join(' · ')}</div></div>
   <p style="margin:1px 0 1px">${p.text}</p>
   <div class="stack"><b>Stack:</b> ${p.stack}</div>
 </div>`).join('\n')}
-<p class="more"><b>Also:</b> ShelfSight AI, retail vision on FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). AISA, a student platform rebuilt from a single 4,019-line HTML file with an exposed Firebase key into Next.js and Spring Boot, 29 tests (${a('https://yaseenyk.github.io/SIT-FE/', 'live')}).</p>
+<p class="more"><b>Also:</b> Sable, a local-first AI finance agent in React Native where the model proposes and only a person commits (${a(`${SITE}/products/sable/`, 'case study')}). streamerOS, a Rust and Tauri 2 desktop app for streamers built with Claude Code, 306 Rust tests (${a('https://streamerosai.com', 'site')}). ShelfSight AI, retail vision on FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). AISA, a student platform rebuilt from one 4,019-line HTML file into Next.js and Spring Boot (${a('https://yaseenyk.github.io/SIT-FE/', 'live')}).</p>
 
 <h2>Open source and writing</h2>
 <p>Public code at ${a(GH, 'github.com/Yaseenyk')}, including this portfolio, its RAG and MCP worker and the content pipelines. Engineering write-ups at ${a(`${SITE}/blog/`, 'yk.streamerosai.com/blog')} and ${a('https://dev.to/yaseenyk04', 'dev.to/yaseenyk04')}.</p>
