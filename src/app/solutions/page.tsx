@@ -19,7 +19,7 @@ const DESCRIPTION =
   "Solution architecture and software builds for businesses that were quoted enterprise prices for a problem that does not need one — AI integration, custom internal systems, and ERP replacement. Plus hosted tools for small businesses from ₹800 a month. Fixed prices, you own the code.";
 
 export const metadata: Metadata = {
-  title: "AI Development Services for Small Business, Fixed Price",
+  title: "AI Development Services, Fixed Price",
   description: seoDescription(DESCRIPTION),
   alternates: { canonical: `${SITE_URL}/solutions/` },
   openGraph: {

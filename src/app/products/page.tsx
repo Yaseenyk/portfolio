@@ -6,13 +6,13 @@ import JsonLd from "@/components/JsonLd";
 import SpotlightCard from "@/components/products/SpotlightCard";
 
 export const metadata: Metadata = {
-  title: "Products",
+  title: "AI Products Built and Shipped Solo",
   description:
     "Shipped products and autonomous pipelines by Yaseen Khatib — SpotAI, FitRank, Sable, streamerOS, the Automated LinkedIn Pipeline, and the Zero-Cost AI Blog Writer.",
   alternates: { canonical: `${SITE_URL}/products/` },
   openGraph: {
     type: "website",
-    title: "Products | Yaseen Khatib",
+    title: "AI Products Built and Shipped Solo | Yaseen Khatib",
     description:
       "Shipped products and autonomous pipelines — built lean, deployed at AI-speed.",
     url: `${SITE_URL}/products/`,

@@ -2,7 +2,7 @@ import GradientText from "./GradientText";
 import PulseDot from "./PulseDot";
 import NeuralCore from "./NeuralCore";
 import { ArrowRightIcon, DownloadIcon } from "./Icons";
-import { RESUME_URL } from "@/lib/site";
+import { RESUME_ATS_URL, RESUME_URL } from "@/lib/site";
 
 export default function Hero() {
   return (
@@ -29,12 +29,12 @@ export default function Hero() {
 
         <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400"
         >
-          I&apos;m Yaseen Khatib. Five years of building for the web end to
-          end — React, Node.js, TypeScript, MongoDB — and the last few wiring
-          that stack into production AI: RAG pipelines, agent orchestration,
-          and six products shipped solo, from a Rust desktop app to
-          autonomous pipelines. Everything on this site actually runs. Scroll
-          down and poke it.
+          I&apos;m Yaseen Khatib. I have five years of building web products
+          from database to screen, in React, Node.js, TypeScript and MongoDB.
+          Since 2025 I have put AI inside them: chatbots that answer from your
+          own documents, agents that do real work, and search over your data.
+          I have shipped six products on my own, and every one runs live. Open
+          them and try.
         </p>
 
         <p className="mt-4 text-sm text-zinc-500">
@@ -53,7 +53,7 @@ export default function Hero() {
           >
             <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">Need it built?</span>
             <span className="mt-1.5 block text-sm font-semibold text-zinc-50">
-              Freelance full-stack &amp; AI developer in Hyderabad — fixed-price builds from <span className="rupee">₹</span>25k
+              AI chatbots, agents and web apps for your business. Freelance, in Hyderabad or remote. Fixed price from <span className="rupee">₹</span>25,000 (about US$300)
             </span>
             <span className="mt-2 inline-flex items-center gap-1 text-xs text-ice">
               See services and prices <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -67,7 +67,7 @@ export default function Hero() {
               <PulseDot color="bg-emerald-400" /> Hiring?
             </span>
             <span className="mt-1.5 block text-sm font-semibold text-zinc-50">
-              Open to senior full-stack &amp; AI roles — remote, hybrid or on-site
+              Open to senior full-stack and AI engineer roles. Remote, hybrid or Hyderabad.
             </span>
             <span className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-300">
               CV and interview brief <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -85,6 +85,13 @@ export default function Hero() {
             className="inline-flex items-center gap-1.5 font-medium text-zinc-400 transition-colors hover:text-ice"
           >
             <DownloadIcon className="h-4 w-4" /> Download CV
+          </a>
+          <a
+            href={RESUME_ATS_URL}
+            download="Yaseen-Khatib-Resume-Plain.pdf"
+            className="font-medium text-zinc-400 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-ice"
+          >
+            Plain CV for application forms
           </a>
         </div>
       </div>

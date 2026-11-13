@@ -36,11 +36,16 @@ export const VERIFICATION = {
  * server has, so a regenerated PDF is invisible to anyone who downloaded a
  * previous one. Bump this every time scripts/generate-resume.js is re-run.
  */
-const RESUME_VERSION = 4;
+const RESUME_VERSION = 5;
 
 export const RESUME_URL = `${
   process.env.NEXT_PUBLIC_BASE_PATH ?? ""
 }/Resume.pdf?v=${RESUME_VERSION}`;
+
+/** One-page, single-column version for application portals (scripts/generate-resume-ats.js). */
+export const RESUME_ATS_URL = `${
+  process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+}/Resume-ATS.pdf?v=${RESUME_VERSION}`;
 
 export const SOCIALS = {
   github: "https://github.com/Yaseenyk",

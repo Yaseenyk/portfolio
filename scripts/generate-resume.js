@@ -323,7 +323,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
 
     const running = (label) => `
       <div class="flex items-baseline justify-between border-b border-stone-200 pb-2 mb-4">
-        <span class="text-[13px] font-bold tracking-tight text-stone-900">Yaseen Khatib <span class="font-normal text-stone-400">· Senior MERN Stack Developer · AI Systems</span></span>
+        <span class="text-[13px] font-bold tracking-tight text-stone-900">Yaseen Khatib <span class="font-normal text-stone-400">· Senior Full-Stack AI Engineer</span></span>
         <span class="text-[9px] uppercase tracking-[0.2em] text-stone-400 font-semibold">${label}</span>
       </div>`;
 
@@ -353,8 +353,8 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
     <div class="relative flex items-start justify-between gap-8">
       <div>
         <h1 class="text-[32px] font-extrabold tracking-tight leading-none">Yaseen Khatib</h1>
-        <p class="mt-2 text-[13px] font-semibold text-[#C9A227]">Senior MERN Stack Developer <span class="text-stone-500">·</span> AI Systems</p>
-        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build MERN products end to end, then put the AI inside them. Seven shipped solo, each one you can open.</p>
+        <p class="mt-2 text-[13px] font-semibold text-[#C9A227]">Senior Full-Stack AI Engineer <span class="text-stone-500">·</span> React, Node.js, TypeScript</p>
+        <p class="mt-2.5 text-[14px] font-medium leading-[1.4] text-stone-100">I build full-stack products end to end, then put the AI inside them. Six shipped solo, each one you can open.</p>
       </div>
       <div class="text-right text-[10px] text-stone-400 leading-[1.7] shrink-0 pt-1">
         <div><a href="mailto:yaseenkhatib04@gmail.com" class="text-stone-200">yaseenkhatib04@gmail.com</a></div>
@@ -368,10 +368,10 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
     <div class="relative mt-3.5 grid grid-cols-5 divide-x divide-white/10 border-t border-white/10 pt-3">
       ${[
         ['5+', 'years full-stack', 'React · Node.js · MongoDB'],
-        ['7', 'products shipped solo', 'in twelve months, each one open'],
+        ['6', 'products shipped solo', 'each one live and open'],
         ['94%', 'smaller API payloads', 'React Flow + MongoDB serialization'],
         ['2x', 'faster dashboards', 'MongoDB pipeline profiling'],
-        ['34', 'articles published', '+35 syndicated on DEV.to'],
+        ['1 day', 'client MVP live', 'Path Saathi LMS, brief to dev URL'],
       ].map(([n, l, s], i) => `
         <div class="${i ? 'pl-4' : ''} pr-3">
           <div class="text-[22px] font-extrabold leading-none text-white tracking-tight">${n}</div>
@@ -384,7 +384,7 @@ const MCP = 'https://yaseen-concierge.yaseenyk.workers.dev/mcp';
   <section class="mt-3">
     ${h2('Summary')}
     <p class="text-[10.5px] text-stone-700 leading-[1.55]">
-      I build full-stack products on <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and for the last year I have been building the AI inside them. I started in 2021 on hospital information systems that clinical staff used every day. In 2023 I joined MSA Software as a full-stack developer, profiled slow MongoDB pipelines until dashboards ran <b>1.5–2x faster</b>, and moved the team to TypeScript and Next.js. Since 2025 I own the <b>LLM and agentic layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents, MCP servers</b>. On the side I have shipped <b>seven products solo</b>: an AI gym app with on-device form check, a React Flow workflow engine that cut payloads <b>94%</b>, a distilled AI decision model, and four more, each with a public link. I own a system from database schema to deployed UI, and I am open to senior remote, hybrid or on-site roles.
+      I build full-stack products on <b>React, Next.js, TypeScript, Node.js, Express and MongoDB</b>, and for the last year I have been building the AI inside them. I started in 2021 on hospital information systems that clinical staff used every day. In 2023 I joined MSA Software as a full-stack developer, profiled slow MongoDB pipelines until dashboards ran <b>1.5–2x faster</b>, and moved the team to TypeScript and Next.js. Since 2025 I own the <b>LLM and agentic layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents, MCP servers</b>. On the side I have shipped <b>six products solo</b>: an AI gym app with on-device form check, a React Flow workflow engine that cut payloads <b>94%</b>, a distilled AI decision model, and three more, each with a public link. I own a system from database schema to deployed UI, and I am open to senior remote, hybrid or on-site roles.
     </p>
   </section>
 

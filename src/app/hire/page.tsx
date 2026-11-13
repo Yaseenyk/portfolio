@@ -1,7 +1,7 @@
 import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL, PERSON, RESUME_URL } from "@/lib/site";
+import { SITE_URL, PERSON, RESUME_ATS_URL, RESUME_URL } from "@/lib/site";
 import { PERSON_ID, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import ContactForm from "@/components/ContactForm";
@@ -50,12 +50,12 @@ const serviceJsonLd = {
 };
 
 const BUILDS: [string, string][] = [
-  ["Agentic RAG systems", "Retrieval that grounds and cites — hybrid search, reranking, guardrails, and the eval loop that proves it works."],
-  ["LLM orchestration & agents", "Reason → act → observe loops, tool use, memory, and the safety boundaries that make a probabilistic model production-safe."],
-  ["Full-stack MERN apps", "React, Node, TypeScript, MongoDB — from schema to deployment, built to hold up under real users, not a demo."],
-  ["Real-time & edge", "WebSockets, streaming, and serverless on Cloudflare Workers + Hono — low-latency systems that scale past one process."],
-  ["On-device & local-first AI", "Private, offline-capable AI where the data never leaves the device — SQLite, function calling, local retrieval."],
-  ["FinOps & performance", "Token-cost governance, caching, and serialization work — including a 94% payload cut on a real workflow engine."],
+  ["AI chatbots that answer from your documents", "It answers from your own files, shows where each answer came from, and says it does not know instead of guessing. Built with hybrid search, reranking, guardrails and an evaluation loop that proves it works (agentic RAG)."],
+  ["AI agents that do a job for you", "An agent takes a request, uses your tools, and checks with a person before anything important changes. Reason, act, observe loops, memory and safety limits."],
+  ["Web apps, from first screen to launch", "React, Node, TypeScript and MongoDB, from database design to deployment, built for real users and not a demo."],
+  ["Live, real-time features", "Chat, scores and dashboards that update as things happen, on WebSockets and Cloudflare Workers, without a heavy server."],
+  ["Private AI that stays on the device", "AI where the data never leaves the phone or laptop: on-device storage, function calling and local search."],
+  ["Lower AI bills, faster apps", "Caching, smaller payloads and token-cost control, including a 94% payload cut on a real workflow engine."],
 ];
 
 const WAYS: [string, string][] = [
@@ -82,10 +82,11 @@ export default function HirePage() {
           Hire a senior full-stack AI engineer
         </h1>
         <p className="mt-6 text-lg leading-relaxed text-zinc-400">
-          I&apos;m {PERSON.name} — five years building for the web end to end,
-          the last few wiring that into production AI. I ship complete systems
-          solo: six products in the last twelve months, from a Rust desktop app
-          to autonomous pipelines. Everything on this site actually runs.
+          I&apos;m {PERSON.name}. I have five years of building web products
+          from database to screen. Since 2025 I have built the AI side too:
+          chatbots that answer from company documents, and agents that do work
+          with a person approving each step. I have shipped six products on my
+          own, and every one runs live.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <a
@@ -100,6 +101,13 @@ export default function HirePage() {
             className="rounded-lg border border-zinc-700 px-6 py-3 text-sm font-medium text-zinc-200 transition-colors duration-300 hover:border-ice/60 hover:text-ice"
           >
             Download CV
+          </a>
+          <a
+            href={RESUME_ATS_URL}
+            download="Yaseen-Khatib-Resume-Plain.pdf"
+            className="text-sm font-medium text-zinc-400 underline decoration-zinc-700 underline-offset-4 transition-colors hover:text-ice"
+          >
+            Plain CV for application forms
           </a>
         </div>
       </header>
