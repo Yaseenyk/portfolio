@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { RESUME_ATS_URL } from "@/lib/site";
 import { ArrowRightIcon } from "@/components/Icons";
-import Image from "next/image";
 import { ShotImage } from "./Shots";
 
 /**
@@ -108,20 +107,12 @@ export function ExperienceTimeline() {
 interface Proof { name: string; shot: string; kind: string; problem: string; built: string; result: string; proves: string[]; links: [string, string][] }
 const PROOFS: Proof[] = [
   {
-    name: "IntegrateX", shot: "integratex", kind: "Workflow engine · React Flow, MongoDB",
-    problem: "A drag-and-drop workflow canvas was saving its whole screen state to the database, so every save was huge.",
-    built: "A serialization adapter that separates what the screen needs from what the database should store.",
-    result: "Stored payloads cut by 94%, with nothing lost on reload. You can run it in your browser.",
-    proves: ["React", "MongoDB", "State design", "Performance"],
-    links: [["Open the live sandbox", "/sandbox/"], ["Read how", "/blog/94-percent-payload-reduction-react-flow/"]],
-  },
-  {
-    name: "Portfolio Concierge", shot: "concierge", kind: "RAG API and MCP server · Cloudflare Workers",
-    problem: "AI chatbots guess when they do not know. On a company's own documents, a confident wrong answer is worse than none.",
-    built: "A question-answering service over this site that answers only from what it finds, and refuses below a confidence threshold.",
-    result: "It runs on this page. It also works as an MCP server, so you can question my work from inside Claude.",
-    proves: ["RAG", "Vector search", "MCP", "TypeScript"],
-    links: [["Ask it something", "#rag-concierge"], ["Read the code", "https://github.com/Yaseenyk/portfolio/tree/main/worker"]],
+    name: "SpotAI", shot: "spotai", kind: "AI gym app · Vue 3, NestJS, PostgreSQL",
+    problem: "In most gyms nobody checks your form, there is no plan, and the owner chases dues on WhatsApp.",
+    built: "One app for members and owners: a squat coach that uses the phone camera, workout logs, UPI payments and a trainer console.",
+    result: "No video ever leaves the phone. Each gym's data is walled off from the others. 190 API tests.",
+    proves: ["Full product", "Privacy by design", "PostgreSQL", "Testing"],
+    links: [["Get the app", "https://spotai.streamerosai.com/#download"], ["Case study", "/products/spotai/"]],
   },
   {
     name: "FitRank", shot: "fitrank", kind: "AI decision model · FastAPI, PostgreSQL",
@@ -131,13 +122,21 @@ const PROOFS: Proof[] = [
     proves: ["Python", "Model evaluation", "Testing", "CI"],
     links: [["See it live", "https://fitrank.streamerosai.com"], ["Case study", "/products/fitrank/"]],
   },
+  {
+    name: "streamerOS", shot: "streameros", kind: "Desktop app · Rust, Tauri 2",
+    problem: "Streamers run OBS, chat and alerts by hand while they are live.",
+    built: "A desktop app that reads chat on the streamer's own PC and switches OBS scenes when chat spikes. Built with Claude Code, reviewed and tested by me.",
+    result: "Works with no account and no cloud. 306 Rust tests. The site and its AI support agent are public.",
+    proves: ["Rust", "Real-time", "Local-first", "AI-assisted build"],
+    links: [["Visit the site", "https://streamerosai.com"], ["Case study", "/products/streameros/"]],
+  },
 ];
 
 const ALSO: [string, string, string][] = [
-  ["SpotAI", "AI gym app. Form check runs on the phone and no video ever leaves it. 190 API tests.", "/products/spotai/"],
+  ["Esports Hub", "Tournament platform: sign-ups, brackets, ID cards and live screens. About 640 browser tests.", "https://esports.streamerosai.com"],
   ["Path Saathi LMS", "Client project. A working learning platform was live one day after the brief.", "/projects/"],
   ["Sable", "AI finance agent. The model proposes, and only a person can commit a change.", "/products/sable/"],
-  ["streamerOS", "Rust desktop app for streamers, built with Claude Code. 306 tests.", "/products/streameros/"],
+  ["Analytics dashboard", "Google Analytics and Search Console for all my sites on one page.", "https://analytics.streamerosai.com"],
 ];
 
 const isExternal = (h: string) => h.startsWith("http");
@@ -146,18 +145,12 @@ export function Proofs() {
   return (
     <section id="work" aria-labelledby="work-h" className="scroll-mt-24 py-14 sm:py-20">
       <p className={eyebrow}>Proof, not adjectives</p>
-      <h2 id="work-h" className={h2}>Three things I built, and what each one shows</h2>
+      <h2 id="work-h" className={h2}>Three flagship products, and what each one shows</h2>
       <p className={lead}>Each one is live. Open it, break it, read the code.</p>
       <div className="mt-10 grid grid-cols-1 gap-x-10 gap-y-10 lg:grid-cols-3">
         {PROOFS.map((p) => (
           <article key={p.name} className={`${card} flex flex-col`}>
-            {p.shot === "concierge" ? (
-              <span className="mb-5 block overflow-hidden rounded-lg border border-white/10 bg-black">
-                <Image src="/shots/concierge.webp" alt="The portfolio concierge terminal, live screenshot" width={1100} height={676} loading="lazy" decoding="async" sizes="(min-width: 1024px) 33vw, 100vw" className="aspect-[16/10] h-auto w-full object-cover object-bottom" />
-              </span>
-            ) : (
-              <ShotImage id={p.shot} alt={`${p.name}, live screenshot`} className="mb-5" />
-            )}
+            <ShotImage id={p.shot} alt={`${p.name}, live screenshot`} className="mb-5" />
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-zinc-500">{p.kind}</p>
             <h3 className="mt-2 text-xl font-semibold text-zinc-50">{p.name}</h3>
             <dl className="mt-4 flex-1 space-y-3 text-sm leading-relaxed">
@@ -185,7 +178,7 @@ export function Proofs() {
       <ul className="mt-4 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
         {ALSO.map(([name, text, href]) => (
           <li key={name}>
-            <Link href={href} className="group flex h-full items-start gap-3 border-t border-white/10 py-4">
+            <Link href={href} target={isExternal(href) ? "_blank" : undefined} rel={isExternal(href) ? "noopener noreferrer" : undefined} className="group flex h-full items-start gap-3 border-t border-white/10 py-4">
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-zinc-100">{name}</span>
                 <span className="mt-0.5 block text-sm leading-relaxed text-zinc-400">{text}</span>

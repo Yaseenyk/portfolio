@@ -52,7 +52,7 @@ const JOBS = [
 ];
 
 // Projects are chosen for a full-stack MERN-and-AI hire and ordered by how much each one proves: a large full-stack product,
-// the two AI systems, the MERN performance result, a complete product with tests, and a client delivery.
+// then the flagship products (SpotAI, FitRank, streamerOS) and a client delivery. Concierge and IntegrateX are in the "Also" line.
 const PROJECTS = [
   {
     name: 'Esports Hub', what: 'Tournament platform for organisers, built with Claude Code', stack: 'Next.js 14, React, TypeScript, Hono on Cloudflare Workers, D1 (SQL), Playwright',
@@ -60,14 +60,9 @@ const PROJECTS = [
     links: [a('https://esports.streamerosai.com', 'Live'), a(`${GH}/esports-frontend`, 'Frontend'), a(`${GH}/esports-backend`, 'API')],
   },
   {
-    name: 'Portfolio Concierge', what: 'Grounded RAG API and public MCP server', stack: 'Cloudflare Workers, Vectorize, Workers AI, MCP, TypeScript',
-    text: 'Answers questions about my work from a vector index of this site and refuses to answer below a similarity threshold instead of guessing. A public MCP server exposes search, products and availability tools, so a recruiter can interview this résumé from inside Claude. The index rebuilds automatically after every deploy.',
-    links: [a(`${SITE}/#rag-concierge`, 'Try it'), a(`${GH}/portfolio/tree/main/worker`, 'Code')],
-  },
-  {
-    name: 'IntegrateX', what: 'Workflow automation engine', stack: 'React Flow, Zustand, TypeScript, MongoDB',
-    text: 'A node-based workflow canvas. The first design stored the React Flow render model; a custom serialization adapter separates the view from the stored record and cut payloads by 94%, round-trip lossless. Runs live in the browser.',
-    links: [a(`${SITE}/sandbox/`, 'Live sandbox'), a(`${SITE}/blog/94-percent-payload-reduction-react-flow/`, 'Write-up')],
+    name: 'SpotAI', what: 'AI gym app for Indian gyms, members and owners in one app', stack: 'Vue 3, Capacitor, NestJS, PostgreSQL, MediaPipe, NATS',
+    text: 'Squat form check runs on the phone: frames never leave it, only rep counts and flags reach the API. Row-level security per gym, tested with two gyms side by side. 190 API tests and browser tests with accessibility checks on every screen.',
+    links: [a('https://spotai.streamerosai.com/#download', 'Android and iPhone apps'), a(`${SITE}/products/spotai/`, 'Case study')],
   },
   {
     name: 'FitRank', what: 'Typed AI decisions for staffing', stack: 'FastAPI, PostgreSQL and pgvector, PyTorch, React, Docker',
@@ -75,9 +70,9 @@ const PROJECTS = [
     links: [a('https://fitrank.streamerosai.com', 'Live'), a(`${SITE}/products/fitrank/`, 'Case study')],
   },
   {
-    name: 'SpotAI', what: 'AI gym app for Indian gyms, members and owners in one app', stack: 'Vue 3, Capacitor, NestJS, PostgreSQL, MediaPipe, NATS',
-    text: 'Squat form check runs on the phone: frames never leave it, only rep counts and flags reach the API. Row-level security per gym, tested with two gyms side by side. 190 API tests and browser tests with accessibility checks on every screen.',
-    links: [a('https://spotai.streamerosai.com/#download', 'Android and iPhone apps'), a(`${SITE}/products/spotai/`, 'Case study')],
+    name: 'streamerOS', what: 'Rust and Tauri 2 streaming cockpit, built with Claude Code', stack: 'Rust, Tauri 2, OBS WebSocket, Next.js, Hono, Upstash Vector',
+    text: 'Reads chat on the streamer’s own PC and switches OBS scenes when chat spikes, with no account and no cloud. 306 Rust tests, reviewed and tested by me. The Next.js site and its support agent (Hono on Cloudflare Workers, Upstash Vector, Gemini) are public; the app repository is private.',
+    links: [a('https://streamerosai.com', 'Website'), a(`${GH}/streamer-os-website`, 'Site and agent source')],
   },
   {
     name: 'Path Saathi LMS', what: 'Client project, free vocational-skilling platform', stack: 'Next.js, React, Tailwind CSS, TypeScript',
@@ -149,7 +144,7 @@ ${PROJECTS.map((p) => `<div class="proj">
   <p style="margin:1px 0 1px">${p.text}</p>
   <div class="stack"><b>Stack:</b> ${p.stack}</div>
 </div>`).join('\n')}
-<p class="more"><b>Also:</b> Sable, a local-first AI finance agent in React Native where the model proposes and only a person commits (${a(`${SITE}/products/sable/`, 'case study')}). streamerOS, a Rust and Tauri 2 desktop app for streamers built with Claude Code, 306 Rust tests (${a('https://streamerosai.com', 'site')}). ShelfSight AI, retail vision on FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). AISA, a student platform rebuilt from one 4,019-line HTML file into Next.js and Spring Boot (${a('https://yaseenyk.github.io/SIT-FE/', 'live')}).</p>
+<p class="more"><b>Also:</b> Portfolio Concierge, a grounded RAG API and public MCP server on Cloudflare Workers that refuses to answer below a similarity threshold (${a(`${SITE}/#rag-concierge`, 'try it')}, ${a(`${GH}/portfolio/tree/main/worker`, 'code')}). IntegrateX, a React Flow and MongoDB workflow engine where a serialization adapter cut stored payloads by 94% (${a(`${SITE}/sandbox/`, 'live sandbox')}). Sable, a local-first AI finance agent in React Native where the model proposes and only a person commits (${a(`${SITE}/products/sable/`, 'case study')}). ShelfSight AI, retail vision on FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). AISA, a student platform rebuilt from one 4,019-line HTML file into Next.js and Spring Boot (${a('https://yaseenyk.github.io/SIT-FE/', 'live')}).</p>
 
 <h2>Open source and writing</h2>
 <p>Public code at ${a(GH, 'github.com/Yaseenyk')}, including this portfolio, its RAG and MCP worker and the content pipelines. Engineering write-ups at ${a(`${SITE}/blog/`, 'yk.streamerosai.com/blog')} and ${a('https://dev.to/yaseenyk04', 'dev.to/yaseenyk04')}.</p>

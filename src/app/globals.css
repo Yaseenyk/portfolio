@@ -323,7 +323,8 @@
 .text-gradient { background: none !important; -webkit-text-fill-color: currentColor !important; color: #22d3ee !important; animation: none !important; }
 [class*="shadow-[0_0"] { box-shadow: none !important; }
 [class*="backdrop-blur"]:not(nav):not(header) { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-:where(.rounded-2xl, .rounded-3xl).border:not(img):not(.keep-box) {
+/* Floating panels (menu dropdown, phone menu, command palette) must stay solid boxes, or the page shows through them. */
+:where(.rounded-2xl, .rounded-3xl).border:not(img):not(.keep-box):not([class*="shadow-2xl"]):not([class*="bg-ink"]):not(.fixed) {
   background-color: transparent !important; background-image: none !important; border-color: transparent !important; border-top-color: rgba(255, 255, 255, 0.12) !important;
   border-radius: 0 !important; padding-left: 0 !important; padding-right: 0 !important; box-shadow: none !important;
 }
@@ -333,3 +334,6 @@
 
 /* One accent: buttons that used a cyan-to-violet gradient are solid cyan. */
 button[class*="bg-gradient-to-"], a[class*="bg-gradient-to-"] { background-image: none !important; background-color: #22d3ee !important; }
+
+/* Floating surfaces (menu bar, dropdown, phone menu): fully solid, since the blur behind them is gone. A plain dark shadow, no coloured glow. */
+[class*="shadow-2xl"] { background-color: #0a0d12 !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55) !important; }

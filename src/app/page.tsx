@@ -145,7 +145,7 @@ export default function Home() {
               Ask my portfolio a question
             </h2>
             <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-zinc-400">
-              This is the concierge from the list above, running live. It answers
+              This is a small AI service I built for this site, running live. It answers
               only from what is written on this site, shows its steps, and tells
               you when it does not know. Try &ldquo;What did he do at
               Sparity?&rdquo; or &ldquo;Does he know PostgreSQL?&rdquo;

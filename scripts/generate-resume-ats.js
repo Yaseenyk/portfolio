@@ -54,10 +54,10 @@ const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
 
 <h2>Selected projects (each live; links on yk.streamerosai.com/products)</h2>
 <ul>
+  <li><b>Esports Hub</b>, tournament platform built with Claude Code (Next.js 14, React, TypeScript, Hono on Cloudflare Workers, D1): sign-ups, brackets, ID cards and live screens; Google sign-in and email confirmation; about 640 browser tests and 600 API tests.</li>
   <li><b>SpotAI</b>, AI gym app for Indian gyms (Vue 3, Capacitor, NestJS, PostgreSQL): squat form check runs on the phone and never uploads a frame; row-level security per gym; 190 API tests.</li>
   <li><b>FitRank</b>, typed AI decisions for staffing (FastAPI, PostgreSQL + pgvector, PyTorch): a 23M-parameter MiniLM model distilled from a 9B teacher, beats a rules-only baseline on hit@5 (94% vs 91%), served on CPU; 93.5% backend test coverage; Docker and GitHub Actions CI.</li>
-  <li><b>Portfolio Concierge</b>, grounded RAG API and public MCP server (Cloudflare Workers, Vectorize): refuses to answer below a similarity threshold; re-indexes automatically after every deploy.</li>
-  <li><b>IntegrateX</b>, workflow engine (React Flow, Zustand, MongoDB): a serialization adapter cut stored payloads by 94%.</li>
+  <li><b>streamerOS</b>, Rust and Tauri 2 desktop app for streamers, built with Claude Code: switches OBS scenes when chat spikes, no account and no cloud; 306 Rust tests.</li>
   <li><b>Path Saathi LMS</b>, client project (Next.js, React, TypeScript): working platform with login and course delivery on the dev environment the day after the brief arrived.</li>
 </ul>
 

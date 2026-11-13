@@ -63,7 +63,7 @@ export function HeroShots() {
   const four = ["fitrank", "spotai", "streameros", "esports"].map(byId);
   return (
     <div aria-label="Screenshots of four live products">
-      <ul className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0">
+      <ul className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-4 lg:overflow-visible lg:px-0 lg:pb-0">
         {four.map((s, i) => (
           <li key={s.id} className="w-[78%] flex-none snap-start sm:w-[46%] lg:w-auto">
             <a href={s.href} target={isExternal(s.href) ? "_blank" : undefined} rel={isExternal(s.href) ? "noopener noreferrer" : undefined} className="group block">
@@ -104,9 +104,10 @@ export function Gallery() {
       </ul>
 
       <h3 className="mt-14 text-sm font-semibold uppercase tracking-[0.14em] text-zinc-400">On a phone</h3>
-      <ul className="-mx-6 mt-5 flex snap-x gap-4 overflow-x-auto px-6 pb-3 md:mx-0 md:px-0">
+      <p className="mt-1 text-[12.5px] text-zinc-500 lg:hidden">Swipe to see more.</p>
+      <ul className="-mx-6 mt-5 flex snap-x gap-4 overflow-x-auto px-6 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:grid lg:grid-cols-7 lg:gap-4 lg:overflow-visible lg:px-0">
         {PHONE_SHOTS.map((s) => (
-          <li key={s.id} className="w-[46%] flex-none snap-start sm:w-[30%] md:w-[19%] lg:w-[13.2%]">
+          <li key={s.id} className="w-[46%] flex-none snap-start sm:w-[30%] lg:w-auto">
             <span className={frame}>
               <Image src={`/shots/${s.id}.webp`} alt={`${s.title} on a phone, live screenshot`} width={520} height={1125} loading="lazy" decoding="async" sizes="(min-width: 1024px) 14vw, 46vw" className="h-auto w-full" />
             </span>
