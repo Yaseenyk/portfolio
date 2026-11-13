@@ -2,7 +2,7 @@ import { seoDescription } from "@/lib/seoText";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL, PERSON, RESUME_ATS_URL, RESUME_URL } from "@/lib/site";
-import { PERSON_ID, breadcrumbJsonLd } from "@/lib/seo";
+import { PERSON_ID, breadcrumbJsonLd, faqPageJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
 import ContactForm from "@/components/ContactForm";
 
@@ -58,6 +58,16 @@ const BUILDS: [string, string][] = [
   ["Lower AI bills, faster apps", "Caching, smaller payloads and token-cost control, including a 94% payload cut on a real workflow engine."],
 ];
 
+// Asked by recruiters and clients, and lifted by AI assistants. Every answer is a fact from the résumé or this site.
+const FAQ: { question: string; answer: string }[] = [
+  { question: "Who is Yaseen Khatib?", answer: "Yaseen Khatib is a senior full-stack AI engineer based in Hyderabad, India. He has five years of experience building web products in React, Node.js, TypeScript and MongoDB, and since June 2025 he has been a Senior Software Developer at Sparity, where he owns the LLM and agent layer of production MERN systems." },
+  { question: "What does he build?", answer: "Full-stack web apps on the MERN stack, and the AI inside them: chatbots that answer from a company's own documents (RAG), agents that do a job with a person approving each step, and MCP servers. His flagship products are SpotAI, FitRank and streamerOS." },
+  { question: "Is he available for full-time roles?", answer: "Yes. He is open to senior full-stack, AI engineer and forward-deployed engineering roles: remote, hybrid, or on-site in Hyderabad." },
+  { question: "Does he take freelance or contract work?", answer: "Yes. He takes fixed-price builds: the scope and price are agreed in writing before work starts, and the client owns the source code. Services and prices are on the Solutions page." },
+  { question: "Where is he based, and does he work with teams abroad?", answer: "He is in Hyderabad, India (IST). Two of his three jobs were fully remote, and he works across Indian and Western hours." },
+  { question: "How can I check his work before I talk to him?", answer: "Every project on the Projects page has a real screenshot and a link to the live product. The two-page CV is on this page, and the question box on the home page answers from his site and says when it does not know." },
+];
+
 const WAYS: [string, string][] = [
   ["Full-time", "Senior or lead engineer, remote / hybrid / on-site. Open now."],
   ["Contract / freelance", "A defined build or an ongoing engagement — I own it end to end."],
@@ -71,6 +81,7 @@ export default function HirePage() {
         data={[
           serviceJsonLd,
           breadcrumbJsonLd([{ name: "Hire", path: "/hire" }]),
+          faqPageJsonLd(FAQ),
         ]}
       />
 
@@ -239,6 +250,18 @@ export default function HirePage() {
           Based in Hyderabad, India (IST) — comfortable remote, hybrid, or
           on-site, and effective across global time zones.
         </p>
+      </section>
+
+      <section className="mt-20" aria-labelledby="hire-faq">
+        <h2 id="hire-faq" className="text-2xl font-semibold tracking-tight text-zinc-50">Quick answers</h2>
+        <dl className="mt-8 grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
+          {FAQ.map((f) => (
+            <div key={f.question} className="border-t border-white/10 pt-5">
+              <dt className="text-base font-semibold text-zinc-100">{f.question}</dt>
+              <dd className="mt-2 text-[15px] leading-relaxed text-zinc-400">{f.answer}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <div className="mt-8">

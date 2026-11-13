@@ -23,10 +23,16 @@ export const siteGraphJsonLd = {
       "@type": "Person",
       "@id": PERSON_ID,
       name: PERSON.name,
+      // The short name is what people search and what the résumé says. Several other people share it, so the role,
+      // employer and city below are what tell search engines and AI assistants which Yaseen Khatib this is.
+      alternateName: "Yaseen Khatib",
       jobTitle: PERSON.jobTitle,
+      description:
+        "Senior full-stack AI engineer in Hyderabad, India. Five years building web products in React, Node.js, TypeScript and MongoDB, and since 2025 the LLM, RAG and agent layer of production MERN systems at Sparity.",
+      worksFor: { "@type": "Organization", name: "Sparity" },
       url: SITE_URL,
       email: `mailto:${PERSON.email}`,
-      sameAs: [SOCIALS.linkedin, SOCIALS.github],
+      sameAs: [SOCIALS.linkedin, SOCIALS.github, "https://dev.to/yaseenyk04"],
       knowsAbout: PERSON.knowsAbout,
       address: {
         "@type": "PostalAddress",

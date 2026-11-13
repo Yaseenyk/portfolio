@@ -7,7 +7,7 @@
       "name": "AI Briefing: Yaseen Nurmahammad Khatib — Senior Full-Stack AI Engineer",
       "description": "Machine-readable engineering profile manifest for AI recruiter agents, automated scrapers, and answer-engine indexers. Summarizes identity, infrastructure stack, and verifiable project metrics.",
       "url": "https://yk.streamerosai.com",
-      "dateModified": "2026-06-10",
+      "dateModified": "2026-11-14",
       "inLanguage": "en",
       "audience": {
         "@type": "Audience",
@@ -25,6 +25,9 @@
         },
         {
           "@id": "https://yk.streamerosai.com/#final-year-projects-service"
+        },
+        {
+          "@id": "https://yk.streamerosai.com/#work"
         }
       ]
     },
@@ -195,8 +198,90 @@
       "availableChannel": {
         "@type": "ServiceChannel",
         "serviceUrl": "https://yk.streamerosai.com/final-year-projects/",
-        "availableLanguage": ["en", "hi"]
+        "availableLanguage": [
+          "en",
+          "hi"
+        ]
       }
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://yk.streamerosai.com/#work",
+      "name": "Projects built by Yaseen Khatib",
+      "url": "https://yk.streamerosai.com/projects/",
+      "numberOfItems": 10,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "SpotAI",
+          "url": "https://spotai.streamerosai.com/",
+          "description": "AI gym app for Indian gyms. Squat form check runs on the phone and no video leaves it. 190 API tests."
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "FitRank",
+          "url": "https://fitrank.streamerosai.com/",
+          "description": "AI decision model for staffing. Beats a rules-only baseline on shortlists (94% vs 91%); a manager makes every final call."
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "streamerOS",
+          "url": "https://streamerosai.com/",
+          "description": "Rust and Tauri 2 desktop app that switches OBS scenes when chat spikes. 306 Rust tests."
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Esports Hub",
+          "url": "https://esports.streamerosai.com/",
+          "description": "Tournament platform: sign-ups, brackets, points tables, ID cards, live screens. About 640 browser tests and 600 API tests."
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Analytics dashboard",
+          "url": "https://analytics.streamerosai.com/",
+          "description": "Google Analytics and Search Console for twelve sites on one page."
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "Solar subsidy guide",
+          "url": "https://solar.streamerosai.com/",
+          "description": "India rooftop solar subsidy guide and calculator in 13 languages; every figure sourced and dated."
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "Exam dates India",
+          "url": "https://exams.streamerosai.com/",
+          "description": "Exam dates read from official bulletins; an unsourced fact fails the build."
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "Free tool sites",
+          "url": "https://calc.streamerosai.com/",
+          "description": "Four utility sites from one codebase, 284 unit tests."
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "name": "DefendIt",
+          "url": "https://campus.streamerosai.com/",
+          "description": "Final-year projects for students in India, built and explained for the viva."
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "Path Saathi LMS",
+          "url": "https://devlms.pathsaathi.in/login",
+          "description": "Client learning platform, live one day after the brief."
+        }
+      ]
     }
   ]
 }

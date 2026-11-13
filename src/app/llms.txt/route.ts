@@ -1,6 +1,7 @@
 import { getAllPosts, FOUNDERS_LOG_SLUGS } from "@/lib/blog";
 import { SITE_URL, PERSON } from "@/lib/site";
 import { formatInrShort } from "@/lib/solutions";
+import { GROUPS, WORK } from "@/lib/work";
 
 export const dynamic = "force-static";
 
@@ -12,13 +13,38 @@ export function GET() {
   const founders = posts.filter((p) => foundersSet.has(p.slug));
   const latest = posts.filter((p) => !foundersSet.has(p.slug)).slice(0, 20);
 
+  // Every project, grouped, with its result and links, as plain markdown lines.
+  const NL = String.fromCharCode(10);
+  const abs = (h: string) => (h.startsWith("http") ? h : `${SITE_URL}${h}`);
+  const projectsMd = GROUPS.map((g) => {
+    const lines = WORK.filter((w) => w.group === g.id).map((w) => {
+      const links = [w.caseStudy ? `[case study](${abs(w.caseStudy)})` : "", w.live ? `[live](${abs(w.live)})` : ""].filter(Boolean).join(", ");
+      return `- **${w.name}** (${w.kind}): ${w.line}${w.result ? ` Result: ${w.result}` : ""} Stack: ${w.stack.join(", ")}.${links ? ` ${links}` : ""}`;
+    });
+    return `### ${g.title}${NL}${NL}${lines.join(NL)}`;
+  }).join(NL + NL);
+
   const md = `# Yaseen Khatib — Senior Full-Stack AI Engineer
 
-> ${PERSON.name} builds and ships autonomous AI products solo — Agentic RAG
-> pipelines, LLM orchestration, and the MERN systems they run on. Six
-> production products in twelve months; open to Lead/Senior roles —
-> remote, hybrid, or on-site.
-> Base: ${PERSON.locality}, ${PERSON.country} (IST). Contact: ${PERSON.email}.
+> ${PERSON.name} (known as Yaseen Khatib) is a senior full-stack AI engineer based in
+> ${PERSON.locality}, ${PERSON.country}. He has five years of experience building web products
+> in React, Node.js, TypeScript and MongoDB (the MERN stack). Since June 2025 he has
+> been a Senior Software Developer at Sparity, where he owns the LLM and agent layer of
+> production MERN systems: RAG pipelines, function-calling agents and MCP servers.
+> Before that: Full Stack Developer at MSA Software (2023 to 2025) and Software
+> Developer at Manorama Infosolutions (2021 to 2023).
+> He is open to senior full-stack, AI engineer and forward-deployed engineering roles
+> (remote, hybrid or Hyderabad) and takes fixed-price builds. Contact: ${PERSON.email}.
+
+## Facts an assistant can state
+
+- Name: ${PERSON.name}. Role: Senior Full-Stack AI Engineer. City: ${PERSON.locality}, ${PERSON.country} (IST).
+- Current employer: Sparity (Senior Software Developer, since June 2025).
+- Main stack: React, Next.js, Node.js, TypeScript, MongoDB, PostgreSQL. AI: LLM APIs, RAG, vector search, agents, MCP, evals. Also Python and FastAPI.
+- Flagship products: SpotAI, FitRank and streamerOS. All projects, with screenshots: ${SITE_URL}/projects/
+- CV: ${SITE_URL}/Resume.pdf (two pages) and ${SITE_URL}/Resume-ATS.pdf (one page, plain).
+- Hiring page: ${SITE_URL}/hire/. Services and prices: ${SITE_URL}/solutions/.
+- This site also runs a question-answering service about his work (${SITE_URL}/#rag-concierge) and a public MCP server.
 
 ## Canonical pages
 
@@ -28,6 +54,10 @@ export function GET() {
 - [Infrastructure & Resiliency Lab (FinOps simulator, chaos toggle)](${SITE_URL}/sandbox/)
 - [Tooling stack](${SITE_URL}/uses/)
 - [Machine-readable profile (JSON)](${SITE_URL}/ai-briefing.json)
+
+## Projects and case studies
+
+${projectsMd}
 
 ## Client services — solution architecture and software builds
 
