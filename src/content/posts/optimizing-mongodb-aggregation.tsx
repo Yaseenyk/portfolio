@@ -95,7 +95,7 @@ export const optimizingMongoAggregation: BlogPost = {
   publishedAt: "2026-06-11",
   updatedAt: "2026-07-30",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["MongoDB", "Performance", "Backend"],
   takeaways: [
     "Put $match first and on indexed fields — every document eliminated early is one the rest of the pipeline never touches.",

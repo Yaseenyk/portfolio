@@ -86,7 +86,7 @@ export const chatgptChangedEngineering: BlogPost = {
   ],
   publishedAt: "2026-06-06",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["AI", "Industry", "MERN"],
   takeaways: [
     "Late 2022 made writing code cheap for everyone at once, invalidating every estimate of how long features take.",

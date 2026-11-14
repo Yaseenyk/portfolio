@@ -101,7 +101,7 @@ export const hireMyHead: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["Founder's Log", "Vision", "Career"],
   takeaways: [
     "AI made implementation abundant; scarce value is the head — seeing whole systems, pricing trade-offs, refusing failures in advance.",

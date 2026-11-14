@@ -182,7 +182,7 @@ export const semanticCachingEdge: BlogPost = {
   publishedAt: "2026-06-02",
   updatedAt: "2026-07-28",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["RAG", "Performance", "Cost Optimization"],
   takeaways: [
     "String-keyed caches miss because no two users phrase a question the same way; semantic caching matches on meaning.",

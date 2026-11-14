@@ -103,7 +103,7 @@ export const aiFinopsPlaybook: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["Founder's Log", "FinOps", "AI Infrastructure"],
   takeaways: [
     "Most production LLM traffic is repetitive or simple; sending it all to a frontier model is an architecture failure invoiced monthly.",

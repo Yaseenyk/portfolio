@@ -98,7 +98,7 @@ export const websocketTelemetryAtScale: BlogPost = {
   publishedAt: "2026-06-12",
   updatedAt: "2026-07-28",
   readingMinutes: 8,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["WebSockets", "Real-Time", "Backend"],
   takeaways: [
     "In-memory broadcast only reaches the local process — multi-instance real-time needs a shared backplane (Redis pub/sub).",

@@ -157,7 +157,7 @@ export const aiEngineerPortfolioExamples: BlogPost = {
   ],
   publishedAt: "2026-10-30",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["Career", "Hiring", "RAG"],
   takeaways: [
     "Reviewers check whether anything runs, whether you made the hard decisions, whether you can explain a trade-off, and whether anything is measured.",

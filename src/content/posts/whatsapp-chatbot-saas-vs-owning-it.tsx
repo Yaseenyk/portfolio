@@ -298,7 +298,7 @@ export const whatsappChatbotSaasVsOwning: BlogPost = {
   ],
   publishedAt: "2026-10-23",
   readingMinutes: 8,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["AI", "RAG", "WhatsApp"],
   takeaways: [
     "Every WhatsApp chatbot pays Meta per delivered message; service replies to customers who wrote first include 1,000 free a month per number from 1 October 2026.",

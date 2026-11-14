@@ -63,10 +63,11 @@ function Body() {
       <h2>Making it official</h2>
       <p>
         In June 2025 the two tracks merged: I joined Sparity as a senior
-        software developer working on exactly this — integrating LLMs and
-        agentic workflows into production MERN systems, owning them from
-        architecture through deployment. The night studies became the day
-        job.
+        software developer and started building the AI tooling layer. A local
+        hybrid RAG system over a large web-app codebase, scored on a golden
+        query set (Recall@5 of 0.95), an MCP server that lets Claude Code
+        search it with 20 tools, and an AI pull-request review service. The
+        night studies became the day job.
       </p>
       <p>
         And then I started building for myself. Over the following year I
@@ -121,7 +122,7 @@ export const myJourneyPost: BlogPost = {
   ],
   publishedAt: "2026-07-20",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["Founder's Log", "Career", "Journey"],
   takeaways: [
     "Started September 2021 at a healthcare software company on ASP.NET + React; the unglamorous fundamentals became the foundation for everything after.",

@@ -115,7 +115,7 @@ export const shippedFiveProductsSolo: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["Founder's Log", "Vision", "Products"],
   takeaways: [
     "Five production products shipped in twelve months by one engineer: streamerOS, IntegrateX, Sable, a zero-cost content engine, and a LinkedIn automation pipeline.",

@@ -167,7 +167,7 @@ export const promptCachingDeepDive: BlogPost = {
   publishedAt: "2026-06-02",
   updatedAt: "2026-07-28",
   readingMinutes: 9,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["AI", "Anthropic", "Claude", "Cost Optimization"],
   takeaways: [
     "Prompt caching stores a prompt prefix so requests sharing it skip recompute; cached input tokens bill at roughly a tenth the rate and cut time-to-first-token, with no quality trade-off.",

@@ -158,7 +158,7 @@ export const llmObservability: BlogPost = {
   publishedAt: "2026-06-03",
   updatedAt: "2026-07-28",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["AI", "Observability", "Architecture"],
   takeaways: [
     "Emit one span per agent step so a request becomes a readable waterfall — total at the root, a labelled child per stage.",

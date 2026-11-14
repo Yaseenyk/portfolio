@@ -155,7 +155,7 @@ export const aiNativePortfolio: BlogPost = {
   ],
   publishedAt: "2026-06-08",
   readingMinutes: 6,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["Career", "AI", "Architecture"],
   takeaways: [
     "Show the system, not the tool usage: architecture diagrams and explicit tradeoffs are what signal seniority.",

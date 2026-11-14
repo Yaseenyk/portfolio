@@ -171,7 +171,7 @@ export const reactFlowAgentCanvas: BlogPost = {
   publishedAt: "2026-06-05",
   updatedAt: "2026-07-30",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["React Flow", "Agentic AI", "Architecture"],
   takeaways: [
     "React Flow can be the control plane for a running agent system, not just a diagram of one.",

@@ -93,7 +93,7 @@ export const sableTrustBoundary: BlogPost = {
   ],
   publishedAt: "2026-07-07",
   readingMinutes: 7,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["Founder's Log", "AI Safety", "Products"],
   takeaways: [
     "Sable has no cloud backend: every financial record lives in on-device SQLite, so privacy is a topology, not a policy.",

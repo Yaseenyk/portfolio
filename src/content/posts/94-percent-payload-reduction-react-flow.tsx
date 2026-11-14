@@ -157,7 +157,7 @@ export const payloadReductionReactFlow: BlogPost = {
   ],
   publishedAt: "2026-06-04",
   readingMinutes: 8,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["React Flow", "Zustand", "Performance"],
   takeaways: [
     "React Flow nodes carry view state, measured dimensions, and handles that never belong in your persistence layer.",

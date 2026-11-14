@@ -288,7 +288,7 @@ export const masteringClaudeArchitecture: BlogPost = {
   publishedAt: "2026-06-10",
   updatedAt: "2026-07-30",
   readingMinutes: 9,
-  author: { name: "Yaseen Khatib", role: "Senior Full-Stack AI Engineer" },
+  author: { name: "Yaseen Khatib", role: "Full Stack AI Developer" },
   tags: ["AI", "Anthropic", "Claude", "LLM Architecture"],
   takeaways: [
     "A Claude model is a single fixed token budget: system prompt, tools, transcript, extended thinking, and the reply all compete for the same context window.",
