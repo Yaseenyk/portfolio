@@ -47,7 +47,7 @@ const JOBS = [
   {
     title: 'Full Stack Developer', org: 'MSA Software', meta: 'Remote', dates: '01/2023 – 05/2025',
     bullets: [
-      'Cut dashboard response times 1.5 to 2x by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.',
+      'Made dashboards 1.5 to 2x faster by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.',
       'Moved the team’s legacy JavaScript to TypeScript and Next.js, removing a class of type-related production bugs.',
       'Migrated shared state from hand-rolled Redux to Redux Toolkit slices.',
     ],
@@ -68,12 +68,12 @@ const JOBS = [
 const PROJECTS = [
   {
     name: 'Esports Hub', what: 'Tournament platform for organisers, built with Claude Code', stack: 'Next.js 14, React, TypeScript, Hono on Cloudflare Workers, D1 (SQL), Playwright',
-    text: 'Sign-ups, brackets, points tables, ID cards, live TV screens and gate check-in, with 14 free tools. Google sign-in verified against Google’s public keys, email confirmation before first use, and organisations with roles. About 640 browser tests on desktop and phone and about 600 API tests, run on every push.',
+    text: 'Sign-ups, brackets, points tables, ID cards, live TV screens and gate check-in, with 14 free tools. Google sign-in verified against Google’s public keys, email confirmation, and organisations with roles. About 640 browser tests and about 600 API tests run on every push.',
     links: [a('https://esports.streamerosai.com', 'Live'), a(`${GH}/esports-frontend`, 'Frontend'), a(`${GH}/esports-backend`, 'API')],
   },
   {
     name: 'SpotAI', what: 'AI gym app for Indian gyms, members and owners in one app', stack: 'Vue 3, Capacitor, NestJS, PostgreSQL, MediaPipe, NATS',
-    text: 'Squat form check runs on the phone: frames never leave it, only rep counts and flags reach the API. Row-level security per gym, tested with two gyms side by side. 190 API tests and browser tests with accessibility checks on every screen.',
+    text: 'Squat form check runs on the phone: frames never leave it, only rep counts and flags reach the API. Row-level security per gym, tested with two gyms side by side. 190 API tests and accessibility checks on every screen.',
     links: [a('https://spotai.streamerosai.com/#download', 'Android and iPhone apps'), a(`${SITE}/products/spotai/`, 'Case study')],
   },
   {
@@ -108,11 +108,11 @@ const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
   .contact { font-size: 9.2pt; color: #2a2f38; line-height: 1.5; }
   .contact span { white-space: nowrap; }
   .open { margin-top: 5px; font-size: 9.2pt; color: #2a2f38; }
-  h2 { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: #0b5d70; border-bottom: 1.4px solid #0b5d70; margin: 13px 0 6px; padding-bottom: 2px; }
+  h2 { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: #0b5d70; border-bottom: 1.4px solid #0b5d70; margin: 11px 0 5px; padding-bottom: 2px; }
   p { margin: 0 0 4px; }
   .skill { margin: 0 0 3px; }
   .skill .k { font-weight: 700; color: #0b5d70; }
-  .job { margin-top: 10px; page-break-inside: avoid; }
+  .job { margin-top: 8px; page-break-inside: avoid; }
   .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .row .t { font-size: 10.9pt; font-weight: 700; color: #111; }
   .row .t i { font-style: normal; font-weight: 600; color: #0b5d70; }
@@ -137,10 +137,10 @@ const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
   <span>${a('https://www.linkedin.com/in/yaseen-yk', 'linkedin.com/in/yaseen-yk')}</span> · <span>${a(GH, 'github.com/Yaseenyk')}</span> · <span>${a(SITE, 'yk.streamerosai.com')}</span>
 </div>
 <div class="strip"><b>Core:</b> MERN <i>|</i> TypeScript <i>|</i> Next.js <i>|</i> LLM apps <i>|</i> RAG <i>|</i> AI agents <i>|</i> MCP <i>|</i> Python and FastAPI <i>|</i> System design <i>|</i> CI/CD</div>
-<div class="open"><b>Open to:</b> senior full-stack, GenAI and forward-deployed roles · remote, hybrid or Hyderabad · fixed-price builds</div>
+<div class="open"><b>Open to:</b> Full Stack AI Developer roles · Hyderabad, Pune, Mumbai, Bangalore or remote India</div>
 
 <h2>Summary</h2>
-<p>${kw('Full Stack AI Developer with five years shipping production web systems on the MERN stack with TypeScript and Next.js: hospital information systems, analytics dashboards and, since 2025, the LLM and agent layer of production MERN systems at Sparity. I build the parts around the model that make AI usable: RAG pipelines, function-calling agents where a person approves every change, MCP servers, evals, and cost-aware routing between models. Cut dashboard response times 1.5 to 2x by profiling MongoDB aggregation pipelines; moved a team from JavaScript to TypeScript and Next.js. Six products shipped solo, each live and open, and a client learning platform live one day after the brief.')}</p>
+<p>${kw('Full Stack AI Developer with five years shipping production web systems on the MERN stack with TypeScript and Next.js: hospital information systems, analytics dashboards and, since 2025, the LLM and agent layer of production MERN systems at Sparity. I build the parts around the model that make AI usable: RAG pipelines, function-calling agents where a person approves every change, MCP servers, evals, and cost-aware routing between models. Made dashboards 1.5 to 2x faster by profiling MongoDB aggregation pipelines; moved a team from JavaScript to TypeScript and Next.js. Shipped several products solo, each live with a public link or case study, and a client learning platform live one day after the brief.')}</p>
 
 <h2>Skills</h2>
 ${SKILLS.map(([k, v]) => `<p class="skill"><span class="k">${k}:</span> ${v}</p>`).join('\n')}
@@ -161,7 +161,7 @@ ${PROJECTS.map((p) => `<div class="proj">
   <p style="margin:1px 0 1px">${kw(p.text)}</p>
   <div class="stack"><b>Stack:</b> ${p.stack}</div>
 </div>`).join('\n')}
-<p class="more"><b>Also:</b> Portfolio Concierge, a grounded RAG API and public MCP server on Cloudflare Workers that refuses to answer below a similarity threshold (${a(`${SITE}/#rag-concierge`, 'try it')}, ${a(`${GH}/portfolio/tree/main/worker`, 'code')}). IntegrateX, a React Flow and MongoDB workflow engine where a serialization adapter cut stored payloads by 94% (${a(`${SITE}/sandbox/`, 'live sandbox')}). Sable, a local-first AI finance agent in React Native where the model proposes and only a person commits (${a(`${SITE}/products/sable/`, 'case study')}). ShelfSight AI, retail vision on FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). AISA, a student platform rebuilt from one 4,019-line HTML file into Next.js and Spring Boot (${a('https://yaseenyk.github.io/SIT-FE/', 'live')}).</p>
+<p class="more"><b>Also:</b> Portfolio Concierge, a grounded RAG API and public <b>MCP</b> server that refuses to answer below a similarity threshold (${a(`${SITE}/#rag-concierge`, 'try it')}) · IntegrateX, a React Flow and MongoDB workflow engine (${a(`${SITE}/sandbox/`, 'sandbox')}) · Sable, a local-first AI finance agent where only a person commits (${a(`${SITE}/products/sable/`, 'case study')}) · ShelfSight AI, FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). All projects: ${a(`${SITE}/projects/`, 'yk.streamerosai.com/projects')}.</p>
 
 <h2>Open source and writing</h2>
 <p>Public code at ${a(GH, 'github.com/Yaseenyk')}, including this portfolio, its RAG and MCP worker and the content pipelines. Engineering write-ups at ${a(`${SITE}/blog/`, 'yk.streamerosai.com/blog')} and ${a('https://dev.to/yaseenyk04', 'dev.to/yaseenyk04')}.</p>

@@ -29,7 +29,7 @@ const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
 <div class="contact">Hyderabad, India (remote, hybrid or on-site) · yaseenkhatib04@gmail.com · +91 8208335028 · linkedin.com/in/yaseen-yk · github.com/Yaseenyk · yk.streamerosai.com</div>
 
 <h2>Summary</h2>
-<p><b>Full Stack AI Developer</b> with 5 years shipping production web systems in <b>React, Next.js, Node.js, TypeScript</b> and <b>MongoDB</b> or <b>PostgreSQL</b>. Since 2025 I own the <b>LLM and agent layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents and MCP servers</b>. Cut dashboard response times <b>1.5 to 2x</b> by profiling MongoDB aggregations; moved a team from JavaScript to <b>TypeScript and Next.js</b>. I own a system from database schema to deployed UI, including a client learning platform that was live one day after the brief. Open to senior full-stack, GenAI and forward-deployed engineering roles.</p>
+<p><b>Full Stack AI Developer</b> with 5 years shipping production web systems in <b>React, Next.js, Node.js, TypeScript</b> and <b>MongoDB</b> or <b>PostgreSQL</b>. Since 2025 I own the <b>LLM and agent layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents and MCP servers</b>. Made dashboards <b>1.5 to 2x</b> faster by profiling MongoDB aggregations; moved a team from JavaScript to <b>TypeScript and Next.js</b>. I own a system from database schema to deployed UI, including a client learning platform that was live one day after the brief. Open to Full Stack AI Developer roles in Hyderabad, Pune, Mumbai, Bangalore or remote India.</p>
 
 <h2>Experience</h2>
 <div class="row"><b>Senior Software Developer, Sparity</b><span class="dates">06/2025 – Present</span></div>
@@ -41,7 +41,7 @@ const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
 <div class="row"><b>Full Stack Developer, MSA Software</b><span class="dates">01/2023 – 05/2025</span></div>
 <div class="muted">Remote</div>
 <ul>
-  <li>Cut dashboard response times <b>1.5 to 2x</b> by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.</li>
+  <li>Made dashboards <b>1.5 to 2x</b> faster by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.</li>
   <li>Moved the team's legacy JavaScript to <b>TypeScript and Next.js</b>, removing a class of type-related production bugs.</li>
   <li>Migrated shared state from hand-rolled Redux to Redux Toolkit slices.</li>
 </ul>
