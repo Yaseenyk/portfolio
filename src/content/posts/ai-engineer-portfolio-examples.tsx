@@ -96,6 +96,15 @@ function Body() {
         FinOps side of that habit is in the{" "}
         <a href="/blog/ai-finops-playbook-stop-burning-money/">AI FinOps playbook</a>.
       </p>
+      <p>
+        For an AI role, the strongest version of that number is retrieval
+        quality. On the hybrid RAG system I built at work, a golden query set
+        gives a Recall@5 of 0.95 and an MRR of 0.83, and the evaluation harness
+        exits with an error when either score falls below its threshold (0.75
+        and 0.55). A reviewer can ask how the golden set was written and what
+        happens when the score drops, and a real answer to those two questions
+        is worth more than a longer list of tools.
+      </p>
 
       <h2>Example 4: the operating model, written down</h2>
       <p>
