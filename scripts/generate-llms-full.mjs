@@ -128,7 +128,22 @@ ${body}`);
   }
 }
 
-const header = `Yaseen Khatib — full corpus (${articleCount} articles${campusCount ? `, ${campusCount} final-year-project pages` : ""}${useCaseCount ? `, ${useCaseCount} service use-case pages` : ""})
+// Work history: career timeline, Sparity AI tooling, and what each product proves. Written by hand in src/content/work-history.md,
+// public-safe only (nothing from private repos, client data or employer-internal systems beyond what the resume already says).
+// Sections are separated by a line of "---", and each starts with "# Title" then "URL:" and "Summary:" like every other article.
+const WORK = join(process.cwd(), "src", "content", "work-history.md");
+let workCount = 0;
+if (existsSync(WORK)) {
+  const NL = String.fromCharCode(10);
+  for (const block of readFileSync(WORK, "utf-8").split(String.fromCharCode(13)).join("").split(NL + "---" + NL)) {
+    const text = block.trim();
+    if (!text.startsWith("# ")) continue;
+    sections.push(text);
+    workCount += 1;
+  }
+}
+
+const header = `Yaseen Khatib — full corpus (${articleCount} articles${campusCount ? `, ${campusCount} final-year-project pages` : ""}${useCaseCount ? `, ${useCaseCount} service use-case pages` : ""}${workCount ? `, ${workCount} work-history sections` : ""})
 Author canonical bio: ${SITE}/about
 Curated index: ${SITE}/llms.txt
 
@@ -136,5 +151,5 @@ Curated index: ${SITE}/llms.txt
 
 writeFileSync(join(OUT, "llms-full.txt"), header + sections.join("\n\n---\n\n") + "\n");
 console.log(
-  `llms-full.txt: ${articleCount} articles + ${campusCount} campus pages + ${useCaseCount} use-case pages written`,
+  `llms-full.txt: ${articleCount} articles + ${campusCount} campus pages + ${useCaseCount} use-case pages + ${workCount} work-history sections written`,
 );

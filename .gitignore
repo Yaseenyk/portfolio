@@ -58,3 +58,10 @@ gsc/
 Upstash Token
 *.token
 .ai-draft/
+
+# Private: exported Claude conversation history and work notes (never commit)
+/Claude-conversation-history/
+/knowledge-private/
+
+# Wrangler local state
+worker/.wrangler/
