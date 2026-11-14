@@ -1,6 +1,7 @@
 // scripts/generate-resume.js
 //
-// Main résumé: two pages, single column, plain headings, aimed at "Senior Full-Stack AI Engineer (MERN)". Page 1 is what a recruiter
+// Main résumé: two pages, single column, plain headings, aimed at "Full Stack AI Developer (MERN, LLM, RAG, agents)". Keywords and
+// results are bold so the page can be skimmed (see kw() below); the text stays real text, in reading order, so portals can parse it. Page 1 is what a recruiter
 // reads in seven seconds (title, summary, skills, the three jobs); page 2 is proof (projects) and education.
 //
 // Every fact here is on the previous résumé (verified against the repo, the live site and GitHub on 2026-10-21) or on the live site.
@@ -16,11 +17,22 @@ const SITE = 'https://yk.streamerosai.com';
 const GH = 'https://github.com/Yaseenyk';
 const a = (url, label) => `<a href="${url}">${label}</a>`;
 
+// Bold the words a hiring manager scans for, and the numbers that prove the work. Longest phrases first so they win over their parts.
+const KEYWORDS = [
+  'MERN', 'Full Stack AI Developer', 'agentic RAG', 'RAG pipelines', 'RAG', 'LLM and agent layer', 'LLM integration', 'LLM', 'function-calling agents', 'agents', 'agent', 'MCP servers', 'MCP',
+  'evals', 'cost-aware routing', 'guardrails', 'schema-validated outputs', 'embeddings', 'vector search', 'pgvector', 'fine-tuning', 'distillation', 'PyTorch',
+  'TypeScript', 'Next.js', 'Node.js', 'React', 'MongoDB', 'Redux Toolkit', 'FastAPI', 'NestJS', 'PostgreSQL', 'Cloudflare Workers', 'Hono', 'Rust', 'Tauri 2', 'Vue 3', 'Docker', 'GitHub Actions', 'CI/CD',
+  'REST', 'JWT', 'row-level security', 'system design',
+  '1.5 to 2x', '2x', '94%', '93.5%', '23M-parameter', 'hit@5', '306 Rust tests', '190 API tests', '640 browser tests', '600 API tests', 'next day', 'one day after the brief',
+];
+const KW_RE = new RegExp('(?<![A-Za-z0-9])(' + KEYWORDS.map((k) => k.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&')).join('|') + ')(?![A-Za-z0-9])', 'g');
+const kw = (t) => t.replace(KW_RE, '<b>$1</b>');
+
 const SKILLS = [
-  ['MERN and web', 'MongoDB, Express, React, Node.js, TypeScript, JavaScript (ES2023), Next.js, Redux Toolkit, Zustand, REST APIs, WebSockets, JWT auth, Tailwind CSS, HTML and CSS'],
-  ['AI engineering', 'LLM integration (OpenAI, Gemini, Claude APIs), RAG, embeddings and vector search (pgvector, Vectorize, Upstash Vector), function calling, agents, MCP servers, prompt engineering, LLM evals, fine-tuning and distillation (PyTorch), Ollama'],
-  ['Backend and data', 'Python and FastAPI, NestJS, Java and Spring Boot, ASP.NET, PostgreSQL, SQL Server, Redis, SQLite, Firestore'],
-  ['Delivery', 'System design, unit and integration testing, Git, GitHub Actions CI/CD, Docker, Cloudflare Workers, Agile delivery'],
+  ['MERN and web', '<b>MongoDB, Express, React, Node.js, TypeScript</b>, JavaScript (ES2023), <b>Next.js</b>, Redux Toolkit, Zustand, <b>REST APIs</b>, WebSockets, JWT auth, Tailwind CSS, HTML and CSS'],
+  ['AI engineering', '<b>LLM integration</b> (OpenAI, Gemini, Claude APIs), <b>RAG</b>, <b>embeddings and vector search</b> (pgvector, Vectorize, Upstash Vector), <b>function calling, agents, MCP servers</b>, prompt engineering, <b>LLM evals</b>, fine-tuning and distillation (PyTorch), Ollama'],
+  ['Backend and data', '<b>Python and FastAPI</b>, NestJS, Java and Spring Boot, ASP.NET, <b>PostgreSQL</b>, SQL Server, Redis, SQLite, Firestore'],
+  ['Delivery', '<b>System design</b>, unit and integration testing, Git, <b>GitHub Actions CI/CD</b>, <b>Docker</b>, <b>Cloudflare Workers</b>, Agile delivery'],
 ];
 
 const JOBS = [
@@ -81,21 +93,25 @@ const PROJECTS = [
   },
 ];
 
-const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Yaseen Khatib - Senior Full-Stack AI Engineer (MERN)</title>
+const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Yaseen Khatib - Full Stack AI Developer (MERN, LLM, RAG, Agents)</title>
 <style>
   @page { size: A4; margin: 12mm 14mm; }
   * { box-sizing: border-box; }
   body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 10.1pt; line-height: 1.4; color: #15171c; margin: 0; }
   a { color: #0b5d70; text-decoration: none; }
-  h1 { font-size: 22pt; line-height: 1.05; margin: 0; letter-spacing: 0.2px; color: #0b2f3a; }
-  .title { font-size: 11pt; font-weight: 700; color: #0b5d70; margin: 3px 0 4px; }
+  .bar { height: 5px; margin: -2mm 0 9px; background: linear-gradient(90deg, #0b5d70, #14a3c7 60%, #7c5cff); border-radius: 3px; }
+  h1 { font-size: 24pt; line-height: 1.05; margin: 0; letter-spacing: 0.2px; color: #0b2f3a; }
+  .title { font-size: 12.2pt; font-weight: 700; color: #0b5d70; margin: 4px 0 5px; }
+  .strip { margin-top: 6px; padding: 4px 8px; background: #eef6f8; border-left: 3px solid #0b5d70; font-size: 9.2pt; color: #0b2f3a; }
+  .strip i { font-style: normal; color: #7c8a92; padding: 0 2px; }
+  b { font-weight: 700; color: #0b2f3a; }
   .contact { font-size: 9.2pt; color: #2a2f38; line-height: 1.5; }
   .contact span { white-space: nowrap; }
   .open { margin-top: 5px; font-size: 9.2pt; color: #2a2f38; }
-  h2 { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #0b2f3a; border-bottom: 1.2px solid #0b5d70; margin: 13px 0 6px; padding-bottom: 2px; }
+  h2 { font-size: 10pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: #0b5d70; border-bottom: 1.4px solid #0b5d70; margin: 13px 0 6px; padding-bottom: 2px; }
   p { margin: 0 0 4px; }
   .skill { margin: 0 0 3px; }
-  .skill b { color: #0b2f3a; }
+  .skill .k { font-weight: 700; color: #0b5d70; }
   .job { margin-top: 10px; page-break-inside: avoid; }
   .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .row .t { font-size: 10.9pt; font-weight: 700; color: #111; }
@@ -113,26 +129,27 @@ const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
   .more { margin-top: 6px; }
   .page2 { break-before: page; }
 </style></head><body>
-
+<div class="bar"></div>
 <h1>Yaseen Khatib</h1>
-<div class="title">Senior Full-Stack AI Engineer · MERN (MongoDB, Express, React, Node.js) · LLM, RAG and agents</div>
+<div class="title">Full Stack AI Developer · MERN · LLM apps, RAG and AI agents</div>
 <div class="contact">
   <span>Hyderabad, India</span> · <span>${a('mailto:yaseenkhatib04@gmail.com', 'yaseenkhatib04@gmail.com')}</span> · <span>${a('tel:+918208335028', '+91 8208335028')}</span> ·
   <span>${a('https://www.linkedin.com/in/yaseen-yk', 'linkedin.com/in/yaseen-yk')}</span> · <span>${a(GH, 'github.com/Yaseenyk')}</span> · <span>${a(SITE, 'yk.streamerosai.com')}</span>
 </div>
+<div class="strip"><b>Core:</b> MERN <i>|</i> TypeScript <i>|</i> Next.js <i>|</i> LLM apps <i>|</i> RAG <i>|</i> AI agents <i>|</i> MCP <i>|</i> Python and FastAPI <i>|</i> System design <i>|</i> CI/CD</div>
 <div class="open"><b>Open to:</b> senior full-stack, GenAI and forward-deployed roles · remote, hybrid or Hyderabad · fixed-price builds</div>
 
 <h2>Summary</h2>
-<p>Senior full-stack developer on the MERN stack with TypeScript and Next.js, five years shipping production web systems: hospital information systems, analytics dashboards and, since 2025, the AI layer of production MERN systems at Sparity. I build the parts around the model that make AI usable: RAG pipelines, function-calling agents where a person approves every change, MCP servers, evals, and cost-aware routing between models. Cut dashboard response times 1.5 to 2x by profiling MongoDB aggregation pipelines; moved a team from JavaScript to TypeScript and Next.js. Six products shipped solo, each live and open, and a client learning platform live one day after the brief.</p>
+<p>${kw('Full Stack AI Developer with five years shipping production web systems on the MERN stack with TypeScript and Next.js: hospital information systems, analytics dashboards and, since 2025, the LLM and agent layer of production MERN systems at Sparity. I build the parts around the model that make AI usable: RAG pipelines, function-calling agents where a person approves every change, MCP servers, evals, and cost-aware routing between models. Cut dashboard response times 1.5 to 2x by profiling MongoDB aggregation pipelines; moved a team from JavaScript to TypeScript and Next.js. Six products shipped solo, each live and open, and a client learning platform live one day after the brief.')}</p>
 
 <h2>Skills</h2>
-${SKILLS.map(([k, v]) => `<p class="skill"><b>${k}:</b> ${v}</p>`).join('\n')}
+${SKILLS.map(([k, v]) => `<p class="skill"><span class="k">${k}:</span> ${v}</p>`).join('\n')}
 
 <h2>Experience</h2>
 ${JOBS.map((j) => `<div class="job">
   <div class="row"><div class="t">${j.title}, <i>${j.org}</i></div><div class="dates">${j.dates}</div></div>
   <div class="meta">${j.meta}</div>
-  <ul>${j.bullets.map((b) => `<li>${b}</li>`).join('')}</ul>
+  <ul>${j.bullets.map((b) => `<li>${kw(b)}</li>`).join('')}</ul>
   <div class="stack"><b>Stack:</b> ${j.stack}</div>
 </div>`).join('\n')}
 
@@ -141,7 +158,7 @@ ${JOBS.map((j) => `<div class="job">
 <p style="font-size:9.2pt;color:#4a505b">Built and shipped solo unless marked client. Links checked on 14 Nov 2026.</p>
 ${PROJECTS.map((p) => `<div class="proj">
   <div class="row"><div class="t">${p.name} <span>· ${p.what}</span></div><div class="links">${p.links.join(' · ')}</div></div>
-  <p style="margin:1px 0 1px">${p.text}</p>
+  <p style="margin:1px 0 1px">${kw(p.text)}</p>
   <div class="stack"><b>Stack:</b> ${p.stack}</div>
 </div>`).join('\n')}
 <p class="more"><b>Also:</b> Portfolio Concierge, a grounded RAG API and public MCP server on Cloudflare Workers that refuses to answer below a similarity threshold (${a(`${SITE}/#rag-concierge`, 'try it')}, ${a(`${GH}/portfolio/tree/main/worker`, 'code')}). IntegrateX, a React Flow and MongoDB workflow engine where a serialization adapter cut stored payloads by 94% (${a(`${SITE}/sandbox/`, 'live sandbox')}). Sable, a local-first AI finance agent in React Native where the model proposes and only a person commits (${a(`${SITE}/products/sable/`, 'case study')}). ShelfSight AI, retail vision on FastAPI and YOLOv8, 650 tests (${a(`${GH}/Shelfsight-AI-real-time-planogram-and-inventory-intelligence-be`, 'code')}). AISA, a student platform rebuilt from one 4,019-line HTML file into Next.js and Spring Boot (${a('https://yaseenyk.github.io/SIT-FE/', 'live')}).</p>

@@ -7,7 +7,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
-const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Yaseen Khatib - Senior Full-Stack AI Engineer</title>
+const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Yaseen Khatib - Full Stack AI Developer</title>
 <style>
   @page { size: A4; margin: 11mm 13mm; }
   * { box-sizing: border-box; }
@@ -25,30 +25,30 @@ const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
   .muted { color: #333; }
 </style></head><body>
 <h1>Yaseen Khatib</h1>
-<div class="title">Senior Full-Stack AI Engineer · React, Node.js, TypeScript · LLM and RAG systems in production</div>
+<div class="title">Full Stack AI Developer · MERN, TypeScript, Next.js · LLM apps, RAG and AI agents in production</div>
 <div class="contact">Hyderabad, India (remote, hybrid or on-site) · yaseenkhatib04@gmail.com · +91 8208335028 · linkedin.com/in/yaseen-yk · github.com/Yaseenyk · yk.streamerosai.com</div>
 
 <h2>Summary</h2>
-<p>Senior full-stack engineer with 5 years shipping production web systems in React, Next.js, Node.js, TypeScript and MongoDB or PostgreSQL. Since 2025 I own the LLM and agent layer of production MERN systems at Sparity: RAG pipelines, function-calling agents and MCP servers. Cut dashboard response times 1.5 to 2x by profiling MongoDB aggregations; moved a team from JavaScript to TypeScript and Next.js. I own a system from database schema to deployed UI, including a client learning platform that was live one day after the brief. Open to senior full-stack, GenAI and forward-deployed engineering roles.</p>
+<p><b>Full Stack AI Developer</b> with 5 years shipping production web systems in <b>React, Next.js, Node.js, TypeScript</b> and <b>MongoDB</b> or <b>PostgreSQL</b>. Since 2025 I own the <b>LLM and agent layer</b> of production MERN systems at Sparity: <b>RAG pipelines, function-calling agents and MCP servers</b>. Cut dashboard response times <b>1.5 to 2x</b> by profiling MongoDB aggregations; moved a team from JavaScript to <b>TypeScript and Next.js</b>. I own a system from database schema to deployed UI, including a client learning platform that was live one day after the brief. Open to senior full-stack, GenAI and forward-deployed engineering roles.</p>
 
 <h2>Experience</h2>
 <div class="row"><b>Senior Software Developer, Sparity</b><span class="dates">06/2025 – Present</span></div>
 <div class="muted">Hyderabad · Hybrid</div>
 <ul>
-  <li>Own the LLM and agentic layer of production MERN systems end to end: architecture, orchestration and deployment.</li>
-  <li>Ship agentic RAG services with schema-validated outputs, guardrails and cost-aware routing between models.</li>
+  <li>Own the <b>LLM and agentic layer</b> of production <b>MERN</b> systems end to end: architecture, orchestration and deployment.</li>
+  <li>Ship <b>agentic RAG</b> services with schema-validated outputs, guardrails and cost-aware routing between models.</li>
 </ul>
 <div class="row"><b>Full Stack Developer, MSA Software</b><span class="dates">01/2023 – 05/2025</span></div>
 <div class="muted">Remote</div>
 <ul>
-  <li>Cut dashboard response times 1.5 to 2x by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.</li>
-  <li>Moved the team's legacy JavaScript to TypeScript and Next.js, removing a class of type-related production bugs.</li>
+  <li>Cut dashboard response times <b>1.5 to 2x</b> by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.</li>
+  <li>Moved the team's legacy JavaScript to <b>TypeScript and Next.js</b>, removing a class of type-related production bugs.</li>
   <li>Migrated shared state from hand-rolled Redux to Redux Toolkit slices.</li>
 </ul>
 <div class="row"><b>Software Developer (SDE 1), Manorama Infosolutions</b><span class="dates">09/2021 – 01/2023</span></div>
 <div class="muted">Healthcare software · Remote</div>
 <ul>
-  <li>Built REST routing layers for hospital information systems on ASP.NET and React; 2x payload throughput on the hot paths.</li>
+  <li>Built REST routing layers for hospital information systems on ASP.NET and React; <b>2x</b> payload throughput on the hot paths.</li>
   <li>Moved tangled request handling into MVC and hardened it for concurrent user sessions.</li>
 </ul>
 
@@ -62,7 +62,7 @@ const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
 </ul>
 
 <h2>Skills</h2>
-<p><b>Frontend:</b> React, Next.js, TypeScript, JavaScript, Redux Toolkit, Zustand, React Native, Tailwind CSS. <b>Backend:</b> Node.js, Express, REST, WebSockets, JWT auth, Python, FastAPI, Java, Spring Boot, ASP.NET. <b>Data:</b> MongoDB, PostgreSQL, SQL Server, Redis, SQLite, pgvector. <b>AI:</b> LLM integration, RAG, embeddings and vector search, function calling, agents, MCP, prompt engineering, fine-tuning and distillation, LLM evals, OpenAI, Gemini and Claude APIs, PyTorch, Ollama. <b>Delivery:</b> Git, GitHub Actions, CI/CD, Docker, Cloudflare Workers, unit and integration testing, system design, Agile.</p>
+<p><b>Frontend:</b> <b>React, Next.js, TypeScript</b>, JavaScript, Redux Toolkit, Zustand, React Native, Tailwind CSS. <b>Backend:</b> <b>Node.js, Express</b>, REST, WebSockets, JWT auth, Python, FastAPI, Java, Spring Boot, ASP.NET. <b>Data:</b> MongoDB, PostgreSQL, SQL Server, Redis, SQLite, pgvector. <b>AI:</b> <b>LLM integration, RAG</b>, embeddings and vector search, <b>function calling, agents, MCP</b>, prompt engineering, fine-tuning and distillation, LLM evals, OpenAI, Gemini and Claude APIs, PyTorch, Ollama. <b>Delivery:</b> Git, GitHub Actions, CI/CD, Docker, Cloudflare Workers, unit and integration testing, system design, Agile.</p>
 
 <h2>Education</h2>
 <p>B.E. Computer Science, D. Y. Patil College of Engineering, 2021 · Diploma in Computer Science, D. Y. Patil Polytechnic, 2018 · Coding Ninjas: Front End Architecture, React Production Development, Advanced Backend Systems</p>
