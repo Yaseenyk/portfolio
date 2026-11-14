@@ -15,7 +15,7 @@ export const PREFERRED_SOURCE_DOMAIN = "streamerosai.com";
 
 /** Sitewide default description — root metadata, OG, and the WebSite entity. */
 export const SITE_DESCRIPTION =
-  "Yaseen Khatib — Senior Full-Stack Developer (MERN) building production AI systems: Agentic RAG, LLM orchestration, and six solo-shipped products. Open to remote, hybrid, or on-site roles.";
+  "Yaseen Khatib — Full Stack AI Developer (MERN) building production AI systems: RAG, MCP servers and LLM agents on a MERN base, with several products shipped solo. Open to roles in Hyderabad, Pune, Mumbai, Bangalore or remote India.";
 
 /**
  * Search-engine site-verification codes. Paste the content value from
@@ -36,7 +36,7 @@ export const VERIFICATION = {
  * server has, so a regenerated PDF is invisible to anyone who downloaded a
  * previous one. Bump this every time scripts/generate-resume.js is re-run.
  */
-const RESUME_VERSION = 11;
+const RESUME_VERSION = 12;
 
 export const RESUME_URL = `${
   process.env.NEXT_PUBLIC_BASE_PATH ?? ""
@@ -54,7 +54,7 @@ export const SOCIALS = {
 
 export const PERSON = {
   name: "Yaseen Nurmahammad Khatib",
-  jobTitle: "Senior Full-Stack AI Engineer",
+  jobTitle: "Full Stack AI Developer",
   email: "contact@streamerosai.com",
   locality: "Hyderabad",
   country: "India",

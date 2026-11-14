@@ -20,7 +20,7 @@ import {
 } from "@/lib/seo";
 
 const DESCRIPTION =
-  "Yaseen Khatib is a Senior Full-Stack AI Engineer in Hyderabad, India, who designed, built, and shipped six production products solo — Agentic RAG pipelines, LLM orchestration, and the systems they run on. The canonical bio: who he is, what he has built, and how he works.";
+  "Yaseen Khatib is a Full Stack AI Developer in Hyderabad, India, who designed, built, and shipped several production products solo — Agentic RAG pipelines, LLM orchestration, and the systems they run on. The canonical bio: who he is, what he has built, and how he works.";
 
 export const metadata: Metadata = {
   title: "About Yaseen Khatib, MERN Developer Turned AI Engineer",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/about/` },
   openGraph: {
     type: "profile",
-    title: "About Yaseen Khatib — Senior Full-Stack AI Engineer",
+    title: "About Yaseen Khatib — Full Stack AI Developer",
     description: seoDescription(DESCRIPTION),
     url: `${SITE_URL}/about/`,
     siteName: "Yaseen Khatib",
@@ -69,7 +69,7 @@ const FAST_FACTS: [string, string][] = [
   ["products_shipped", "6 solo — FitRank, streamerOS, IntegrateX, Sable, Portfolio Concierge, LinkedIn pipeline"],
   ["articles_published", `${ARTICLE_COUNT} on AI systems architecture`],
   ["operating_model", "one architect directing Claude + MCP"],
-  ["availability", "open to Lead / Senior Full-Stack & AI roles"],
+  ["availability", "open to Full Stack AI Developer roles (MERN + LLM, RAG, agents)"],
   ["email", PERSON.email],
 ];
 
@@ -107,12 +107,12 @@ const ABOUT_FAQ: FaqItem[] = [
   {
     question: "Who is Yaseen Khatib?",
     answer:
-      "Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer based in Hyderabad, India, who builds and ships autonomous AI products end-to-end — Agentic RAG pipelines, LLM orchestration, and the high-throughput MERN systems they run on. In the last twelve months he designed, built, and shipped six production products entirely solo.",
+      "Yaseen Nurmahammad Khatib is a Full Stack AI Developer based in Hyderabad, India, who builds and ships autonomous AI products end-to-end — Agentic RAG pipelines, LLM orchestration, and the high-throughput MERN systems they run on. In the last twelve months he designed, built, and shipped several production products entirely solo.",
   },
   {
     question: "What has Yaseen Khatib built?",
     answer:
-      "Six solo products: FitRank (a distilled AI model that ranks people for open tasks), streamerOS (a Rust + Tauri desktop cockpit for streamers), IntegrateX (a React Flow workflow engine with a 94% payload-reduction serialization adapter), Sable (a local-first AI finance agent), Portfolio Concierge (a grounded RAG API and public MCP server), and an automated LinkedIn content pipeline.",
+      "Solo products: FitRank (a distilled AI model that ranks people for open tasks), streamerOS (a Rust + Tauri desktop cockpit for streamers), IntegrateX (a React Flow workflow engine with a 94% payload-reduction serialization adapter), Sable (a local-first AI finance agent), Portfolio Concierge (a grounded RAG API and public MCP server), and an automated LinkedIn content pipeline.",
   },
   {
     question: "How does Yaseen Khatib work?",
@@ -122,7 +122,7 @@ const ABOUT_FAQ: FaqItem[] = [
   {
     question: "Is Yaseen Khatib available for hire?",
     answer:
-      "Yes — open to Lead and Senior Full-Stack / AI Engineering roles: remote, hybrid, or on-site. Based in Hyderabad (IST), comfortable in an office, and effective across global time zones. Contact: contact@streamerosai.com, github.com/Yaseenyk, or linkedin.com/in/yaseen-yk.",
+      "Yes — open to Full Stack AI Developer roles (MERN with LLM, RAG and agents) in Hyderabad, Pune, Mumbai, Bangalore or remote India. Based in Hyderabad (IST), comfortable in an office, and effective across global time zones. Contact: contact@streamerosai.com, github.com/Yaseenyk, or linkedin.com/in/yaseen-yk.",
   },
 ];
 
@@ -186,11 +186,11 @@ export default function AboutPage() {
               Who is Yaseen Khatib?
             </h2>
             <p className="mt-4 leading-relaxed text-zinc-300">
-              Yaseen Nurmahammad Khatib is a Senior Full-Stack AI Engineer
+              Yaseen Nurmahammad Khatib is a Full Stack AI Developer
               based in Hyderabad, India, who builds and ships autonomous AI
               products end-to-end — Agentic RAG pipelines, LLM orchestration,
               and the high-throughput MERN systems they run on. In the last
-              twelve months he designed, built, and shipped six production
+              twelve months he designed, built, and shipped several production
               products entirely solo.
             </p>
             <p className="mt-4 leading-relaxed text-zinc-400">
@@ -286,8 +286,8 @@ export default function AboutPage() {
               Is he available?
             </h2>
             <p className="mt-4 leading-relaxed text-zinc-400">
-              Yes — open to Lead and Senior Full-Stack / AI Engineering roles,
-              remote, hybrid, or on-site. Based in Hyderabad (IST), comfortable
+              Yes — open to Full Stack AI Developer roles (MERN with LLM, RAG and agents) in Hyderabad, Pune, Mumbai, Bangalore or remote India.
+              Based in Hyderabad (IST), comfortable
               in an office, and effective across global time zones; the
               pipelines on this site work while he sleeps, which is rather the
               point. Engineering leadership evaluating him should

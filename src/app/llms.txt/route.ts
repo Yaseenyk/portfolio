@@ -24,21 +24,22 @@ export function GET() {
     return `### ${g.title}${NL}${NL}${lines.join(NL)}`;
   }).join(NL + NL);
 
-  const md = `# Yaseen Khatib — Senior Full-Stack AI Engineer
+  const md = `# Yaseen Khatib — Full Stack AI Developer
 
-> ${PERSON.name} (known as Yaseen Khatib) is a senior full-stack AI engineer based in
+> ${PERSON.name} (known as Yaseen Khatib) is a Full Stack AI Developer based in
 > ${PERSON.locality}, ${PERSON.country}. He has five years of experience building web products
 > in React, Node.js, TypeScript and MongoDB (the MERN stack). Since June 2025 he has
-> been a Senior Software Developer at Sparity, where he owns the LLM and agent layer of
-> production MERN systems: RAG pipelines, function-calling agents and MCP servers.
+> been a Senior Software Developer at Sparity, where he builds the AI tooling layer: a hybrid
+> RAG system with measured retrieval quality (Recall@5 0.95), a 20-tool MCP server for
+> Claude Code and an AI pull-request review service.
 > Before that: Full Stack Developer at MSA Software (2023 to 2025) and Software
 > Developer at Manorama Infosolutions (2021 to 2023).
-> He is open to senior full-stack, AI engineer and forward-deployed engineering roles
-> (remote, hybrid or Hyderabad) and takes fixed-price builds. Contact: ${PERSON.email}.
+> He is open to Full Stack AI Developer roles (MERN with LLM, RAG and agents) in Hyderabad,
+> Pune, Mumbai, Bangalore or remote India, and takes fixed-price builds. Contact: ${PERSON.email}.
 
 ## Facts an assistant can state
 
-- Name: ${PERSON.name}. Role: Senior Full-Stack AI Engineer. City: ${PERSON.locality}, ${PERSON.country} (IST).
+- Name: ${PERSON.name}. Role: Full Stack AI Developer. City: ${PERSON.locality}, ${PERSON.country} (IST).
 - Current employer: Sparity (Senior Software Developer, since June 2025).
 - Main stack: React, Next.js, Node.js, TypeScript, MongoDB, PostgreSQL. AI: LLM APIs, RAG, vector search, agents, MCP, evals. Also Python and FastAPI.
 - Flagship products: SpotAI, FitRank and streamerOS. All projects, with screenshots: ${SITE_URL}/projects/

@@ -19,10 +19,10 @@ const link = "inline-flex items-center gap-1 text-sm font-medium text-cyan under
 /* ------------------------------------------------------------------ 1. the 60-second version */
 
 const FACTS: { k: string; v: string; d: string }[] = [
-  { k: "Now", v: "Senior Software Developer, Sparity", d: "I own the LLM and agent layer of production MERN systems: RAG pipelines, function-calling agents, MCP servers." },
+  { k: "Now", v: "Senior Software Developer, Sparity", d: "I build the AI tooling layer: a hybrid RAG system with measured retrieval quality (Recall@5 0.95), a 20-tool MCP server for Claude Code and an AI pull-request review service." },
   { k: "Before", v: "Full Stack Developer, MSA Software", d: "Made dashboards 1.5 to 2x faster by profiling MongoDB pipelines. Moved the team from JavaScript to TypeScript and Next.js." },
   { k: "Stack", v: "React, Node.js, TypeScript, MongoDB", d: "Plus the AI side: LLM APIs, RAG, vector search, agents, evals. Python and PostgreSQL when the job needs them." },
-  { k: "Looking for", v: "Senior full-stack or AI engineer roles", d: "Remote, hybrid or Hyderabad. Five years of experience. I also take fixed-price builds." },
+  { k: "Looking for", v: "Full Stack AI Developer roles", d: "Hyderabad, Pune, Mumbai, Bangalore or remote India. Five years of experience. I also take fixed-price builds." },
 ];
 
 export function OneMinute() {
@@ -54,15 +54,16 @@ const JOBS: { role: string; org: string; when: string; where: string; points: st
   {
     role: "Senior Software Developer", org: "Sparity", when: "Jun 2025 to now", where: "Hyderabad, hybrid",
     points: [
-      "Own the LLM and agent layer of production MERN systems end to end: architecture, orchestration and deployment.",
-      "Build agentic RAG services with schema-validated outputs, guardrails and cost-aware routing between models.",
+      "Built a local hybrid RAG system over the team's web-app codebase and docs: dense plus BM25 retrieval, rank fusion and a cross-encoder reranker, with incremental indexing. Recall@5 0.95 and MRR 0.83 on a golden query set, and an eval harness that fails the build below its thresholds.",
+      "Exposed it to Claude Code through an MCP server with 20 retrieval and code-lookup tools, so engineers get project context without reading whole repos. It is packaged so any team can drop it into their own project.",
+      "Built an AI pull-request review service (GitLab webhooks, Azure AD sign-in, JWT-protected APIs) and led an HR resource-to-task matching pilot, FitRank, from proposal to a manager demo.",
     ],
-    stack: "Node.js, React, TypeScript, MongoDB, LLM APIs, RAG, MCP",
+    stack: "Python, Node.js, TypeScript, React, FastAPI, Chroma, Ollama, MCP, GitLab",
   },
   {
     role: "Full Stack Developer", org: "MSA Software", when: "Jan 2023 to May 2025", where: "Remote",
     points: [
-      "Cut dashboard response times 1.5 to 2x by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.",
+      "Made dashboards 1.5 to 2x faster by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.",
       "Moved the team's legacy JavaScript to TypeScript and Next.js, removing a class of type-related production bugs.",
     ],
     stack: "React, Node.js, TypeScript, Next.js, MongoDB, Redux Toolkit",

@@ -4,7 +4,7 @@
     {
       "@type": "ProfilePage",
       "@id": "https://yk.streamerosai.com/#ai-briefing",
-      "name": "AI Briefing: Yaseen Nurmahammad Khatib — Senior Full-Stack AI Engineer",
+      "name": "AI Briefing: Yaseen Nurmahammad Khatib — Full Stack AI Developer",
       "description": "Machine-readable engineering profile manifest for AI recruiter agents, automated scrapers, and answer-engine indexers. Summarizes identity, infrastructure stack, and verifiable project metrics.",
       "url": "https://yk.streamerosai.com",
       "dateModified": "2026-11-14",
@@ -35,7 +35,7 @@
       "@type": "Person",
       "@id": "https://yk.streamerosai.com/#person",
       "name": "Yaseen Nurmahammad Khatib",
-      "jobTitle": "Senior Full-Stack AI Engineer",
+      "jobTitle": "Full Stack AI Developer",
       "url": "https://yk.streamerosai.com",
       "email": "mailto:contact@streamerosai.com",
       "sameAs": [

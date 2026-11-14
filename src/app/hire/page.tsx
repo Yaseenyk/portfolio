@@ -8,10 +8,10 @@ import ContactForm from "@/components/ContactForm";
 
 const URL = `${SITE_URL}/hire/`;
 const DESCRIPTION =
-  "Hire Yaseen Khatib — a Senior Full-Stack AI Engineer (MERN + TypeScript) who ships production AI systems solo: agentic RAG, LLM orchestration, real-time and edge architectures. Open to senior/lead roles and contract work, remote or on-site.";
+  "Hire Yaseen Khatib — a Full Stack AI Developer (MERN + TypeScript) who ships production AI systems solo: agentic RAG, LLM orchestration, real-time and edge architectures. Open to senior/lead roles and contract work, remote or on-site.";
 
 export const metadata: Metadata = {
-  title: "Hire a Senior Full-Stack AI Engineer (MERN, RAG)",
+  title: "Hire a Full Stack AI Developer (MERN, RAG)",
   description: seoDescription(DESCRIPTION),
   keywords: [
     "hire ai engineer",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   alternates: { canonical: URL },
   openGraph: {
     type: "website",
-    title: "Hire Yaseen Khatib — Senior Full-Stack AI Engineer",
+    title: "Hire Yaseen Khatib — Full Stack AI Developer",
     description: seoDescription(DESCRIPTION),
     url: URL,
     siteName: "Yaseen Khatib",
@@ -60,9 +60,9 @@ const BUILDS: [string, string][] = [
 
 // Asked by recruiters and clients, and lifted by AI assistants. Every answer is a fact from the résumé or this site.
 const FAQ: { question: string; answer: string }[] = [
-  { question: "Who is Yaseen Khatib?", answer: "Yaseen Khatib is a senior full-stack AI engineer based in Hyderabad, India. He has five years of experience building web products in React, Node.js, TypeScript and MongoDB, and since June 2025 he has been a Senior Software Developer at Sparity, where he owns the LLM and agent layer of production MERN systems." },
+  { question: "Who is Yaseen Khatib?", answer: "Yaseen Khatib is a Full Stack AI Developer based in Hyderabad, India. He has five years of experience building web products in React, Node.js, TypeScript and MongoDB, and since June 2025 he has been a Senior Software Developer at Sparity, where he builds the AI tooling layer: a hybrid RAG system with measured retrieval quality (Recall@5 0.95), a 20-tool MCP server for Claude Code and an AI pull-request review service." },
   { question: "What does he build?", answer: "Full-stack web apps on the MERN stack, and the AI inside them: chatbots that answer from a company's own documents (RAG), agents that do a job with a person approving each step, and MCP servers. His flagship products are SpotAI, FitRank and streamerOS." },
-  { question: "Is he available for full-time roles?", answer: "Yes. He is open to senior full-stack, AI engineer and forward-deployed engineering roles: remote, hybrid, or on-site in Hyderabad." },
+  { question: "Is he available for full-time roles?", answer: "Yes. He is open to Full Stack AI Developer roles (MERN with LLM, RAG and agents) in Hyderabad, Pune, Mumbai, Bangalore or remote India, and takes fixed-price builds." },
   { question: "Does he take freelance or contract work?", answer: "Yes. He takes fixed-price builds: the scope and price are agreed in writing before work starts, and the client owns the source code. Services and prices are on the Solutions page." },
   { question: "Where is he based, and does he work with teams abroad?", answer: "He is in Hyderabad, India (IST). Two of his three jobs were fully remote, and he works across Indian and Western hours." },
   { question: "How can I check his work before I talk to him?", answer: "Every project on the Projects page has a real screenshot and a link to the live product. The two-page CV is on this page, and the question box on the home page answers from his site and says when it does not know." },
@@ -90,13 +90,13 @@ export default function HirePage() {
           Open to work · remote / hybrid / on-site
         </span>
         <h1 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-tight text-zinc-50 sm:text-5xl">
-          Hire a senior full-stack AI engineer
+          Hire a Full Stack AI Developer
         </h1>
         <p className="mt-6 text-lg leading-relaxed text-zinc-400">
           I&apos;m {PERSON.name}. I have five years of building web products
           from database to screen. Since 2025 I have built the AI side too:
           chatbots that answer from company documents, and agents that do work
-          with a person approving each step. I have shipped six products on my
+          with a person approving each step. I have shipped several products on my
           own, and every one runs live.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-4">

@@ -16,7 +16,7 @@ export default function Hero() {
       </p>
 
       <h1 className="mt-6 max-w-4xl text-balance text-4xl font-semibold leading-[1.06] tracking-tight text-zinc-50 sm:text-5xl xl:text-6xl">
-        Senior full-stack AI engineer.
+        Full stack AI developer.
         <br />
         MERN apps with <span className="text-cyan">real AI</span> inside.
       </h1>
@@ -25,7 +25,7 @@ export default function Hero() {
         I have five years of building web products from database to screen, in
         React, Node.js, TypeScript and MongoDB. Since 2025 I have put AI inside
         them: chatbots that answer from your own documents, agents that do real
-        work, and search over your data. I have shipped six products on my own,
+        work, and search over your data. I have shipped several products on my own,
         and every one runs live.
       </p>
 
@@ -33,7 +33,7 @@ export default function Hero() {
       <div className="mt-10 max-w-2xl divide-y divide-white/10 border-y border-white/10">
         <a href="/hire/" className="group flex items-center justify-between gap-6 py-4">
           <span>
-            <span className="block text-[15px] font-semibold text-zinc-50">Hiring? I am open to senior full-stack and AI engineer roles.</span>
+            <span className="block text-[15px] font-semibold text-zinc-50">Hiring? I am open to Full Stack AI Developer roles.</span>
             <span className="mt-0.5 block text-sm text-zinc-400">Remote, hybrid or Hyderabad. CV and interview brief inside.</span>
           </span>
           <ArrowRightIcon className="h-4 w-4 flex-none text-zinc-500 transition-transform group-hover:translate-x-1 group-hover:text-cyan" />

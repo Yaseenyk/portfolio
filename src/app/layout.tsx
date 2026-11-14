@@ -22,7 +22,7 @@ const firaCode = Fira_Code({
   variable: "--font-mono",
 });
 
-const TITLE_DEFAULT = "Yaseen Khatib | Senior Full-Stack AI Engineer";
+const TITLE_DEFAULT = "Yaseen Khatib | Full Stack AI Developer";
 const DESCRIPTION = SITE_DESCRIPTION;
 
 export const metadata: Metadata = {
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     images: [
       {
         url: `${SITE_URL}/og-lockup.png`,
-        alt: "Circuit Y mark — Yaseen Khatib, Senior Full-Stack AI Engineer",
+        alt: "Circuit Y mark — Yaseen Khatib, Full Stack AI Developer",
       },
     ],
   },

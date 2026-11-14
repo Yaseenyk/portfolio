@@ -94,7 +94,7 @@ export default function ProjectsPage() {
 
           <section className="mt-20 border-t border-white/10 pt-10">
             <h2 className="text-xl font-semibold text-zinc-50">Want one of these for your team or your business?</h2>
-            <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-zinc-400">I am open to senior full-stack and AI engineer roles, and I take fixed-price builds.</p>
+            <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-zinc-400">I am open to Full Stack AI Developer roles, and I take fixed-price builds.</p>
             <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm">
               <Link href="/hire/" className="inline-flex items-center gap-2 rounded-lg bg-cyan px-5 py-2.5 font-semibold text-ink">Hire me</Link>
               <Link href="/solutions/" className="inline-flex items-center font-medium text-zinc-300 underline decoration-zinc-700 underline-offset-4 hover:text-cyan">Services and prices</Link>

@@ -17,24 +17,24 @@ import { SITE_URL } from "@/lib/site";
 import { PERSON_ID, WEBSITE_ID, personRef } from "@/lib/seo";
 
 // Homepage metadata is set here (not inherited from the layout default) so the
-// title/description target hiring intent — "Senior Full-Stack AI Engineer",
+// title/description target hiring intent — "Full Stack AI Developer",
 // stack, seniority — rather than the generic informational phrasing that drew
 // non-converting encyclopedia traffic and got the page de-indexed.
 export const metadata: Metadata = {
   title: {
-    absolute: "Yaseen Khatib — Senior Full-Stack AI Engineer (MERN, RAG)",
+    absolute: "Yaseen Khatib — Full Stack AI Developer (MERN, RAG)",
   },
   description:
-    "Senior Full-Stack AI Engineer (MERN + TypeScript) shipping production LLM systems — RAG pipelines, agents, real-time architecture. Six products built solo.",
+    "Full Stack AI Developer (MERN + TypeScript) shipping production LLM systems — RAG pipelines, agents, real-time architecture. Several products built solo.",
   openGraph: {
-    title: "Yaseen Khatib — Senior Full-Stack AI Engineer",
+    title: "Yaseen Khatib — Full Stack AI Developer",
     description:
-      "MERN + TypeScript engineer shipping production LLM systems: RAG, agent orchestration, real-time architectures. Six products built solo. Open to senior / lead roles.",
+      "MERN + TypeScript engineer shipping production LLM systems: RAG, agent orchestration, real-time architectures. Several products built solo. Open to senior / lead roles.",
   },
   twitter: {
-    title: "Yaseen Khatib — Senior Full-Stack AI Engineer",
+    title: "Yaseen Khatib — Full Stack AI Developer",
     description:
-      "MERN + TypeScript engineer shipping production LLM systems: RAG, agents, real-time. Six products built solo. Open to senior / lead roles.",
+      "MERN + TypeScript engineer shipping production LLM systems: RAG, agents, real-time. Several products built solo. Open to senior / lead roles.",
   },
 };
 

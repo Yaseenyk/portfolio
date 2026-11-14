@@ -36,7 +36,7 @@ const KNOWLEDGE: { match: RegExp; answer: string }[] = [
   {
     match: /stack|tech|tool|skill|language|framework/i,
     answer:
-      "Yaseen is a Senior Full-Stack AI Engineer specializing in Next.js 14 (App Router), Node.js, and strict TypeScript, with an edge-native AI layer: Hono on Cloudflare Workers, LangGraph orchestration, and Upstash Vector for retrieval.",
+      "Yaseen is a Full Stack AI Developer specializing in Next.js 14 (App Router), Node.js, and strict TypeScript, with an edge-native AI layer: Hono on Cloudflare Workers, LangGraph orchestration, and Upstash Vector for retrieval.",
   },
   {
     match: /experience|work|role|job|career|background/i,

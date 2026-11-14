@@ -28,7 +28,7 @@ export const siteGraphJsonLd = {
       alternateName: "Yaseen Khatib",
       jobTitle: PERSON.jobTitle,
       description:
-        "Senior full-stack AI engineer in Hyderabad, India. Five years building web products in React, Node.js, TypeScript and MongoDB, and since 2025 the LLM, RAG and agent layer of production MERN systems at Sparity.",
+        "Full Stack AI Developer in Hyderabad, India. Five years building web products in React, Node.js, TypeScript and MongoDB, and since 2025 the AI tooling layer at Sparity: a hybrid RAG system, an MCP server and an AI pull-request review service.",
       worksFor: { "@type": "Organization", name: "Sparity" },
       url: SITE_URL,
       email: `mailto:${PERSON.email}`,

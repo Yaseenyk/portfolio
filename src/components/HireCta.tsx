@@ -14,7 +14,7 @@ export default function HireCta() {
           Want a system like this built?
         </h2>
         <p className="mt-3 max-w-2xl text-zinc-300">
-          I&apos;m Yaseen Khatib — a Senior Full-Stack AI Engineer (MERN +
+          I&apos;m Yaseen Khatib — a Full Stack AI Developer (MERN +
           TypeScript) who ships production AI systems solo: RAG pipelines, agent
           orchestration, real-time and edge architectures. Open to senior / lead
           roles and contract work, remote or on-site.
