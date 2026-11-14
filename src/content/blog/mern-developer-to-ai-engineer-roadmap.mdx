@@ -1,0 +1,114 @@
+---
+title: 'MERN Developer to AI Engineer: A Practical Roadmap'
+slug: mern-developer-to-ai-engineer-roadmap
+date: '2026-12-10'
+description: 'A roadmap from MERN developer to AI engineer: what already transfers, then LLM APIs, embeddings, RAG with evals, agents and MCP, with a project for each step.'
+tags:
+  - Career
+  - AI Engineering
+  - MERN
+keywords:
+  - ai engineer roadmap
+  - mern developer to ai engineer
+  - how to become an ai engineer
+  - full stack developer to ai engineer
+  - ai engineer skills
+readingMinutes: 8
+takeaways:
+  - 'Most of a MERN skill set transfers: APIs, auth, state, TypeScript and deployment. The new part is smaller than it looks, and it is mostly retrieval, evaluation and tool use.'
+  - 'Learn in this order: LLM APIs, embeddings and vector search, RAG with an evaluation, agents with guardrails, then MCP. Each step needs one small project.'
+  - 'Measured quality is what separates an AI engineer from a demo builder. Learn to write an eval before you learn another framework.'
+author:
+  name: Yaseen Khatib
+  role: Full Stack AI Developer
+---
+
+If you build MERN apps today and want to work on AI systems, the usual roadmaps are not much help. They start with linear algebra and end with a list of fifty tools. Most of that is not what the job asks of a full stack developer.
+
+This roadmap is the order I would take from a MERN background. It comes from the stack I work in now: five years of web development, and since 2025 building retrieval, MCP and review tooling around a large codebase. It is one engineer's view, not a standard curriculum, so treat the order as a suggestion and the projects as the part that matters.
+
+## Start by counting what you already have
+
+You are further along than the roadmaps assume. A MERN developer already knows:
+
+- **APIs and backends.** Most AI features are an API call wrapped in your normal Node service.
+- **Auth and access control.** Putting an assistant in front of company data is mainly an authorisation problem.
+- **State and UI.** Streaming responses, loading states and optimistic updates are front-end work you already do.
+- **TypeScript.** Typed inputs and outputs make model calls much more reliable.
+- **Deployment.** Queues, caching and CI/CD apply to AI features exactly as they do to any other.
+
+What is new is a short list: how models are called, how retrieval works, how to measure quality, and how to let a model use tools safely.
+
+## Step 1: Call an LLM from your own backend
+
+Learn one provider API well, then the shape of the others. I use OpenAI, Gemini and Claude APIs, and the differences are smaller than the marketing suggests.
+
+Focus on three things: structured output (get JSON, validate it), function calling (let the model request a tool), and streaming to a front end.
+
+**Build:** an endpoint that takes free text and returns validated JSON. **Done when:** bad model output is caught and handled instead of crashing the request.
+
+## Step 2: Embeddings and vector search
+
+An embedding turns text into a vector so that similar meanings sit near each other. Store those vectors and you can search by meaning.
+
+Pick one vector store and use it for real. I have worked with pgvector, Vectorize, Upstash Vector and Chroma, and the concept is the same in each. Notice where vector search fails: exact identifiers, codes and rare names.
+
+**Build:** semantic search over a set of documents you care about. **Done when:** you can name two queries it gets wrong and say why.
+
+## Step 3: RAG, with an evaluation
+
+Retrieval-augmented generation means fetching relevant text and giving it to the model with the question. The pipeline is easy to build and hard to make good.
+
+This is where most roadmaps stop and where the real work starts. Write a golden set of questions with the correct source for each, and measure Recall@k and MRR. Then try hybrid retrieval, which combines keyword search with vectors, and a reranker, and keep each only if the numbers improve. I describe a full example in [hybrid RAG for a codebase](/blog/hybrid-rag-for-a-codebase-bm25-vectors-reranker/), and a smaller, deployed one in [a RAG chatbot on Cloudflare Workers](/blog/rag-chatbot-cloudflare-workers-where-it-broke/).
+
+**Build:** a RAG system over documents with a golden set and a score. **Done when:** a change that hurts retrieval makes a check fail.
+
+## Step 4: Agents, with guardrails
+
+An agent is a model that decides which tool to call. The engineering problem is not making it clever. It is stopping it from doing something you did not intend.
+
+The pattern I trust is propose and confirm: the model proposes an action, a person confirms it, and anything that changes data goes through that gate. I wrote about it in [a custom AI agent that never touches money](/blog/custom-ai-agent-development-agent-that-never-touches-money/).
+
+**Build:** an agent with two or three tools, one of them a write action behind a confirmation. **Done when:** you can show the confirmation step and what happens when the user says no.
+
+## Step 5: MCP, the Model Context Protocol
+
+MCP is a standard way to give an assistant tools. Once you have retrieval and tools, exposing them over MCP lets assistants such as Claude Code use them. I cover the protocol in [how to create an MCP server](/blog/how-to-create-an-mcp-server-portfolio-lessons/).
+
+**Build:** an MCP server with a handful of tools over data you know. **Done when:** an assistant uses it without you explaining each tool.
+
+## Step 6: Make it production-shaped
+
+The last step is the part you already know from web work, applied to AI. Run the eval in CI. Cache what you can. Put the model calls behind your own auth. Deploy somewhere real, for instance on Cloudflare Workers or Docker. Keep a record of what the model was asked and answered.
+
+## What to put on your portfolio
+
+Do not list the tools. Show one project per step with its measurement: the golden-set score, the confirmation gate, the deployed endpoint. A hiring manager can check a number and a live link. They cannot check "familiar with RAG".
+
+## A checklist
+
+1. Count your MERN skills that transfer.
+2. Call an LLM from your backend with validated output.
+3. Build semantic search, then find where it fails.
+4. Build RAG and write the eval before tuning anything.
+5. Build an agent with a confirmation gate.
+6. Expose your tools over MCP.
+7. Deploy it and run the eval in CI.
+
+## FAQ
+
+### How do I become an AI engineer from a MERN background?
+
+Keep your web skills and add LLM APIs, embeddings and vector search, RAG with an evaluation, agents with guardrails and MCP. Build one small project for each step and measure the quality.
+
+### Do I need machine learning maths to be an AI engineer?
+
+Not for most application work. You need to understand what embeddings and models do, and how to evaluate them. Deeper maths matters if you train or fine-tune models.
+
+### How long does the transition take?
+
+It depends on how much time you have and what you already know. The steps above are sized as small projects, so progress is visible quickly, but there is no honest fixed answer.
+
+### What is the most important skill?
+
+Evaluation. A system you can measure can be improved, and one you cannot measure is a demo.

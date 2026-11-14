@@ -1,0 +1,114 @@
+---
+title: 'Hybrid RAG for a Codebase: BM25, Vectors and a Reranker'
+slug: hybrid-rag-for-a-codebase-bm25-vectors-reranker
+date: '2026-11-26'
+description: 'How I built a local hybrid RAG system over a web app code, docs and lint rules: BM25 plus dense search, a reranker, and an eval that fails when quality drops.'
+tags:
+  - RAG
+  - AI Engineering
+  - Retrieval
+keywords:
+  - hybrid rag codebase
+  - rag for code search
+  - bm25 and vector search
+  - reciprocal rank fusion
+  - rag evaluation recall mrr
+readingMinutes: 7
+takeaways:
+  - 'Code questions mix exact identifiers and loose intent, so pure vector search misses half of them. Dense search plus BM25, fused and reranked, covers both.'
+  - 'Index docs, lint rules and code as separate collections. They need different splitting and they answer different kinds of question.'
+  - 'A golden query set with Recall@k and MRR, and a harness that exits non-zero below a threshold, turns retrieval quality into something a build can fail on.'
+author:
+  name: Yaseen Khatib
+  role: Full Stack AI Developer
+---
+
+Ask a code search tool "where do we validate the session token" and you want one file. Ask it for `useDebouncedValue` and you want the one function with that exact name. Those are two different retrieval problems, and a retrieval system that only handles one of them will quietly fail on the other.
+
+I built a local retrieval system over a large web application's source code, documentation and lint rules, so that engineers and AI assistants could work on the codebase without reading all of it. This post is the design: what is in the pipeline, why each part is there, and the evaluation that keeps it honest. It describes the design, not the code.
+
+## Why pure vector search is not enough for code
+
+Embeddings are good at meaning. "How do we retry failed uploads" finds the retry helper even if the word "retry" never appears in it. They are weak at exact strings: a function name, an error code, a config key. Two identifiers that look alike to a person can land far apart in vector space, and one that is a rare token gets averaged away.
+
+BM25 is the opposite. It is plain keyword scoring over a term index, so an exact identifier is an easy win, and a loosely worded question is a loss. Code questions are a mix of both. That is the whole case for running them together.
+
+## The pipeline, in order
+
+1. **Dense search** over embeddings, for meaning.
+2. **BM25** over the same chunks, for exact terms.
+3. **Reciprocal rank fusion** to merge the two ranked lists into one.
+4. **A cross-encoder reranker** over the merged top results, to order them by how well each chunk answers the question.
+
+## Reciprocal rank fusion, explained
+
+Reciprocal rank fusion is worth knowing because it avoids a real problem. The two searches produce scores on different scales, so adding them directly means one side dominates. Fusion ignores the raw scores and uses only rank position: a chunk that is near the top of both lists beats a chunk that is first in one and missing from the other. There is nothing to tune per query.
+
+## The cross-encoder reranker
+
+The reranker is a cross-encoder (FlashRank with an ms-marco MiniLM model). Unlike the embedding step, which encodes the question and each chunk separately, a cross-encoder reads the question and one chunk together, so it judges the pair. It is slower per chunk, which is why it only sees the short fused list and not the whole index.
+
+## Three collections, not one
+
+I keep three vector collections in Chroma: docs, rules and code. It would be simpler to throw everything into one index, and I tried to resist that for two reasons.
+
+First, they are split differently. Prose splits on headings and paragraphs. Code splits with language-aware splitters, so a function is not cut in half and a component stays with its props. A single splitter is a compromise that is wrong for both.
+
+Second, they answer different questions. "What is our rule for state in components" belongs to the rules collection. "Where is that rule broken" belongs to code. Keeping them apart lets a tool search the right one, and lets the assistant say which kind of source an answer came from.
+
+## Everything stays on the machine
+
+Source code is the data most teams will not send to a hosted embedding API, so I did not. Embeddings come from nomic-embed-text running through Ollama, and the vectors live in a local Chroma store. Nothing leaves the machine. The cost is that you carry the compute yourself, which is fine for a codebase-sized corpus.
+
+## Incremental ingestion, so it stays current
+
+A retrieval system that goes stale is worse than none, because people trust it. The fix is not to rebuild everything on a schedule. Each file gets a SHA-256 hash recorded in a manifest. On the next run, only files whose hash changed are re-embedded, and files that were deleted lose their chunks.
+
+The numbers from the project's own notes, on its own machine: an incremental ingest with no changes takes about 3 seconds, a warm query comes back in 200 to 400 milliseconds, and a full rebuild of 500 files takes 3 to 5 minutes. Treat those as one setup's measurements, not a benchmark.
+
+One rule keeps the index useful: only steady-state knowledge goes in. Task lists, status reports and session logs are never indexed. They are true on Tuesday and wrong on Friday, and retrieval cannot tell the difference.
+
+## The evaluation that gates it
+
+This is the part I would not skip. Retrieval quality is easy to feel and hard to know, and "it seems to work" stops being true the first time someone changes a chunk size.
+
+The harness runs a golden set of queries, each with the chunk or file that should come back, and reports two numbers:
+
+- **Recall@k**: for how many queries did a correct result appear in the top k. At k of 5, a score of 0.95 means a correct result was in the top five for nearly every golden query.
+- **MRR** (mean reciprocal rank): how high the first correct result sat. It rewards putting the right answer first, not just somewhere in the list.
+
+My baseline was a Recall@5 of 0.95 and an MRR of 0.83. The thresholds are 0.75 and 0.55, and the harness exits non-zero when either number falls below its threshold. That last detail is what makes it useful: a change that quietly hurts retrieval fails the run instead of shipping.
+
+An honest limit: these scores come from my own golden set, which tests the questions this codebase's engineers actually ask. They say the system is good at that set. They do not say it would score the same on someone else's code, and I would not compare them with a public benchmark.
+
+## How to build your own
+
+1. Start with the golden set, before the pipeline. Write down real questions and the right answers. Without it every later choice is a guess.
+2. Add dense search first and measure. Add BM25 and fusion and measure again. Keep the reranker only if the numbers justify the latency.
+3. Split code with a splitter that knows the language.
+4. Record a content hash per file and make ingestion incremental from day one.
+5. Put a floor under the scores and fail the build below it.
+
+If you are curious how I handle the same kind of problem at a smaller scale, I wrote about [a RAG chatbot on Cloudflare Workers and where it broke](/blog/rag-chatbot-cloudflare-workers-where-it-broke/).
+
+## FAQ
+
+### What is hybrid RAG?
+
+Hybrid RAG retrieves with two methods at once, usually dense vector search and keyword search such as BM25, then merges the results before the language model sees them. It covers both meaning and exact terms.
+
+### Why use reciprocal rank fusion?
+
+The two searches score on different scales, so adding scores favours one of them. Fusion uses only rank position, which makes the merge stable without per-query tuning.
+
+### Do I need a reranker?
+
+Not always. A cross-encoder reranker improves the order of a short list but costs time per chunk. Measure Recall@k and MRR with and without it, and keep it if the gain is worth the latency.
+
+### How do I measure RAG quality?
+
+Write a golden set of questions with the correct source for each, then report Recall@k and MRR. Set a threshold and fail the run below it, so a regression cannot ship unnoticed.
+
+### Can RAG over code run fully local?
+
+Yes. Local embeddings through Ollama and a local vector store keep source code on your machine. The trade-off is that you provide the compute.

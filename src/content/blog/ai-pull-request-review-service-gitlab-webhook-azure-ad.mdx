@@ -1,0 +1,101 @@
+---
+title: 'AI Pull Request Review for GitLab: Webhook and Azure AD Design'
+slug: ai-pull-request-review-service-gitlab-webhook-azure-ad
+date: '2026-12-01'
+description: 'How I structured an AI pull request review service for GitLab: a webhook on a shared secret, Azure AD sign-in, and role-checked routes behind its own JWT.'
+tags:
+  - AI Engineering
+  - GitLab
+  - Authentication
+keywords:
+  - ai pull request review gitlab
+  - gitlab merge request webhook
+  - azure ad msal jwt validation
+  - ai code review service
+  - rs256 token validation
+readingMinutes: 7
+takeaways:
+  - 'An AI review service has two kinds of caller, a webhook from GitLab and a person in a browser. Give them separate authentication paths.'
+  - 'Validate the Azure ID token against Azure public keys, then issue your own short, signed JWT so the rest of the API never depends on Azure details.'
+  - 'Put the roles inside your own token and check them per route. Scan, audit and analytics should not share one permission.'
+author:
+  name: Yaseen Khatib
+  role: Full Stack AI Developer
+---
+
+A pull request review service sounds like one feature: a model reads a diff and leaves comments. Once you try to run it for a real team it turns into an access problem. GitLab has to be able to trigger it. Engineers have to be able to use it from a browser. Managers want to see what it has been doing. Those are three kinds of caller with three different reasons to be trusted.
+
+This post is about how I structured the backend of an AI pull request review service for GitLab merge requests, and why the authentication is split the way it is. It is the part that decides whether a tool like this is something a team can run or something that stays a demo.
+
+## What the service does
+
+The service reviews GitLab merge requests. A webhook tells it when a merge request opens or changes, and it runs the review. People sign in through a front end to start scans, look at audit results and read analytics. So there are two entrances: one for GitLab, one for people.
+
+I will leave the model prompts out here. The interesting engineering is around them.
+
+## Two entrances, two kinds of trust
+
+The webhook and the browser should not share a way of proving who they are.
+
+**The webhook** comes from a system, not a person. GitLab can send a secret token with each webhook request, so the service compares it with a shared secret it holds. That is all the webhook path does. It carries no user, no role and no session. If the secret is wrong, the request is dropped before any review work starts.
+
+**The browser** is a person, and a person needs an identity and a role. For that I used Azure AD sign-in with MSAL.
+
+Keeping these apart means a leaked browser token cannot trigger webhook-only behaviour, and a webhook secret cannot be used to read audit data. They are different keys for different doors.
+
+## Azure AD in, my own JWT out
+
+The sign-in flow works in three steps.
+
+1. The front end signs the person in with MSAL and gets an Azure ID token.
+2. It sends that token to the API.
+3. The API validates the token against Azure's published signing keys, checks it was signed with RS256, and then issues its own signed JWT.
+
+The last step is the one worth explaining. I could have made every route accept the Azure token directly. I did not, for three reasons.
+
+- **Validation happens once.** Checking a token against the signing keys, plus the issuer, audience and expiry, is work you want in exactly one place. After that, every other route only has to verify one signature that I control.
+- **My token carries my roles.** Azure knows who the person is. It does not know that someone is allowed to run scans but not read analytics. The role lives in the token my API issues, so I can change it without touching the identity provider.
+- **The rest of the API does not depend on Azure details.** If the sign-in provider changes, one validation function changes and the routes do not.
+
+## Role-checked routes
+
+Behind that token, the routes are checked by role, not just by "is signed in". The three groups I separated are scan, audit and analytics.
+
+The reason is the usual one. Starting a scan costs compute and touches repositories. Reading audit results can expose what the reviewer said about a particular change. Analytics is about trends across the team. A person who needs one of these does not automatically need the others, and an all-or-nothing permission makes people either over-grant or work around the tool.
+
+A role check on each route is a few lines, and it is the first thing I would add to any internal AI tool that touches source code.
+
+## Where the review meets the rest of the tooling
+
+The same GitLab merge-request data shows up in other parts of my tooling. The MCP server I built for Claude Code has GitLab tools that list open merge requests, read review comments and resolve threads. That lets an engineer and an assistant work through a review from the editor instead of switching to the browser.
+
+I wrote about the retrieval layer that sits under that work in [hybrid RAG for a codebase](/blog/hybrid-rag-for-a-codebase-bm25-vectors-reranker/). It is the same philosophy: treat the surrounding system as engineering, with measured behaviour and access control, instead of a prompt in a box.
+
+## A checklist if you build one
+
+1. Authenticate the webhook with a shared secret and nothing else. Reject before doing work.
+2. Authenticate people through your identity provider, and validate the ID token properly: signature, issuer, audience, expiry.
+3. Issue your own short-lived token and keep the roles in it.
+4. Check the role on every route, with separate permissions for starting work and reading results.
+5. Keep review output and audit logs somewhere a person can read them, so a bad review can be traced.
+6. Never let the model's output decide who is allowed to do something.
+
+The last point is the one people forget. The model suggests; the access rules are code, and they do not move because a comment sounded confident.
+
+## FAQ
+
+### How do I secure a GitLab webhook?
+
+Set a secret token on the webhook in GitLab and compare it with a shared secret on your server for every request. Reject anything that does not match before doing any work.
+
+### How do I validate an Azure AD ID token?
+
+Fetch Azure's public signing keys, verify the token signature, then check the issuer, audience and expiry. Only then trust the claims inside it.
+
+### Why issue my own JWT after Azure sign-in?
+
+It lets you validate Azure once, keep your own roles in a token you control, and keep the rest of the API independent of the identity provider.
+
+### Can an AI review replace a human reviewer?
+
+No. It is a first pass that catches routine issues and gives the reviewer a head start. A person still decides what merges.

@@ -1,0 +1,96 @@
+---
+title: 'An MCP Server for Claude Code: The 20 Tools I Exposed and Why'
+slug: mcp-server-for-claude-code-20-tools-codebase
+date: '2026-12-08'
+description: 'How I designed an MCP server for Claude Code over a large web codebase: 20 tools in four groups, structural lookups that skip the LLM, and a drop-in setup.'
+tags:
+  - MCP
+  - Claude Code
+  - AI Engineering
+keywords:
+  - claude code mcp
+  - mcp server for claude code
+  - how to build an mcp server
+  - mcp tools design
+  - codebase mcp server
+readingMinutes: 7
+takeaways:
+  - 'Group MCP tools by the question being asked: search, structure, operations and review. A flat list of twenty tools is hard for a model to choose from.'
+  - 'Structural lookups (find a symbol, list the hooks, outline a file) can be answered from an index with no LLM call, which makes them fast and free.'
+  - 'Make the server drop into a project folder with no configuration. Setup friction decides whether a team uses it.'
+author:
+  name: Yaseen Khatib
+  role: Full Stack AI Developer
+---
+
+Claude Code is good at reading a repository one file at a time. On a large web application that is slow, and it spends a lot of its context just finding out where things are. I built an MCP server so that Claude Code can ask the codebase questions directly instead of crawling it.
+
+This post is about the design of that server: the twenty tools, how I grouped them, which ones never call a language model, and the choices that made it easy for engineers to adopt. It describes the design, not the code.
+
+If you want the basics first, I wrote about [how to create an MCP server](/blog/how-to-create-an-mcp-server-portfolio-lessons/) for a different project, with the protocol details. This one is about tool design for an existing codebase.
+
+## What the server sits on top of
+
+The server exposes a retrieval system I built over the application's source code, docs and lint rules. The retrieval side is its own story, which I covered in [hybrid RAG for a codebase](/blog/hybrid-rag-for-a-codebase-bm25-vectors-reranker/). MCP is the interface: it turns that system into tools that Claude Code can call during a task.
+
+## Twenty tools in four groups
+
+A model picks a tool from its name and description. Twenty tools in one flat list invites wrong picks, so I grouped them by the kind of question each one answers.
+
+**Search (five tools).** Questions in natural language: a general search, a smart search, and searches scoped to docs, to code and to rules. Scoping matters because "how should I write this component" belongs to the rules, and "where is this component used" belongs to the code.
+
+**Structure (eight tools).** Questions about the shape of the application: list the features, components, hooks, state slices, and APIs and routes, plus outline a file, find a symbol and find its usages. These are not searches. They are lookups.
+
+**Operations (four tools).** Housekeeping the assistant sometimes needs: index stats, guidance, ingest status and regenerate docs. They let the assistant check that the index is current before it trusts an answer.
+
+**Review (three tools).** GitLab merge-request tools: list open merge requests, read review comments and resolve threads. They keep an engineer and the assistant inside the editor during a review instead of switching to the browser.
+
+## Tool descriptions are the interface
+
+The model never sees your code, only the name and description of each tool, so those words do the routing. A few habits help. Name the tool for the question, not the implementation. Say in one sentence what it returns and when not to use it. Keep similar tools distinct: if two descriptions could both fit a question, the model will pick between them at random. Grouping makes this easier, because each group has one clear job and the descriptions inside it can stay short.
+
+## Structural lookups that never call a model
+
+This is the design choice I would repeat first. The structural docs are generated without calling a language model, and the structural tools answer from them.
+
+Ask for every hook in the application and the answer comes from what was parsed out of the code, not from a prompt. There are no tokens to pay for and no room for a model to invent a hook that does not exist. The answer is the same every time and it is cheap.
+
+The split also helps the assistant. Search tools return ranked passages that it has to judge. Structural tools return facts. Mixing the two kinds of answer in one tool would blur which one the assistant is looking at.
+
+## Make it drop-in
+
+A tool nobody installs does nothing. The server is designed to be copied into a project folder:
+
+- It detects its parent folder as the project root, so there is no path to configure.
+- It generates the structural docs on its own.
+- It ingests the project at startup, so the first question already has an index behind it.
+
+On my setup, an incremental ingest with no changes takes about 3 seconds and a warm query comes back in 200 to 400 milliseconds. Those are one machine's numbers from the project's notes, not a benchmark. The point is that a startup that takes seconds does not get switched off.
+
+## Lessons for your own MCP server
+
+1. Group tools by the question they answer, and say so in the descriptions.
+2. Prefer lookups over generation where the answer already exists in an index.
+3. Add operational tools so the assistant can check its own freshness.
+4. Keep setup to copying a folder.
+5. Test with the questions engineers really ask, not the ones that show the tool off.
+
+The last one is the easiest to skip. A tool set shaped like your data model looks tidy and gets used less than one shaped like the questions people ask during a real task.
+
+## FAQ
+
+### What is an MCP server for Claude Code?
+
+It is a program that exposes tools to Claude Code over the Model Context Protocol. Claude Code can call those tools during a task, for example to search a codebase or list its components.
+
+### How many tools should an MCP server have?
+
+As few as the questions require, but group them clearly. Twenty well-grouped tools worked for a large codebase. Twenty ungrouped ones would not.
+
+### Should MCP tools call an LLM?
+
+Only when they need to. Lookups that can come from an index, such as finding a symbol or listing hooks, are faster and more reliable without a model.
+
+### How do I make an MCP server easy to adopt?
+
+Make it a drop-in: detect the project root automatically, generate what it needs on its own and ingest at startup, so there is nothing to configure.

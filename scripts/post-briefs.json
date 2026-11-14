@@ -571,6 +571,253 @@
         "href": "/solutions/ai-agents/",
         "text": "Custom AI agents"
       }
+    },
+    {
+      "slug": "hybrid-rag-for-a-codebase-bm25-vectors-reranker",
+      "keyword": "hybrid rag codebase",
+      "secondary_keywords": [
+        "rag for code search",
+        "bm25 and vector search",
+        "reciprocal rank fusion",
+        "rag evaluation recall mrr"
+      ],
+      "research": "treg Google SERP, India, 14 Nov 2026, 'hybrid rag codebase': positions 1-8 are tutorials and small-site blogs (nexorazentrix, github sample, ailearnings.in, logicstack.org, ontology.works, fabrisoft.in, cognifysystems.in); no big authority domain, so a first-person design post with measured numbers is competitive. Cost under $0.01.",
+      "angle": "First-person design walkthrough of a local hybrid RAG over a web app's code, docs and lint rules, with the eval that gates it.",
+      "facts": [
+        {
+          "claim": "Local retrieval system over a web application's source code, documentation and lint rules; three vector collections (docs, rules, code) in Chroma; embeddings from nomic-embed-text through Ollama so nothing leaves the machine.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        },
+        {
+          "claim": "Retrieval is hybrid: dense search plus BM25, fused with reciprocal rank fusion, then reranked by a cross-encoder (FlashRank, ms-marco MiniLM).",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        },
+        {
+          "claim": "Code is split with language-aware splitters. Ingestion is incremental: a SHA-256 manifest means only changed files are re-embedded and deleted files lose their chunks.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        },
+        {
+          "claim": "Evaluation harness runs a golden query set and reports Recall@k and MRR. Baseline Recall@5 0.95 and MRR 0.83, thresholds 0.75 and 0.55; the harness exits non-zero when quality drops below them.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        },
+        {
+          "claim": "Only steady-state knowledge is indexed, never task lists, status reports or session logs.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        },
+        {
+          "claim": "Timings from the project's own notes: incremental ingest with no changes about 3 seconds, warm query 200 to 400 milliseconds, full rebuild of 500 files 3 to 5 minutes.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        }
+      ],
+      "internal_links": [
+        "/blog/rag-chatbot-cloudflare-workers-where-it-broke/"
+      ],
+      "status": "scheduled",
+      "market": "IN",
+      "audience": "An engineer, hiring manager or recruiter who found the post searching the keyword.",
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts.",
+        "Never name private repositories, clients or confidential code; describe the design only."
+      ],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire me for AI work"
+      }
+    },
+    {
+      "slug": "ai-pull-request-review-service-gitlab-webhook-azure-ad",
+      "keyword": "ai pull request review gitlab",
+      "secondary_keywords": [
+        "gitlab merge request webhook",
+        "azure ad msal jwt validation",
+        "ai code review service"
+      ],
+      "research": "treg Google SERP, US, 14 Nov 2026, 'ai pull request review tool': results are tool vendors and tutorials (propelcode, hatica, bito, regolo-ai tutorial); a first-person backend/auth design angle for GitLab is uncovered. Cost under $0.01.",
+      "angle": "The auth and access design of an AI pull-request review backend for GitLab merge requests: webhook on a shared secret, Azure AD sign-in, own JWT, role-checked routes.",
+      "facts": [
+        {
+          "claim": "Backend that reviews GitLab merge requests through a webhook, with Azure AD (MSAL) sign-in: the front end gets an Azure ID token, the API validates it against the Azure keys (RS256), and issues its own signed JWT for role-checked scan, audit and analytics routes. The webhook stays on a separate shared-secret check.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        },
+        {
+          "claim": "The MCP server built for Claude Code has 20 tools including GitLab merge-request tools: list open requests, read review comments, resolve threads.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own Sparity work, 2025 to now); scripts/generate-resume.js",
+          "checked": "2026-11-14"
+        }
+      ],
+      "internal_links": [
+        "/blog/hybrid-rag-for-a-codebase-bm25-vectors-reranker/"
+      ],
+      "status": "scheduled",
+      "market": "IN",
+      "audience": "An engineer, hiring manager or recruiter who found the post searching the keyword.",
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts.",
+        "Never name private repositories, clients or confidential code; describe the design only."
+      ],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire me for AI work"
+      }
+    },
+    {
+      "slug": "full-stack-ai-developer-resume-what-i-put-on-mine",
+      "status": "scheduled",
+      "keyword": "full stack developer resume",
+      "secondary_keywords": [
+        "ai engineer resume",
+        "mern stack developer resume",
+        "ats resume developer"
+      ],
+      "market": "IN",
+      "research": "DataForSEO Google Ads volumes, 15 Nov 2026: 'full stack developer resume' India 720 a month, 'ai engineer resume' India 590 and US 260. treg Google SERP 15 Nov 2026: results are a personal GitHub page, Scribd, Instagram, Reddit, small career sites, so a first-person post with real PDFs is competitive. Cost about $0.01.",
+      "audience": "A developer in India preparing a full stack or AI engineer resume.",
+      "angle": "First-person walkthrough of the author's own two resume versions: headline, summary, result bullets, honest bold keywords, a plain ATS version.",
+      "facts": [
+        {
+          "claim": "The resume has a designed two-page version (Resume.pdf) and a plain single-column one-page ATS version (Resume-ATS.pdf); the ATS version's sections are Summary, Experience, Selected projects, Skills and Education.",
+          "source": "src/content/work-history.md; scripts/generate-resume-ats.js; scripts/generate-resume.js (the author's own resume, RESUME_VERSION 12)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "Headline: Full Stack AI Developer, MERN, TypeScript, Next.js, LLM apps, RAG and AI agents in production. Summary: 5 years of production web systems; since 2025 the AI tooling layer at Sparity; open to roles in Hyderabad, Pune, Mumbai, Bangalore or remote India.",
+          "source": "src/content/work-history.md; scripts/generate-resume-ats.js; scripts/generate-resume.js (the author's own resume, RESUME_VERSION 12)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "MSA Software: dashboards made 1.5 to 2x faster by profiling slow MongoDB aggregation pipelines, adding a caching layer and lazy-loading heavy panels.",
+          "source": "src/content/work-history.md; scripts/generate-resume-ats.js; scripts/generate-resume.js (the author's own resume, RESUME_VERSION 12)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "Sparity RAG system: baseline Recall@5 0.95 and MRR 0.83; the harness fails below thresholds.",
+          "source": "src/content/work-history.md; scripts/generate-resume-ats.js; scripts/generate-resume.js (the author's own resume, RESUME_VERSION 12)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "The designed resume bolds stack keywords inside sentences and has a short Core skills strip near the top.",
+          "source": "scripts/generate-resume.js (kw() and KEYWORDS, Core strip)",
+          "checked": "2026-11-15"
+        }
+      ],
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts.",
+        "No recruiter statistics (such as seconds spent per resume) without a source."
+      ],
+      "internal_links": [
+        "/blog/hybrid-rag-for-a-codebase-bm25-vectors-reranker/"
+      ],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire me for AI work"
+      }
+    },
+    {
+      "slug": "mcp-server-for-claude-code-20-tools-codebase",
+      "keyword": "claude code mcp",
+      "secondary_keywords": [
+        "mcp server for claude code",
+        "how to build an mcp server",
+        "mcp tools design"
+      ],
+      "market": "US",
+      "research": "DataForSEO Google Ads volumes 15 Nov 2026: 'claude code mcp' US 1,900 and India 390 a month; 'how to build an mcp server' US 480. treg Google SERP 15 Nov 2026 'claude code mcp': smartscope.blog, Reddit, webtomcp.net, mcpall.com, hydroxide.dev, hoop.dev, YouTube: small sites and forums, beatable. Cost about $0.01.",
+      "audience": "An engineer who found the post searching for Claude Code MCP.",
+      "angle": "Design of a 20-tool MCP server for Claude Code over a large web codebase: four groups, structural lookups without an LLM, drop-in setup.",
+      "facts": [
+        {
+          "claim": "The retrieval system is exposed to Claude Code over the Model Context Protocol with 20 tools: search tools (general, smart, docs, code, rules), structural lookups (list features, components, hooks, state slices, APIs and routes, outline a file, find a symbol, find its usages), operational tools (index stats, guidance, ingest status, regenerate docs), and GitLab merge-request tools (list open requests, read review comments, resolve threads).",
+          "source": "src/content/work-history.md (public-safe summary of the author's own work, 2021 to now)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "Designed to be copied into a project folder: it detects its parent folder as the project root, generates structural docs without calling an LLM, and ingests at startup.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own work, 2021 to now)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "Incremental ingest with no changes takes about 3 seconds, a warm query 200 to 400 milliseconds.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own work, 2021 to now)",
+          "checked": "2026-11-15"
+        }
+      ],
+      "internal_links": [
+        "/blog/how-to-create-an-mcp-server-portfolio-lessons/",
+        "/blog/hybrid-rag-for-a-codebase-bm25-vectors-reranker/"
+      ],
+      "status": "scheduled",
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts.",
+        "No invented personal anecdotes; only what facts support.",
+        "Never name private repositories, clients or confidential code."
+      ],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire me for AI work"
+      }
+    },
+    {
+      "slug": "mern-developer-to-ai-engineer-roadmap",
+      "keyword": "ai engineer roadmap",
+      "secondary_keywords": [
+        "mern developer to ai engineer",
+        "how to become an ai engineer",
+        "full stack developer to ai engineer"
+      ],
+      "market": "IN",
+      "research": "DataForSEO Google Ads volumes 15 Nov 2026: 'ai engineer roadmap' India 5,400 and US 720 a month; 'how to become ai engineer' India 2,400. treg Google SERP 15 Nov 2026: YouTube x4, javarevisited, skillveris, hireorbitai.in, codewithprashant.in, LinkedIn: many small sites, moderate. Cost about $0.01.",
+      "audience": "A MERN or full stack developer in India who wants to move into AI engineering.",
+      "angle": "A practical step order from MERN to AI engineer, one small project per step, based on the author's own stack.",
+      "facts": [
+        {
+          "claim": "Five years of full-stack work; since 2025 builds the AI tooling layer (hybrid RAG, an MCP server, an AI pull-request review service) at Sparity.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own work, 2021 to now)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "Skills include LLM integration (OpenAI, Gemini and Claude APIs), RAG, embeddings and vector search (pgvector, Vectorize, Upstash Vector, Chroma), function calling, agents, MCP servers, LLM evals, Cloudflare Workers and Docker.",
+          "source": "src/content/work-history.md (public-safe summary of the author's own work, 2021 to now)",
+          "checked": "2026-11-15"
+        },
+        {
+          "claim": "The author's RAG work is measured with a golden query set, Recall@k and MRR; the author wrote up a propose-and-confirm agent (Sable) and a RAG chatbot on Cloudflare Workers on this site.",
+          "source": "src/content/blog posts rag-chatbot-cloudflare-workers-where-it-broke, custom-ai-agent-development-agent-that-never-touches-money; work-history.md",
+          "checked": "2026-11-15"
+        }
+      ],
+      "internal_links": [
+        "/blog/hybrid-rag-for-a-codebase-bm25-vectors-reranker/",
+        "/blog/rag-chatbot-cloudflare-workers-where-it-broke/",
+        "/blog/custom-ai-agent-development-agent-that-never-touches-money/",
+        "/blog/how-to-create-an-mcp-server-portfolio-lessons/"
+      ],
+      "status": "scheduled",
+      "computed": [],
+      "must_say": [],
+      "must_not": [
+        "No invented numbers; every figure needs a source in facts.",
+        "No invented personal anecdotes; only what facts support.",
+        "Never name private repositories, clients or confidential code."
+      ],
+      "cta": {
+        "href": "/hire/",
+        "text": "Hire me for AI work"
+      }
     }
   ]
 }
