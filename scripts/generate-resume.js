@@ -39,10 +39,11 @@ const JOBS = [
   {
     title: 'Senior Software Developer', org: 'Sparity', meta: 'Hyderabad · Hybrid', dates: '06/2025 – Present',
     bullets: [
-      'Own the LLM and agent layer of production MERN systems end to end: architecture, orchestration and deployment.',
-      'Build agentic RAG services with schema-validated outputs, guardrails and cost-aware routing between models; build MCP servers.',
+      'Built a local hybrid RAG system over the team’s web-app codebase and docs: dense plus BM25 retrieval, rank fusion and a cross-encoder reranker, incremental ingestion. Recall@5 0.95 and MRR 0.83 on a golden query set, with an eval harness that fails the build below its thresholds.',
+      'Exposed it to Claude Code through an MCP server with 20 retrieval and code-lookup tools, so engineers get project context without reading whole repos; packaged so any team can vendor it into their own project.',
+      'Built an AI pull-request review service: GitLab webhooks, Azure AD (MSAL) sign-in, internal JWTs and role-checked APIs. Led an HR resource-to-task matching pilot (FitRank) from proposal to a manager demo.',
     ],
-    stack: 'Node.js, React, TypeScript, MongoDB, LLM APIs, RAG, MCP',
+    stack: 'Python, Node.js, TypeScript, React, FastAPI, Chroma, Ollama, MCP, GitLab',
   },
   {
     title: 'Full Stack Developer', org: 'MSA Software', meta: 'Remote', dates: '01/2023 – 05/2025',
@@ -95,9 +96,9 @@ const PROJECTS = [
 
 const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Yaseen Khatib - Full Stack AI Developer (MERN, LLM, RAG, Agents)</title>
 <style>
-  @page { size: A4; margin: 12mm 14mm; }
+  @page { size: A4; margin: 11mm 14mm; }
   * { box-sizing: border-box; }
-  body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 10.1pt; line-height: 1.4; color: #15171c; margin: 0; }
+  body { font-family: "Segoe UI", Arial, Helvetica, sans-serif; font-size: 9.8pt; line-height: 1.36; color: #15171c; margin: 0; }
   a { color: #0b5d70; text-decoration: none; }
   .bar { height: 5px; margin: -2mm 0 9px; background: linear-gradient(90deg, #0b5d70, #14a3c7 60%, #7c5cff); border-radius: 3px; }
   h1 { font-size: 24pt; line-height: 1.05; margin: 0; letter-spacing: 0.2px; color: #0b2f3a; }

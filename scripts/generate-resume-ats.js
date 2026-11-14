@@ -35,8 +35,9 @@ const HTML = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>
 <div class="row"><b>Senior Software Developer, Sparity</b><span class="dates">06/2025 – Present</span></div>
 <div class="muted">Hyderabad · Hybrid</div>
 <ul>
-  <li>Own the <b>LLM and agentic layer</b> of production <b>MERN</b> systems end to end: architecture, orchestration and deployment.</li>
-  <li>Ship <b>agentic RAG</b> services with schema-validated outputs, guardrails and cost-aware routing between models.</li>
+  <li>Built a local hybrid <b>RAG</b> system over the team's web-app codebase and docs: dense plus BM25 retrieval, rank fusion and a cross-encoder reranker; Recall@5 0.95 and MRR 0.83 on a golden query set, with an eval harness that fails the build below its thresholds.</li>
+  <li>Exposed it to Claude Code through an <b>MCP</b> server with 20 retrieval and code-lookup tools; packaged so any team can vendor it into their own project.</li>
+  <li>Built an AI pull-request review service (GitLab webhooks, Azure AD sign-in, JWT-protected APIs) and led an HR resource-to-task matching pilot (FitRank) to a manager demo.</li>
 </ul>
 <div class="row"><b>Full Stack Developer, MSA Software</b><span class="dates">01/2023 – 05/2025</span></div>
 <div class="muted">Remote</div>
