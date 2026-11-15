@@ -56,17 +56,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    // /roadmap/ and /anthropic-roadmap/ are link hubs with little body text of
+    // their own: noindex, left out of the sitemap (AdSense readiness, 16 Nov 2026).
     {
-      url: `${SITE_URL}/roadmap/`,
-      lastModified: routeDate("src/app/roadmap", lastBlogUpdate),
-      changeFrequency: "weekly",
-      priority: 0.9,
+      url: `${SITE_URL}/contact/`,
+      lastModified: routeDate("src/app/contact", lastBlogUpdate),
+      changeFrequency: "yearly",
+      priority: 0.5,
     },
     {
-      url: `${SITE_URL}/anthropic-roadmap/`,
-      lastModified: routeDate("src/app/anthropic-roadmap", lastBlogUpdate),
-      changeFrequency: "weekly",
-      priority: 0.9,
+      url: `${SITE_URL}/privacy/`,
+      lastModified: routeDate("src/app/privacy", lastBlogUpdate),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${SITE_URL}/terms/`,
+      lastModified: routeDate("src/app/terms", lastBlogUpdate),
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
     {
       url: `${SITE_URL}/uses/`,

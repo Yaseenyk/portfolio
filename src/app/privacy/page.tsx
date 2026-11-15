@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import GridBackground from "@/components/GridBackground";
 import Navbar from "@/components/Navbar";
 import Prose from "@/components/products/Prose";
@@ -41,6 +42,43 @@ export default function PrivacyPage() {
                 for advertising. You can block it with a browser extension or by disabling
                 cookies.
               </p>
+              <p>
+                There is also a small first-party visit counter that runs on a Cloudflare Worker I
+                operate. It counts page views and tells people apart from bots by simple signals such
+                as screen size and whether the page was interacted with. It sets no cookie, does not
+                store your IP address, and respects Do Not Track and Global Privacy Control.
+                GoatCounter is a similar cookie-free counter.
+              </p>
+              <h2>Cookies</h2>
+              <p>
+                Google Analytics and Microsoft Clarity set cookies in your browser to recognise a
+                returning visit. The site sets no other cookies for logins or tracking. You can
+                delete or block cookies in your browser settings and the site keeps working.
+              </p>
+              <h2>The AI concierge</h2>
+              <p>
+                The chat box on the home page sends your question to a Cloudflare Worker, which looks
+                up passages from this site and asks a language model to answer from them. Do not type
+                anything private into it.
+              </p>
+              <h2>Advertising</h2>
+              <p>
+                This site shows no ads today and loads no advertising code. I may apply for Google
+                AdSense in future. If ads are switched on, Google and its partners may use cookies to
+                serve and measure ads, and this notice will be updated first. You can opt out of
+                personalised ads at <a href="https://adssettings.google.com">adssettings.google.com</a>{" "}
+                or <a href="https://www.aboutads.info">aboutads.info</a>, and read how Google uses
+                data at{" "}
+                <a href="https://policies.google.com/technologies/partner-sites">
+                  policies.google.com/technologies/partner-sites
+                </a>
+                .
+              </p>
+              <h2>Other sites linked from here</h2>
+              <p>
+                The footer links to my other sites on streamerosai.com subdomains, LinkedIn and
+                GitHub. Each has its own privacy notice; this one covers only this website.
+              </p>
               <h2>What I use it for</h2>
               <p>
                 Only to reply to you and to understand which pages are useful. I do not sell or share
@@ -56,7 +94,9 @@ export default function PrivacyPage() {
                 To see, correct or delete what you sent, email{" "}
                 <a href={`mailto:${PERSON.email}`}>{PERSON.email}</a>.
               </p>
-              <p>Last updated 4 November 2026.</p>
+              <p>
+                Last updated 16 November 2026. See also the <Link href="/terms/">terms of use</Link>.
+              </p>
             </Prose>
           </div>
         </div>

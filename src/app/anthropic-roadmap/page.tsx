@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     "Claude Opus 4.8",
   ],
   alternates: { canonical: url },
+  robots: { index: false, follow: true },
   openGraph: {
     type: "website",
     title: `${AN_META.title} | Yaseen Khatib`,

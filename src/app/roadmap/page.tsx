@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     "AI architect masterclass",
   ],
   alternates: { canonical: url },
+  robots: { index: false, follow: true },
   openGraph: {
     type: "website",
     title: `${ROADMAP_META.title} | Yaseen Khatib`,

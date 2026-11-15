@@ -28,7 +28,7 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
       { href: "/interview/", label: "Interview brief" },
       { href: RESUME_URL, label: "Résumé (PDF)", external: true },
       { href: "/#rag-concierge", label: "Ask the concierge" },
-      { href: "/#contact", label: "Contact" },
+      { href: "/contact/", label: "Contact" },
       { href: SOCIALS.linkedin, label: "LinkedIn", external: true },
       { href: SOCIALS.github, label: "GitHub", external: true },
     ],
@@ -143,9 +143,18 @@ export default function SiteFooter() {
             © {new Date().getFullYear()} {PERSON.name} — everything linked
             above is real and running.
           </p>
-          <p>
+          <p className="flex gap-4">
+            <Link href="/about/" className="transition-colors hover:text-cyan">
+              About
+            </Link>
+            <Link href="/contact/" className="transition-colors hover:text-cyan">
+              Contact
+            </Link>
             <Link href="/privacy/" className="transition-colors hover:text-cyan">
               Privacy
+            </Link>
+            <Link href="/terms/" className="transition-colors hover:text-cyan">
+              Terms
             </Link>
           </p>
           <p className="font-mono">
