@@ -81,6 +81,15 @@ JSON-LD, and OG tags only exist post-build.
 If `git push` is rejected, a bot committed — `git stash push package-lock.json`
 (if dirty), `git pull --rebase`, push.
 
+## Freeze until 1 Dec 2026 (set by the owner, 17 Nov 2026)
+
+No edits to any page on any site (portfolio, streamerosai.com, spotai, solar, exams, esports, campus, fitrank, tool sites)
+until 1 Dec 2026, so Google can index what is new and every earlier change can be read cleanly. Allowed: the scheduled
+blog posters (this repo's `src/content/blog/` posts, `streamer-os-website` AI Blogger, linkedin-bot, the esports and SpotAI
+guide queues) and fixes for something broken or a security problem. The optimizer runs reports only
+(`FREEZE_UNTIL` in `analytics-dashboard/.github/workflows/optimizer.yml`). Every change made on purpose is logged in
+`analytics-dashboard/data/changes.json` so the dashboard's "What worked" tab can read it.
+
 ## Conventions
 
 - Conventional commits (`feat(scope):`), push directly to `main` when done —
