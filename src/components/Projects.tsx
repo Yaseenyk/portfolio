@@ -21,7 +21,6 @@ import ShelfScan from "./projects/ShelfScan";
 import RoleGate from "./projects/RoleGate";
 import LinkedInPipelineArt from "./products/art/LinkedInPipelineArt";
 import AiBloggerArt from "./products/art/AiBloggerArt";
-import SableArt from "./products/art/SableArt";
 import FitRankArt from "./products/art/FitRankArt";
 import AnalyticsDashboardArt from "./products/art/AnalyticsDashboardArt";
 
@@ -162,9 +161,12 @@ export const PROJECTS: Project[] = [
     category: "Local-First · AI Finance Agent",
     description:
       "A personal-finance agent where the AI is structurally incapable of touching the money: every record lives in on-device SQLite (no cloud backend), and the model's function calls render as Review & Confirm cards — it proposes, only a human commits. Serialized writes, offline-first, and a daily on-device briefing.",
-    metrics: ["Propose/Confirm Boundary", "Zero-Cloud", "On-Device RAG"],
+    metrics: ["Propose/Confirm Boundary", "Zero-Cloud", "No SMS Access"],
     tech: ["React Native", "SQLite", "Function Calling", "TypeScript"],
-    Animation: SableArt,
+    shot: "sable2",
+    links: [
+      { href: "https://sable.streamerosai.com/", label: "Live site", icon: "external" },
+    ],
   },
   {
     name: "ShelfSight AI",

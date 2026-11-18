@@ -107,7 +107,8 @@ export const PRODUCTS: ProductMeta[] = [
     // The app repo is private; this is the public marketing site.
     repoUrl: "https://github.com/Yaseenyk/sable-website",
     liveUrl: "https://sable.streamerosai.com/",
-    shots: { desktop: ["sable"], phone: ["sable-app-m", "sable-m"] },
+    // "sable2": the restyled app (19 Nov 2026). A new id, so browsers do not show a saved copy of the old look.
+    shots: { desktop: ["sable2"], phone: ["sable2-app-m", "sable2-m"] },
   },
   {
     slug: "streameros",
