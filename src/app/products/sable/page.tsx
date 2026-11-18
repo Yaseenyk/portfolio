@@ -51,7 +51,8 @@ const jsonLd = [
     "@type": "SoftwareApplication",
     name: product.name,
     applicationCategory: "FinanceApplication",
-    operatingSystem: "iOS, Android",
+    operatingSystem: "Android",
+    url: product.liveUrl,
     description: seoDescription(product.summary),
     keywords: product.tech.join(", "),
     author: personRef,
@@ -69,6 +70,12 @@ export default function SablePage() {
       <JsonLd data={jsonLd} />
 
       <ProductHero product={product} art={<SableArt />} />
+
+      {/* Added 19 Nov 2026: the sections below describe the first design; this says what changed since. */}
+      <p className="mt-8 max-w-3xl border-t border-zinc-800 pt-5 text-[15px] leading-relaxed text-zinc-300">
+        <strong className="text-zinc-50">Update, November 2026.</strong> This page documents Sable&apos;s first architecture, from July 2026. The app as it ships today is Android only and no longer reads SMS: you add money by typing, in chat, or by importing a bank statement, and the Morning Briefing is not switched on. The Review &amp; Confirm boundary and the on-device SQLite store are unchanged. What the app does today, with real screens, is on{" "}
+        <a href="https://sable.streamerosai.com/" className="text-cyan underline underline-offset-2">sable.streamerosai.com</a>.
+      </p>
 
       <Section label="01 · Executive Summary">
         <div className="max-w-3xl">

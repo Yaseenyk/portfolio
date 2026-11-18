@@ -49,6 +49,7 @@ const COLUMNS: { heading: string; links: { href: string; label: string; external
       { href: "https://streamerosai.com", label: "streamerOS", external: true },
       { href: "https://spotai.streamerosai.com/", label: "SpotAI", external: true },
       { href: "https://fitrank.streamerosai.com/", label: "FitRank", external: true },
+      { href: "https://sable.streamerosai.com/", label: "Sable", external: true },
       { href: "https://esports.streamerosai.com/", label: "Esports Hub", external: true },
       { href: "https://campus.streamerosai.com/", label: "DefendIt", external: true },
       { href: "https://analytics.streamerosai.com/", label: "Analytics dashboard", external: true },

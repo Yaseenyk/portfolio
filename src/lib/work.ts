@@ -113,10 +113,10 @@ export const WORK: Work[] = [
   },
   {
     slug: "sable", name: "Sable", group: "product", kind: "Mobile AI agent",
-    line: "A personal-finance agent where the model proposes and only a person can commit a change. All data stays on the device.",
-    result: "No cloud backend. Every database change waits behind a Review and Confirm card.",
+    line: "A personal expense tracker for Android where the model proposes and only a person can commit a change. Records stay on the phone.",
+    result: "No cloud backend and no SMS access. Every database change waits behind a Review and Confirm card.",
     stack: ["React Native (Expo)", "SQLite", "OpenAI function calling", "TypeScript"],
-    caseStudy: "/products/sable/",
+    shot: "sable", live: "https://sable.streamerosai.com/", caseStudy: "/products/sable/",
   },
   {
     slug: "portfolio-concierge", name: "Portfolio Concierge", group: "product", kind: "RAG API and MCP server",

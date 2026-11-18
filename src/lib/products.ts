@@ -92,19 +92,22 @@ export const PRODUCTS: ProductMeta[] = [
   {
     slug: "sable",
     name: "Sable",
-    category: "Mobile · AI Agent",
+    category: "Mobile · Android · AI Agent",
     tagline: "Local-First AI Financial Agent",
     summary:
-      "A privacy-first personal finance agent that keeps 100% of your financial data on-device in SQLite — no cloud backend. An OpenAI function-calling agent tracks debts and pushes proactive briefings, with every database mutation gated behind a Review & Confirm boundary.",
+      "A personal expense tracker for Android that keeps every record on the phone in SQLite, with no account and no backend. You add money by typing, in chat or from a bank statement; an OpenAI function-calling agent (on the user's own key) reads files and loose wording, and every database change waits behind a Review & Confirm card.",
     tech: [
       "React Native (Expo)",
       "TypeScript",
       "SQLite",
       "Zustand",
       "OpenAI · Function Calling",
-      "Local RAG",
+      "OpenAI · Vision",
     ],
-    // Source is private; no repo link rather than a 404.
+    // The app repo is private; this is the public marketing site.
+    repoUrl: "https://github.com/Yaseenyk/sable-website",
+    liveUrl: "https://sable.streamerosai.com/",
+    shots: { desktop: ["sable"], phone: ["sable-app-m", "sable-m"] },
   },
   {
     slug: "streameros",

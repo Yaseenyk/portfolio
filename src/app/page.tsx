@@ -83,11 +83,12 @@ const projectsJsonLd = [
     "@type": "SoftwareApplication",
     name: "Sable",
     applicationCategory: "FinanceApplication",
-    operatingSystem: "iOS, Android",
+    operatingSystem: "Android",
+    url: "https://sable.streamerosai.com/",
     description:
-      "A local-first AI financial agent: all data lives on-device in SQLite with no cloud backend, an OpenAI function-calling agent manages debts behind a Review & Confirm boundary, and a daily local RAG job delivers a proactive Morning Briefing.",
+      "A local-first personal expense tracker for Android: records live on-device in SQLite with no cloud backend, and an OpenAI function-calling agent, on the user's own key, logs spending and debts behind a Review & Confirm boundary.",
     keywords:
-      "React Native, Expo, TypeScript, SQLite, OpenAI, Function Calling, Local RAG, offline-first",
+      "React Native, Expo, TypeScript, SQLite, OpenAI, Function Calling, offline-first",
     author,
   },
   {
