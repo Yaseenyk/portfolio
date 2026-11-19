@@ -81,7 +81,12 @@ JSON-LD, and OG tags only exist post-build.
 If `git push` is rejected, a bot committed — `git stash push package-lock.json`
 (if dirty), `git pull --rebase`, push.
 
-## Freeze until 1 Dec 2026 (set by the owner, 17 Nov 2026)
+## Freeze LIFTED 19 Nov 2026 (by the owner, for an AdSense revamp of every site)
+
+The section below is kept for history. Page edits are allowed again; still log every deliberate change in
+`analytics-dashboard/data/changes.json`.
+
+## (Lifted) Freeze until 1 Dec 2026 (set by the owner, 17 Nov 2026)
 
 No edits to any page on any site (portfolio, streamerosai.com, spotai, solar, exams, esports, campus, fitrank, tool sites)
 until 1 Dec 2026, so Google can index what is new and every earlier change can be read cleanly. Allowed: the scheduled
