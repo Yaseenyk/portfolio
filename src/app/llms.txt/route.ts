@@ -79,10 +79,11 @@ ${projectsMd}
 - [RAG chatbot trained on your documents, website or WhatsApp — from $800; AI-integrated CRM from $2,000; $15–$30/hour](${SITE_URL}/solutions/ai-chatbot/)
 - [For small businesses — hosted tools from ₹800/month](${SITE_URL}/solutions/small-business/)
 
-## DefendIt — final year projects for Indian students (separate site)
+## DefendIt — final year project classes for Indian students (separate site)
 
-> The student-projects business, its free guides, the viva question bank and
-> the 16-day AI engineering journey live on their own site, with their own
+> Project classes where the project is built together in live classes and the
+> student writes part of every module. The classes, the free guides, the viva
+> question bank and the 16-day AI engineering journey live on their own site, with their own
 > llms.txt: https://campus.streamerosai.com/
 
 ## Founder's Log — vision series

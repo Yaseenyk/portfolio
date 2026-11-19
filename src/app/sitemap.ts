@@ -155,12 +155,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
-    {
-      url: `${SITE_URL}/interview/`,
-      lastModified: routeDate("src/app/interview", lastBlogUpdate),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
+    // /interview/ is a short brief for interviewers who already have the link; it repeats /about/ and /hire/
+    // and is noindex since 19 Nov 2026 (AdSense low-value review), so it is not listed.
     ...postEntries,
     // Tag archive pages are intentionally excluded — they're noindex, so
     // listing them here would only dilute crawl budget on a young domain.

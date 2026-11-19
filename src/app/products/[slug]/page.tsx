@@ -13,7 +13,8 @@ import { getWork, studies } from "@/lib/work";
  * Case-study pages for the products that had none (lib/work.ts entries with a `study`): Esports Hub, the solar guide,
  * exam dates, the tool sites and DefendIt. The older products keep their hand-written pages in sibling folders, which
  * take priority over this route. One shape for every study: the problem, what was built, the decisions and their
- * reasons, what a stranger can verify, and the honest limits.
+ * reasons, how it works (read from the product repo), what a stranger can verify, the honest limits and a dated
+ * timeline from git log.
  */
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -101,22 +102,52 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
         </ol>
       </section>
 
+      {s.howItWorks && (
+        <section className="mt-14 border-t border-white/10 pt-10">
+          <p className={eyebrow}>04 · How it works</p>
+          <h2 className={`${h2} mt-3`}>Read from the code</h2>
+          <dl className="mt-6 space-y-7">
+            {s.howItWorks.map(([title, text]) => (
+              <div key={title} className="grid grid-cols-1 gap-2 border-t border-white/10 pt-5 md:grid-cols-[minmax(0,16rem)_1fr] md:gap-8">
+                <dt className="text-[16px] font-semibold leading-snug text-zinc-50">{title}</dt>
+                <dd className="text-[15px] leading-relaxed text-zinc-400">{text}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
       <div className="mt-14 grid grid-cols-1 gap-x-12 gap-y-10 border-t border-white/10 pt-10 md:grid-cols-2">
         <section>
-          <p className={eyebrow}>04 · What you can check</p>
+          <p className={eyebrow}>{s.howItWorks ? "05" : "04"} · What you can check</p>
           <ul className="mt-4 space-y-3 text-[15px] leading-relaxed text-zinc-300">
             {s.proof.map((p) => <li key={p} className="flex gap-3"><span aria-hidden="true" className="mt-[10px] h-1 w-1 flex-none rounded-full bg-cyan" />{p}</li>)}
           </ul>
         </section>
         {s.limits && (
           <section>
-            <p className={eyebrow}>05 · Honest limits</p>
+            <p className={eyebrow}>{s.howItWorks ? "06" : "05"} · Honest limits</p>
             <ul className="mt-4 space-y-3 text-[15px] leading-relaxed text-zinc-400">
               {s.limits.map((p) => <li key={p} className="flex gap-3"><span aria-hidden="true" className="mt-[10px] h-1 w-1 flex-none rounded-full bg-zinc-600" />{p}</li>)}
             </ul>
           </section>
         )}
       </div>
+
+      {s.timeline && (
+        <section className="mt-14 border-t border-white/10 pt-10">
+          <p className={eyebrow}>Timeline</p>
+          <h2 className={`${h2} mt-3`}>Dates from the git history</h2>
+          <ol className="mt-6 space-y-4">
+            {s.timeline.map(([date, text]) => (
+              <li key={date + text} className="grid grid-cols-1 gap-1 md:grid-cols-[8rem_1fr] md:gap-6">
+                <time className="font-mono text-[13px] text-cyan">{date}</time>
+                <p className="text-[15px] leading-relaxed text-zinc-300">{text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       <section className="mt-14 border-t border-white/10 pt-8">
         <p className={eyebrow}>Stack</p>

@@ -12,7 +12,7 @@ import {
 } from "@/lib/seo";
 
 const DESCRIPTION =
-  "An internal-style talent briefing for engineering leadership evaluating Yaseen Khatib for a Lead MERN / AI Systems Architect role — architectural strengths, suggested interview prompts, and verifiable proof points.";
+  "An internal-style talent briefing for engineering leadership evaluating Yaseen Khatib for a Full Stack AI Developer role — architectural strengths, suggested interview prompts, and verifiable proof points.";
 
 // One array drives BOTH the visible accordion and the FAQPage JSON-LD —
 // rich-results rules require the markup to match rendered content, and a
@@ -40,12 +40,11 @@ const FAQ_ITEMS: FaqItem[] = [
 ];
 
 export const metadata: Metadata = {
-  title: { absolute: "Interview Brief — Yaseen Khatib, Senior MERN + AI Engineer" },
+  title: { absolute: "Interview Brief — Yaseen Khatib, Full Stack AI Developer" },
   description: seoDescription(DESCRIPTION),
   keywords: [
     "Yaseen Khatib",
-    "Lead MERN Architect",
-    "AI Systems Architect",
+    "Full Stack AI Developer",
     "engineering interview",
     "hiring brief",
     "React Flow",
@@ -53,6 +52,9 @@ export const metadata: Metadata = {
     "Agentic Workflows",
   ],
   alternates: { canonical: `${SITE_URL}/interview/` },
+  // A short brief for interviewers who already have the link; it overlaps /about/ and /hire/. Kept out of search
+  // since 19 Nov 2026 so the domain's indexed pages are the substantial ones.
+  robots: { index: false, follow: true },
   openGraph: {
     type: "article",
     title: "Interview Brief — Yaseen Khatib",
@@ -89,7 +91,7 @@ export default function InterviewPage() {
             <p>
               <strong>Objective:</strong>
               <br />
-              Evaluate Yaseen Khatib for Lead MERN / AI Systems Architect.
+              Evaluate Yaseen Khatib for a Full Stack AI Developer role.
             </p>
 
             <h2>Architectural Strengths to Probe</h2>

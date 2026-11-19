@@ -18,7 +18,7 @@ export const SHOTS: Shot[] = [
   { id: "esports", title: "Esports Hub", caption: "Free tournament tools for organisers: sign-ups, brackets, ID cards, live screens.", href: "https://esports.streamerosai.com" },
   { id: "esports-tool", title: "Points table maker", caption: "One of the Esports Hub tools: standings for BGMI and Free Fire, no account.", href: "https://esports.streamerosai.com/tools/points-table/" },
   { id: "analytics", title: "Analytics dashboard", caption: "Google Analytics and Search Console for all my sites on one page.", href: "https://analytics.streamerosai.com" },
-  { id: "defendit", title: "DefendIt", caption: "Final-year projects for students in India, built and explained for the viva.", href: "https://campus.streamerosai.com" },
+  { id: "defendit", title: "DefendIt", caption: "Final-year project classes for students in India, built together in live classes.", href: "https://campus.streamerosai.com" },
   { id: "solar", title: "Solar subsidy guide", caption: "A subsidy calculator and guide in 13 languages, every figure sourced.", href: "https://solar.streamerosai.com" },
   { id: "exams", title: "Exam dates India", caption: "Dates and fees read from official bulletins. The build fails on an unsourced fact.", href: "https://exams.streamerosai.com" },
   { id: "aisa", title: "AISA", caption: "A student association site rebuilt from one 4,019-line file into Next.js and Spring Boot.", href: "https://yaseenyk.github.io/SIT-FE/" },
