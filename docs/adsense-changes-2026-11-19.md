@@ -52,3 +52,21 @@ the sitemap; /interview is `noindex, follow` and not in the sitemap; no "built a
   asked and your answers), not more of the same summary.
 - A personal portfolio adds little to a domain-level AdSense case; the guide sites carry it. Wait for a recrawl (2 to 3
   weeks) before requesting review.
+
+## Privacy and crawl audit (19 Nov 2026)
+
+Method: live pages loaded in headless Chromium (home, /contact/, /blog/, two product pages) with every third-party request
+and cookie recorded, plus the layout code read for lazily injected scripts.
+
+- Loaded on yk.streamerosai.com: Google Analytics 4 (googletagmanager.com, analytics.google.com, stats.g.doubleclick.net;
+  cookies `_ga`, `_ga_XNCMTGDG3N`), Microsoft Clarity (clarity.ms, c.bing.com; cookies `_clck`, `_clsk`, plus Microsoft's
+  `MUID`/`MR`/`SM` on clarity.ms and bing.com), Pulse (pulse.yaseenyk.workers.dev, no cookies), GoatCounter (gc.zgo.at,
+  yaseen.goatcounter.com), Ahrefs Web Analytics (analytics.ahrefs.com), EmailJS (only when a form is sent), the concierge
+  Worker (only when a question is asked). No AdSense, no Google Fonts request (fonts are self-hosted by next/font).
+- Privacy page fixed: it did not name Ahrefs Web Analytics at all, and the Pulse text missed what it records (country,
+  network name, clicks, form name on submit), the daily-rotating visitor code and 90-day deletion. Rewritten as one list
+  per service with what it collects, its cookies and the opt-out (GA opt-out add-on, Microsoft privacy statement, DNT/GPC
+  for Pulse). AdSense "future use" paragraph kept.
+- Crawl: robots.txt allows crawling and names the sitemap. All 78 sitemap URLs return 200, none redirects, none is
+  noindex, every canonical matches its URL, none is blocked by robots.txt.
+- Raw HTML: the main text is in the static HTML on every sampled page (home about 1,600 words, /blog/ about 1,900).
