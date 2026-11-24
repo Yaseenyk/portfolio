@@ -29,8 +29,11 @@ export default function PrivacyPage() {
               <p>
                 When you send a message through a form, I receive what you type: your name, email,
                 and optionally a company, phone number, budget and message, plus the page you sent it
-                from. The form sends it by email using EmailJS, and a second copy is stored by a
-                Cloudflare Worker so an enquiry is not lost if the email fails.
+                from. It is saved in my own database (a Cloudflare Worker and D1 database I run, at
+                pulse.yaseenyk.workers.dev) together with where your visit came from, so no message is
+                lost if an email fails; a notification is also sent by email using EmailJS. Only I can
+                read these messages. They are kept for up to 24 months (spam for 30 days); ask at the
+                address below and I will delete yours.
               </p>
               <h2>Analytics</h2>
               <p>
@@ -61,8 +64,11 @@ export default function PrivacyPage() {
                   pulse.yaseenyk.workers.dev, a Cloudflare Worker I run). It records the page (without
                   the query string), the referring site and campaign tags, country, device type,
                   browser and system name, screen size, language, the name of your network provider,
-                  scroll depth, time on the page, page speed, which links and buttons were clicked, and,
-                  when a form is sent, the form&apos;s name only, never what was typed in it. It sets no
+                  scroll depth, time on the page, page speed, which links and buttons were clicked,
+                  technical problems (up to three script error messages per page, whether your browser
+                  translated the page and into which language, your connection type such as 4g, how
+                  fast the page responded to a tap, and layout jumps), and the name of a form that was
+                  sent or started but not sent, never what was typed in it. It sets no
                   cookies and stores no IP address or browser string. The IP address is used in memory
                   only, to limit abuse and to make a visitor code that changes every day (a one-way hash
                   with a random salt that is deleted the next day), so visits cannot be linked across

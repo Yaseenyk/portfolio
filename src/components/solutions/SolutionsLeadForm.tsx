@@ -4,6 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { m as motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
+import { sendToInbox } from "@/lib/inbox";
 import { track } from "@/lib/analytics";
 import { recordLead } from "@/lib/leads";
 
@@ -107,6 +108,14 @@ export default function SolutionsLeadForm({
 
     // Durable record first, in parallel and unawaited — if EmailJS fails, the
     // enquiry still exists somewhere. Never blocks or fails the submit.
+    const saved = await sendToInbox({
+      form: "solutions",
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      message: form.message,
+      extra: { interest: form.interest, budget: form.budget, company: form.company },
+    });
     void recordLead({
       source: "solutions",
       name: form.name,
@@ -157,6 +166,13 @@ export default function SolutionsLeadForm({
           ? `${(err as { status?: number }).status ?? ""} ${(err as { text?: string }).text ?? ""}`.trim()
           : String(err);
       console.error("EmailJS send failed:", err);
+      if (saved) {
+        // Stored safely in the inbox, so the enquiry is not lost even though the email failed.
+        setStatus("sent");
+        track(`solutions-lead:${form.interest || "unspecified"}`);
+        setForm({ ...EMPTY_FORM, interest: defaultInterest });
+        return;
+      }
       // A silently dropped six-figure enquiry is the worst failure on this
       // surface — surface it in analytics so failures are visible, not guessed.
       track("solutions-lead-failed");

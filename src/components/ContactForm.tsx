@@ -4,6 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { m as motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
 import { EMAILJS, OWNER_NAME } from "@/lib/emailjs";
+import { sendToInbox } from "@/lib/inbox";
 import SectionLabel from "./SectionLabel";
 import Reveal from "./Reveal";
 import { track } from "@/lib/analytics";
@@ -52,6 +53,8 @@ export default function ContactForm() {
     if (status === "sending") return;
 
     setStatus("sending");
+    // The inbox (the owner's own database) is the record; email is only a notification on top.
+    const saved = await sendToInbox({ form: "contact", name: form.name, email: form.email, message: form.message });
     try {
       await emailjs.send(
         EMAILJS_SERVICE,
@@ -76,6 +79,13 @@ export default function ContactForm() {
           ? `${(err as { status?: number }).status ?? ""} ${(err as { text?: string }).text ?? ""}`.trim()
           : String(err);
       console.error("EmailJS send failed:", err);
+      if (saved) {
+        // Stored safely in the inbox, so the person's message is not lost.
+        setStatus("sent");
+        setForm(EMPTY_FORM);
+        track("contact-submit");
+        return;
+      }
       setErrorDetail(detail || null);
       setStatus("error");
     }
