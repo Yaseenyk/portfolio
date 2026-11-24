@@ -47,7 +47,12 @@ export default function PrivacyPage() {
                   <code>_ga_*</code>) and sends usage data, such as pages viewed, approximate location
                   and the source of the visit, to Google. The site also keeps your first source (for
                   example a search engine or a shared link) in your browser&apos;s local storage so a
-                  later message can be tied to where you first came from. Opt out with Google&apos;s{" "}
+                  later message can be tied to where you first came from. Google signals is on: for
+                  visitors signed in to a Google account with ad personalisation on, Google may link this
+                  site&apos;s visit data to that account to give me grouped reports on age, gender and
+                  interests; no individual is identified to me. You can turn this off in your{" "}
+                  <a href="https://myadcenter.google.com/">Google account (My Ad Center)</a>. Opt out of
+                  Google Analytics entirely with Google&apos;s{" "}
                   <a href="https://tools.google.com/dlpage/gaoptout">browser add-on</a>.
                 </li>
                 <li>
