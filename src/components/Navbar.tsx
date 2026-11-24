@@ -125,6 +125,9 @@ function MenuToggle({ open, onClick }: { open: boolean; onClick: () => void }) {
           stroke="currentColor"
           strokeWidth="1.7"
           strokeLinecap="round"
+          // A starting shape, so the first paint never draws d="undefined" (a console error on every page).
+          d={open ? "M4 4 L16 16" : "M3 6 L17 6"}
+          initial={false}
           animate={open ? { d: "M4 4 L16 16" } : { d: "M3 6 L17 6" }}
           transition={{ duration: 0.25 }}
         />
@@ -140,6 +143,8 @@ function MenuToggle({ open, onClick }: { open: boolean; onClick: () => void }) {
           stroke="currentColor"
           strokeWidth="1.7"
           strokeLinecap="round"
+          d={open ? "M4 16 L16 4" : "M3 14 L17 14"}
+          initial={false}
           animate={open ? { d: "M4 16 L16 4" } : { d: "M3 14 L17 14" }}
           transition={{ duration: 0.25 }}
         />

@@ -101,6 +101,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
       <head>
+        {/* Translate guard: Chrome's Google Translate swaps text nodes for <font> elements, and React then throws
+            removeChild/insertBefore errors when it updates them. This keeps translated pages working. Runs before hydration. */}
+        <script dangerouslySetInnerHTML={{ __html: "(function(){if(typeof Node!=='function'||!Node.prototype)return;var r=Node.prototype.removeChild;Node.prototype.removeChild=function(c){if(c.parentNode!==this){return c;}return r.apply(this,arguments);};var i=Node.prototype.insertBefore;Node.prototype.insertBefore=function(n,ref){if(ref&&ref.parentNode!==this){return i.call(this,n,null);}return i.apply(this,arguments);};})();" }} />
         {/* Google tag (GA4). A plain tag in the server-rendered head so Google's tag checker finds it
             in the HTML; next/script would inject it client-side and the checker misses it. Unlike
             GoatCounter and Ahrefs below, GA4 sets cookies. */}
